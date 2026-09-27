@@ -1,0 +1,859 @@
+# 08 - Rotom Directory Tree
+# Documentation set: Rotom Project Documentation
+# Document role: Canonical observed filesystem topology and important persistent paths.
+# Configuration semantics remain canonical in the numbered subject documents.
+# Evidence state: mixed dates; annotations identify current, historical, proposed, and Needs Verification material.
+# Index and terminology: 01-Rotom-Server-Inventory.md
+# Change history and update rules: 00-Rotom-Change-Log.md
+# Record substantive tree changes in the change log in the same task,
+# following its maintenance guide. Keep proposed paths separate from observed paths.
+#
+# Documentation revised: 2026-09-27; live post-boot audit refreshed current topology/automation/identity evidence; pre-migration tree remains historical recovery evidence.
+# Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox backup storage, and JAR-33 baseline verification.
+# State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the RPD.
+#
+# PHASE B CURRENT TOPOLOGY — VERIFIED THROUGH JAR-33 ROTOM VIRTUALIZATION BASELINE, 2026-09-27
+# - Physical NUC runs Proxmox `proxmox` / `proxmox.rotom.casa` at 192.168.1.68; hypervisor has no Rotom application Docker/NFS workload. Dedicated PVE backup storage `nas-rotom-proxmox-backup` is the intentional NFS exception at `/mnt/pve/nas-rotom-proxmox-backup`.
+# - Proxmox monitoring helper: /usr/local/sbin/rotom-temp-api + /etc/systemd/system/rotom-temp-api.service; binds 192.168.1.68:8788 and exposes /temperature plus Glances-compatible /api/4/sensors for coretemp `Package id 0`; this is a read-only Homepage temperature bridge, not an application runtime.
+# - VMID 100 `rotom`: Debian 13.7, q35/OVMF, x86-64-v2-AES, 8 vCPU, 12 GiB RAM, 100 GiB thin VirtIO SCSI; no iGPU passthrough.
+# - Guest identity: rotom.casa, VirtIO MAC BC:24:11:97:10:47, UniFi-reserved DHCP 192.168.1.69/24; public DNS/WAN observed 68.8.40.225.
+# - Docker Engine 29.8.1 / Compose v5.5.1; Docker+containerd enabled; /var/lib/docker on guest-local ext4; daemon json-file max-size 10m / max-file 3.
+# - Last explicit docker-group verification remains package-created GID 989 with no members; JAR-31 does not establish a return to historical GID 984 broad membership.
+# - JAR-31 final reboot restored exact 16-container running set; Jared Wines intentionally has no container object; zero failed systemd units.
+# - Healthy after reboot with zero restarts: Arcane, Homepage, Jared Palworld, Fran Palworld, Gamarr. qBittorrent WireGuard wg0 present.
+# - Core HTTP acceptance passed; Homepage requires Host: rotom.casa (raw 127.0.0.1:3001 correctly returns host-validation 400).
+# - JAR-24 Restic snapshot fbe1838e and JAR-25 raw NVMe image remain pre-migration recovery artifacts. **Rotom Virtualization Baseline** pairs verified Proxmox VZDump `vzdump-qemu-100-2026_09_27-01_19_56.vma.zst` with Restic snapshot `74d3b0ca`; post-run restic check passed 21/21 snapshots; automatic timer remains disabled.
+#
+#
+# PROXMOX HOST BACKUP STORAGE — JAR-66/JAR-33
+# /mnt/pve/nas-rotom-proxmox-backup/  PVE-managed NFSv3 storage; UNAS Rotom_Proxmox_Backup/.data; export authorized only to 192.168.1.68; content=backup; no Proxmox /etc/fstab entry; write/read/delete verified
+#   dump/vzdump-qemu-100-2026_09_27-01_19_56.vma.zst  verified whole-VM baseline archive; ~43 GB; full VMA verify exit 0
+# - This path exists on Proxmox, not inside the Rotom VM. Rotom has no fstab/systemd reference to Rotom_Proxmox_Backup.
+#
+# LIVE POST-BOOT VERIFICATION REFRESH — 2026-09-27 02:29–02:32 PDT
+# - Fresh Debian VM reboot confirmed; zero failed systemd units at audit start/end.
+# - Docker 29.8.1 / Compose 5.5.1; 16 total, 16 running, 0 stopped; all restart counts 0; current bridge map unchanged.
+# - qBittorrent wg0 up at 10.2.0.2/32. Core service HTTP probes returned expected 200/302 results.
+# - All ten current service identities/homes verified; each home mode 0750; every /home/<service>/nas-<service> symlink resolves to the current /mnt/nas-<service> target.
+# - docker group remains GID 989 with no members; Fran remains absent.
+# - All twelve fstab-backed systemd automounts active. Media/Game bindfs compatibility views mounted RO and traversal PASS.
+# - Restic mounted NFS root verified 988:988 mode 0700; backup timer disabled/inactive; weekly updater cron absent; JAR-32 temporary helper absent.
+# - Arcane current settings freshly verified: auto-update midnight/no exclusions; auto-heal every 30s/no exclusions, max 5 per 30m; followProjectSymlinks=true; scheduled prune disabled.
+# - Arcane discovery symlink /home/infra/docker/downloads -> /home/downloaders/docker verified. Arcane qBittorrentVPN project status is stale/unknown from 2026-09-22 while Docker runtime/wg0 are current.
+# - Rotom local NSS query for rotom.casa returned 127.0.1.1; keep distinct from separately verified LAN DNS answer 192.168.1.69.
+#
+# CURRENT GUEST RUNTIME/STORAGE/IDENTITY TOPOLOGY — JAR-31 RUNTIME + JAR-33 BASELINE UPDATE
+# /etc/
+#   fstab                          current Restic entry -> Rotom_Restic_Backup/.data at /mnt/nas-rotom-restic-backup
+#   fstab.pre-restic-share-cutover.20260926-235232  rollback copy from immediately before Restic mount cutover
+#   docker/daemon.json             root-owned; global json-file 10m x 3
+#   restic/include.txt             restored; /mnt remains outside host Restic scope
+#   restic/exclude.txt             restored
+#   restic/unas-password           protected credential path; contents never document
+#   sudoers.d/update-to-nas        restored; Jared exact backup path
+#   sudoers.d/fran-backup-to-nas   intentionally ABSENT; Fran not recreated
+#   cron.d/weekly-linux-update     intentionally ABSENT; reboot-capable weekly schedule deferred
+#   systemd/system/
+#     rotom-nas-docker-recovery.service   restored/adapted/enabled; reboot retry path verified
+#     unas-backup.service                 restored; RequiresMountsFor=/mnt/nas-rotom-restic-backup; not automatically running
+#     unas-backup.service.pre-restic-share-cutover.20260926-235232  rollback copy from immediately before cutover
+#     unas-backup.timer                   restored but DISABLED/INACTIVE
+#     unas-backup-status-api.service      restored/enabled/active; TCP 8787
+# /usr/local/
+#   sbin/rotom-nas-docker-recovery  current helper; uses /mnt/nas-downloaders and compatibility views
+#   sbin/backup-to-unas             restored root-protected backup implementation; current repository /mnt/nas-rotom-restic-backup/rotom-restic-backup
+#   sbin/backup-to-unas.pre-restic-share-cutover.20260926-235232  rollback copy from immediately before cutover
+#   sbin/unas-backup-status-api     restored root-protected status API
+#   sbin/weekly-linux-update        restored script; cron not installed
+#   bin/backup-to-nas               restored shared launcher
+# /var/lib/docker/
+#   current Docker runtime on VM-local ext4
+#   volumes/arcane_arcane-data/     restored Arcane persistent named-volume data
+#
+# /home/
+#   media/       127:5000  mode 0750  -> nas-media -> /mnt/nas-media
+#     docker/jellyfin/              ACTIVE
+#     docker/radarr/                ACTIVE
+#     docker/sonarr/                ACTIVE
+#   game/        995:5001  mode 0750  -> nas-game -> /mnt/nas-game
+#     docker/palworld-server-jared/ ACTIVE; world preserved; network 172.27.0.0/16
+#     docker/palworld-server-fran/  ACTIVE; network 172.25.0.0/16
+#     docker/gamarr/                ACTIVE; network 172.23.0.0/16
+#   infra/       997:5002  mode 0750  -> nas-infra -> /mnt/nas-infra
+#     docker/arcane/                ACTIVE; network 172.28.0.0/16
+#     docker/cloudflare-ddns/       ACTIVE
+#     docker/homepage/              ACTIVE Homepage+Glances; network 172.24.0.0/16
+#       Homepage monitoring: extra_hosts pins rotom/nginx/arcane/home-assistant/homebridge names to 192.168.1.69; backup widget -> http://192.168.1.69:8787/backup-status; Disk Usage -> disk:sda; CPU Temperature -> Glances URL http://192.168.1.68:8788 metric sensor:Package id 0 with charting.
+#     docker/nginx-proxy-manager/   ACTIVE
+#   smarthome/   126:5003  mode 0750  -> nas-smarthome -> /mnt/nas-smarthome
+#     docker/home-assistant/        ACTIVE
+#     docker/homebridge/            ACTIVE
+#   documents/   900:5004  mode 0750  -> nas-documents -> /mnt/nas-documents
+#   downloaders/ 901:5005  mode 0750  -> nas-downloaders -> /mnt/nas-downloaders
+#     docker/prowlarr/              ACTIVE
+#     docker/qbittorrentvpn/        ACTIVE; wg0 verified
+#   web/         902:5006  mode 0750  -> nas-web -> /mnt/nas-web
+#     docker/alohamillworks.com/    ACTIVE
+#     docker/jaredwines.com/        project retained; intentionally NO container
+#   filesync/    903:5007  mode 0750  -> nas-filesync -> /mnt/nas-filesync
+#   apps/        904:5008  mode 0750  -> nas-apps -> /mnt/nas-apps
+#   auth/        905:5009  mode 0750  -> nas-auth -> /mnt/nas-auth
+#
+# /mnt/
+#   nas-media/         NFSv3 Media/.data; root 988:5000 mode 2770
+#   nas-game/          NFSv3 Game/.data; root 988:5001 mode 2770
+#   nas-infra/         NFSv3 Infra/.data; root 988:5002 mode 2770
+#   nas-smarthome/     NFSv3 Smarthome/.data; root 988:5003 mode 2770
+#   nas-documents/     NFSv3 Documents/.data; root 988:5004 mode 2770
+#   nas-downloaders/   NFSv3 Downloader/.data; root 988:5005 mode 2770; CURRENT active torrent domain
+#     .rotom-qbt-nas-ready/
+#     torrents/{games,incomplete,movies,shows}/
+#   nas-downloads-media-ro/  bindfs RO source /mnt/nas-downloaders; media compatibility view
+#   nas-downloads-game-ro/   bindfs RO source /mnt/nas-downloaders; game compatibility view
+#   nas-web/           NFSv3 Web/.data; root 988:5006 mode 2770
+#   nas-filesync/      NFSv3 Filesync/.data; root 988:5007 mode 2770
+#   nas-apps/          NFSv3 Apps/.data; root 988:5008 mode 2770
+#   nas-auth/          NFSv3 Auth/.data; root 988:5009 mode 2770
+#   nas-rotom-restic-backup/  NFSv3 Rotom_Restic_Backup/.data; mounted root freshly verified 988:988 mode 0700; underlying local directory mode not isolated while fully unmounted in the live audit
+#     rotom-restic-backup/     repository 799babb2; JAR-33 baseline snapshot 74d3b0ca verified; 21 snapshots passed restic check
+#     rotom-linux-home-server-backup-restore-kit/  copied legacy restore documentation from old share; not a self-contained recovery bundle
+#   nas-rotom-backup/         RETIRED NFS path; unmounted/no active backup config reference; inert local directory may remain; old UNAS share retained rollback-only
+#   nas-shared-drive/  NFSv3 Shared_Drive/.data; root 988:988 mode 0770
+# - Current downloader correction: live fstab/generated unit/findmnt/showmount all use Downloader/.data. Historical Downloads/.data records below remain dated evidence.
+# - All twelve current canonical NFS paths remain fstab/systemd automounts using _netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s; the Restic member is now nas-rotom-restic-backup rather than nas-rotom-backup.
+# - JAR-31 reboot: first NAS recovery invocation failed at Media readiness; systemd retry about 30s later succeeded and recovered qBittorrentVPN, Radarr, Sonarr, Gamarr, Jellyfin.
+#
+# CURRENT DOCKER BRIDGE MAP — JAR-31 FINAL REBOOT
+#   bridge                     172.17.0.0/16
+#   jellyfin_default           172.18.0.0/16
+#   radarr_default             172.19.0.0/16
+#   sonarr_default             172.20.0.0/16
+#   prowlarr_default           172.21.0.0/16
+#   qbittorrentvpn_default     172.22.0.0/16
+#   gamarr_default             172.23.0.0/16
+#   homepage                   172.24.0.0/16
+#   palworld-fran_default      172.25.0.0/16
+#   alohamillworkscom_default  172.26.0.0/16
+#   palworld-jared_default     172.27.0.0/16
+#   arcane_default             172.28.0.0/16
+#
+# JAR-31 safety/recovery notes
+# - Jared Palworld active-save gate: JAR-26 active paths=5, live active paths=5, missing=0, extra=0 before network relocation.
+# - Jared Palworld was cleanly stopped; stopped-state archive /var/tmp/jar31-palworld-jared-pre-network-move.tar.gz was created (observed 51681150 bytes, root:root, mode 0644); server returned healthy after recreation.
+# - Archive in /var/tmp is a migration safety artifact, not a substitute for the canonical Palworld backup/Restic recovery strategy.
+# - zsh: never use `path` as an interactive loop/scalar variable; it mutates $PATH. JAR-31 diagnostics reconfirmed this; restoring/exporting PATH and `rehash` fixed command lookup.
+#
+# The large filesystem/NAS tree below is the verified PRE-MIGRATION RESTORATION TARGET and
+# historical evidence from the Linux Mint system. It is not the current live Debian VM tree.
+# Later account/access facts: user-supplied "Torrent Seeding Explanation" and
+# "Create Rotom docs setup guide" conversations.
+# The tree preserves observed paths. Sample media titles and Restic shard names
+# are historical listing contents, not a guarantee of current contents or counts.
+# Do not manually reorganize or delete any Restic repository internals.
+# Proposed mounts are listed separately after the observed tree.
+
+# JAR-9 rollback note - 2026-09-21
+# - game restored as 995:5001 with home /home/game.
+# - Palworld restored under /home/game/docker; both original worlds verified healthy.
+# - Gamarr restored under /home/game/docker/gamarr with /mnt/nas-game -> /game.
+# - qBittorrent restored Game torrent + sentinel binds.
+# - /mnt/nas-game-servers removed from fstab and is not mounted.
+# - At rollback time the UNAS Game_Servers share was retained; later JAR-6 UNAS inspection found the former Game_Servers/.data path absent. JAR-6 did not delete it.
+# - snapshot b5f77aeb is retained as a pre-rollback JAR-9 recovery point, not current-path evidence.
+# - Mac alias `ssh nas` is verified working for UNAS administration.
+#
+# 2026-09-21 intermediate identity-path migration note (superseded by JAR-6 GIDs below)
+# - rotom -> infra, preserving 997:986; /home/rotom -> /home/infra.
+# - smart-home -> smarthome, preserving 126:128; /home/smart-home -> /home/smarthome.
+# - new homes: /home/documents (900:900), /home/downloads (901:901),
+#   /home/web (902:902), /home/filesync (903:903), /home/apps (904:904),
+#   /home/auth (905:905); each has a service-owned docker/ root.
+# - built-in Linux sync UID 4 remains unchanged.
+# - JAR-19 later migrated website workloads to web 902:902 and removed web-host 128:130.
+# - final JAR-19 Restic snapshot e886c55d saved 2026-09-21 02:47:55 PDT; intermediate 2c22607e was pruned by normal retention.
+#
+# JAR-19 website migration note
+# - alohamillworks.com -> /home/web/docker/alohamillworks.com; running, host port 7778 -> 80, local and proxied HTTP 200.
+# - jaredwines.com -> /home/web/docker/jaredwines.com; intentionally remains stopped.
+# - web-host user/group/home removed after process, Docker-bind, operational-reference, and UID/GID dependency guards passed.
+# - root-only rollback copy retained at /root/jar-19-20260921-024634.
+# - no NPM, DNS, TLS, firewall, published-port, or NAS deployment change occurred.
+#
+# JAR-6 per-service storage note - 2026-09-21
+# - primary GIDs: infra 5002, smarthome 5003, documents 5004, downloads 5005,
+#   web 5006, filesync 5007, apps 5008, auth 5009; UIDs unchanged.
+# - all eight changed service home trees were reconciled to their new primary GID.
+# - new automounts: /mnt/nas-infra, /mnt/nas-smarthome, /mnt/nas-documents,
+#   /mnt/nas-downloads, /mnt/nas-web, /mnt/nas-filesync, /mnt/nas-apps, /mnt/nas-auth.
+# - each new UNAS share root is owner UID 988, matching service GID 5002-5009,
+#   mode 2770; intended-account and unrelated-account tests passed.
+# - JAR-6 initially moved no workload data; JAR-21 later activated /mnt/nas-downloads for torrents.
+# - a normal Rotom reboot verified the new automounts, exact sources, access behavior,
+#   and existing qBittorrent Media/Game protections persist.
+# - UNAS-side root metadata persistence across a future UNAS/UniFi Drive restart/update
+#   remains deferred.
+#
+# Service-home NAS shortcut note - 2026-09-21
+# - final naming convention: /home/<service>/nas-<service> -> /mnt/nas-<service>.
+# - examples: /home/media/nas-media -> /mnt/nas-media, /home/game/nas-game ->
+#   /mnt/nas-game, and /home/downloads/nas-downloads -> /mnt/nas-downloads.
+# - the links were initially created as generic /home/<service>/nas names, then renamed
+#   in place without changing their targets.
+# - all ten final link targets and intended-account traversal checks passed; verifier ended
+#   with ALL NAS SHORTCUT RENAMES: PASS.
+# - these links are interactive-admin conveniences only; /mnt/nas-* remains canonical
+#   for Docker, systemd, backup/recovery, guards, diagnostics, and storage semantics.
+# - creating/renaming the symlinks changed no NFS export, fstab entry, NAS permission,
+#   Docker bind, container configuration, or application data.
+# - final JAR-21 snapshot a6d86b20 includes the current host-side state and these links.
+#
+# PRE-MIGRATION account and NAS access annotations
+# Account       UID    Primary GID    Storage state
+# media         127    5000           /mnt/nas-media; active application share
+# game          995    5001           /mnt/nas-game; active application share
+# infra         997    5002           /mnt/nas-infra; JAR-6 boundary, no workload bound
+# smarthome     126    5003           /mnt/nas-smarthome; HA/Homebridge remain local
+# documents     900    5004           /mnt/nas-documents; empty commissioned boundary
+# downloads     901    5005           /mnt/nas-downloads; active torrent/download-stack domain
+# web           902    5006           /mnt/nas-web; websites remain local
+# filesync      903    5007           /mnt/nas-filesync; empty commissioned boundary
+# apps          904    5008           /mnt/nas-apps; empty commissioned boundary
+# auth          905    5009           /mnt/nas-auth; empty commissioned boundary
+
+# These are account identities, not a claim that every file has that owner.
+# Media-owned Compose settings (Jellyfin/Radarr/Sonarr): PUID=127, PGID=5000, UMASK=002.
+# Central qBittorrentVPN: /home/downloads/docker/qbittorrentvpn, PUID=901, PGID=5005, UMASK=002.
+# Gamarr: /home/game/docker/gamarr, PUID=995, PGID=5001.
+# NAS media root: numeric 988:5000, mode 2770.
+# Media final library: GID 5000. Active torrents are on Downloads GID 5005.
+# Existing mixed owner UIDs were preserved rather than forced to UID 127.
+# NAS backup root: numeric 988:988, mode 0700 after 2026-09-18 protection change.
+# A fresh 2026-09-19 backup-share matrix denied ordinary read/write/traverse for
+# jared/fran/rotom/media/current game (995:5001)/smart-home/web-host. Root retained access.
+# Backup export uses no_root_squash/no_all_squash; Btrfs is mounted noacl.
+# Rotom displays numeric 988 as fwupd-refresh; UNAS UID/GID 988 is unifi-drive.
+# Use numeric IDs for NFS. Glances no longer mounts the backup share.
+
+# Prowlarr active path is /home/downloads/docker/prowlarr, numeric 901:5005.
+# Its active config bind is /home/downloads/docker/prowlarr/config -> /config.
+# Old Media/Infra rollback Prowlarr trees were removed after JAR-21 acceptance.
+
+# qBittorrentVPN active path is /home/downloads/docker/qbittorrentvpn, numeric 901:5005.
+# Pre-migration binds: /mnt/nas-downloads/torrents -> /media/torrents and /game/torrents,
+# plus /mnt/nas-downloads/.rotom-qbt-nas-ready -> /run/rotom-nas-downloads read-only.
+# The project .env is downloads:downloads mode 0600 with a narrow infra read ACL for Arcane;
+# never document credential values.
+
+# Palworld final pre-migration canonical paths are under /home/game/docker.
+# Verified world IDs after the migration:
+# - palworld-server-jared: DB40338954B844C28CEA21471A392F98
+# - palworld-server-fran:  396F5898378F4E9CAE89461F403653D9
+# Both containers were healthy with /home/game/... -> /palworld live binds.
+# 2026-09-19: both Compose files now use PUID=995 / PGID=5001; a stopped-state
+# 234-file .sav checksum manifest compared with no differences after recreation.
+
+# JAR-21 final download-stack state - 2026-09-21
+# - Prowlarr and qBittorrentVPN are active under /home/downloads/docker at 901:5005.
+# - Active torrents are /mnt/nas-downloads/torrents; old /mnt/nas-media/torrents and
+#   /mnt/nas-game/torrents rollback trees are removed.
+# - qBittorrent binds Downloads torrents at both /media/torrents and /game/torrents and
+#   uses /mnt/nas-downloads/.rotom-qbt-nas-ready as its fail-closed sentinel.
+# - persistent read-only bindfs views: /mnt/nas-downloads-media-ro and
+#   /mnt/nas-downloads-game-ro.
+# - Arcane discovery: /home/infra/docker/downloads -> /home/downloads/docker,
+#   /home/downloads/docker mounted read-only in Arcane, followProjectSymlinks=true.
+# - final post-cleanup Restic snapshot a6d86b20 saved 2026-09-21 19:44:55 PDT.
+#
+# JAR-22 pre-migration audit note - 2026-09-22
+# - read-only audit artifacts: /home/jared/audits/jar-22-2026-09-22 (140K at closeout)
+# - SHA256SUMS records the captured text artifacts; JAR-24 verified this path inside final snapshot fbe1838e.
+# - pre-migration Docker state was 16 running / 16 total container objects.
+# - /home/web/docker/jaredwines.com/compose.yaml remained present, but there was no Jared Wines container object and no jaredwinescom_default network.
+# - all twelve canonical NAS mounts and final pre-migration service UID/GID contracts were reverified without changing live state.
+#
+# JAR-23 critical-application preservation note - 2026-09-25
+# - audit/preservation artifacts: /home/jared/audits/jar-23-2026-09-23.
+# - Palworld Jared world DB40338954B844C28CEA21471A392F98: 135 stopped-state .sav checksum entries.
+# - Palworld Fran world 396F5898378F4E9CAE89461F403653D9: 108 stopped-state .sav checksum entries.
+# - fresh SQLite staging under /var/backups/system-info/sqlite passed quick_check for
+#   home-assistant_v2.db, zigbee.db, and npm-database.sqlite.
+# - Aloha and Jared Wines content were checksummed; Jared Wines remains intentionally undeployed.
+# - consolidated acceptance: 16 expected containers running, zero failed systemd units, PASS.
+# - new host recovery helper: /usr/local/sbin/rotom-nas-docker-recovery.
+# - new enabled unit: /etc/systemd/system/rotom-nas-docker-recovery.service.
+# - manual helper validation passed; full reboot validation remains deferred.
+# - JAR-23 ran no Restic backup; JAR-24 later verified both jar-22 and jar-23 audit trees in final snapshot fbe1838e.
+#
+# JAR-24 final pre-migration Restic recovery note - 2026-09-25
+# - audit artifacts: /home/jared/audits/jar-24-2026-09-25.
+# - final surviving snapshot: fbe1838e (fbe1838e769cb740294ec0bf1017088a47ca5b97560083382af7cfcbebb2897f).
+# - final snapshot time: 2026-09-25 18:14:22 PDT.
+# - canonical retention/prune completed under existing 7 daily / 4 weekly / 12 monthly policy.
+# - exact jar-22 and jar-23 audit trees, staged HA/Zigbee/NPM databases, both Palworld Level.sav files,
+#   and the JAR-23 NAS recovery helper/unit were verified inside the final snapshot.
+# - restic check and full restic check --read-data passed; all 971 packs read with no errors.
+# - representative isolated restore and restored SQLite quick_check passed; restore scratch was deleted.
+# - /mnt remains excluded from host Restic; NAS data remains a separate protection domain.
+
+# JAR-25 bare-metal NVMe rollback image note - 2026-09-25
+# - source: /dev/nvme0n1, Samsung SSD 970 EVO Plus 250GB, serial S59BNM0R702702E.
+# - exact source/image logical size: 250059350016 bytes.
+# - image: /mnt/nas-shared-drive/rotom-bare-metal/jar-25-2026-09-25/rotom-nvme-live-pre-proxmox-2026-09-25.img.
+# - source-stream and stored-image SHA-256: b62b2c8210bb2a6446abc29c5767c7d8531f547dfd2ec3f0259dbee8d74c5e90.
+# - stored image exposes EFI System and Linux filesystem partitions.
+# - consistency classification: BEST-EFFORT LIVE / CRASH-CONSISTENT; root remained mounted.
+# - final runtime: original 16 containers restored; zero failed systemd units.
+# - protected JAR-25 directory observed as numeric 977:988 mode 0700; image as 977:988 mode 0660.
+# - directory ACL denies group/other traversal even though the image retains group rw bits.
+# - actual bare-metal restore has not been rehearsed.
+# - image and Restic repository are on different UNAS shares but the same physical UNAS appliance.
+#
+# PRE-MIGRATION RESTORATION TARGET — LOCAL SERVICE HOMES
+/home
+├── apps
+│   ├── docker
+│   └── nas-apps -> /mnt/nas-apps
+├── auth
+│   ├── docker
+│   └── nas-auth -> /mnt/nas-auth
+├── documents
+│   ├── docker
+│   └── nas-documents -> /mnt/nas-documents
+├── downloads
+│   ├── docker
+│   │   ├── prowlarr
+│   │   │   └── config
+│   │   └── qbittorrentvpn
+│   │       └── config
+│   └── nas-downloads -> /mnt/nas-downloads
+├── filesync
+│   ├── docker
+│   └── nas-filesync -> /mnt/nas-filesync
+├── fran
+├── game
+│   ├── nas-game -> /mnt/nas-game
+│   └── docker
+│       ├── gamarr
+│       │   └── config
+│       ├── palworld-server-fran
+│       │   ├── backups
+│       │   ├── Engine
+│       │   ├── linux64
+│       │   ├── Pal
+│       │   └── steamapps
+│       └── palworld-server-jared
+│           ├── backups
+│           ├── Engine
+│           ├── linux64
+│           ├── Pal
+│           └── steamapps
+├── infra
+│   ├── nas-infra -> /mnt/nas-infra
+│   ├── documentation
+│   │   ├── AGENTS.md
+│   │   └── README.md
+│   └── docker
+│       ├── arcane
+│       ├── cloudflare-ddns
+│       │   └── secrets
+│       ├── homepage
+│       │   └── config
+│       ├── nginx-proxy-manager
+│       │   ├── data
+│       │   └── letsencrypt
+│       └── downloads -> /home/downloads/docker
+├── jared
+│   ├── audits
+│   │   ├── jar-22-2026-09-22
+│   │   │   ├── 00-host-baseline.txt
+│   │   │   ├── 01-cpu.txt
+│   │   │   ├── 02-storage.txt
+│   │   │   ├── 03-local-footprint.txt
+│   │   │   ├── 04-network.txt
+│   │   │   ├── 05-ip68-check.txt
+│   │   │   ├── 06-docker.txt
+│   │   │   ├── 07-identities.txt
+│   │   │   ├── 08-nfs-and-automounts.txt
+│   │   │   ├── 09-maintenance.txt
+│   │   │   ├── 10-targeted-reconciliation.txt
+│   │   │   └── SHA256SUMS
+│   │   ├── jar-23-2026-09-23
+│   │   │   ├── 00-preservation-preflight.txt
+│   │   │   ├── 01-arr-outage-diagnostics.txt
+│   │   │   ├── 02-nfs-bindfs-root-cause.txt
+│   │   │   ├── 03-arr-service-recovery.txt
+│   │   │   ├── 04-boot-order-preflight.txt
+│   │   │   ├── 05-palworld-jared-stopped-state.txt
+│   │   │   ├── 05-palworld-jared-save-sha256.txt
+│   │   │   ├── 06-palworld-fran-stopped-state.txt
+│   │   │   ├── 06-palworld-fran-save-sha256.txt
+│   │   │   ├── 07-ha-npm-sqlite-preservation.txt
+│   │   │   ├── 08-alohamillworks-content-sha256.txt
+│   │   │   ├── 08-jaredwines-content-sha256.txt
+│   │   │   ├── 08-websites-preservation.txt
+│   │   │   ├── 09-stateful-app-persistence.txt
+│   │   │   ├── 10-jar-23-acceptance-summary.txt
+│   │   │   └── SHA256SUMS
+│   │   └── jar-24-2026-09-25
+│   │       ├── 00-preflight.txt
+│   │       ├── 01-backup-run.txt
+│   │       ├── 01-backup-rerun-after-lock.txt
+│   │       ├── 01-final-canonical-backup.txt
+│   │       ├── 02-final-snapshot-verification.txt
+│   │       ├── 03-restic-check.txt
+│   │       ├── 04-restic-check-read-data.txt
+│   │       ├── 05-sample-restore.txt
+│   │       ├── 06-jar-24-summary.txt
+│   │       └── SHA256SUMS
+│   └── docker
+├── media
+│   ├── nas-media -> /mnt/nas-media
+│   └── docker
+│       ├── jellyfin
+│       │   └── config
+│       ├── radarr
+│       │   └── config
+│       └── sonarr
+│           └── config
+├── smarthome
+│   ├── nas-smarthome -> /mnt/nas-smarthome
+│   └── docker
+│       ├── home-assistant
+│       │   ├── backups
+│       │   ├── blueprints
+│       │   ├── deps
+│       │   └── tts
+│       └── homebridge
+│           └── volumes
+└── web
+    ├── nas-web -> /mnt/nas-web
+    └── docker
+        ├── alohamillworks.com
+        │   └── alohamillworks.com
+        └── jaredwines.com
+            └── jaredwines.com
+# PRE-MIGRATION RESTORATION TARGET — NAS MOUNTS
+# Historical sample descendant names remain embedded where explicitly identified.
+# At the pre-migration baseline, /mnt/nas-shared-drive was a verified mount. The `Important` and `rotom`
+# child names shown in the main tree are preserved historical captured contents,
+# not a claim that those directory names are continuously current.
+/mnt
+├── nas-apps
+├── nas-auth
+├── nas-documents
+├── nas-downloads
+│   ├── .rotom-qbt-nas-ready
+│   └── torrents
+│       ├── games
+│       ├── incomplete
+│       │   ├── games
+│       │   ├── movies
+│       │   └── shows
+│       ├── movies
+│       └── shows
+├── nas-downloads-game-ro   # bindfs RO view of /mnt/nas-downloads
+├── nas-downloads-media-ro  # bindfs RO view of /mnt/nas-downloads
+├── nas-filesync
+├── nas-infra
+├── nas-smarthome
+├── nas-web
+├── nas-game
+│   └── library
+│       └── games
+│           ├── pc
+│           └── roms
+├── nas-media
+│   └── library
+│       ├── movies
+│       │   └── Backrooms (2026)
+│       └── shows
+│           └── Fullmetal Alchemist
+├── nas-shared-drive
+│   ├── Important
+│   └── rotom
+└── nas-rotom-backup
+    ├── rotom-linux-home-server-backup-restore-kit
+    └── rotom-restic-backup
+        ├── data
+        │   ├── 00
+        │   ├── 01
+        │   ├── 02
+        │   ├── 03
+        │   ├── 04
+        │   ├── 05
+        │   ├── 06
+        │   ├── 07
+        │   ├── 08
+        │   ├── 09
+        │   ├── 0a
+        │   ├── 0b
+        │   ├── 0c
+        │   ├── 0d
+        │   ├── 0e
+        │   ├── 0f
+        │   ├── 10
+        │   ├── 11
+        │   ├── 12
+        │   ├── 13
+        │   ├── 14
+        │   ├── 15
+        │   ├── 16
+        │   ├── 17
+        │   ├── 18
+        │   ├── 19
+        │   ├── 1a
+        │   ├── 1b
+        │   ├── 1c
+        │   ├── 1d
+        │   ├── 1e
+        │   ├── 1f
+        │   ├── 20
+        │   ├── 21
+        │   ├── 22
+        │   ├── 23
+        │   ├── 24
+        │   ├── 25
+        │   ├── 26
+        │   ├── 27
+        │   ├── 28
+        │   ├── 29
+        │   ├── 2a
+        │   ├── 2b
+        │   ├── 2c
+        │   ├── 2d
+        │   ├── 2e
+        │   ├── 2f
+        │   ├── 30
+        │   ├── 31
+        │   ├── 32
+        │   ├── 33
+        │   ├── 34
+        │   ├── 35
+        │   ├── 36
+        │   ├── 37
+        │   ├── 38
+        │   ├── 39
+        │   ├── 3a
+        │   ├── 3b
+        │   ├── 3c
+        │   ├── 3d
+        │   ├── 3e
+        │   ├── 3f
+        │   ├── 40
+        │   ├── 41
+        │   ├── 42
+        │   ├── 43
+        │   ├── 44
+        │   ├── 45
+        │   ├── 46
+        │   ├── 47
+        │   ├── 48
+        │   ├── 49
+        │   ├── 4a
+        │   ├── 4b
+        │   ├── 4c
+        │   ├── 4d
+        │   ├── 4e
+        │   ├── 4f
+        │   ├── 50
+        │   ├── 51
+        │   ├── 52
+        │   ├── 53
+        │   ├── 54
+        │   ├── 55
+        │   ├── 56
+        │   ├── 57
+        │   ├── 58
+        │   ├── 59
+        │   ├── 5a
+        │   ├── 5b
+        │   ├── 5c
+        │   ├── 5d
+        │   ├── 5e
+        │   ├── 5f
+        │   ├── 60
+        │   ├── 61
+        │   ├── 62
+        │   ├── 63
+        │   ├── 64
+        │   ├── 65
+        │   ├── 66
+        │   ├── 67
+        │   ├── 68
+        │   ├── 69
+        │   ├── 6a
+        │   ├── 6b
+        │   ├── 6c
+        │   ├── 6d
+        │   ├── 6e
+        │   ├── 6f
+        │   ├── 70
+        │   ├── 71
+        │   ├── 72
+        │   ├── 73
+        │   ├── 74
+        │   ├── 75
+        │   ├── 76
+        │   ├── 77
+        │   ├── 78
+        │   ├── 79
+        │   ├── 7a
+        │   ├── 7b
+        │   ├── 7c
+        │   ├── 7d
+        │   ├── 7e
+        │   ├── 7f
+        │   ├── 80
+        │   ├── 81
+        │   ├── 82
+        │   ├── 83
+        │   ├── 84
+        │   ├── 85
+        │   ├── 86
+        │   ├── 87
+        │   ├── 88
+        │   ├── 89
+        │   ├── 8a
+        │   ├── 8b
+        │   ├── 8c
+        │   ├── 8d
+        │   ├── 8e
+        │   ├── 8f
+        │   ├── 90
+        │   ├── 91
+        │   ├── 92
+        │   ├── 93
+        │   ├── 94
+        │   ├── 95
+        │   ├── 96
+        │   ├── 97
+        │   ├── 98
+        │   ├── 99
+        │   ├── 9a
+        │   ├── 9b
+        │   ├── 9c
+        │   ├── 9d
+        │   ├── 9e
+        │   ├── 9f
+        │   ├── a0
+        │   ├── a1
+        │   ├── a2
+        │   ├── a3
+        │   ├── a4
+        │   ├── a5
+        │   ├── a6
+        │   ├── a7
+        │   ├── a8
+        │   ├── a9
+        │   ├── aa
+        │   ├── ab
+        │   ├── ac
+        │   ├── ad
+        │   ├── ae
+        │   ├── af
+        │   ├── b0
+        │   ├── b1
+        │   ├── b2
+        │   ├── b3
+        │   ├── b4
+        │   ├── b5
+        │   ├── b6
+        │   ├── b7
+        │   ├── b8
+        │   ├── b9
+        │   ├── ba
+        │   ├── bb
+        │   ├── bc
+        │   ├── bd
+        │   ├── be
+        │   ├── bf
+        │   ├── c0
+        │   ├── c1
+        │   ├── c2
+        │   ├── c3
+        │   ├── c4
+        │   ├── c5
+        │   ├── c6
+        │   ├── c7
+        │   ├── c8
+        │   ├── c9
+        │   ├── ca
+        │   ├── cb
+        │   ├── cc
+        │   ├── cd
+        │   ├── ce
+        │   ├── cf
+        │   ├── d0
+        │   ├── d1
+        │   ├── d2
+        │   ├── d3
+        │   ├── d4
+        │   ├── d5
+        │   ├── d6
+        │   ├── d7
+        │   ├── d8
+        │   ├── d9
+        │   ├── da
+        │   ├── db
+        │   ├── dc
+        │   ├── dd
+        │   ├── de
+        │   ├── df
+        │   ├── e0
+        │   ├── e1
+        │   ├── e2
+        │   ├── e3
+        │   ├── e4
+        │   ├── e5
+        │   ├── e6
+        │   ├── e7
+        │   ├── e8
+        │   ├── e9
+        │   ├── ea
+        │   ├── eb
+        │   ├── ec
+        │   ├── ed
+        │   ├── ee
+        │   ├── ef
+        │   ├── f0
+        │   ├── f1
+        │   ├── f2
+        │   ├── f3
+        │   ├── f4
+        │   ├── f5
+        │   ├── f6
+        │   ├── f7
+        │   ├── f8
+        │   ├── f9
+        │   ├── fa
+        │   ├── fb
+        │   ├── fc
+        │   ├── fd
+        │   ├── fe
+        │   └── ff
+        ├── index
+        ├── keys
+        ├── locks
+        └── snapshots
+
+332 directories (original captured tree count; not recounted for this revision)
+
+# PRE-MIGRATION RESTORATION TARGET — JAR-23 HOST RECOVERY / SQLITE STAGING PATHS
+/usr/local/sbin/rotom-nas-docker-recovery
+/etc/systemd/system/rotom-nas-docker-recovery.service
+/var/backups/system-info/sqlite
+├── home-assistant_v2.db
+├── npm-database.sqlite
+└── zigbee.db
+# The recovery service is enabled and manually validated; reboot validation is deferred.
+# SQLite staging files are root:root mode 0600 and passed PRAGMA quick_check on 2026-09-25.
+#
+# PRE-MIGRATION RESTORATION TARGET — SYSTEM-LEVEL ROTOM DOCUMENTATION PATHS
+# Authoritative documentation update - 2026-09-16
+# /home/infra/documentation is owned by Infra numeric 997:5002, mode 0750 after JAR-6 group migration.
+# AGENTS.md and README.md remain the confirmed control files; the named ACL model was preserved through the Infra GID migration.
+# Named ACLs give jared and fran execute-only traversal through /home/infra,
+# r-x access to the documentation directory, and read-only access to both files.
+# Default directory ACLs extend read/traverse access to future documentation.
+# The ACLs do not add either user to the infra group or grant write access.
+# A fresh 2026-09-19 top-level listing again shows only AGENTS.md and README.md.
+# None of the current nine Rotom Project Documentation files are deployed at this
+# location, so they are not shown above. AGENTS.md and README.md are separate
+# authoritative on-server Codex/control-index files; Available Sources defines the
+# maintained Rotom Project Documentation membership. Synchronization between these
+# distinct destinations is deliberate and must not be assumed from either copy alone.
+
+
+# PRESERVED NAS RECOVERY CONTENT + HISTORICAL SAMPLE CONTENTS — SHARED DRIVE
+# At the pre-migration baseline, /mnt/nas-shared-drive was verified as a live NFSv3 mount from
+# UNAS Shared_Drive/.data through an active fstab-backed systemd automount.
+# `Important` and `rotom` are historical captured child names. JAR-25 added
+# the protected `rotom-bare-metal` recovery subtree shown below.
+/mnt/nas-shared-drive
++-- Important
++-- rotom
++-- rotom-bare-metal
+    +-- jar-25-2026-09-25
+        +-- CONSISTENCY-NOTE.txt
+        +-- JAR-25-RESULT.txt
+        +-- METADATA-SHA256SUMS
+        +-- RESTORE-PROCEDURE.txt
+        +-- image-fdisk.txt
+        +-- rotom-nvme-live-pre-proxmox-2026-09-25.image.sha256
+        +-- rotom-nvme-live-pre-proxmox-2026-09-25.img
+        +-- rotom-nvme-live-pre-proxmox-2026-09-25.source.sha256
+        +-- runtime-containers-after.txt
+        +-- runtime-containers-before.txt
+        +-- runtime-paused-units.txt
+        +-- runtime-status-before.txt
+        +-- runtime-systemd-after.txt
+        +-- source-fdisk.txt
+        +-- source-lsblk.txt
+        +-- source-partition-table.sfdisk
+        +-- source-root-ext4.txt
+# The workflow may also have written source-uefi-nvram.txt and/or
+# image-partition-table.sfdisk when the corresponding inspection command succeeded.
+# No .partial image remained after JAR-25 acceptance.
+
+# PRE-MIGRATION RESTORATION TARGET — NAS ACCESS MODEL
+# UNAS Isolated Mode plus rpc.mountd --manage-gids makes primary numeric GIDs the
+# reliable ordinary-access contract. JAR-6 directly tested all eight new service shares.
+# Each intended service account could traverse/list/create, new objects inherited the
+# expected service GID, child directories inherited setgid, and disposable objects were
+# removed. A different unrelated service account was denied traverse/read/write.
+# The same positive/negative behavior passed after a normal Rotom reboot.
+# Jared remains outside service storage groups for ordinary work; use sudo -iu <service>
+# for service-specific administration. Root/sudo/Docker administrators remain privileged.
+# Backup remains 988:988 mode 0700. The Shared Drive root retains its established
+# shared-storage contract. The JAR-25 child directory was observed as 977:988 mode 0700
+# with group/other ACL access denied; its raw image was 977:988 mode 0660. The parent
+# directory prevents group/other pathname traversal to the image.
+# UNAS/NFS numeric IDs must be interpreted numerically; Rotom's local fwupd-refresh name
+# for GID 988 does not establish application ownership of these NAS objects.
+#
+# PRE-MIGRATION RESTORATION TARGET — SERVICE-ACCOUNT NAS MOUNTS
+# Account       Pre-migration UID:GID   Mount              Status
+# media         127:5000          /mnt/nas-media         active application share
+# game          995:5001          /mnt/nas-game          active application share
+# infra         997:5002          /mnt/nas-infra         commissioned, empty boundary
+# smarthome     126:5003          /mnt/nas-smarthome     commissioned; HA/Homebridge local
+# documents     900:5004          /mnt/nas-documents     commissioned, empty boundary
+# downloads     901:5005          /mnt/nas-downloads     active torrent/download-stack domain
+# web           902:5006          /mnt/nas-web           commissioned; websites local
+# filesync      903:5007          /mnt/nas-filesync      commissioned, empty boundary
+# apps          904:5008          /mnt/nas-apps          commissioned, empty boundary
+# auth          905:5009          /mnt/nas-auth          commissioned, empty boundary
+#
+# New JAR-6 roots are numeric owner UID 988, matching service GID 5002-5009,
+# mode 2770. Only each .data root was changed non-recursively.
+# /mnt/nas-media/.rotom-qbt-nas-ready and /mnt/nas-game/.rotom-qbt-nas-ready remain
+# qBittorrent now uses the Downloads sentinel; old Media/Game qBittorrent sentinels are obsolete.
+# qBittorrent now uses only Downloads torrent storage. Seven of the eight JAR-6
+# JAR-6 mounts is a Docker bind source.
+# /mnt/nas-game-servers remains absent from fstab and unmounted; the former UNAS
+# Game_Servers/.data path was observed absent during JAR-6 audit, not deleted by JAR-6.
+# Host Restic excludes /mnt; the new shares therefore require separate protection if
+# future authoritative data is placed on them.
+#
+
+# PRE-MIGRATION NEEDS VERIFICATION / CURRENT FOLLOW-UP
+# - Persistence of the eight JAR-6 share-root GID/mode settings across a future
+#   UNAS reboot, UniFi Drive restart/update, or share reconfiguration was deferred.
+#   The current VM-era equivalent remains a follow-up for the service shares and should
+#   be checked read-only with findmnt/stat plus UNAS-side share/export inspection after such an event.
+# - The pre-migration Backup-root 0700 persistence check belongs to the retired
+#   Rotom_Home_Server_Backup path. Current Restic storage is Rotom_Restic_Backup at
+#   /mnt/nas-rotom-restic-backup, mounted root 988:988 mode 0700; its persistence across
+#   a future NAS-side event likewise remains Needs Verification.
+# - The detailed Shared Drive permission/purpose model remains unverified beyond the
+#   recorded mount/root metadata evidence.
+#
+
+# PRE-MIGRATION CONSOLIDATED VERIFICATION NOTE
+# Consolidated verification note - 2026-09-21
+# No new full filesystem tree scan was performed. The final pre-migration supporting checks verify
+# all twelve NAS mounts/automount contracts, JAR-6 service-share identity/access
+# boundaries and reboot persistence, final pre-migration Media/Game/Downloads/Backup/Shared Drive state, qBittorrent Downloads sentinel metadata,
+# active service Compose paths, and the /home/infra/documentation top-level listing
+# described above. The tree content itself remains the preserved observed baseline
+# plus the targeted path additions already recorded in this file.
