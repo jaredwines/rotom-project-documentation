@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; JAR-31 restoration retained, with the 16-container runtime freshly reverified post-boot on 2026-09-27  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-27 — live post-boot Docker/runtime verification refreshed
+**Documentation updated:** 2026-09-27 — current VM-era backup recovery point and automation state refreshed
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -410,7 +410,7 @@ No additional Docker service is promoted to current state by this restructure. A
 
 ## 13. Outstanding / Needs Verification
 
-The VM-era backup baseline is no longer a Docker gap: JAR-33 established Restic snapshot `74d3b0ca` and post-run `restic check` passed 21/21 snapshots. Automatic Restic execution remains intentionally disabled/inactive as a separate commissioning decision.
+The VM-era backup baseline is no longer a Docker gap. The current verified guest recovery snapshot is `f666d63c` (`2026-09-27 13:30:28 PDT`, 17.410 GiB), and post-run `restic check` passed 21/21 snapshots with no errors. Guest Restic automation is now recommissioned under enabled/active `rotom-restic-backup.timer`; this does not change Docker backup scope, and `/mnt` remains outside the host Restic source set.
 
 - **Intentional:** Fran is not recreated, and her historical backup sudoers rule is not installed.
 - **Needs Verification — live Downloader-NFS loss:** startup/recreation fail-closed behavior and boot-time recovery are verified, but behavior after sudden NFS loss while qBittorrent is already running is not. Read-only inspection of the current Compose/systemd definitions can confirm that no runtime watchdog is documented; actual failure behavior would require a separately planned non-destructive maintenance test and must not be inferred.

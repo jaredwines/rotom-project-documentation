@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** Proxmox hypervisor `proxmox` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-27 — live post-boot network/listener verification refreshed
+**Documentation updated:** 2026-09-27 — current backup-control naming and NAS terminology refreshed
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -36,7 +36,7 @@ No passwords, API tokens, private keys, VPN credentials, cookies, or other authe
 
 ---
 
-## 2. Current Phase B Host, VM, and NAS Network Identity — through JAR-33, 2026-09-27
+## 2. Current Phase B Host, VM, and NAS Network Identity — 2026-09-27 refresh
 
 The physical NUC and Rotom workload identity remain separate:
 
@@ -47,7 +47,7 @@ The physical NUC and Rotom workload identity remain separate:
 | Rotom VM | hostname `rotom`; FQDN `rotom.casa`; VirtIO `ens18`; fixed virtual MAC `BC:24:11:97:10:47`; attached directly to LAN through `vmbr0` |
 | Rotom VM IPv4 | DHCP `192.168.1.69/24` reserved in UniFi to MAC `BC:24:11:97:10:47`; gateway/DNS `192.168.1.1` |
 | Rotom LAN DNS | UniFi/local resolver `192.168.1.1` returns `rotom.casa -> 192.168.1.69`; public resolver remains `68.8.40.225` |
-| UNAS | `192.168.1.70` |
+| NAS | `192.168.1.70` |
 
 JAR-26 removed the old UniFi fixed-IP/client association tying `.69` to the physical NIC. JAR-27 deliberately used temporary DHCP `192.168.1.241` for the guest foundation. JAR-28 verified `.69` unused, then reserved `192.168.1.69` in UniFi for the VM's fixed virtual MAC. After reboot, qemu-guest-agent reported `ens18` at `.69/24`, Proxmox pinged `.69` successfully, and its neighbor table resolved `.69` to `bc:24:11:97:10:47`. Proxmox remains solely on `.68`.
 
@@ -55,7 +55,7 @@ The local DNS override remains verified: direct queries to `192.168.1.1` and the
 
 ### 2026-09-27 live post-boot network refresh
 
-A read-only post-boot audit reconfirmed `ens18` at `192.168.1.69/24`, default gateway `192.168.1.1`, current Docker bridge subnets `172.18.0.0/16` through `172.28.0.0/16`, reachability to Proxmox `192.168.1.68` and UNAS `192.168.1.70`, NPM listeners on TCP `80/81/443`, SSH on `22`, backup-status API on `8787`, and the documented application listeners/published ports. Host-side listener state is therefore current; WAN reachability still depends on UniFi NAT/firewall policy and cannot be inferred from Rotom alone.
+A read-only post-boot audit reconfirmed `ens18` at `192.168.1.69/24`, default gateway `192.168.1.1`, current Docker bridge subnets `172.18.0.0/16` through `172.28.0.0/16`, reachability to Proxmox `192.168.1.68` and NAS `192.168.1.70`, NPM listeners on TCP `80/81/443`, SSH on `22`, backup-status API on `8787`, and the documented application listeners/published ports. Host-side listener state is therefore current; WAN reachability still depends on UniFi NAT/firewall policy and cannot be inferred from Rotom alone.
 
 On Rotom itself, `getent ahostsv4 rotom.casa` returned `127.0.1.1` during this audit. Treat that as the VM's host-local NSS answer; it does not supersede the separately verified LAN DNS record `rotom.casa -> 192.168.1.69` observed from the LAN resolver. Troubleshooting should distinguish host-local NSS resolution from client/LAN DNS.
 
@@ -80,15 +80,15 @@ The server-side `.ssh` / `authorized_keys` permissions used during installation 
 
 Guest default routing through `192.168.1.1`, gateway reachability, external DNS, outbound IPv4, and zero failed systemd units remain verified. The Proxmox host has no application NFS mounts or application Docker networking. The guest now carries the restored production Docker network topology through JAR-31.
 
-### Current NAS / NFS connectivity — through JAR-33 baseline
+### Current NAS / NFS connectivity — 2026-09-27 refresh
 
-The Debian VM reaches the UNAS directly over the LAN from `192.168.1.69` to `192.168.1.70`. All twelve guest paths remain fstab-backed systemd automounts using `_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s`.
+The Debian VM reaches the NAS directly over the LAN from `192.168.1.69` to `192.168.1.70`. All twelve guest paths remain fstab-backed systemd automounts using `_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s`.
 
-JAR-66 added one intentional hypervisor-only NFS path: UNAS `Rotom_Proxmox_Backup/.data` is authorized only to Proxmox `192.168.1.68` and is mounted by PVE as `nas-rotom-proxmox-backup` under `/mnt/pve/nas-rotom-proxmox-backup`. The Rotom guest has no mount, fstab entry, or systemd reference for that share. Conversely, `Rotom_Restic_Backup/.data` remains authorized only to Rotom `192.168.1.69`. This keeps whole-VM backup traffic and guest Restic storage on distinct NFS exports even though both terminate on UNAS `192.168.1.70`.
+JAR-66 added one intentional hypervisor-only NFS path: NAS `Rotom_Proxmox_Backup/.data` is authorized only to Proxmox `192.168.1.68` and is mounted by PVE as `nas-rotom-proxmox-backup` under `/mnt/pve/nas-rotom-proxmox-backup`. The Rotom guest has no mount, fstab entry, or systemd reference for that share. Conversely, `Rotom_Restic_Backup/.data` remains authorized only to Rotom `192.168.1.69`. This keeps whole-VM backup traffic and guest Restic storage on distinct NFS exports even though both terminate on NAS `192.168.1.70`.
 
-**Current downloader source correction:** JAR-31 live verification shows `/mnt/nas-downloaders` configured and mounted from UNAS `Downloader/.data`. Current `/etc/fstab`, the generated `mnt-nas\x2ddownloaders.mount`, the active NFSv3 source, and current `showmount -e 192.168.1.70 | grep -i download` all agree on `Downloader/.data`; the supplied `showmount` result exposed that export to `192.168.1.69`. This supersedes the earlier JAR-29/JAR-30 current-state wording naming `Downloads/.data` while retaining those older statements as dated historical evidence.
+**Current downloader source correction:** JAR-31 live verification shows `/mnt/nas-downloaders` configured and mounted from NAS `Downloader/.data`. Current `/etc/fstab`, the generated `mnt-nas\x2ddownloaders.mount`, the active NFSv3 source, and current `showmount -e 192.168.1.70 | grep -i download` all agree on `Downloader/.data`; the supplied `showmount` result exposed that export to `192.168.1.69`. This supersedes the earlier JAR-29/JAR-30 current-state wording naming `Downloads/.data` while retaining those older statements as dated historical evidence.
 
-**Current Restic source cutover:** JAR-32 verification now uses UNAS `Rotom_Restic_Backup/.data`, exported to Rotom `192.168.1.69`, mounted at `/mnt/nas-rotom-restic-backup` over NFSv3. Current `/etc/fstab`, `/usr/local/sbin/backup-to-unas`, and `unas-backup.service` reference only the new mount/repository path. The former `/mnt/nas-rotom-backup` NFS mount is unmounted and no longer used by Rotom; its old UNAS `Rotom_Home_Server_Backup` share is retained as rollback data.
+**Current Restic source and controls:** Rotom uses NAS `Rotom_Restic_Backup/.data`, exported to Rotom `192.168.1.69`, mounted at `/mnt/nas-rotom-restic-backup` over NFSv3. Current `/etc/fstab`, `/usr/local/sbin/rotom-restic-backup`, and `rotom-restic-backup.service` reference the active mount/repository path; manual access is `/usr/local/bin/backup-restic-to-nas`. The former `/mnt/nas-rotom-backup` NFS mount is unmounted and no longer used by Rotom; its old `Rotom_Home_Server_Backup` share is retained as rollback data.
 
 On the JAR-31 final reboot, the NAS recovery helper first failed when Media NFS was not yet ready, then retried automatically about 30 seconds later. The second run verified `/mnt/nas-downloaders`, `/mnt/nas-media`, `/mnt/nas-game`, both bindfs compatibility views, and service-account traversal before recovering the stopped NAS-backed containers. Final system state had zero failed units.
 
