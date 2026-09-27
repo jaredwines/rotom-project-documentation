@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** Proxmox hypervisor `proxmox` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-09-27 — live post-boot identity/group/symlink verification refreshed
+**Documentation updated:** 2026-09-27 — RPD maintenance cross-reference aligned to the canonical `00` contract
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -17,12 +17,12 @@ This is the canonical detailed owner of Rotom account identity and permission fa
 
 ### Evidence provenance
 
-**Documentation updated:** 2026-09-27 — live post-boot identity/group/symlink verification refreshed; JAR-66/JAR-33 export separation retained  
+**Documentation updated:** 2026-09-27 — live identity/group state retained; current Restic privilege/control names and permissions refreshed  
 
 **Baseline method:** read-only inspection of the live host configuration, Docker metadata, systemd unit files, sudo policy, SSH metadata, filesystem modes, ACLs, NFS mount metadata, and non-mutating access tests. No passwords, password hashes, key contents, tokens, or private-key material were read or recorded.  
 **Update scope:** JAR-29 restored the ten storage-facing identities and JAR-30 established the package-created Docker privilege boundary. JAR-31 restored the application/recovery workload layer under those service identities. A fresh 2026-09-27 post-boot read reconfirmed `docker:x:989:` with no members, all ten service UID:GID/home contracts, and every service-home NAS symlink. Fran remains unrecreated and her backup sudoers rule remains deferred. Administrative Mac key-only access remains verified; no key contents are recorded.
 
-## 2. Current Phase B Identity and Access Model — through JAR-33, 2026-09-27
+## 2. Current Phase B Identity and Access Model — 2026-09-27 refresh
 
 JAR-31 restored production workloads under the Phase B service-account model. A fresh 2026-09-27 post-boot read again returned package-created `docker:x:989:` with no members, confirming the current VM has not returned to the historical pre-migration GID `984` broad-membership model.
 
@@ -46,9 +46,9 @@ JAR-31 restored production workloads under the Phase B service-account model. A 
 
 Ordinary NFS isolation remains numeric-ID based. Current downloader root is `988:5005` mode `2770`; the existing compatibility views provide Media/Game read-only access without broadening direct Downloader write access. The final reboot verified service-account traversal of those read-only views.
 
-JAR-66 adds a host-level NFS client boundary without changing Linux account identities: UNAS `Rotom_Proxmox_Backup` is authorized only to Proxmox `192.168.1.68`, while `Rotom_Restic_Backup` remains authorized only to Rotom `192.168.1.69`. The Rotom guest has no mount or configuration reference for the Proxmox backup share.
+JAR-66 adds a host-level NFS client boundary without changing Linux account identities: NAS `Rotom_Proxmox_Backup` is authorized only to Proxmox `192.168.1.68`, while `Rotom_Restic_Backup` remains authorized only to Rotom `192.168.1.69`. The Rotom guest has no mount or configuration reference for the Proxmox backup share.
 
-Jared's `/etc/sudoers.d/update-to-nas` rule and shared `/usr/local/bin/backup-to-nas` path remain restored. Fran's historical exact-command backup rule remains intentionally absent because Fran is not recreated. Current backup storage is `/mnt/nas-rotom-restic-backup` on UNAS `Rotom_Restic_Backup`; the 2026-09-27 live audit freshly verified its mounted share root as numeric `988:988` mode `0700`. Root-run Restic access/write was previously verified. The mounted share root grants no group/other permission bits; however it is **not** literally `root:root` or a pure UID-0-only directory while mounted—the owner is numeric UID `988`, and numeric NFS identities remain authoritative. The live audit did not isolate the underlying local directory while fully unmounted, so its local-directory mode is not current authority. A fresh named-user denial matrix was not rerun against the new share during this cutover. The retired `/mnt/nas-rotom-backup` NFS path is unmounted and no longer used by current Rotom backup configuration.
+Jared's current exact-command rule is `/etc/sudoers.d/rotom-restic-backup`, mode `0440`, with `jared ALL=(root) NOPASSWD: /usr/local/sbin/rotom-restic-backup`; `visudo -cf` parsed it successfully and `sudo -n -l /usr/local/sbin/rotom-restic-backup` confirmed authorization. The shared human command is `/usr/local/bin/backup-restic-to-nas` (`root:root`, mode `0755`), which hands off through sudo to root-protected `/usr/local/sbin/rotom-restic-backup` (`root:root`, mode `0700`). Protected credential path is `/etc/restic/nas-password` (`root:root`, mode `0600`; contents never document). Fran's historical exact-command backup rule remains intentionally absent because Fran is not recreated. Current backup storage is `/mnt/nas-rotom-restic-backup` on NAS `Rotom_Restic_Backup`; the mounted share root is numeric `988:988` mode `0700`. Root-run Restic access/write and a later complete manual backup are verified. The mounted share root grants no group/other permission bits; however it is **not** literally `root:root` while mounted—the owner is numeric UID `988`, and numeric NFS identities remain authoritative. A fresh named-user denial matrix was not rerun against the new share during this cutover. The retired `/mnt/nas-rotom-backup` NFS path is unmounted and no longer used by current Rotom backup configuration.
 
 All ten service-home convenience links remain `/home/<service>/nas-<service> -> /mnt/nas-<service>`. No permission broadening such as world-writable modes was used during JAR-31.
 
@@ -358,11 +358,11 @@ At that baseline, the active SSH policy permitted password authentication and pu
 
 At that historical baseline, only `/home/jared/.ssh/authorized_keys` was found among the checked root and named-home locations. Its directory was mode `0700` and its file mode `0600`, both owned by Jared. Key material was not read. `/root/.ssh` existed at root:root mode `0700`, but no root authorized-keys file was found at the standard locations at that time. No authorized-keys files were found in the other named homes. This is not the current Proxmox state: the current Proxmox `/root/.ssh/authorized_keys` now contains the preserved pre-existing RSA key plus the verified Mac ED25519 administration key documented above.
 
-### System services and local scripts
+### Current backup system services and local scripts
 
-The two custom system services, unas-backup.service and unas-backup-status-api.service, do not declare User= or Group=, so systemd runs them as root by default. The standard operating-system unit files explicitly use their usual dedicated identities where applicable, including colord, cups-browsed, fwupd-refresh, geoclue, kernoops with group adm, man, polkitd, saned, speech-dispatcher, systemd-network, systemd-resolve, systemd-timesync, uuidd, and xrdp. No custom systemd service was found that declares a named Rotom service account.
+The current custom Restic units are `rotom-restic-backup.service` and `rotom-restic-backup-status-api.service`. Neither declares `User=` or `Group=`, so systemd runs them as root by default. The backup service invokes root-protected `/usr/local/sbin/rotom-restic-backup`; the status API invokes `/usr/local/sbin/rotom-restic-backup-status-api`. The backup timer is `rotom-restic-backup.timer` and is enabled/active on the daily `03:00` schedule with persistent catch-up and up to ten minutes randomized delay.
 
-Files under `/usr/local/bin` and `/usr/local/sbin` are root-owned. The protected `/usr/local/sbin/backup-to-unas` script and the backup status API are mode `0700`. The shared `/usr/local/bin/backup-to-nas` launcher is `root:root` mode `0755` and contains only the handoff to the protected backup script through `sudo`. Other inspected local scripts were mode `0755`. No world-writable local script and no file capability under those two directories was found.
+The human-facing `/usr/local/bin/backup-restic-to-nas` launcher is `root:root` mode `0755` and contains only the sudo handoff to `/usr/local/sbin/rotom-restic-backup`, which is `root:root` mode `0700`. The exact-command sudoers fragment is `/etc/sudoers.d/rotom-restic-backup` mode `0440`; the protected credential path is `/etc/restic/nas-password` mode `0600`. Old active `backup-to-unas`, `backup-to-nas`, `unas-backup*`, `update-to-nas`, and `unas-password` control paths were verified absent; dated rollback/history material may retain those old names. No credential contents are recorded here.
 
 ## 3. Preserved Pre-Migration Operational and Follow-up Findings
 
@@ -414,5 +414,5 @@ The JAR-6 service storage-GID plan is no longer proposed; it is current as-built
 
 - See `04-NAS-and-Storage.md` for the canonical NAS export, mountpoint, storage-layout, and NFS mount behavior details.
 - See `02-Docker-Services.md` for container/runtime deployment context that uses these identities.
-- See `06-Maintenance-and-Automation.md` for routine administration and documentation-maintenance workflows.
-- See `00-Rotom-Change-Log.md` for identity-migration history.
+- See `06-Maintenance-and-Automation.md` for routine administration and automation workflows.
+- See `00-Rotom-Change-Log.md` for the canonical RPD maintenance contract and identity-migration history.

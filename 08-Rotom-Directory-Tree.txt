@@ -8,11 +8,11 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-09-27; live post-boot audit refreshed current topology/automation/identity evidence; pre-migration tree remains historical recovery evidence.
-# Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox backup storage, and JAR-33 baseline verification.
+# Documentation revised: 2026-09-27; current Restic control names/schedule and refreshed Proxmox/Restic recovery points reconciled; pre-migration tree remains historical recovery evidence.
+# Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox backup storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, and the later 2026-09-27 backup-control/recovery-point refresh.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the RPD.
 #
-# PHASE B CURRENT TOPOLOGY — VERIFIED THROUGH JAR-33 ROTOM VIRTUALIZATION BASELINE, 2026-09-27
+# CURRENT TOPOLOGY — ROTOM VIRTUALIZATION BASELINE + ACTIVE RESTIC/PVE BACKUP SCHEDULING, 2026-09-27
 # - Physical NUC runs Proxmox `proxmox` / `proxmox.rotom.casa` at 192.168.1.68; hypervisor has no Rotom application Docker/NFS workload. Dedicated PVE backup storage `nas-rotom-proxmox-backup` is the intentional NFS exception at `/mnt/pve/nas-rotom-proxmox-backup`.
 # - Proxmox monitoring helper: /usr/local/sbin/rotom-temp-api + /etc/systemd/system/rotom-temp-api.service; binds 192.168.1.68:8788 and exposes /temperature plus Glances-compatible /api/4/sensors for coretemp `Package id 0`; this is a read-only Homepage temperature bridge, not an application runtime.
 # - VMID 100 `rotom`: Debian 13.7, q35/OVMF, x86-64-v2-AES, 8 vCPU, 12 GiB RAM, 100 GiB thin VirtIO SCSI; no iGPU passthrough.
@@ -22,14 +22,21 @@
 # - JAR-31 final reboot restored exact 16-container running set; Jared Wines intentionally has no container object; zero failed systemd units.
 # - Healthy after reboot with zero restarts: Arcane, Homepage, Jared Palworld, Fran Palworld, Gamarr. qBittorrent WireGuard wg0 present.
 # - Core HTTP acceptance passed; Homepage requires Host: rotom.casa (raw 127.0.0.1:3001 correctly returns host-validation 400).
-# - JAR-24 Restic snapshot fbe1838e and JAR-25 raw NVMe image remain pre-migration recovery artifacts. **Rotom Virtualization Baseline** pairs verified Proxmox VZDump `vzdump-qemu-100-2026_09_27-01_19_56.vma.zst` with Restic snapshot `74d3b0ca`; post-run restic check passed 21/21 snapshots; automatic timer remains disabled.
+# - JAR-24 Restic snapshot fbe1838e and JAR-25 raw NVMe image remain pre-migration recovery artifacts. Current VM-era recovery points are verified Restic snapshot `f666d63c` (2026-09-27 13:30:28 PDT; 21/21 repository check PASS) and sole Proxmox archive `vzdump-qemu-100-2026_09_27-14_08_51.vma.zst` (45,424,272,161 bytes; full VMA verify exit 0). `rotom-restic-backup.timer` is enabled/active around 03:00; native PVE `rotom-daily` remains enabled at 05:00 with 7 daily / 4 weekly / 6 monthly retention.
 #
 #
-# PROXMOX HOST BACKUP STORAGE — JAR-66/JAR-33
-# /mnt/pve/nas-rotom-proxmox-backup/  PVE-managed NFSv3 storage; UNAS Rotom_Proxmox_Backup/.data; export authorized only to 192.168.1.68; content=backup; no Proxmox /etc/fstab entry; write/read/delete verified
-#   dump/vzdump-qemu-100-2026_09_27-01_19_56.vma.zst  verified whole-VM baseline archive; ~43 GB; full VMA verify exit 0
-# - This path exists on Proxmox, not inside the Rotom VM. Rotom has no fstab/systemd reference to Rotom_Proxmox_Backup.
+# PROXMOX HOST BACKUP STORAGE / AUTOMATION — CURRENT 2026-09-27
+# /usr/local/bin/backup-proxmox-to-nas  manual human-facing VMID 100 helper; snapshot + zstd -> nas-rotom-proxmox-backup
+# /etc/pve/jobs.cfg  native automatic PVE job `rotom-daily`: node proxmox; VMID 100; storage nas-rotom-proxmox-backup; schedule 05:00; snapshot; zstd; repeat-missed=0; retention 7 daily / 4 weekly / 6 monthly
+# /mnt/pve/nas-rotom-proxmox-backup/  PVE-managed NFSv3 storage; NAS Rotom_Proxmox_Backup/.data; export authorized only to 192.168.1.68; content=backup; no Proxmox /etc/fstab entry; write/read/delete verified
+#   dump/vzdump-qemu-100-2026_09_27-14_08_51.vma.zst            sole current VMID 100 archive; 45,424,272,161 bytes; full VMA verify exit 0; no protection marker observed
+#   dump/vzdump-qemu-100-2026_09_27-14_08_51.log                normal companion log
+# - Older VMID 100 archives/sidecars (JAR-33 protected baseline, JAR-67 commissioning archive, later 13:44 verified manual archive, interrupted-run log) were intentionally deleted before the clean-slate 14:08 backup. Storage and `rotom-daily` were not removed.
+# - Manual helper and native scheduler are independent; no rotom-proxmox-backup.service/.timer exists.
+# - First unattended scheduler-triggered 05:00 run still not observed.
+# - This storage/path exists on Proxmox, not inside the Rotom VM. Rotom has no fstab/systemd reference to Rotom_Proxmox_Backup.
 #
+
 # LIVE POST-BOOT VERIFICATION REFRESH — 2026-09-27 02:29–02:32 PDT
 # - Fresh Debian VM reboot confirmed; zero failed systemd units at audit start/end.
 # - Docker 29.8.1 / Compose 5.5.1; 16 total, 16 running, 0 stopped; all restart counts 0; current bridge map unchanged.
@@ -37,35 +44,35 @@
 # - All ten current service identities/homes verified; each home mode 0750; every /home/<service>/nas-<service> symlink resolves to the current /mnt/nas-<service> target.
 # - docker group remains GID 989 with no members; Fran remains absent.
 # - All twelve fstab-backed systemd automounts active. Media/Game bindfs compatibility views mounted RO and traversal PASS.
-# - Restic mounted NFS root verified 988:988 mode 0700; backup timer disabled/inactive; weekly updater cron absent; JAR-32 temporary helper absent.
+# - Restic mounted NFS root verified 988:988 mode 0700; this 02:29 audit observed the then-held backup timer disabled/inactive, later superseded the same day by deliberate `rotom-restic-backup.timer` recommissioning; weekly updater cron absent; JAR-32 temporary helper absent.
 # - Arcane current settings freshly verified: auto-update midnight/no exclusions; auto-heal every 30s/no exclusions, max 5 per 30m; followProjectSymlinks=true; scheduled prune disabled.
 # - Arcane discovery symlink /home/infra/docker/downloads -> /home/downloaders/docker verified. Arcane qBittorrentVPN project status is stale/unknown from 2026-09-22 while Docker runtime/wg0 are current.
 # - Rotom local NSS query for rotom.casa returned 127.0.1.1; keep distinct from separately verified LAN DNS answer 192.168.1.69.
 #
-# CURRENT GUEST RUNTIME/STORAGE/IDENTITY TOPOLOGY — JAR-31 RUNTIME + JAR-33 BASELINE UPDATE
+# CURRENT GUEST RUNTIME/STORAGE/IDENTITY TOPOLOGY — 2026-09-27 REFRESH
 # /etc/
 #   fstab                          current Restic entry -> Rotom_Restic_Backup/.data at /mnt/nas-rotom-restic-backup
 #   fstab.pre-restic-share-cutover.20260926-235232  rollback copy from immediately before Restic mount cutover
 #   docker/daemon.json             root-owned; global json-file 10m x 3
 #   restic/include.txt             restored; /mnt remains outside host Restic scope
 #   restic/exclude.txt             restored
-#   restic/unas-password           protected credential path; contents never document
-#   sudoers.d/update-to-nas        restored; Jared exact backup path
+#   restic/nas-password            current protected credential path; root:root 0600; contents never document
+#   sudoers.d/rotom-restic-backup  current Jared exact-command rule; root:root 0440; visudo PASS
 #   sudoers.d/fran-backup-to-nas   intentionally ABSENT; Fran not recreated
 #   cron.d/weekly-linux-update     intentionally ABSENT; reboot-capable weekly schedule deferred
 #   systemd/system/
-#     rotom-nas-docker-recovery.service   restored/adapted/enabled; reboot retry path verified
-#     unas-backup.service                 restored; RequiresMountsFor=/mnt/nas-rotom-restic-backup; not automatically running
-#     unas-backup.service.pre-restic-share-cutover.20260926-235232  rollback copy from immediately before cutover
-#     unas-backup.timer                   restored but DISABLED/INACTIVE
-#     unas-backup-status-api.service      restored/enabled/active; TCP 8787
+#     rotom-nas-docker-recovery.service        restored/adapted/enabled; reboot retry path verified
+#     rotom-restic-backup.service              current oneshot; RequiresMountsFor=/mnt/nas-rotom-restic-backup; ExecStart=/usr/local/sbin/rotom-restic-backup
+#     rotom-restic-backup.timer                ENABLED/ACTIVE; daily 03:00; Persistent=true; RandomizedDelaySec=10m
+#     rotom-restic-backup-status-api.service   enabled/active; TCP 8787; Homepage /backup-status
+#     unas-backup.service.pre-restic-share-cutover.20260926-235232  historical rollback copy; old name intentionally preserved
 # /usr/local/
-#   sbin/rotom-nas-docker-recovery  current helper; uses /mnt/nas-downloaders and compatibility views
-#   sbin/backup-to-unas             restored root-protected backup implementation; current repository /mnt/nas-rotom-restic-backup/rotom-restic-backup
-#   sbin/backup-to-unas.pre-restic-share-cutover.20260926-235232  rollback copy from immediately before cutover
-#   sbin/unas-backup-status-api     restored root-protected status API
-#   sbin/weekly-linux-update        restored script; cron not installed
-#   bin/backup-to-nas               restored shared launcher
+#   sbin/rotom-nas-docker-recovery       current helper; uses /mnt/nas-downloaders and compatibility views
+#   sbin/rotom-restic-backup             current root-protected backup implementation; repository /mnt/nas-rotom-restic-backup/rotom-restic-backup
+#   sbin/backup-to-unas.pre-restic-share-cutover.20260926-235232  historical rollback copy; old name intentionally preserved
+#   sbin/rotom-restic-backup-status-api  current root-protected status API
+#   sbin/weekly-linux-update             restored script; cron not installed
+#   bin/backup-restic-to-nas             current shared manual launcher
 # /var/lib/docker/
 #   current Docker runtime on VM-local ext4
 #   volumes/arcane_arcane-data/     restored Arcane persistent named-volume data
@@ -115,9 +122,9 @@
 #   nas-apps/          NFSv3 Apps/.data; root 988:5008 mode 2770
 #   nas-auth/          NFSv3 Auth/.data; root 988:5009 mode 2770
 #   nas-rotom-restic-backup/  NFSv3 Rotom_Restic_Backup/.data; mounted root freshly verified 988:988 mode 0700; underlying local directory mode not isolated while fully unmounted in the live audit
-#     rotom-restic-backup/     repository 799babb2; JAR-33 baseline snapshot 74d3b0ca verified; 21 snapshots passed restic check
+#     rotom-restic-backup/     repository 799babb2; current verified snapshot f666d63c; post-run restic check passed 21/21 snapshots
 #     rotom-linux-home-server-backup-restore-kit/  copied legacy restore documentation from old share; not a self-contained recovery bundle
-#   nas-rotom-backup/         RETIRED NFS path; unmounted/no active backup config reference; inert local directory may remain; old UNAS share retained rollback-only
+#   nas-rotom-backup/         RETIRED NFS path; unmounted/no active backup config reference; inert local directory may remain; old NAS share retained rollback-only
 #   nas-shared-drive/  NFSv3 Shared_Drive/.data; root 988:988 mode 0770
 # - Current downloader correction: live fstab/generated unit/findmnt/showmount all use Downloader/.data. Historical Downloads/.data records below remain dated evidence.
 # - All twelve current canonical NFS paths remain fstab/systemd automounts using _netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s; the Restic member is now nas-rotom-restic-backup rather than nas-rotom-backup.
