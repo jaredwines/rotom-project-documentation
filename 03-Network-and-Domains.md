@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** Proxmox hypervisor `proxmox` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-27 — current backup-control naming and NAS terminology refreshed
+**Documentation updated:** 2026-09-27 — Proxmox host-config Restic NFS boundary added and verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -15,7 +15,7 @@ Record substantive changes to this document in the change log as part of the sam
 
 ### Evidence provenance
 
-Last updated: 2026-09-27 (JAR-66/JAR-33 Proxmox backup NFS boundary added; JAR-32 Restic cutover and JAR-31 application networking/reboot acceptance retained; pre-migration sections remain historical evidence)
+Last updated: 2026-09-27 (Proxmox host-config Restic NFS boundary added; JAR-66/JAR-33 VZDump boundary, JAR-32 guest Restic cutover, and JAR-31 application networking/reboot acceptance retained; pre-migration sections remain historical evidence)
 Project: **Rotom-Home-Server**
 
 This document records Rotom's networking state using three read-only host audits collected on 2026-09-14:
@@ -43,7 +43,7 @@ The physical NUC and Rotom workload identity remain separate:
 | Layer | Verified current identity |
 |---|---|
 | Proxmox host | hostname `proxmox`; FQDN `proxmox.rotom.casa`; `vmbr0` `192.168.1.68/24`; default gateway `192.168.1.1`; DNS `192.168.1.1` |
-| Physical NIC | `nic0`, Intel I219-V / `e1000e`, MAC `1c:69:7a:0e:f2:f7`; bridged into `vmbr0` |
+| Physical NIC | `nic0`, Intel I219-V / `e1000e`, MAC `1c:69:7a:0e:f2:f7`; bridged into `vmbr0`; `Supports Wake-on: pumbg`, current `Wake-on: g`, PCI wake `enabled`; `/etc/network/interfaces` reasserts `wol g` with a `post-up` command |
 | Rotom VM | hostname `rotom`; FQDN `rotom.casa`; VirtIO `ens18`; fixed virtual MAC `BC:24:11:97:10:47`; attached directly to LAN through `vmbr0` |
 | Rotom VM IPv4 | DHCP `192.168.1.69/24` reserved in UniFi to MAC `BC:24:11:97:10:47`; gateway/DNS `192.168.1.1` |
 | Rotom LAN DNS | UniFi/local resolver `192.168.1.1` returns `rotom.casa -> 192.168.1.69`; public resolver remains `68.8.40.225` |
@@ -58,6 +58,12 @@ The local DNS override remains verified: direct queries to `192.168.1.1` and the
 A read-only post-boot audit reconfirmed `ens18` at `192.168.1.69/24`, default gateway `192.168.1.1`, current Docker bridge subnets `172.18.0.0/16` through `172.28.0.0/16`, reachability to Proxmox `192.168.1.68` and NAS `192.168.1.70`, NPM listeners on TCP `80/81/443`, SSH on `22`, backup-status API on `8787`, and the documented application listeners/published ports. Host-side listener state is therefore current; WAN reachability still depends on UniFi NAT/firewall policy and cannot be inferred from Rotom alone.
 
 On Rotom itself, `getent ahostsv4 rotom.casa` returned `127.0.1.1` during this audit. Treat that as the VM's host-local NSS answer; it does not supersede the separately verified LAN DNS record `rotom.casa -> 192.168.1.69` observed from the LAN resolver. Troubleshooting should distinguish host-local NSS resolution from client/LAN DNS.
+
+### Current Proxmox Wake-on-LAN — 2026-09-27
+
+The physical NUC's Wake-on-LAN target is Proxmox `nic0`, not the Rotom VM's VirtIO NIC. Live inspection showed `nic0` up with MAC `1c:69:7a:0e:f2:f7`, `Supports Wake-on: pumbg`, `Wake-on: g`, and `/sys/class/net/nic0/device/power/wakeup` set to `enabled`. Before editing, `/etc/network/interfaces` was copied to `/etc/network/interfaces.pre-wol`. The existing `iface nic0 inet manual` stanza now contains `post-up /usr/sbin/ethtool -s nic0 wol g`; the `vmbr0` static address, gateway, bridge membership, and `nic1` stanza were otherwise unchanged. `ifquery --check nic0` and `ifquery --check vmbr0` both passed.
+
+A subsequent physical `systemctl poweroff`/return cycle reverified `Wake-on: g` after Proxmox came back and reverified VMID 100 `running` with `onboot: 1`. Rotom then completed its normal transient-NFS recovery path back to the full production runtime. The supplied transcript does not show the actual magic-packet sender invocation and therefore does not prove that this particular power-on was caused by WOL; end-to-end magic-packet delivery from a client while the NUC is off remains **Needs Verification**. No separate Proxmox WOL systemd service was added.
 
 ### Homepage internal monitoring resolution and Proxmox temperature bridge
 
@@ -84,11 +90,11 @@ Guest default routing through `192.168.1.1`, gateway reachability, external DNS,
 
 The Debian VM reaches the NAS directly over the LAN from `192.168.1.69` to `192.168.1.70`. All twelve guest paths remain fstab-backed systemd automounts using `_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s`.
 
-JAR-66 added one intentional hypervisor-only NFS path: NAS `Rotom_Proxmox_Backup/.data` is authorized only to Proxmox `192.168.1.68` and is mounted by PVE as `nas-rotom-proxmox-backup` under `/mnt/pve/nas-rotom-proxmox-backup`. The Rotom guest has no mount, fstab entry, or systemd reference for that share. Conversely, `Rotom_Restic_Backup/.data` remains authorized only to Rotom `192.168.1.69`. This keeps whole-VM backup traffic and guest Restic storage on distinct NFS exports even though both terminate on NAS `192.168.1.70`.
+Two intentional hypervisor-only NFS backup paths now exist. NAS `Rotom_Proxmox_Backup/.data` is authorized only to Proxmox `192.168.1.68` and is mounted by PVE as `nas-rotom-proxmox-backup` under `/mnt/pve/nas-rotom-proxmox-backup` for VZDump. NAS `Proxmox_Restic_Backup/.data` is also authorized only to Proxmox `192.168.1.68` and is mounted at `/mnt/nas-proxmox-restic-backup` through Proxmox `/etc/fstab` with systemd automount for host-configuration Restic. The Rotom guest has no mount, fstab entry, or systemd reference for either Proxmox backup share. Conversely, `Rotom_Restic_Backup/.data` remains authorized only to Rotom `192.168.1.69`. This keeps whole-VM VZDump, Proxmox host-config Restic, and guest Restic on distinct NFS exports even though all terminate on NAS `192.168.1.70`.
 
 **Current downloader source correction:** JAR-31 live verification shows `/mnt/nas-downloaders` configured and mounted from NAS `Downloader/.data`. Current `/etc/fstab`, the generated `mnt-nas\x2ddownloaders.mount`, the active NFSv3 source, and current `showmount -e 192.168.1.70 | grep -i download` all agree on `Downloader/.data`; the supplied `showmount` result exposed that export to `192.168.1.69`. This supersedes the earlier JAR-29/JAR-30 current-state wording naming `Downloads/.data` while retaining those older statements as dated historical evidence.
 
-**Current Restic source and controls:** Rotom uses NAS `Rotom_Restic_Backup/.data`, exported to Rotom `192.168.1.69`, mounted at `/mnt/nas-rotom-restic-backup` over NFSv3. Current `/etc/fstab`, `/usr/local/sbin/rotom-restic-backup`, and `rotom-restic-backup.service` reference the active mount/repository path; manual access is `/usr/local/bin/backup-restic-to-nas`. The former `/mnt/nas-rotom-backup` NFS mount is unmounted and no longer used by Rotom; its old `Rotom_Home_Server_Backup` share is retained as rollback data.
+**Current Restic sources and controls:** Rotom uses NAS `Rotom_Restic_Backup/.data`, exported to Rotom `192.168.1.69`, mounted at `/mnt/nas-rotom-restic-backup` over NFSv3; current guest `/etc/fstab`, `/usr/local/sbin/rotom-restic-backup`, and `rotom-restic-backup.service` reference that repository path. Proxmox separately uses `Proxmox_Restic_Backup/.data`, exported to `192.168.1.68`, mounted at `/mnt/nas-proxmox-restic-backup` over NFSv3 by a host systemd automount; its backup script verifies the underlying NFS source before repository work. Both hosts use a local `backup-restic-to-nas` operator command, but the implementations and repositories are host-specific. The former guest `/mnt/nas-rotom-backup` NFS mount is unmounted and no longer used; `Rotom_Home_Server_Backup` remains rollback data.
 
 On the JAR-31 final reboot, the NAS recovery helper first failed when Media NFS was not yet ready, then retried automatically about 30 seconds later. The second run verified `/mnt/nas-downloaders`, `/mnt/nas-media`, `/mnt/nas-game`, both bindfs compatibility views, and service-account traversal before recovering the stopped NAS-backed containers. Final system state had zero failed units.
 
@@ -866,6 +872,10 @@ Current VM reservation and local-DNS identity are already verified: `192.168.1.6
 
 A read-only UniFi/controller inspection of the `.68`, `.69`, and `.70` clients plus firewall/NAT/port-forward configuration would resolve these items. Host-side `ip route`, resolver queries, and listener checks can reconfirm client state but cannot prove router configuration.
 
+### Wake-on-LAN end-to-end trigger — Needs Verification
+
+Host-side WOL is current and persistent: Proxmox `nic0` supports magic-packet wake, reports `Wake-on: g`, PCI wake is enabled, and `/etc/network/interfaces` reasserts `wol g` on interface bring-up. A complete physical power-off/return cycle also preserved the setting and restored VMID 100 plus the full Rotom runtime. The supplied evidence does not include the client-side magic-packet transmission, however, so it cannot establish that WOL caused that power-on. Resolve with one future controlled power-off where the sender invocation is captured before the NUC returns.
+
 ### Legacy NPM records — Needs Verification
 
 Historical NPM evidence retained legacy Smart Hub/Portainer/OliveTin/PalTools database rows that were `enabled=1` but absent from generated `proxy_host/*.conf` files. The RPD does not contain a fresh JAR-31/JAR-33 reread proving whether those rows still exist in the restored NPM database or whether administrator intent is to retain them.
@@ -884,7 +894,7 @@ Boot/recreation fail-closed behavior and the JAR-31 recovery retry path are veri
 
 ### Resolved or intentional states — not gaps
 
-- Current `/mnt/nas-downloaders`, `/mnt/nas-media`, `/mnt/nas-game`, both bindfs views, and boot-time recovery behavior were verified by JAR-31.
+- Current `/mnt/nas-downloaders`, `/mnt/nas-media`, `/mnt/nas-game`, both bindfs views, and boot-time recovery behavior were verified by JAR-31 and reverified during the later physical Proxmox power-cycle.
 - `jaredwines.com` is intentionally undeployed; its Compose project is retained. Starting it later is an administrative decision, not missing evidence.
 - Historical `jaredwinescom_default`, `olivetin_default`, `portainer_default`, and `palworld_default` network observations are not part of the current JAR-31 bridge map.
 - Homepage backup-status access no longer depends on a guest UFW rule because UFW is not installed in the current VM.

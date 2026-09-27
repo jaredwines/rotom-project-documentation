@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** Proxmox hypervisor `proxmox` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-09-27 — RPD maintenance cross-reference aligned to the canonical `00` contract
+**Documentation updated:** 2026-09-27 — Proxmox host-config Restic root/NFS permission boundary added
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -17,10 +17,10 @@ This is the canonical detailed owner of Rotom account identity and permission fa
 
 ### Evidence provenance
 
-**Documentation updated:** 2026-09-27 — live identity/group state retained; current Restic privilege/control names and permissions refreshed  
+**Documentation updated:** 2026-09-27 — Proxmox host-config Restic root/NFS permission boundary added  
 
 **Baseline method:** read-only inspection of the live host configuration, Docker metadata, systemd unit files, sudo policy, SSH metadata, filesystem modes, ACLs, NFS mount metadata, and non-mutating access tests. No passwords, password hashes, key contents, tokens, or private-key material were read or recorded.  
-**Update scope:** JAR-29 restored the ten storage-facing identities and JAR-30 established the package-created Docker privilege boundary. JAR-31 restored the application/recovery workload layer under those service identities. A fresh 2026-09-27 post-boot read reconfirmed `docker:x:989:` with no members, all ten service UID:GID/home contracts, and every service-home NAS symlink. Fran remains unrecreated and her backup sudoers rule remains deferred. Administrative Mac key-only access remains verified; no key contents are recorded.
+**Update scope:** JAR-29 restored the ten storage-facing identities and JAR-30 established the package-created Docker privilege boundary. JAR-31 restored the application/recovery workload layer under those service identities. A fresh 2026-09-27 post-boot read reconfirmed `docker:x:989:` with no members, all ten service UID:GID/home contracts, and every service-home NAS symlink. Later 2026-09-27 Proxmox host-config Restic commissioning added a root-only host backup implementation, protected credential path, and second Proxmox-only NFS backup export without changing guest/service identities. Fran remains unrecreated and her backup sudoers rule remains deferred. Administrative Mac key-only access remains verified; no key contents are recorded.
 
 ## 2. Current Phase B Identity and Access Model — 2026-09-27 refresh
 
@@ -46,7 +46,9 @@ JAR-31 restored production workloads under the Phase B service-account model. A 
 
 Ordinary NFS isolation remains numeric-ID based. Current downloader root is `988:5005` mode `2770`; the existing compatibility views provide Media/Game read-only access without broadening direct Downloader write access. The final reboot verified service-account traversal of those read-only views.
 
-JAR-66 adds a host-level NFS client boundary without changing Linux account identities: NAS `Rotom_Proxmox_Backup` is authorized only to Proxmox `192.168.1.68`, while `Rotom_Restic_Backup` remains authorized only to Rotom `192.168.1.69`. The Rotom guest has no mount or configuration reference for the Proxmox backup share.
+The current backup NFS client boundaries do not change Linux account identities: NAS `Rotom_Proxmox_Backup` and `Proxmox_Restic_Backup` are authorized only to Proxmox `192.168.1.68`, while `Rotom_Restic_Backup` remains authorized only to Rotom `192.168.1.69`. The Rotom guest has no mount or configuration reference for either Proxmox backup share.
+
+Proxmox host-configuration Restic is root-operated. `/usr/local/sbin/proxmox-restic-backup` is `root:root` mode `0700`; `/usr/local/bin/backup-restic-to-nas` is `root:root` mode `0755` but explicitly refuses non-root execution; `/etc/restic/nas-password` is `root:root` mode `0600`; and repository directory `/mnt/nas-proxmox-restic-backup/proxmox-restic-backup` was observed `root:root` mode `0700`. The generated staging root `/var/backups/proxmox-restic-recovery` is created under root control with restrictive umask. The backup deliberately excludes `/etc/pve/priv` and private `*.key` material. Because Proxmox `/root/.ssh/authorized_keys` is a symlink into `/etc/pve/priv`, the script preserves only a resolved copy of that public authorized-keys file rather than the private PVE tree or SSH private keys. No credential contents are recorded in the RPD.
 
 Jared's current exact-command rule is `/etc/sudoers.d/rotom-restic-backup`, mode `0440`, with `jared ALL=(root) NOPASSWD: /usr/local/sbin/rotom-restic-backup`; `visudo -cf` parsed it successfully and `sudo -n -l /usr/local/sbin/rotom-restic-backup` confirmed authorization. The shared human command is `/usr/local/bin/backup-restic-to-nas` (`root:root`, mode `0755`), which hands off through sudo to root-protected `/usr/local/sbin/rotom-restic-backup` (`root:root`, mode `0700`). Protected credential path is `/etc/restic/nas-password` (`root:root`, mode `0600`; contents never document). Fran's historical exact-command backup rule remains intentionally absent because Fran is not recreated. Current backup storage is `/mnt/nas-rotom-restic-backup` on NAS `Rotom_Restic_Backup`; the mounted share root is numeric `988:988` mode `0700`. Root-run Restic access/write and a later complete manual backup are verified. The mounted share root grants no group/other permission bits; however it is **not** literally `root:root` while mounted—the owner is numeric UID `988`, and numeric NFS identities remain authoritative. A fresh named-user denial matrix was not rerun against the new share during this cutover. The retired `/mnt/nas-rotom-backup` NFS path is unmounted and no longer used by current Rotom backup configuration.
 

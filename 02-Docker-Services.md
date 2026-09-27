@@ -2,9 +2,9 @@
 
 **Documentation set:** Rotom Project Documentation  
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
-**Scope:** Rotom workload layer; JAR-31 restoration retained, with the 16-container runtime freshly reverified post-boot on 2026-09-27  
+**Scope:** Rotom workload layer; JAR-31 restoration retained, with the 16-container runtime reverified again after the 2026-09-27 physical Proxmox power-cycle  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-27 — current VM-era backup recovery point and automation state refreshed
+**Documentation updated:** 2026-09-27 — physical-host WOL power-cycle runtime recovery reverified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -60,6 +60,10 @@ The final post-reboot acceptance compared the running names to the pre-reboot ca
 A fresh read-only audit after a real VM reboot reconfirmed Docker Engine `29.8.1`, Compose `v5.5.1`, Docker root `/var/lib/docker`, 16 total containers / 16 running / 0 stopped, `unless-stopped` on every container, and restart count `0` across the full set. The named bridge map exactly matched the JAR-31 assignments from Jellyfin `172.18.0.0/16` through Arcane `172.28.0.0/16`; NPM, Cloudflare DDNS, Home Assistant, and Homebridge remain host-network services. qBittorrent `wg0` was up at `10.2.0.2/32`; core HTTP probes returned expected `200` or application redirect `302` results.
 
 Arcane database inspection also showed Prowlarr current/running but qBittorrentVPN persisted as `unknown`, `running_count=0`, last updated 2026-09-22. Docker independently verifies qBittorrentVPN running with WireGuard up, so the Arcane row is retained as stale registry/status metadata rather than application-runtime authority.
+
+### Additional physical-host power-cycle recovery verification — 2026-09-27
+
+After persistent WOL configuration was added to Proxmox `nic0`, the physical host was shut down with `systemctl poweroff` and later returned. VMID 100 auto-started (`onboot: 1`). During the guest's early boot, `/mnt/nas-downloaders`, `/mnt/nas-media`, and `/mnt/nas-game` briefly appeared as failed mount units and only the 11 non-NAS-dependent containers were initially running. The existing `rotom-nas-docker-recovery.service` retried successfully, recovered qBittorrentVPN, Radarr, Sonarr, Gamarr, and Jellyfin, and exited `0/SUCCESS`. Final verification showed zero failed systemd units and the exact 16-container production set. qBittorrentVPN `wg0` was up at `10.2.0.2/32`; Downloader, Media, and Game resolved to their genuine NFSv3 NAS exports rather than local fallback directories. This is an additional verification of the already-adopted recovery design, not a Compose or container-definition change.
 
 ### Homepage/Glances post-restore monitoring reconciliation
 
