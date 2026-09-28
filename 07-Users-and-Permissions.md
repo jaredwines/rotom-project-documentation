@@ -2,9 +2,9 @@
 
 **Documentation set:** Rotom Project Documentation  
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
-**Hosts:** Proxmox hypervisor `proxmox` and Debian VM `rotom`  
+**Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-09-28 — JAR-68 canonical PVE administrative identity/key and backup-root paths documented
+**Documentation updated:** 2026-09-28 — current RPD/Codex/GitHub access model added; canonical PVE identity retained
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -49,6 +49,16 @@ PVE host-config Restic is root-operated. `/usr/local/sbin/pve-restic-backup` is 
 The Mac SSH config maps `pve` / `pve.rotom.casa` to `192.168.1.68` as `root` using `~/.ssh/id_ed25519_pve`, `IdentitiesOnly yes`, `AddKeysToAgent yes`, and `UseKeychain yes`. Both aliases were verified after cleanup. The old `proxmox` / `proxmox.rotom.casa` SSH aliases and old `~/.ssh/id_ed25519_proxmox{,.pub}` filenames are absent. PVE `/etc/hosts` likewise contains only the canonical `pve.rotom.casa pve` names for `.68`. Password-auth policy was not changed.
 
 The Rotom VM continues to use `rotom` / `rotom.casa`, user `jared`, and `~/.ssh/id_ed25519_rotom`. Private-key contents, passwords, and other authentication secrets are never recorded.
+
+### Current RPD / GitHub / Codex access — 2026-09-28
+
+The Debian `acl` package is now installed so `getfacl`/`setfacl` are available. Supplied final `getfacl -p /home/infra` output shows owner/group `infra:infra`, base owner/group access consistent with mode `0750`, named ACL `user:jared:--x`, mask `r-x`, and `other::---`. This gives Jared traversal through the private Infra home without granting directory listing or write access and without adding Jared to the `infra` group. Fran is not currently recreated and no current Fran ACL was established by this task.
+
+The current documentation/Git paths observed during this task are `/home/infra/documentation` as `root:root` mode `0755` and `/home/infra/documentation/rpd` as `jared:infra` mode `0750`. Jared can traverse `/home/infra`, read the documentation path, and write the `rpd` checkout. The private `/home/infra` parent remains the controlling boundary for unrelated local accounts. This current state supersedes the older 2026-09-16 documentation ownership/ACL description for these paths; that older state is retained below as historical evidence.
+
+Jared's general GitHub SSH identity is `~/.ssh/d_ed25519_github`. The private key is kept under Jared's account and must not be copied to `infra` or another service account; key contents and passphrases are never documented. Supplied output verified `ssh -T git@github.com` authenticated as GitHub account `jaredwines`, and the RPD checkout uses the SSH remote `git@github.com:jaredwines/rotom-project-documentation.git`. The user also set `~/.ssh` mode `0700`, the GitHub private-key file mode `0600`, public-key mode `0644`, and SSH config mode `0600`.
+
+Jared's Codex directory `/home/jared/.codex` was set to mode `0700` and `/home/jared/.codex/AGENTS.md` to mode `0600`. A fresh Codex session after those changes successfully loaded the file and followed its RPD path/discrepancy rules.
 
 ## 2A. Preserved Pre-Migration Identity and Access Model
 
@@ -263,9 +273,9 @@ The post-migration old-name audit found no active `game-server` references in th
 
 The parent home mode prevents unrelated local accounts from traversing into these otherwise group-readable Docker trees unless a targeted ACL grants access. At the baseline audit, direct traversal tests confirmed that each named account could read and traverse its own home but could not read or traverse the other six named homes. Media's later group migration changes its numeric group to 5000 while preserving this service-account organization. The Palworld account/home migration initially preserved `995:985`; the later Game GID migration changed current group ownership to `5001`. `/home/game` remains mode `0750`; after the targeted migration, zero GID-985 objects remained beneath it and the key roots `/home/game`, `/home/game/docker`, and both Palworld project directories were verified `995:5001`. The baseline full cross-account traversal matrix was not repeated after these changes. The inspection container binds the host root read-only, so its write-test results for the local homes were not used to evaluate host write permission; the authoritative owner and mode metadata above shows that each owner has write permission.
 
-### Authoritative documentation permissions — 2026-09-16
+### Historical documentation permissions — 2026-09-16
 
-The authoritative documentation directory and confirmed control files use this ownership and base-mode policy:
+At the 2026-09-16 pre-migration checkpoint, the documentation directory and confirmed control files used this ownership and base-mode policy. The current 2026-09-28 paths are documented above and supersede this table for present operations:
 
 | Path | Owner | Base mode | Recorded purpose |
 |---|---|---:|---|

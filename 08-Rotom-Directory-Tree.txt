@@ -8,7 +8,7 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-09-28; JAR-68 canonical PVE identity/backup naming, final post-reboot acceptance, historical-name cleanup, Restic snapshot cleanup, and refreshed whole-VM baseline recorded.
+# Documentation revised: 2026-09-28; Git-backed RPD/Codex discovery integration added, current documentation access refreshed, and JAR-68 final PVE/backup state retained.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the RPD.
 #
@@ -47,6 +47,29 @@
 # - Controlled physical PVE reboot changed boot ID; pve-cluster/pvedaemon/pveproxy active; VM100 auto-started.
 # - Final PVE acceptance: canonical Restic, whole-VM backup, monitoring and identity PASS; zero failed units.
 # - Final Rotom acceptance: 16 total / 14 intended running; Palworld Jared+Fran intentionally stopped/preserved; all 12 NFS automounts + RO bindfs passed; qBittorrent sentinel/wg0 passed; Homepage PVE CPU monitoring passed; guest Restic timer active/enabled; zero failed units.
+#
+# CURRENT RPD / CODEX / GITHUB INTEGRATION — 2026-09-28
+# /home/infra/                              infra:infra; private service home; current named ACL user:jared:--x
+# /home/infra/documentation/                root:root mode 0755 as observed during RPD Git commissioning
+#   rpd/                                    jared:infra mode 0750; Git checkout of current RPD reference set
+#     .git/                                  repository metadata
+#     .gitignore                             repository support metadata; not an RPD member unless added to Available Sources
+#     00-Rotom-Change-Log.md
+#     01-Rotom-Server-Inventory.md
+#     02-Docker-Services.md
+#     03-Network-and-Domains.md
+#     04-NAS-and-Storage.md
+#     05-Backup-and-Restore.md
+#     06-Maintenance-and-Automation.md
+#     07-Users-and-Permissions.md
+#     08-Rotom-Directory-Tree.txt
+# - Git origin: git@github.com:jaredwines/rotom-project-documentation.git; branch main; clean after verified fast-forward pull.
+# - Tracked .DS_Store was removed upstream; .gitignore was added and pulled successfully.
+# /home/jared/.ssh/d_ed25519_github         Jared general GitHub SSH identity; private contents never document
+# /home/jared/.codex/                       mode 0700 after hardening
+#   AGENTS.md                                mode 0600; global Rotom Codex entry point -> /home/infra/documentation/rpd
+# - Codex CLI updated from 0.157.1 to 0.158.0; fresh post-update session loaded AGENTS.md and returned the expected RPD path/first-read/conflict policy.
+# - The older pre-migration top-level /home/infra/documentation/AGENTS.md + README.md state was not re-inspected in this task; preserve it below only as dated historical evidence.
 #
 # The dated 2026-09-27 sections below are preserved historical checkpoints and may contain superseded pre-JAR-68 names or then-current 16-running observations.
 #

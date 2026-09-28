@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-28 — JAR-68 final PVE identity, backup naming, post-reboot acceptance, and refreshed VM baseline
+**Documentation updated:** 2026-09-28 — Git-backed RPD checkout/Codex discovery added; JAR-68 final PVE state retained
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -28,6 +28,7 @@ The accepted Phase B architecture now uses **PVE** as the product abbreviation a
 | PVE administration | `root`; canonical Mac aliases `pve` / `pve.rotom.casa`; `HostName 192.168.1.68`; key `~/.ssh/id_ed25519_pve`; fingerprint `SHA256:xVX+MEAncK6Z2aTbNinSufYpTwyER+NFSp8iIPf11Zg`; old SSH aliases removed |
 | Rotom VM | VMID `100`, name `rotom`; q35 + OVMF; `x86-64-v2-AES`; 8 vCPU; 12 GiB RAM; 100 GiB thin VirtIO SCSI; `onboot: 1` |
 | Rotom guest | Debian 13.7; `rotom.casa`; MAC `BC:24:11:97:10:47`; UniFi-reserved `192.168.1.69/24`; gateway/DNS `192.168.1.1` |
+| RPD / Codex integration | Git checkout `/home/infra/documentation/rpd` from `git@github.com:jaredwines/rotom-project-documentation.git`, branch `main`; Jared-global `/home/jared/.codex/AGENTS.md` directs Codex to the RPD and was functionally verified with Codex CLI `0.158.0` |
 | Docker runtime | Docker Engine `29.8.1`; Compose `v5.5.1`; 16 container objects; **14 intended running** because both Palworld containers are intentionally stopped to save resources |
 | Palworld | `palworld-server-jared` and `palworld-server-fran` intentionally stopped, not dead/restarting/OOM; `unless-stopped`; active worlds/saves reverified and preserved |
 | qBittorrentVPN | Running; fail-closed design retained; `wg0` verified `10.2.0.2/32`; Downloader sentinel and NAS mounts verified |
@@ -44,7 +45,7 @@ The accepted Phase B architecture now uses **PVE** as the product abbreviation a
 
 JAR-31 restored the production Compose/application layer into the Debian VM while retaining the Phase B service-account split. The Linux-side download identity is **`downloaders`** at UID:GID `901:5005`; current active Prowlarr/qBittorrent project discovery uses `/home/downloaders/docker`. Historical sections retain the old `downloads` name where they describe pre-migration state.
 
-ChatGPT-controlled browser work is not part of the Rotom administration or documentation workflow. Available Sources replacements are handled manually by Jared when needed. Apple Passwords/iCloud Passwords remains the credential source of truth; never record credential values or authentication material in the project documentation. See document 06 for the standing Mac/administration workflow and document 00 for RPD maintenance governance.
+ChatGPT-controlled browser work is not part of the Rotom administration or documentation workflow. Available Sources replacements are handled manually by Jared when needed. Rotom now also carries a Git-backed operational checkout of the current RPD at `/home/infra/documentation/rpd` for Codex/Git use; that checkout does not replace the Available Sources membership boundary or the maintenance contract in document 00. Apple Passwords/iCloud Passwords remains the credential source of truth; never record credential values or authentication material in the project documentation. See document 06 for the standing administration/Codex workflow and document 00 for RPD maintenance governance.
 
 | Account | Current responsibility |
 |---|---|
@@ -268,7 +269,7 @@ Available Sources determines the complete Rotom Project Documentation membership
 
 The current Project-backed Available Sources set is exactly the nine-file Core Numbered Reference Set (`00`–`08`) listed above. There are no additional current non-numbered Rotom Project Documentation files. Future files intentionally added to Available Sources become Rotom Project Documentation automatically, regardless of file type or extension; files removed from Available Sources cease to be current members without erasing their historical change-log references.
 
-On Rotom, `/home/infra/documentation/README.md` is the directory-level index and `/home/infra/documentation/AGENTS.md` supplies operating instructions. A fresh 2026-09-19 top-level listing confirms those are the only files currently deployed there; none of the current nine Rotom Project Documentation files are present at that location. These server-side control files are not part of the current Available Sources set unless intentionally added there in the future.
+On Rotom, `/home/infra/documentation/rpd` is now a verified Git working checkout of the nine-file Core Numbered Reference Set, with origin `git@github.com:jaredwines/rotom-project-documentation.git`, branch `main`, and a clean working tree after the verified 2026-09-28 fast-forward pull. The repository also contains `.gitignore` as Git support metadata; that file is not part of Rotom Project Documentation unless it is intentionally added to Available Sources. The local Git checkout is an operational mirror/reference for Codex and Git use and does not supersede Available Sources as the RPD membership boundary. `/home/jared/.codex/AGENTS.md` is the verified Jared-global Codex entry point and directs Codex to this checkout. The older 2026-09-19 statement that only top-level `/home/infra/documentation/AGENTS.md` and `README.md` were present is historical; those legacy top-level files were not re-inspected during the current integration task, so their present state remains unverified.
 
 ## 12. Historical Verification Record — 2026-09-19 through 2026-09-21
 

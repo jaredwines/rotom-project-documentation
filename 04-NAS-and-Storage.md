@@ -2,9 +2,9 @@
 
 **Documentation set:** Rotom Project Documentation  
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
-**Hosts:** Proxmox hypervisor `proxmox`, Debian VM `rotom`, and UniFi UNAS 2  
+**Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-28 — JAR-68 canonical PVE Restic/VM backup shares and final backup set documented
+**Documentation updated:** 2026-09-28 — current host header corrected to canonical PVE `pve`; JAR-68 storage state retained
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)

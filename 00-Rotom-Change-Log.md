@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-09-28 — JAR-68 PVE identity/backup naming normalization and final backup cleanup documented
+**Documentation updated:** 2026-09-28 — Git-backed RPD checkout and Codex discovery integration documented; JAR-68 state retained
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -52,6 +52,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-09-28 — Establish Git-backed RPD checkout and Codex discovery
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified / Documentation only.** Rotom now has a Git-backed local RPD checkout and a verified Jared-scoped Codex discovery path. This documentation task records the already-completed live changes and also corrects four current document headers that still used the superseded physical host name `proxmox`; it makes no additional live-system change.
+- **Changes:** Installed Debian package `acl`; restored narrow `jared` execute-only traversal on `/home/infra`; configured Jared's general GitHub SSH identity at `~/.ssh/d_ed25519_github` without documenting key material; cloned `git@github.com:jaredwines/rotom-project-documentation.git` to `/home/infra/documentation/rpd`; retained branch `main`; pulled the upstream `.gitignore`/`.DS_Store` cleanup with `--ff-only`; and created `/home/jared/.codex/AGENTS.md` so Codex starts from `01-Rotom-Server-Inventory.md`, reads the relevant RPD, inspects live state before changes, treats the checkout as read-only during normal work, and reports live/RPD discrepancies instead of silently forcing either side to match. `/home/jared/.codex` was tightened to mode `0700` and `AGENTS.md` to `0600`. Codex CLI updated from `0.157.1` to `0.158.0`. Current host labels in documents 03, 04, 06, and 07 were corrected to canonical PVE host `pve`.
+- **Evidence:** Supplied Rotom terminal output shows package `acl` installed successfully; final `/home/infra` ACL `user:jared:--x`; `/home/infra/documentation` observed `root:root` mode `0755`; `/home/infra/documentation/rpd` observed `jared:infra` mode `0750`; successful GitHub SSH authentication as account `jaredwines`; successful clone and clean `main` working tree tracking the expected SSH remote; successful fast-forward pull that deleted tracked `.DS_Store` and added `.gitignore`; and two fresh Codex sessions, including after upgrade to `0.158.0`, correctly identifying `/home/infra/documentation/rpd`, `01-Rotom-Server-Inventory.md`, and the live-vs-RPD discrepancy policy. No secret value or private-key content is recorded.
+- **Outstanding:** The older top-level `/home/infra/documentation/AGENTS.md` and `README.md` described in pre-migration evidence were not re-inspected in this task; their current presence/content remains unverified and they are not required by the verified Jared-global Codex workflow. Fran is not recreated/configured for Codex. Jared must manually replace the corresponding Mac-folder and Available Sources copies with this RPD update package.
 
 ## 2026-09-28 — JAR-68 normalize PVE identity and backup naming
 
