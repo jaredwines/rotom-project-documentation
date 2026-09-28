@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-09-28 — Git-backed legacy documentation/Codex discovery workflow added; canonical PVE/Rotom automation state retained
+**Documentation updated:** 2026-09-28 — `retired-helper` helper workflow decision/Mac verification added; Git-backed legacy documentation/Codex state retained
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -344,7 +344,8 @@ The current workflow is:
 - For Rotom work tied to an active **Linear** ticket, keep the ticket current during execution: record meaningful verified implementation milestones, material design or scope decisions, blockers, rollbacks, and intentional deferrals as they occur. Do not use Linear as a raw command transcript or duplicate routine diagnostics. When ChatGPT is actively assisting with the ticket and Linear access is available, make these meaningful updates during the work without requiring a separate request for each update. **The legacy documentation remains the canonical verified as-built source of truth**; update it from the final verified state at ticket closeout.
 - Generated packages and separate saved artifacts belong in the project's `Downloads/` folder. The project-managed `sources/` directory is read-only and is not a mechanism for updating Available Sources.
 - Rotom maintains an operational Git checkout of the current nine-file legacy documentation set at `/home/infra/documentation/retired-helper`, origin `git@github.com:jaredwines/rotom-runbook.git`, branch `main`. Git operations use Jared's general GitHub SSH identity and run as `jared`; do not copy that private key into service accounts. The checkout is a convenience/reference mirror for Codex and Git use, not a replacement for the Available Sources membership boundary.
-- During normal Codex work, treat the legacy documentation checkout as read-only and do not automatically pull. When explicitly asked to update it, use `git -C /home/infra/documentation/retired-helper pull --ff-only`; if local changes or divergence exist, stop and report them rather than discarding or merging automatically.
+- The adopted routine Git interface is a single `retired-helper` helper with subcommands `status`, `check`, `pull`, `diff`, `log [N]`, `commit "message"`, `push`, and `help`. The Mac helper at `/usr/local/bin/retired-helper` is verified through help/status/diff/check/log/pull safety behavior against `/Users/jared/Documents/ChatGPT/Rotom-Home-Server`. It uses `git --no-pager`, so normal output returns directly to the terminal instead of requiring `q`. The final supported design removes Y/N confirmation prompts: `commit` stages all changed, deleted, and new non-ignored legacy documentation files and creates the supplied local commit; `push` publishes existing commits immediately after safety checks.
+- A Rotom-targeted `/usr/local/bin/retired-helper` variant has been prepared for `/home/infra/documentation/retired-helper`, user `jared`, the expected SSH remote/`main`/`origin/main`, and the existing `/home/infra` traversal/access check, but supplied output has not yet verified its deployment. Until that verification exists, the verified Codex update instruction remains `git -C /home/infra/documentation/retired-helper pull --ff-only`. After the Rotom helper is installed and verified, update `/home/jared/.codex/AGENTS.md` to use `retired-helper pull` instead. In either form, if local changes or divergence exist, stop and report them rather than discarding or merging automatically.
 
 This policy supersedes the earlier browser-workflow and `00`–`08`-only documentation-scope decisions recorded in the change log. The verified current Codex discovery path is now Jared's global `/home/jared/.codex/AGENTS.md`, which points directly to the Git-backed legacy documentation checkout. The older top-level `/home/infra/documentation/AGENTS.md` and `README.md` were not re-inspected or modified during this task; their older state is preserved as historical evidence below. Preparing legacy documentation set does not by itself deploy files to Rotom or change its services.
 
@@ -359,6 +360,25 @@ Jared's general GitHub SSH identity is `~/.ssh/d_ed25519_github`; successful `ss
 For Codex, `/home/jared/.codex/AGENTS.md` is the verified global Rotom entry point. The directory was tightened to mode `0700` and `AGENTS.md` to mode `0600`. The file directs Codex to `/home/infra/documentation/retired-helper`, starts with `01-Rotom-Server-Inventory.md`, requires reading the relevant legacy documentation plus live-state inspection before changes, preserves service/data safety rules, treats the legacy documentation checkout as read-only during normal work, and requires live/legacy documentation discrepancies to be reported and investigated instead of silently changing either side.
 
 Codex CLI updated from `0.157.1` to `0.158.0`. Fresh sessions before and after the update correctly identified the legacy documentation path, the first-read inventory file, and the discrepancy policy, proving that the global `AGENTS.md` is being loaded in Jared's normal home-directory launch context. Codex configuration remains per Linux account; Fran is not currently recreated/configured. Never copy Codex login caches, API keys, device codes, tokens, or authentication-file contents into Rotom documentation.
+
+### legacy documentation helper workflow — adopted 2026-09-28
+
+The supported command namespace is:
+
+- `retired-helper status` — local repository summary without a network check.
+- `retired-helper check` — repository/integrity validation plus a fresh GitHub fetch and ahead/behind/divergence report.
+- `retired-helper pull` — clean-tree, fast-forward-only GitHub-to-local update.
+- `retired-helper diff` — non-paged unstaged/staged local differences.
+- `retired-helper log [N]` — non-paged recent commit history, default 10.
+- `retired-helper commit "message"` — stage all changed, deleted, and new non-ignored legacy documentation files and create a local commit only.
+- `retired-helper push` — push existing clean local commits only after refusing behind/diverged state.
+- `retired-helper help` — usage and safety summary.
+
+The Mac implementation at `/usr/local/bin/retired-helper` was syntax-checked and then exercised successfully for help/status/diff/check/log and guarded pull behavior. The supplied check output verified the expected repository path `/Users/jared/Documents/ChatGPT/Rotom-Home-Server`, SSH origin, `main`, `origin/main`, all nine core legacy documentation files tracked, no tracked `.DS_Store`, read/write access, and successful GitHub fetch. The supplied pull test correctly refused a dirty tree containing the seven intentional pending legacy documentation replacements. The final design was then revised to remove the earlier commit/push confirmation prompts so it behaves more like normal Git while retaining the wrapper's safety checks; that exact final revision has not yet been reverified from terminal output.
+
+A matching Rotom variant has been prepared for `/usr/local/bin/retired-helper` with `RPD_DIR=/home/infra/documentation/retired-helper`, expected user `jared`, the same remote/branch/upstream checks, and an additional `/home/infra` traversal/access test. Treat that Rotom helper as **Proposed / Needs Verification** until installation and successful `retired-helper check`/`retired-helper pull` output are supplied. The existing raw fast-forward command remains the verified Codex update path in the meantime.
+
+The Mac emitted a Git warning that an earlier commit identity had been derived automatically from the local username/hostname. Explicit global `user.name` and `user.email` configuration was recommended before routine use of `retired-helper commit`, but no confirming output has yet been supplied.
 
 When authoritative documents change, follow the canonical legacy documentation maintenance contract in `00-Rotom-Change-Log.md`; Jared performs any manual replacement of the Mac-folder and Available Sources copies. The on-server Git checkout is an operational reference mirror and does not change the Available Sources membership boundary.
 

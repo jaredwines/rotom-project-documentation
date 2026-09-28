@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-09-28 — Git-backed legacy documentation checkout and Codex discovery integration documented; JAR-68 state retained
+**Documentation updated:** 2026-09-28 — `retired-helper` helper workflow decision and Mac verification added; Git-backed Codex integration retained
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -52,6 +52,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-09-28 — Adopt `retired-helper` helper workflow for routine legacy documentation Git operations
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified on Mac / Proposed / Needs Verification on Rotom / Documentation only.** A single `retired-helper` command namespace was adopted for routine legacy documentation Git operations. The Mac helper is installed and functionally exercised; the final no-confirmation revision and the Rotom-targeted deployment have not yet been reverified from supplied output.
+- **Changes:** Adopted the supported interface `retired-helper status`, `retired-helper check`, `retired-helper pull`, `retired-helper diff`, `retired-helper log [N]`, `retired-helper commit "message"`, `retired-helper push`, and `retired-helper help`. The helper disables Git paging with `git --no-pager`; `status` stays local-only; `check` validates repository identity, the tracked core `00`–`08` set, `.DS_Store` state, filesystem access, GitHub reachability, and ahead/behind/divergence; `pull` requires a clean tree and only fast-forwards; `commit` stages all changed, deleted, and new non-ignored legacy documentation files before committing the supplied message; and `push` refuses dirty, behind, or diverged state. The final design deliberately removes Y/N confirmation prompts so the wrapper behaves more like normal Git while retaining legacy documentation-specific guardrails. The verified Mac checkout is `/Users/jared/Documents/ChatGPT/Rotom-Home-Server`; the Rotom-targeted helper uses `/home/infra/documentation/retired-helper` and includes the existing `/home/infra` traversal/access check.
+- **Evidence:** Supplied Mac terminal output shows `/usr/local/bin/retired-helper` passed `bash -n`, was installed root-owned/executable, and successfully ran `retired-helper help`, `retired-helper status`, `retired-helper diff`, and `retired-helper check`; the check verified the expected SSH remote, `main`, `origin/main`, all nine core files tracked, no tracked `.DS_Store`, and a successful GitHub fetch. `retired-helper pull` correctly refused while seven intentional legacy documentation files were locally modified. The same output also demonstrates non-paged `retired-helper log`/`retired-helper diff` behavior. No post-change terminal evidence was supplied for the later no-confirmation revision or for the Rotom-targeted helper.
+- **Outstanding:** Verify the final no-confirmation helper revision on Mac and install/verify the Rotom-targeted `/usr/local/bin/retired-helper`. Until Rotom verification is supplied, the already-verified Codex pull path remains `git -C /home/infra/documentation/retired-helper pull --ff-only`; after helper verification, update `/home/jared/.codex/AGENTS.md` to use `retired-helper pull`. Also verify an explicit Mac Git `user.name`/`user.email` configuration before relying on `retired-helper commit`; earlier supplied Git output showed an automatically derived commit identity.
 
 ## 2026-09-28 — Establish Git-backed legacy documentation checkout and Codex discovery
 
