@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** Proxmox hypervisor `proxmox`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-27 — Proxmox host-config Restic NFS storage added and verified
+**Documentation updated:** 2026-09-28 — JAR-68 canonical PVE Restic/VM backup shares and final backup set documented
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -20,61 +20,35 @@ This document records the current Phase B storage architecture and preserves the
 **Project:** Rotom-Home-Server  
 **Document:** `04-NAS-and-Storage.md`  
 **Baseline evidence:** 2026-09-14 22:46 PDT; read-only update 2026-09-15  
-**Documentation updated:** 2026-09-27 — Proxmox host-config Restic share/mount/repository added; guest Restic and PVE VZDump boundaries retained  
-**Status:** All twelve required application/storage NFS mounts remain guest-only systemd automounts. JAR-31 restored the production application/storage layer, compatibility bindfs views, and NAS recovery helper; JAR-32 replaced the guest Restic member with `Rotom_Restic_Backup`; JAR-66 added the separate hypervisor-only `Rotom_Proxmox_Backup` export and PVE storage; JAR-67 established recurring VMID 100 backups on that storage. Later on 2026-09-27 a second hypervisor-only backup export, `Proxmox_Restic_Backup`, was commissioned for Proxmox host-configuration Restic at `/mnt/nas-proxmox-restic-backup`. The Proxmox host still has no Rotom application NFS mounts.
+**Documentation updated:** 2026-09-27 — current Proxmox VZDump archive set and disconnect-safe manual path recorded; storage boundaries unchanged  
+**Status:** All twelve required application/storage NFS mounts remain guest-only systemd automounts. Guest `Rotom_Restic_Backup` remains unchanged. JAR-68 normalized the two PVE-only backup exports to `PVE_Restic_Backup` for host-config Restic and `Rotom_VM_Backup` for whole-VM VZDump; canonical mounts are `/mnt/nas-pve-restic-backup` and `/mnt/pve/nas-rotom-vm-backup`. The PVE host still has no Rotom application NFS mounts.
 
 The original audit was read-only. It did not recursively enumerate the NAS, modify mounts or permissions, restart containers, inspect secrets, traverse Restic repository internals, or create a hardlink test file. Later user-supplied checks, completed media GID changes, and the 2026-09-18 backup-share access-protection deployment are recorded below; they are separate from that audit. Unchanged capacity, mount, and systemd observations retain their original evidence dates.
 
-## 2. Current Storage State — 2026-09-27 backup refresh
+## 2. Current Storage State — 2026-09-28 JAR-68 final
 
-The storage boundary follows the virtualization design: Docker engine state stays on VM-local ext4 while application data reaches the NAS through guest-only NFS mounts.
+The Rotom guest storage contract remains unchanged: twelve NFS systemd automounts plus read-only Media/Game bindfs compatibility views. PVE has only backup-specific NAS mounts; it does not host the guest application shares.
 
-- **Proxmox storage:** `local` and `local-lvm` remain active. PVE VZDump storage `nas-rotom-proxmox-backup` is PVE-managed at `/mnt/pve/nas-rotom-proxmox-backup`, sourced from NAS `Rotom_Proxmox_Backup/.data`, restricted to `content backup`, negotiated NFSv3, and has no Proxmox `/etc/fstab` entry; enabled `rotom-daily` uses it for VMID 100 at `05:00` with snapshot + zstd and `7 daily / 4 weekly / 6 monthly`. Separately, Proxmox host-configuration Restic uses NAS `Proxmox_Restic_Backup/.data` at `/mnt/nas-proxmox-restic-backup`, configured in Proxmox `/etc/fstab` with `defaults,_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s`; its live mount negotiated NFSv3 and passed write/read/delete testing. Both are hypervisor backup exceptions, not Rotom application NFS mounts.
-- **Rotom VM disk / Docker root:** VMID `100` retains its 100 GiB VirtIO SCSI disk; DockerRootDir `/var/lib/docker` resolves to guest-local ext4, not NFS.
-- **Automount contract:** all twelve entries retain `defaults,_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s`.
-- **Current downloader correction:** `/mnt/nas-downloaders` is currently configured/mounted from **NAS `Downloader/.data`**. JAR-31 `/etc/fstab`, generated systemd mount unit, live `findmnt`, and `showmount` agree. This supersedes the earlier JAR-29/JAR-30 current-state claim naming `Downloads/.data`.
-- **Downloader root/content:** live root is UID:GID `988:5005`, mode `2770`; observed top-level data includes `.rotom-qbt-nas-ready` and `torrents`, with `games`, `incomplete`, `movies`, and `shows` beneath the torrent tree.
-- **Compatibility views:** `/mnt/nas-downloads-media-ro` and `/mnt/nas-downloads-game-ro` are active read-only bindfs views whose source is `/mnt/nas-downloaders`; `media` and `game` traversal tests passed after reboot.
-- **Production recovery behavior:** the adapted `rotom-nas-docker-recovery.service` is enabled. On the final JAR-31 reboot its first run failed because Media NFS was not yet ready; systemd retried about 30 seconds later, then the helper verified Downloader/Media/Game storage and the bindfs views and recovered qBittorrentVPN, Radarr, Sonarr, Gamarr, and Jellyfin. A later 2026-09-27 physical Proxmox power-cycle repeated the same class of transient failure: all three Downloader/Media/Game mount units were briefly failed and the guest initially had only 11 containers, then the recovery helper exited `0/SUCCESS`, all five NAS-backed containers returned, `systemctl --failed` returned zero, and the full 16-container set was restored.
-- **No local fallback acceptance:** final acceptance required real NFS/bindfs mounts and ended with the exact 16-container runtime set and zero failed units. The later power-cycle verification again confirmed `/mnt/nas-downloaders` from `Downloader/.data`, `/mnt/nas-media` from `Media/.data`, and `/mnt/nas-game` from `Game/.data` as genuine NFSv3 mounts after recovery; qBittorrentVPN `wg0` was up at `10.2.0.2/32`.
-- **Backup-share separation:** Rotom mounts NAS `Rotom_Restic_Backup/.data` at `/mnt/nas-rotom-restic-backup`; that export is restricted to Rotom `192.168.1.69`. Proxmox separately uses two exports restricted to `192.168.1.68`: `Rotom_Proxmox_Backup/.data` through PVE storage `nas-rotom-proxmox-backup` for VZDump, and `Proxmox_Restic_Backup/.data` at `/mnt/nas-proxmox-restic-backup` for host-configuration Restic. The guest does not mount or reference either Proxmox backup share. The former guest `/mnt/nas-rotom-backup` NFS mount is retired/unmounted; `Rotom_Home_Server_Backup` remains rollback-only.
-- **Mountpoint ownership lesson:** the 2026-09-27 live audit verifies the mounted `/mnt/nas-rotom-restic-backup` NFS root as numeric `988:988` mode `0700`. JAR-32 previously observed the underlying local mountpoint directory as `root:root` mode `0700` while unmounted, but the later post-boot audit did not isolate that local directory while fully unmounted, so the older observation remains dated historical evidence rather than current authority. While NFS is mounted, `ls`/`stat` show the NAS share-root metadata, not the local directory beneath the mount. Root-run backup access is verified; mounted owner permission belongs to numeric UID `988`.
-- **NFS discovery lesson:** the NAS-internal `/volume/.../.srv/.unifi-drive/...` tree exists on the NAS, not on Rotom. From Rotom, query the server with `/usr/sbin/showmount -e 192.168.1.70`; Debian supplies `showmount` through `nfs-common`, and Jared's current zsh PATH may not include `/usr/sbin`. `showmount -e 127.0.0.1` on Rotom queries Rotom itself and is not a NAS export check.
+### PVE host-config Restic storage
 
-Current mount contract:
+- NAS share/export: `PVE_Restic_Backup/.data`, authorized to PVE `192.168.1.68`.
+- Host mount: `/mnt/nas-pve-restic-backup`, `/etc/fstab` systemd automount.
+- Repository directory: `/mnt/nas-pve-restic-backup/pve-restic-backup`.
+- Repository ID: `8ca0218c645dc2968c2b21d67dbda3840794d8bc9c157c0515a85af30eb3d0e3`.
+- Superseded local mount `/mnt/nas-proxmox-restic-backup` was verified empty/unmounted/unreferenced and removed with `rmdir`.
 
-| Current VM mount | Live NAS source | Root metadata | Current role |
-|---|---|---|---|
-| `/mnt/nas-media` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Media/.data` | `988:5000` mode `2770` | Final media library |
-| `/mnt/nas-game` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Game/.data` | `988:5001` mode `2770` | Final Game library |
-| `/mnt/nas-infra` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Infra/.data` | `988:5002` mode `2770` | Infra storage boundary |
-| `/mnt/nas-smarthome` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Smarthome/.data` | `988:5003` mode `2770` | Smarthome storage boundary |
-| `/mnt/nas-documents` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Documents/.data` | `988:5004` mode `2770` | Documents storage boundary |
-| `/mnt/nas-downloaders` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Downloader/.data` | `988:5005` mode `2770` | Active torrent/download stack; sentinel + torrent tree verified |
-| `/mnt/nas-web` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Web/.data` | `988:5006` mode `2770` | Web storage boundary |
-| `/mnt/nas-filesync` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Filesync/.data` | `988:5007` mode `2770` | Filesync storage boundary |
-| `/mnt/nas-apps` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Apps/.data` | `988:5008` mode `2770` | Apps storage boundary |
-| `/mnt/nas-auth` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Auth/.data` | `988:5009` mode `2770` | Auth storage boundary |
-| `/mnt/nas-rotom-restic-backup` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Rotom_Restic_Backup/.data` | mounted root `988:988` mode `0700`; underlying local-directory mode not isolated while fully unmounted in the 2026-09-27 live audit | Canonical Restic repository/recovery storage |
-| `/mnt/nas-shared-drive` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Shared_Drive/.data` | `988:988` mode `0770` | Shared Drive/JAR-25 raw-image storage |
+### Whole-VM PVE storage
 
-Proxmox-only backup mount contract:
+- NAS share/export: `Rotom_VM_Backup/.data`, authorized to PVE `192.168.1.68`.
+- PVE storage ID: `nas-rotom-vm-backup`.
+- Mount: `/mnt/pve/nas-rotom-vm-backup`; PVE-managed NFS, `content backup`.
+- Six earlier VMID 100 backups were deliberately removed after exact storage/VM safety checks. The storage now contains the fresh verified baseline `vzdump-qemu-100-2026_09_28-00_09_19.vma.zst`, `47,415,540,796` bytes. zstd integrity and full `vma verify` passed; VM100 remained running. The archive is currently unprotected and participates in normal retention.
 
-| Proxmox mount | Live NAS source | Observed root metadata | Current role |
-|---|---|---|---|
-| `/mnt/nas-proxmox-restic-backup` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Proxmox_Restic_Backup/.data` | mounted root `988:988` mode `0770`; local mountpoint created `root:root` mode `0755` before mounting | Proxmox host-configuration Restic; repository `/mnt/nas-proxmox-restic-backup/proxmox-restic-backup` (`8ca0218c64`) |
+### Guest storage and post-reboot acceptance
 
-The Proxmox Restic fstab entry uses `defaults,_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s`. Post-reboot testing showed the automount layer can be active while the underlying NFS mount is still absent, so `/usr/local/sbin/proxmox-restic-backup` deliberately reads the directory (`timeout 35s ls -A`) before requiring an NFS/NFS4 `findmnt` result and exact expected source. This prevents accidental local fallback while allowing the automount to activate.
+All twelve guest NFS automounts and both read-only bindfs views passed final post-reboot verification. `/mnt/nas-downloaders/.rotom-qbt-nas-ready` remained valid; qBittorrentVPN saw the expected mounts and WireGuard `10.2.0.2/32`. Current finished media/library and torrent/download separation remains unchanged.
 
-The current Linux identity/path is `downloaders` / `/mnt/nas-downloaders`. Historical sections below preserve `downloads` / `/mnt/nas-downloads` and the former `Downloads/.data` source where they describe pre-migration or earlier Phase B observations; do not rewrite those historical records as though they were the current source.
-
-The dedicated Proxmox backup storage is intentionally outside the guest mount table:
-
-| Proxmox host path | Live NAS source | Access boundary | Role |
-|---|---|---|---|
-| `/mnt/pve/nas-rotom-proxmox-backup` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Rotom_Proxmox_Backup/.data` | export authorized only to Proxmox `192.168.1.68`; PVE storage `content backup` | Whole-VM VZDump storage; native `rotom-daily` writes routine VMID 100 backups here; sole current verified archive is `vzdump-qemu-100-2026_09_27-14_08_51.vma.zst` and is not protected in the final observed listing |
-
-JAR-66 implemented the Proxmox-specific backup export as the intentional hypervisor-storage exception: `Rotom_Proxmox_Backup` is authorized only to `192.168.1.68` and mounted by Proxmox at `/mnt/pve/nas-rotom-proxmox-backup`. The live PVE mount negotiated NFSv3, is managed through `/etc/pve/storage.cfg` rather than `/etc/fstab`, and passed a write/read/delete check. JAR-67 left that storage/export boundary unchanged while adding native PVE job `rotom-daily`. Later on 2026-09-27 the administrator intentionally removed all older VMID 100 backup artifacts—including the protected JAR-33 baseline, the JAR-67 commissioning archive, a later verified manual archive, and the failed-run log—without changing the storage or scheduler. A fresh manual `/usr/local/bin/backup-proxmox-to-nas` run then created the sole current archive `vzdump-qemu-100-2026_09_27-14_08_51.vma.zst` (`45,424,272,161` bytes); full VMA verification returned exit code `0`, VM 100 remained running, and the final listing showed only that archive plus its normal log. No `.protected` marker was present. No Rotom application share is mounted on Proxmox, and the Proxmox backup share is not mounted inside the Rotom VM.
+The old PVE backup share names are no longer part of active PVE configuration. Historical sections below may preserve their dated names as evidence.
 
 ## 2A. Preserved Pre-Migration NAS and Storage Overview
 
