@@ -2,9 +2,9 @@
 
 **Documentation set:** Rotom Project Documentation  
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
-**Scope:** Rotom workload layer; JAR-31 restoration retained, with the 16-container runtime reverified again after the 2026-09-27 physical Proxmox power-cycle  
+**Scope:** Rotom workload layer; final JAR-68 post-reboot state is 16 container objects / 14 intended running with both Palworld servers intentionally stopped
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-27 — physical-host WOL power-cycle runtime recovery reverified
+**Documentation updated:** 2026-09-28 — JAR-68 final post-reboot Docker state and intentional Palworld stop documented
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -26,93 +26,34 @@ Services are grouped by the Linux account directory containing their active Comp
 
 **Port notation:** Entries containing `->` are published host-to-container mappings. Bare ports are listed separately as container-only ports with no host mapping shown. “None shown” means the source PORTS field was blank; it does not establish network mode or lack of connectivity.
 
-## 1A. Current Phase B Docker State — JAR-31, 2026-09-26
+## 1A. Current Phase B Docker State — final JAR-68 acceptance, 2026-09-28
 
-JAR-31 restored the production application layer inside the Debian `rotom` VM. The Proxmox host remains hypervisor-only with no application Docker/Podman runtime.
+The Proxmox VE host `pve` remains hypervisor-only; the application Docker runtime is inside the Debian `rotom` VM. Current runtime foundation remains Docker Engine `29.8.1`, containerd `2.3.6`, Docker Compose `v5.5.1`, local Docker root `/var/lib/docker`, and package-created Docker group GID `989` with no members.
 
-Current runtime foundation remains Docker Engine Community `29.8.1`, containerd `2.3.6`, runc `1.5.1`, Docker Compose `v5.5.1`, buildx `v0.37.1`, local Docker root `/var/lib/docker` on guest ext4, and daemon-wide `json-file` logging `max-size=10m`, `max-file=3`. A fresh 2026-09-27 post-boot read again verified Docker group GID `989` with no members.
+### Verified current intended state
 
-### Verified current running set
+There are **16 total container objects and 14 intended running containers**. Both Palworld containers were intentionally stopped by the administrator to save resources; they remain preserved with `unless-stopped`, are not dead/restarting/OOM, and their current world save trees were reverified during final JAR-68 acceptance. All other expected production containers are running.
 
-The final post-reboot acceptance compared the running names to the pre-reboot capture and found an exact 16-container match. `jaredwines.com` remains intentionally absent as a container object.
-
-| Container | Current role / verification |
+| Container | Current state / role |
 |---|---|
-| `arcane` | Restored from preserved named volume; healthy; zero restarts; local and HTTPS HTTP 200 |
-| `cloudflare-ddns` | Running; JAR-31 pre-reboot check matched Rotom WAN and Cloudflare DNS at `68.8.40.225` |
-| `homepage` | Healthy; canonical Host-header local HTTP 200 and `https://rotom.casa` HTTP 200 |
-| `glances` | Running with Homepage project |
-| `nginx-proxy-manager` | Running; reverse-proxied paths used by acceptance checks |
-| `jellyfin` | Running; recovered automatically by boot NAS helper after initial NFS race |
-| `radarr` | Running; recovered automatically by boot NAS helper |
-| `sonarr` | Running; recovered automatically by boot NAS helper |
-| `prowlarr` | Running; core HTTP 302 accepted |
-| `qbittorrentvpn` | Running; recovered automatically by boot NAS helper; WireGuard `wg0` verified present after reboot |
-| `palworld-server-jared` | Healthy; zero restarts; network relocated to `172.27.0.0/16` after stopped-state save/archive gate |
-| `palworld-server-fran` | Healthy; zero restarts; network `172.25.0.0/16` |
-| `gamarr` | Healthy; zero restarts; recovered automatically by boot NAS helper |
-| `home-assistant` | Running; local HTTP 200 |
-| `homebridge` | Running; local HTTP 200 |
-| `alohamillworks.com` | Running; local and proxied HTTP 200 |
+| `arcane` | Running |
+| `cloudflare-ddns` | Running |
+| `homepage` | Running |
+| `glances` | Running |
+| `nginx-proxy-manager` | Running |
+| `jellyfin` | Running |
+| `radarr` | Running |
+| `sonarr` | Running |
+| `prowlarr` | Running |
+| `qbittorrentvpn` | Running; `wg0` verified `10.2.0.2/32`; NAS sentinel/mount checks passed |
+| `palworld-server-jared` | **Intentionally stopped**; world `DB40338954B844C28CEA21471A392F98` preserved |
+| `palworld-server-fran` | **Intentionally stopped**; world `396F5898378F4E9CAE89461F403653D9` preserved |
+| `gamarr` | Running |
+| `home-assistant` | Running |
+| `homebridge` | Running |
+| `alohamillworks.com` | Running |
 
-### 2026-09-27 live post-boot Docker verification
-
-A fresh read-only audit after a real VM reboot reconfirmed Docker Engine `29.8.1`, Compose `v5.5.1`, Docker root `/var/lib/docker`, 16 total containers / 16 running / 0 stopped, `unless-stopped` on every container, and restart count `0` across the full set. The named bridge map exactly matched the JAR-31 assignments from Jellyfin `172.18.0.0/16` through Arcane `172.28.0.0/16`; NPM, Cloudflare DDNS, Home Assistant, and Homebridge remain host-network services. qBittorrent `wg0` was up at `10.2.0.2/32`; core HTTP probes returned expected `200` or application redirect `302` results.
-
-Arcane database inspection also showed Prowlarr current/running but qBittorrentVPN persisted as `unknown`, `running_count=0`, last updated 2026-09-22. Docker independently verifies qBittorrentVPN running with WireGuard up, so the Arcane row is retained as stale registry/status metadata rather than application-runtime authority.
-
-### Additional physical-host power-cycle recovery verification — 2026-09-27
-
-After persistent WOL configuration was added to Proxmox `nic0`, the physical host was shut down with `systemctl poweroff` and later returned. VMID 100 auto-started (`onboot: 1`). During the guest's early boot, `/mnt/nas-downloaders`, `/mnt/nas-media`, and `/mnt/nas-game` briefly appeared as failed mount units and only the 11 non-NAS-dependent containers were initially running. The existing `rotom-nas-docker-recovery.service` retried successfully, recovered qBittorrentVPN, Radarr, Sonarr, Gamarr, and Jellyfin, and exited `0/SUCCESS`. Final verification showed zero failed systemd units and the exact 16-container production set. qBittorrentVPN `wg0` was up at `10.2.0.2/32`; Downloader, Media, and Game resolved to their genuine NFSv3 NAS exports rather than local fallback directories. This is an additional verification of the already-adopted recovery design, not a Compose or container-definition change.
-
-### Homepage/Glances post-restore monitoring reconciliation
-
-After the JAR-31 reboot acceptance, Homepage itself remained healthy but its URL-based site monitors logged repeated `getaddrinfo EAI_AGAIN` errors for internal `*.rotom.casa` names. The fix is intentionally scoped to the Homepage container rather than a global DNS rewrite:
-
-- `homepage` now has `extra_hosts` mappings to `192.168.1.69` for `rotom.casa`, `nginx.rotom.casa`, `arcane.rotom.casa`, `home-assistant.rotom.casa`, and `homebridge.rotom.casa`. `HOMEPAGE_ALLOWED_HOSTS=rotom.casa` remains unchanged.
-- Nginx Proxy Manager, Arcane, Home Assistant, and Homebridge site-monitor probes each returned HTTP 200 after the mapping change, and no new `EAI_AGAIN` errors appeared in the verification window.
-- Rotom Backup Schedule uses the custom API URL `http://192.168.1.69:8787/backup-status`; the verified response reports the intentionally held schedule as `INACTIVE` / `disabled`, with `next_run` and `last_run` `Unknown` and `last_result` `success`.
-- Glances `diskio` inspection exposed `sda`, `sda1`, `sda2`, `sda3`, and `sr0`; the guest root is `/dev/sda2`, so Homepage Disk Usage now uses `metric: disk:sda` instead of the stale bare-metal `disk:nvme0n1`.
-- The Debian VM exposes no CPU temperature sensor. The physical NUC's Proxmox host exposes `coretemp` `Package id 0`; a small read-only host service on `192.168.1.68:8788` presents that sensor through a Glances-compatible `/api/4/sensors` endpoint. Homepage CPU Temperature therefore remains a `type: glances` widget pointed at `http://192.168.1.68:8788`, `version: 4`, `metric: sensor:Package id 0`, `chart: true`, `refreshInterval: 1000`, and `pointsLimit: 15`. This preserves the rolling graph while sourcing the actual physical CPU package temperature.
-
-Do not revert Disk Usage to `nvme0n1`, and do not expect `Package id 0` to appear inside the Debian VM unless hardware sensor passthrough is deliberately added later.
-
-### Current Compose/storage adaptation
-
-- Prowlarr/qBittorrentVPN are canonically owned/stored in the current `downloaders` service domain under `/home/downloaders/docker`. Arcane discovery uses `/home/infra/docker/downloads -> /home/downloaders/docker`; fresh Docker metadata records Prowlarr `compose_workdir=/home/infra/docker/downloads/prowlarr` through that symlink, while qBittorrentVPN records `/home/downloaders/docker/qbittorrentvpn`. Arcane itself persists both project records through the symlinked `/home/infra/docker/downloads/...` discovery path. These discovery/workdir strings do not transfer ownership back to Infra.
-- Current `/mnt/nas-downloaders` is NFSv3 from UNAS **`Downloader/.data`**, root `988:5005` mode `2770`. This supersedes the earlier JAR-29/JAR-30 current-state statement naming `Downloads/.data`.
-- The qBittorrent startup sentinel is present at `/mnt/nas-downloaders/.rotom-qbt-nas-ready`.
-- Persistent compatibility views keep the historical consumer paths: `/mnt/nas-downloads-media-ro` and `/mnt/nas-downloads-game-ro` are read-only bindfs views sourced from `/mnt/nas-downloaders`; Media/Game traversal checks passed after reboot.
-- Arcane named volume `arcane_arcane-data` was present before start. Current inspected mounts were its named-volume data at `/app/data` RW, `/home/downloaders/docker` RO, `/home/infra/docker` RW, and `/var/run/docker.sock` RW.
-
-### Current application bridge map
-
-| Docker network | Current subnet | Current use |
-|---|---|---|
-| `bridge` | `172.17.0.0/16` | default bridge |
-| `jellyfin_default` | `172.18.0.0/16` | Jellyfin |
-| `radarr_default` | `172.19.0.0/16` | Radarr |
-| `sonarr_default` | `172.20.0.0/16` | Sonarr |
-| `prowlarr_default` | `172.21.0.0/16` | Prowlarr |
-| `qbittorrentvpn_default` | `172.22.0.0/16` | qBittorrentVPN |
-| `gamarr_default` | `172.23.0.0/16` | Gamarr |
-| `homepage` | `172.24.0.0/16` | Homepage + Glances |
-| `palworld-fran_default` | `172.25.0.0/16` | Fran Palworld |
-| `alohamillworkscom_default` | `172.26.0.0/16` | Aloha Millworks |
-| `palworld-jared_default` | `172.27.0.0/16` | Jared Palworld |
-| `arcane_default` | `172.28.0.0/16` | Arcane |
-
-Nginx Proxy Manager, Cloudflare DDNS, Home Assistant, and Homebridge retain their previously documented host-network architecture; the final named-network map contains no per-service bridge for them.
-
-### Palworld Jared network relocation safety
-
-Before moving Jared Palworld off the Homepage collision, the five-path active-save gate matched the preserved JAR-26 structure. The container was stopped cleanly and verified exited; a stopped-state archive `/var/tmp/jar31-palworld-jared-pre-network-move.tar.gz` was created (observed size `51681150`, UID/GID `0:0`, mode `0644`). The Compose project network was then recreated as `172.27.0.0/16`; the server returned healthy on the preserved image with zero restarts. Do not treat the `/var/tmp` archive as a substitute for the Restic/Palworld recovery strategy.
-
-### Reboot acceptance
-
-A real VM reboot changed the boot ID. Docker/containerd returned active/enabled. The adapted NAS recovery helper's first run failed when Media NFS was not yet ready, then its configured systemd retry succeeded about 30 seconds later and automatically recovered qBittorrentVPN, Radarr, Sonarr, Gamarr, and Jellyfin. The exact 16-container running set returned; Arcane, Homepage, both Palworld servers, and Gamarr were healthy with zero restarts; qBittorrent `wg0` was present; all core HTTP probes passed; zero systemd units were failed.
-
-Everything below remains valuable pre-migration/historical configuration evidence where explicitly labeled, but the current runtime facts in this JAR-31 section supersede older “not yet restored” statements.
+`jaredwines.com` remains intentionally undeployed and has no container object. Final post-reboot acceptance verified all twelve NAS automounts, both read-only bindfs compatibility views, qBittorrentVPN, Homepage PVE CPU monitoring, guest Restic timer state, and zero failed guest systemd units. The earlier 16-running observations below remain valid historical checkpoints but are superseded for the current intended runtime by this 14-running state.
 
 ## 2. Core Infrastructure — `infra`
 
@@ -238,8 +179,8 @@ Game services are owned by the `game` service account under `/home/game/docker/`
 
 | Current container name | Observed image | Observed status | Published ports | Container-only ports shown | Compose file |
 | --- | --- | --- | --- | --- | --- |
-| `palworld-server-fran` | `thijsvanloef/palworld-server-docker:latest` | Running, healthy after 2026-09-19 GID migration | `0.0.0.0:8212->8212/udp`, `[::]:8212->8212/udp`, `0.0.0.0:27016->27016/udp`, `[::]:27016->27016/udp` | `25575/tcp` | `/home/game/docker/palworld-server-fran/compose.yaml` |
-| `palworld-server-jared` | `thijsvanloef/palworld-server-docker:latest` | Running, healthy after 2026-09-19 GID migration | `0.0.0.0:8211->8211/udp`, `[::]:8211->8211/udp`, `0.0.0.0:27015->27015/udp`, `[::]:27015->27015/udp` | `25575/tcp` | `/home/game/docker/palworld-server-jared/compose.yaml` |
+| `palworld-server-fran` | `thijsvanloef/palworld-server-docker:latest` | **Intentionally stopped** at final JAR-68 acceptance; preserved, not dead/restarting/OOM; `unless-stopped` | `0.0.0.0:8212->8212/udp`, `[::]:8212->8212/udp`, `0.0.0.0:27016->27016/udp`, `[::]:27016->27016/udp` | `25575/tcp` | `/home/game/docker/palworld-server-fran/compose.yaml` |
+| `palworld-server-jared` | `thijsvanloef/palworld-server-docker:latest` | **Intentionally stopped** at final JAR-68 acceptance; preserved, not dead/restarting/OOM; `unless-stopped` | `0.0.0.0:8211->8211/udp`, `[::]:8211->8211/udp`, `0.0.0.0:27015->27015/udp`, `[::]:27015->27015/udp` | `25575/tcp` | `/home/game/docker/palworld-server-jared/compose.yaml` |
 | `gamarr` | `ghcr.io/gamarr-app/gamarr:latest` | Running; healthy in fresh 2026-09-19 audit (image-provided healthcheck) | `0.0.0.0:6767->6767/tcp`, `[::]:6767->6767/tcp` | None shown | `/home/game/docker/gamarr/compose.yaml` |
 
 ### Palworld account/home migration — 2026-09-18

@@ -8,57 +8,48 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-09-27; Proxmox host-config Restic layer added/restore-tested/scheduled; current WOL and guest Restic/PVE recovery state retained; pre-migration tree remains historical recovery evidence.
+# Documentation revised: 2026-09-28; JAR-68 canonical PVE identity/backup naming, final post-reboot acceptance, historical-name cleanup, Restic snapshot cleanup, and refreshed whole-VM baseline recorded.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the RPD.
 #
-# CURRENT TOPOLOGY — ROTOM VIRTUALIZATION BASELINE + PROXMOX WOL + GUEST RESTIC + PROXMOX HOST RESTIC + PVE VZDUMP SCHEDULING, 2026-09-27
-# - Physical NUC runs Proxmox `proxmox` / `proxmox.rotom.casa` at 192.168.1.68; physical `nic0` is Intel I219-V/e1000e MAC 1c:69:7a:0e:f2:f7 with WOL `pumbg` / current `Wake-on: g`; hypervisor has no Rotom application Docker/NFS workload. Backup-only NFS exceptions are PVE VZDump storage `/mnt/pve/nas-rotom-proxmox-backup` and host-config Restic `/mnt/nas-proxmox-restic-backup`.
-# - Proxmox monitoring helper: /usr/local/sbin/rotom-temp-api + /etc/systemd/system/rotom-temp-api.service; binds 192.168.1.68:8788 and exposes /temperature plus Glances-compatible /api/4/sensors for coretemp `Package id 0`; this is a read-only Homepage temperature bridge, not an application runtime.
-# - VMID 100 `rotom`: Debian 13.7, q35/OVMF, x86-64-v2-AES, 8 vCPU, 12 GiB RAM, 100 GiB thin VirtIO SCSI; no iGPU passthrough.
-# - Guest identity: rotom.casa, VirtIO MAC BC:24:11:97:10:47, UniFi-reserved DHCP 192.168.1.69/24; public DNS/WAN observed 68.8.40.225.
-# - Docker Engine 29.8.1 / Compose v5.5.1; Docker+containerd enabled; /var/lib/docker on guest-local ext4; daemon json-file max-size 10m / max-file 3.
-# - Last explicit docker-group verification remains package-created GID 989 with no members; JAR-31 does not establish a return to historical GID 984 broad membership.
-# - JAR-31 final reboot restored exact 16-container running set; Jared Wines intentionally has no container object; zero failed systemd units.
-# - Healthy after reboot with zero restarts: Arcane, Homepage, Jared Palworld, Fran Palworld, Gamarr. qBittorrent WireGuard wg0 present.
-# - Core HTTP acceptance passed; Homepage requires Host: rotom.casa (raw 127.0.0.1:3001 correctly returns host-validation 400).
-# - JAR-24 Restic snapshot fbe1838e and JAR-25 raw NVMe image remain pre-migration recovery artifacts. Current VM-era guest Restic point is `f666d63c` (2026-09-27 13:30:28 PDT; 21/21 repository check PASS). Proxmox host-config Restic repository `8ca0218c64` has verified restore-tested baseline `0cf1c62a` and final observed latest snapshot `a59fc03f`; timer is enabled/active at 04:00 with 7 daily / 4 weekly / 12 monthly retention. Sole current whole-VM archive remains `vzdump-qemu-100-2026_09_27-14_08_51.vma.zst` (45,424,272,161 bytes; full VMA verify exit 0). Guest `rotom-restic-backup.timer` remains around 03:00; native PVE `rotom-daily` remains at 05:00 with 7 daily / 4 weekly / 6 monthly retention.
+# CURRENT TOPOLOGY — JAR-68 FINAL, 2026-09-28
+# - Physical NUC runs Proxmox VE as `pve` / `pve.rotom.casa` at 192.168.1.68. `nic0` is Intel I219-V/e1000e MAC 1c:69:7a:0e:f2:f7; WOL `g`; previously documented TSO/GSO mitigation retained.
+# - Canonical Mac PVE SSH: aliases `pve` / `pve.rotom.casa` -> 192.168.1.68 root using ~/.ssh/id_ed25519_pve. Old `proxmox*` aliases/key filenames are absent. PVE /etc/hosts contains canonical `192.168.1.68 pve.rotom.casa pve`.
+# - PVE monitoring: /usr/local/sbin/pve-cpu-temp-api + /etc/systemd/system/pve-cpu-temp-api.service; 192.168.1.68:8788; Homepage label `PVE CPU Temperature`.
+# - VMID 100 `rotom`: q35/OVMF, x86-64-v2-AES, 8 vCPU, 12 GiB RAM, 100 GiB; onboot=1; guest rotom.casa at reserved 192.168.1.69, MAC BC:24:11:97:10:47.
+# - Docker: 16 total container objects / 14 intended running; both Palworld containers intentionally stopped with worlds preserved; qBittorrentVPN wg0 10.2.0.2/32; final post-reboot guest acceptance 0 failed units.
 #
-# PROXMOX HOST WOL / NETWORK CONFIG — CURRENT 2026-09-27
-# /etc/network/interfaces                  current Proxmox network config; `iface nic0 inet manual` includes `post-up /usr/sbin/ethtool -s nic0 wol g`; vmbr0 remains 192.168.1.68/24 via nic0
-# /etc/network/interfaces.pre-wol          rollback copy created immediately before the WOL persistence edit
-# - Live validation: `ifquery --check nic0` PASS; `ifquery --check vmbr0` PASS; `/sys/class/net/nic0/device/power/wakeup` = enabled; post-cycle `Wake-on: g`.
-# - Physical `systemctl poweroff`/return cycle: Proxmox returned, VMID 100 auto-started (`onboot: 1`), Rotom briefly had failed Downloader/Media/Game mount units + 11 containers, then the existing recovery helper restored all five NAS-backed containers; final state 0 failed units / 16 containers / qBittorrent wg0 10.2.0.2/32 / genuine NFSv3 Downloader, Media, Game mounts.
-# - End-to-end magic-packet wake remains NEEDS VERIFICATION because the supplied transcript does not capture the sender invocation or otherwise prove WOL caused the power-on.
+# PVE HOST-CONFIG RESTIC — CURRENT
+# /etc/fstab                                  canonical automount -> PVE_Restic_Backup/.data at /mnt/nas-pve-restic-backup
+# /etc/restic/nas-password                   protected credential path; contents never document
+# /usr/local/bin/backup-restic-to-nas        unchanged manual launcher name
+# /usr/local/sbin/pve-restic-backup          canonical root worker
+# /etc/systemd/system/pve-restic-backup.service
+# /etc/systemd/system/pve-restic-backup.timer  enabled/active; daily 04:00; Persistent=true; AccuracySec=1min
+# /var/backups/pve-restic-recovery/          canonical reconstruction staging tree
+# /mnt/nas-pve-restic-backup/                NFS PVE_Restic_Backup/.data
+#   pve-restic-backup/                       Restic repo ID 8ca0218c645dc2968c2b21d67dbda3840794d8bc9c157c0515a85af30eb3d0e3
+# - Current snapshot: 35d4b0c2, host pve, path /var/backups/pve-restic-recovery. Pre-rename snapshots 0cf1c62a and 3db28d41 were deliberately forgotten; restic check then passed with no errors.
+# - Old local mount /mnt/nas-proxmox-restic-backup and old active worker/unit/timer/staging names are absent.
 #
-# PROXMOX HOST BACKUP STORAGE / AUTOMATION — CURRENT 2026-09-27
-# Whole-VM VZDump layer:
-# /usr/local/bin/backup-proxmox-to-nas  manual human-facing VMID 100 helper; snapshot + zstd -> nas-rotom-proxmox-backup
-# /etc/pve/jobs.cfg  native automatic PVE job `rotom-daily`: node proxmox; VMID 100; storage nas-rotom-proxmox-backup; schedule 05:00; snapshot; zstd; repeat-missed=0; retention 7 daily / 4 weekly / 6 monthly
-# /mnt/pve/nas-rotom-proxmox-backup/  PVE-managed NFSv3 storage; NAS Rotom_Proxmox_Backup/.data; export authorized only to 192.168.1.68; content=backup; no Proxmox /etc/fstab entry; write/read/delete verified
-#   dump/vzdump-qemu-100-2026_09_27-14_08_51.vma.zst            sole current VMID 100 archive; 45,424,272,161 bytes; full VMA verify exit 0; no protection marker observed
-#   dump/vzdump-qemu-100-2026_09_27-14_08_51.log                normal companion log
-# - Older VMID 100 archives/sidecars were intentionally deleted before the clean-slate 14:08 backup. Storage and `rotom-daily` were not removed.
-# - Manual VZDump helper and native PVE scheduler are independent. First unattended scheduler-triggered 05:00 run still not observed.
+# PVE WHOLE-VM BACKUP — CURRENT
+# /usr/local/bin/backup-rotom-vm-to-nas
+# /usr/local/sbin/rotom-vm-vzdump-manual
+# /etc/systemd/system/rotom-vm-vzdump-manual.service
+# /run/lock/rotom-vm-vzdump-manual.lock
+# /etc/pve/jobs.cfg  job `rotom-vm-daily`: node pve; VMID 100; storage nas-rotom-vm-backup; 05:00; snapshot; zstd; repeat-missed=0; retention 7 daily / 4 weekly / 6 monthly
+# /mnt/pve/nas-rotom-vm-backup/              PVE-managed NFS Rotom_VM_Backup/.data, content=backup
+#   dump/vzdump-qemu-100-2026_09_28-00_09_19.vma.zst  47,415,540,796 bytes; zstd PASS; full VMA verify PASS; currently unprotected
+# - Six older VMID 100 backups were deliberately removed before this fresh baseline. Historical local backup-proxmox-to-nas.pre-systemd.* launcher was also deliberately deleted.
+# - Old active storage/job/manual names are absent.
 #
-# Proxmox host-configuration Restic layer:
-# /etc/fstab  current NFS automount -> Proxmox_Restic_Backup/.data at /mnt/nas-proxmox-restic-backup; defaults,_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s
-# /etc/fstab.pre-proxmox-restic-backup.20260927-152218  rollback copy from immediately before the new Restic mount entry
-# /etc/restic/nas-password                 root:root 0600; credential contents never document
-# /usr/local/bin/backup-restic-to-nas      root:root 0755; manual root command; direct handoff to proxmox-restic-backup for live terminal output
-# /usr/local/sbin/proxmox-restic-backup    root:root 0700; stages recovery bundle, verifies exact NFS source, backs up + forget/prune
-# /etc/systemd/system/proxmox-restic-backup.service  oneshot; HOME=/root; RequiresMountsFor=/mnt/nas-proxmox-restic-backup; UMask=0077; Nice=10; best-effort IO priority 7
-# /etc/systemd/system/proxmox-restic-backup.timer    ENABLED/ACTIVE; daily 04:00; Persistent=true; AccuracySec=1min
-# /var/backups/proxmox-restic-recovery/    generated reconstruction bundle; files/ + inventory/ + RESTORE-NOTES.txt; do not blindly restore over live /etc/pve
-# /mnt/nas-proxmox-restic-backup/          NFSv3 Proxmox_Restic_Backup/.data; export authorized only to 192.168.1.68; mounted root observed 988:988 mode 0770; local mountpoint was root:root 0755 before mount
-#   proxmox-restic-backup/                  Restic repository 8ca0218c64; repo dir root:root 0700; format v2/compression auto
-# - Scope excludes /etc/pve/priv, private *.key material, /etc/restic/nas-password, SSH private keys, VM disks, VZDump archives, and mounted NAS data. Resolved public /root/.ssh/authorized_keys is intentionally preserved.
-# - First snapshot 0cf1c62a passed isolated restore of 284 files/dirs and representative file comparisons; final observed latest snapshot a59fc03f saved 2026-09-27 15:57:03 PDT. Retention 7 daily / 4 weekly / 12 monthly.
-# - Automount hardening: script runs `timeout 35s ls -A` before NFS/exact-source checks; post-reboot autofs-only -> real NFS activation + successful backup verified.
-# - First genuinely timer-triggered unattended 04:00 run still not observed.
-# - Both Proxmox backup shares exist only on Proxmox; Rotom has no fstab/systemd reference to Rotom_Proxmox_Backup or Proxmox_Restic_Backup.
+# FINAL JAR-68 ACCEPTANCE
+# - Controlled physical PVE reboot changed boot ID; pve-cluster/pvedaemon/pveproxy active; VM100 auto-started.
+# - Final PVE acceptance: canonical Restic, whole-VM backup, monitoring and identity PASS; zero failed units.
+# - Final Rotom acceptance: 16 total / 14 intended running; Palworld Jared+Fran intentionally stopped/preserved; all 12 NFS automounts + RO bindfs passed; qBittorrent sentinel/wg0 passed; Homepage PVE CPU monitoring passed; guest Restic timer active/enabled; zero failed units.
 #
-
+# The dated 2026-09-27 sections below are preserved historical checkpoints and may contain superseded pre-JAR-68 names or then-current 16-running observations.
+#
 # LIVE POST-BOOT VERIFICATION REFRESH — 2026-09-27 02:29–02:32 PDT
 # - Fresh Debian VM reboot confirmed; zero failed systemd units at audit start/end.
 # - Docker 29.8.1 / Compose 5.5.1; 16 total, 16 running, 0 stopped; all restart counts 0; current bridge map unchanged.

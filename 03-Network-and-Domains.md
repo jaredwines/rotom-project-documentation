@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** Proxmox hypervisor `proxmox` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-27 — Proxmox host-config Restic NFS boundary added and verified
+**Documentation updated:** 2026-09-28 — JAR-68 canonical PVE identity, SSH aliases, monitoring name, and PVE-only NFS names documented
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -36,88 +36,42 @@ No passwords, API tokens, private keys, VPN credentials, cookies, or other authe
 
 ---
 
-## 2. Current Phase B Host, VM, and NAS Network Identity — 2026-09-27 refresh
-
-The physical NUC and Rotom workload identity remain separate:
+## 2. Current Phase B Host, VM, and NAS Network Identity — 2026-09-28 JAR-68 final
 
 | Layer | Verified current identity |
 |---|---|
-| Proxmox host | hostname `proxmox`; FQDN `proxmox.rotom.casa`; `vmbr0` `192.168.1.68/24`; default gateway `192.168.1.1`; DNS `192.168.1.1` |
-| Physical NIC | `nic0`, Intel I219-V / `e1000e`, MAC `1c:69:7a:0e:f2:f7`; bridged into `vmbr0`; `Supports Wake-on: pumbg`, current `Wake-on: g`, PCI wake `enabled`; `/etc/network/interfaces` reasserts `wol g` with a `post-up` command |
-| Rotom VM | hostname `rotom`; FQDN `rotom.casa`; VirtIO `ens18`; fixed virtual MAC `BC:24:11:97:10:47`; attached directly to LAN through `vmbr0` |
-| Rotom VM IPv4 | DHCP `192.168.1.69/24` reserved in UniFi to MAC `BC:24:11:97:10:47`; gateway/DNS `192.168.1.1` |
-| Rotom LAN DNS | UniFi/local resolver `192.168.1.1` returns `rotom.casa -> 192.168.1.69`; public resolver remains `68.8.40.225` |
-| NAS | `192.168.1.70` |
+| PVE host | hostname `pve`; FQDN `pve.rotom.casa`; `vmbr0` `192.168.1.68/24`; gateway/DNS `192.168.1.1` |
+| Physical NIC | `nic0`, Intel I219-V / `e1000e`, MAC `1c:69:7a:0e:f2:f7`; WOL `g`; persistent WOL/offload settings remain in `/etc/network/interfaces` |
+| Rotom VM | hostname `rotom`; FQDN `rotom.casa`; VirtIO MAC `BC:24:11:97:10:47`; UniFi-reserved `192.168.1.69/24`; gateway/DNS `192.168.1.1` |
+| NAS | UniFi UNAS 2 at `192.168.1.70` |
 
-JAR-26 removed the old UniFi fixed-IP/client association tying `.69` to the physical NIC. JAR-27 deliberately used temporary DHCP `192.168.1.241` for the guest foundation. JAR-28 verified `.69` unused, then reserved `192.168.1.69` in UniFi for the VM's fixed virtual MAC. After reboot, qemu-guest-agent reported `ens18` at `.69/24`, Proxmox pinged `.69` successfully, and its neighbor table resolved `.69` to `bc:24:11:97:10:47`. Proxmox remains solely on `.68`.
-
-The local DNS override remains verified: direct queries to `192.168.1.1` and the Mac's normal resolver return `rotom.casa -> 192.168.1.69`, while public DNS continues to return the WAN address `68.8.40.225`. JAR-31 restored the production application network layer and reverse-proxied services. Cloudflare DDNS reported Rotom WAN `68.8.40.225` and Cloudflare DNS `68.8.40.225` during restoration. The current Docker bridge map is recorded below.
-
-### 2026-09-27 live post-boot network refresh
-
-A read-only post-boot audit reconfirmed `ens18` at `192.168.1.69/24`, default gateway `192.168.1.1`, current Docker bridge subnets `172.18.0.0/16` through `172.28.0.0/16`, reachability to Proxmox `192.168.1.68` and NAS `192.168.1.70`, NPM listeners on TCP `80/81/443`, SSH on `22`, backup-status API on `8787`, and the documented application listeners/published ports. Host-side listener state is therefore current; WAN reachability still depends on UniFi NAT/firewall policy and cannot be inferred from Rotom alone.
-
-On Rotom itself, `getent ahostsv4 rotom.casa` returned `127.0.1.1` during this audit. Treat that as the VM's host-local NSS answer; it does not supersede the separately verified LAN DNS record `rotom.casa -> 192.168.1.69` observed from the LAN resolver. Troubleshooting should distinguish host-local NSS resolution from client/LAN DNS.
-
-### Current Proxmox Wake-on-LAN — 2026-09-27
-
-The physical NUC's Wake-on-LAN target is Proxmox `nic0`, not the Rotom VM's VirtIO NIC. Live inspection showed `nic0` up with MAC `1c:69:7a:0e:f2:f7`, `Supports Wake-on: pumbg`, `Wake-on: g`, and `/sys/class/net/nic0/device/power/wakeup` set to `enabled`. Before editing, `/etc/network/interfaces` was copied to `/etc/network/interfaces.pre-wol`. The existing `iface nic0 inet manual` stanza now contains `post-up /usr/sbin/ethtool -s nic0 wol g`; the `vmbr0` static address, gateway, bridge membership, and `nic1` stanza were otherwise unchanged. `ifquery --check nic0` and `ifquery --check vmbr0` both passed.
-
-A subsequent physical `systemctl poweroff`/return cycle reverified `Wake-on: g` after Proxmox came back and reverified VMID 100 `running` with `onboot: 1`. Rotom then completed its normal transient-NFS recovery path back to the full production runtime. The supplied transcript does not show the actual magic-packet sender invocation and therefore does not prove that this particular power-on was caused by WOL; end-to-end magic-packet delivery from a client while the NUC is off remains **Needs Verification**. No separate Proxmox WOL systemd service was added.
-
-### Homepage internal monitoring resolution and Proxmox temperature bridge
-
-JAR-31 post-restore monitoring exposed a container-local name-resolution problem rather than an NPM/application outage: Homepage logged repeated `EAI_AGAIN` errors for internal service names. The `homepage` container now uses targeted host mappings to `192.168.1.69` for `rotom.casa`, `nginx.rotom.casa`, `arcane.rotom.casa`, `home-assistant.rotom.casa`, and `homebridge.rotom.casa`. Verification from Homepage returned HTTP 200 for the four affected HTTPS service monitors and no new `EAI_AGAIN` errors. This does not alter LAN/public DNS and does not weaken Homepage's intentional `HOMEPAGE_ALLOWED_HOSTS=rotom.casa` policy.
-
-The physical CPU temperature remains a Proxmox-host concern because the Debian VM exposes no package-temperature sensor. Proxmox `coretemp` `Package id 0` was verified directly (56.0 C at the audit point). A minimal `rotom-temp-api.service` listens on **`192.168.1.68:8788`** and is restricted by the application to loopback/Proxmox/Rotom client addresses (`127.0.0.1`, `192.168.1.68`, `192.168.1.69`). It serves `/temperature` and the Glances-compatible `/api/4/sensors` endpoint consumed by Homepage's graphing widget. This is a monitoring bridge only; the Proxmox host still has no Rotom application Docker runtime or application NFS mounts.
+JAR-68 renamed only the physical PVE identity and PVE-only support components. PVE `/etc/hosts` now contains canonical `192.168.1.68 pve.rotom.casa pve`; the temporary `proxmox` / `proxmox.rotom.casa` compatibility names were removed after final acceptance. VMID 100 remains `rotom` and its guest network identity is unchanged.
 
 ### Current administrative SSH access
 
-SSH to the Debian VM works by `.69` and `rotom.casa`; the Debian **server host key** had already been independently console-verified during JAR-28. The later administrative-key work below concerns separate **client authentication keys** on the Mac and does not replace that server-host-key trust record.
+| Target | Mac aliases | Destination/user | Identity file | Verification |
+|---|---|---|---|---|
+| Rotom VM | `rotom`, `rotom.casa` | `rotom.casa` / `jared` | `~/.ssh/id_ed25519_rotom` | key-only login previously verified |
+| PVE host | `pve`, `pve.rotom.casa` | `192.168.1.68` / `root` | `~/.ssh/id_ed25519_pve` | fingerprint preserved as `SHA256:xVX+MEAncK6Z2aTbNinSufYpTwyER+NFSp8iIPf11Zg`; both canonical aliases logged into `pve` / `pve.rotom.casa`; old Mac aliases removed |
 
-| Target | Mac SSH aliases | Effective destination/user | Mac identity file | Client public-key fingerprint | Server authorized-keys location | Verification |
-|---|---|---|---|---|---|---|
-| Rotom VM | `rotom`, `rotom.casa` | `rotom.casa` / `jared` | `~/.ssh/id_ed25519_rotom` | `SHA256:JaZ8H+JwufPGK9/ZIsT6dhcMSsHdl2sbwOZ7Uqq1ZIE` (`mac-to-rotom`) | `/home/jared/.ssh/authorized_keys` | forced public-key-only login returned `SSH key authentication: PASS`; normal `ssh rotom.casa` then logged in without the Rotom account password |
-| Proxmox host | `proxmox`, `proxmox.rotom.casa` | `192.168.1.68` / `root` | `~/.ssh/id_ed25519_proxmox` | `SHA256:xVX+MEAncK6Z2aTbNinSufYpTwyER+NFSp8iIPf11Zg` (`mac-to-proxmox`) | `/root/.ssh/authorized_keys` | forced public-key-only login returned `SSH key authentication: PASS` as `root` |
+Password authentication policy was not changed. Key contents and credentials are never recorded. The public-key comment may retain historical wording; it is metadata only and not an active alias.
 
-The Rotom Mac key pair was not newly generated during this closeout: the existing generic `~/.ssh/id_ed25519` and `.pub` files were renamed to `~/.ssh/id_ed25519_rotom` and `.pub`, then the existing public key was installed on the new Debian VM. For Proxmox, a new dedicated ED25519 key pair was generated with 100 KDF rounds and comment `mac-to-proxmox`; only its public key was copied to the host. The Proxmox authorized-keys file already contained an RSA key identified as `root@proxmox` (fingerprint `SHA256:ooeAZiD4l9htGSiSS8hnB7984QnBGVvqAjqTkNGGPhc`), and that existing entry was preserved when the new ED25519 key was appended.
+### Current PVE monitoring bridge
 
-The server-side `.ssh` / `authorized_keys` permissions used during installation were `0700` / `0600`. macOS SSH config uses `IdentitiesOnly yes`, `AddKeysToAgent yes`, and `UseKeychain yes` for both targets. Password authentication was **not** disabled. No private-key bytes, public-key contents, passphrases, or passwords are recorded in the RPD.
+The read-only physical CPU temperature helper is `/usr/local/sbin/pve-cpu-temp-api` with `pve-cpu-temp-api.service`, listening on `192.168.1.68:8788`. Homepage uses the exact label **`PVE CPU Temperature`** and the Glances-compatible sensor endpoint. Final post-reboot monitoring verification passed.
 
-Guest default routing through `192.168.1.1`, gateway reachability, external DNS, outbound IPv4, and zero failed systemd units remain verified. The Proxmox host has no application NFS mounts or application Docker networking. The guest now carries the restored production Docker network topology through JAR-31.
+### Current NAS / NFS connectivity
 
-### Current NAS / NFS connectivity — 2026-09-27 refresh
+The Rotom guest retains its twelve fstab-backed NFS systemd automounts and two read-only bindfs compatibility views. Two PVE-only backup exports are canonical:
 
-The Debian VM reaches the NAS directly over the LAN from `192.168.1.69` to `192.168.1.70`. All twelve guest paths remain fstab-backed systemd automounts using `_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s`.
+- `PVE_Restic_Backup/.data` -> `/mnt/nas-pve-restic-backup` on `192.168.1.68`; repository subdirectory `pve-restic-backup`.
+- `Rotom_VM_Backup/.data` -> PVE storage `nas-rotom-vm-backup` at `/mnt/pve/nas-rotom-vm-backup`.
 
-Two intentional hypervisor-only NFS backup paths now exist. NAS `Rotom_Proxmox_Backup/.data` is authorized only to Proxmox `192.168.1.68` and is mounted by PVE as `nas-rotom-proxmox-backup` under `/mnt/pve/nas-rotom-proxmox-backup` for VZDump. NAS `Proxmox_Restic_Backup/.data` is also authorized only to Proxmox `192.168.1.68` and is mounted at `/mnt/nas-proxmox-restic-backup` through Proxmox `/etc/fstab` with systemd automount for host-configuration Restic. The Rotom guest has no mount, fstab entry, or systemd reference for either Proxmox backup share. Conversely, `Rotom_Restic_Backup/.data` remains authorized only to Rotom `192.168.1.69`. This keeps whole-VM VZDump, Proxmox host-config Restic, and guest Restic on distinct NFS exports even though all terminate on NAS `192.168.1.70`.
+`showmount` verification after cleanup showed those canonical PVE backup exports; the superseded `Proxmox_Restic_Backup` and `Rotom_Proxmox_Backup` export names were not present. Guest `Rotom_Restic_Backup/.data` remains separate and unchanged.
 
-**Current downloader source correction:** JAR-31 live verification shows `/mnt/nas-downloaders` configured and mounted from NAS `Downloader/.data`. Current `/etc/fstab`, the generated `mnt-nas\x2ddownloaders.mount`, the active NFSv3 source, and current `showmount -e 192.168.1.70 | grep -i download` all agree on `Downloader/.data`; the supplied `showmount` result exposed that export to `192.168.1.69`. This supersedes the earlier JAR-29/JAR-30 current-state wording naming `Downloads/.data` while retaining those older statements as dated historical evidence.
+### Post-reboot verification
 
-**Current Restic sources and controls:** Rotom uses NAS `Rotom_Restic_Backup/.data`, exported to Rotom `192.168.1.69`, mounted at `/mnt/nas-rotom-restic-backup` over NFSv3; current guest `/etc/fstab`, `/usr/local/sbin/rotom-restic-backup`, and `rotom-restic-backup.service` reference that repository path. Proxmox separately uses `Proxmox_Restic_Backup/.data`, exported to `192.168.1.68`, mounted at `/mnt/nas-proxmox-restic-backup` over NFSv3 by a host systemd automount; its backup script verifies the underlying NFS source before repository work. Both hosts use a local `backup-restic-to-nas` operator command, but the implementations and repositories are host-specific. The former guest `/mnt/nas-rotom-backup` NFS mount is unmounted and no longer used; `Rotom_Home_Server_Backup` remains rollback data.
-
-On the JAR-31 final reboot, the NAS recovery helper first failed when Media NFS was not yet ready, then retried automatically about 30 seconds later. The second run verified `/mnt/nas-downloaders`, `/mnt/nas-media`, `/mnt/nas-game`, both bindfs compatibility views, and service-account traversal before recovering the stopped NAS-backed containers. Final system state had zero failed units.
-
-### Current JAR-31 Docker network map
-
-| Docker network | Subnet |
-|---|---|
-| `bridge` | `172.17.0.0/16` |
-| `jellyfin_default` | `172.18.0.0/16` |
-| `radarr_default` | `172.19.0.0/16` |
-| `sonarr_default` | `172.20.0.0/16` |
-| `prowlarr_default` | `172.21.0.0/16` |
-| `qbittorrentvpn_default` | `172.22.0.0/16` |
-| `gamarr_default` | `172.23.0.0/16` |
-| `homepage` | `172.24.0.0/16` |
-| `palworld-fran_default` | `172.25.0.0/16` |
-| `alohamillworkscom_default` | `172.26.0.0/16` |
-| `palworld-jared_default` | `172.27.0.0/16` |
-| `arcane_default` | `172.28.0.0/16` |
-
-Homepage/Glances deliberately retain `172.24.0.0/16`. Jared Palworld was moved from the conflicting restored allocation to `172.27.0.0/16` only after a stopped-state save/archive gate; Arcane then uses `172.28.0.0/16`. The final reboot preserved this map. Nginx Proxy Manager, Cloudflare DDNS, Home Assistant, and Homebridge retain the previously documented host-network topology.
-
-Homepage host validation is intentional: a raw local request to `127.0.0.1:3001` returned HTTP 400 with a host-validation error, while the same backend request with `Host: rotom.casa` and the HTTPS apex both returned HTTP 200. Do not broaden `HOMEPAGE_ALLOWED_HOSTS` merely to make IP-host probes return 200.
+A controlled physical PVE reboot produced a new boot ID. `pve-cluster`, `pvedaemon`, and `pveproxy` returned active, VMID 100 auto-started, Rotom SSH returned, and final PVE/Rotom acceptance passed with zero failed systemd units. qBittorrentVPN `wg0` was `10.2.0.2/32`; genuine NAS mounts and monitoring endpoints passed.
 
 ## 2A. Pre-Migration Bare-Metal Host Identity — Historical Baseline
 

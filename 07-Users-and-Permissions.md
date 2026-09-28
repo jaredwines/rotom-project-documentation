@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** Proxmox hypervisor `proxmox` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-09-27 — Proxmox host-config Restic root/NFS permission boundary added
+**Documentation updated:** 2026-09-28 — JAR-68 canonical PVE administrative identity/key and backup-root paths documented
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -22,50 +22,33 @@ This is the canonical detailed owner of Rotom account identity and permission fa
 **Baseline method:** read-only inspection of the live host configuration, Docker metadata, systemd unit files, sudo policy, SSH metadata, filesystem modes, ACLs, NFS mount metadata, and non-mutating access tests. No passwords, password hashes, key contents, tokens, or private-key material were read or recorded.  
 **Update scope:** JAR-29 restored the ten storage-facing identities and JAR-30 established the package-created Docker privilege boundary. JAR-31 restored the application/recovery workload layer under those service identities. A fresh 2026-09-27 post-boot read reconfirmed `docker:x:989:` with no members, all ten service UID:GID/home contracts, and every service-home NAS symlink. Later 2026-09-27 Proxmox host-config Restic commissioning added a root-only host backup implementation, protected credential path, and second Proxmox-only NFS backup export without changing guest/service identities. Fran remains unrecreated and her backup sudoers rule remains deferred. Administrative Mac key-only access remains verified; no key contents are recorded.
 
-## 2. Current Phase B Identity and Access Model — 2026-09-27 refresh
+## 2. Current Phase B Identity and Access Model — 2026-09-28 JAR-68 final
 
-JAR-31 restored production workloads under the Phase B service-account model. A fresh 2026-09-27 post-boot read again returned package-created `docker:x:989:` with no members, confirming the current VM has not returned to the historical pre-migration GID `984` broad-membership model.
+Guest service-account identities and Docker-group policy remain unchanged. Docker group is package-created GID `989` with no members; administrative Docker use remains `sudo docker`. No permission broadening was introduced.
 
 | Layer/account | Verified current state |
 |---|---|
-| Proxmox host | Administration as `root`; `/usr/bin/zsh` + Oh My Zsh; dedicated Mac ED25519 key-only login verified; existing authorized-key material preserved |
-| Debian VM `jared` | UID/GID `1000:1000`; supplementary `sudo`; `/usr/bin/zsh` + Oh My Zsh; key-only Mac login verified via `~/.ssh/id_ed25519_rotom` |
-| Debian VM root | Administrative identity available; no authentication material recorded |
-| media | `127:5000`, `/home/media`, locked password, mode-`0750` home; active Jellyfin/Radarr/Sonarr; media NFS boundary retained |
-| game | `995:5001`, `/home/game`, locked password, mode-`0750` home; active both Palworld servers + Gamarr; Game NFS boundary retained |
-| infra | `997:5002`, `/home/infra`, locked; active Arcane/DDNS/Homepage/Glances/NPM owner |
-| smarthome | `126:5003`, `/home/smarthome`, locked; active Home Assistant/Homebridge owner |
-| documents | `900:5004`, `/home/documents`, locked; storage boundary only |
-| downloaders | `901:5005`, `/home/downloaders`, locked; active Prowlarr/qBittorrentVPN owner; `/mnt/nas-downloaders` current source `Downloader/.data`; qBittorrent `wg0` verified |
-| web | `902:5006`, `/home/web`, locked; Aloha active; Jared Wines intentionally undeployed |
-| filesync | `903:5007`, `/home/filesync`, locked; storage boundary only |
-| apps | `904:5008`, `/home/apps`, locked; storage boundary only |
-| auth | `905:5009`, `/home/auth`, locked; storage boundary only |
-| Fran | Pre-migration identity `1001:1001`; not yet recreated; `/etc/sudoers.d/fran-backup-to-nas` intentionally not promoted |
-| Docker group | Fresh 2026-09-27 verification: package-created GID `989`, no members; use `sudo docker` for administration unless policy is deliberately changed |
+| PVE host | hostname `pve`; administration as `root`; canonical Mac aliases `pve` / `pve.rotom.casa`; key `~/.ssh/id_ed25519_pve`; fingerprint `SHA256:xVX+MEAncK6Z2aTbNinSufYpTwyER+NFSp8iIPf11Zg`; old Mac aliases removed |
+| Debian VM `jared` | UID/GID `1000:1000`; supplementary `sudo`; key-only Mac login via `~/.ssh/id_ed25519_rotom` |
+| media | `127:5000`, `/home/media`; Jellyfin/Radarr/Sonarr |
+| game | `995:5001`, `/home/game`; Gamarr running; both Palworld containers intentionally stopped with worlds preserved |
+| infra | `997:5002`, `/home/infra`; Arcane/DDNS/Homepage/Glances/NPM |
+| smarthome | `126:5003`, `/home/smarthome`; Home Assistant/Homebridge |
+| documents | `900:5004`, `/home/documents` |
+| downloaders | `901:5005`, `/home/downloaders`; Prowlarr/qBittorrentVPN |
+| web | `902:5006`, `/home/web`; Aloha active; Jared Wines undeployed |
+| filesync/apps/auth | `903:5007`, `904:5008`, `905:5009` respectively |
+| Docker group | GID `989`, no members |
 
-Ordinary NFS isolation remains numeric-ID based. Current downloader root is `988:5005` mode `2770`; the existing compatibility views provide Media/Game read-only access without broadening direct Downloader write access. The final reboot verified service-account traversal of those read-only views.
+### Current PVE backup privilege boundary
 
-The current backup NFS client boundaries do not change Linux account identities: NAS `Rotom_Proxmox_Backup` and `Proxmox_Restic_Backup` are authorized only to Proxmox `192.168.1.68`, while `Rotom_Restic_Backup` remains authorized only to Rotom `192.168.1.69`. The Rotom guest has no mount or configuration reference for either Proxmox backup share.
-
-Proxmox host-configuration Restic is root-operated. `/usr/local/sbin/proxmox-restic-backup` is `root:root` mode `0700`; `/usr/local/bin/backup-restic-to-nas` is `root:root` mode `0755` but explicitly refuses non-root execution; `/etc/restic/nas-password` is `root:root` mode `0600`; and repository directory `/mnt/nas-proxmox-restic-backup/proxmox-restic-backup` was observed `root:root` mode `0700`. The generated staging root `/var/backups/proxmox-restic-recovery` is created under root control with restrictive umask. The backup deliberately excludes `/etc/pve/priv` and private `*.key` material. Because Proxmox `/root/.ssh/authorized_keys` is a symlink into `/etc/pve/priv`, the script preserves only a resolved copy of that public authorized-keys file rather than the private PVE tree or SSH private keys. No credential contents are recorded in the RPD.
-
-Jared's current exact-command rule is `/etc/sudoers.d/rotom-restic-backup`, mode `0440`, with `jared ALL=(root) NOPASSWD: /usr/local/sbin/rotom-restic-backup`; `visudo -cf` parsed it successfully and `sudo -n -l /usr/local/sbin/rotom-restic-backup` confirmed authorization. The shared human command is `/usr/local/bin/backup-restic-to-nas` (`root:root`, mode `0755`), which hands off through sudo to root-protected `/usr/local/sbin/rotom-restic-backup` (`root:root`, mode `0700`). Protected credential path is `/etc/restic/nas-password` (`root:root`, mode `0600`; contents never document). Fran's historical exact-command backup rule remains intentionally absent because Fran is not recreated. Current backup storage is `/mnt/nas-rotom-restic-backup` on NAS `Rotom_Restic_Backup`; the mounted share root is numeric `988:988` mode `0700`. Root-run Restic access/write and a later complete manual backup are verified. The mounted share root grants no group/other permission bits; however it is **not** literally `root:root` while mounted—the owner is numeric UID `988`, and numeric NFS identities remain authoritative. A fresh named-user denial matrix was not rerun against the new share during this cutover. The retired `/mnt/nas-rotom-backup` NFS path is unmounted and no longer used by current Rotom backup configuration.
-
-All ten service-home convenience links remain `/home/<service>/nas-<service> -> /mnt/nas-<service>`. No permission broadening such as world-writable modes was used during JAR-31.
+PVE host-config Restic is root-operated. `/usr/local/sbin/pve-restic-backup` is the privileged worker; `/usr/local/bin/backup-restic-to-nas` remains the manual root command; `/etc/restic/nas-password` remains protected and its contents are never documented. The repository is `/mnt/nas-pve-restic-backup/pve-restic-backup` and staging is `/var/backups/pve-restic-recovery`. Whole-VM manual backup uses root-owned `/usr/local/bin/backup-rotom-vm-to-nas`, `rotom-vm-vzdump-manual.service`, and `/usr/local/sbin/rotom-vm-vzdump-manual`.
 
 ### Current administrative public-key access
 
-The verified current client/server key-authentication model is:
+The Mac SSH config maps `pve` / `pve.rotom.casa` to `192.168.1.68` as `root` using `~/.ssh/id_ed25519_pve`, `IdentitiesOnly yes`, `AddKeysToAgent yes`, and `UseKeychain yes`. Both aliases were verified after cleanup. The old `proxmox` / `proxmox.rotom.casa` SSH aliases and old `~/.ssh/id_ed25519_proxmox{,.pub}` filenames are absent. PVE `/etc/hosts` likewise contains only the canonical `pve.rotom.casa pve` names for `.68`. Password-auth policy was not changed.
 
-| Target | Client identity on Mac | Server authorization | Verified result |
-|---|---|---|---|
-| Debian `rotom` / `jared` | Existing key pair renamed from `~/.ssh/id_ed25519{,.pub}` to `~/.ssh/id_ed25519_rotom{,.pub}`; fingerprint `SHA256:JaZ8H+JwufPGK9/ZIsT6dhcMSsHdl2sbwOZ7Uqq1ZIE` (`mac-to-rotom`) | public key installed in `/home/jared/.ssh/authorized_keys`; `.ssh` mode `0700`, file mode `0600` | forced public-key-only command returned `SSH key authentication: PASS`; normal `ssh rotom.casa` succeeded without the Rotom account password |
-| Proxmox / `root` | Dedicated new ED25519 pair `~/.ssh/id_ed25519_proxmox{,.pub}` generated with 100 KDF rounds; fingerprint `SHA256:xVX+MEAncK6Z2aTbNinSufYpTwyER+NFSp8iIPf11Zg` (`mac-to-proxmox`) | public key appended to `/root/.ssh/authorized_keys`; `.ssh` mode `0700`, file mode `0600`; existing RSA `root@proxmox` authorized key with fingerprint `SHA256:ooeAZiD4l9htGSiSS8hnB7984QnBGVvqAjqTkNGGPhc` preserved | forced public-key-only command returned `SSH key authentication: PASS` as `root` |
-
-The Mac SSH config maps aliases `rotom` / `rotom.casa` to user `jared` with `IdentityFile ~/.ssh/id_ed25519_rotom`, and `proxmox` / `proxmox.rotom.casa` to `192.168.1.68` as `root` with `IdentityFile ~/.ssh/id_ed25519_proxmox`. Both entries use `IdentitiesOnly yes`, `AddKeysToAgent yes`, and `UseKeychain yes`. Password authentication was not disabled on either target. Private/public key contents, passphrases, and passwords are intentionally not recorded.
-
-The preserved model below remains authoritative for **pre-migration Docker/group/application ownership history**. Where it uses old `downloads` naming or Docker GID `984`, treat those values as historical recovery evidence rather than current JAR-31 guest state.
+The Rotom VM continues to use `rotom` / `rotom.casa`, user `jared`, and `~/.ssh/id_ed25519_rotom`. Private-key contents, passwords, and other authentication secrets are never recorded.
 
 ## 2A. Preserved Pre-Migration Identity and Access Model
 
