@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-09-28 — Git-backed RPD checkout and Codex discovery integration documented; JAR-68 state retained
+**Documentation updated:** 2026-09-28 — `rpd` helper workflow decision and Mac verification added; Git-backed Codex integration retained
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -52,6 +52,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-09-28 — Adopt `rpd` helper workflow for routine RPD Git operations
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified on Mac / Proposed / Needs Verification on Rotom / Documentation only.** A single `rpd` command namespace was adopted for routine RPD Git operations. The Mac helper is installed and functionally exercised; the final no-confirmation revision and the Rotom-targeted deployment have not yet been reverified from supplied output.
+- **Changes:** Adopted the supported interface `rpd status`, `rpd check`, `rpd pull`, `rpd diff`, `rpd log [N]`, `rpd commit "message"`, `rpd push`, and `rpd help`. The helper disables Git paging with `git --no-pager`; `status` stays local-only; `check` validates repository identity, the tracked core `00`–`08` set, `.DS_Store` state, filesystem access, GitHub reachability, and ahead/behind/divergence; `pull` requires a clean tree and only fast-forwards; `commit` stages all changed, deleted, and new non-ignored RPD files before committing the supplied message; and `push` refuses dirty, behind, or diverged state. The final design deliberately removes Y/N confirmation prompts so the wrapper behaves more like normal Git while retaining RPD-specific guardrails. The verified Mac checkout is `/Users/jared/Documents/ChatGPT/Rotom-Home-Server`; the Rotom-targeted helper uses `/home/infra/documentation/rpd` and includes the existing `/home/infra` traversal/access check.
+- **Evidence:** Supplied Mac terminal output shows `/usr/local/bin/rpd` passed `bash -n`, was installed root-owned/executable, and successfully ran `rpd help`, `rpd status`, `rpd diff`, and `rpd check`; the check verified the expected SSH remote, `main`, `origin/main`, all nine core files tracked, no tracked `.DS_Store`, and a successful GitHub fetch. `rpd pull` correctly refused while seven intentional RPD files were locally modified. The same output also demonstrates non-paged `rpd log`/`rpd diff` behavior. No post-change terminal evidence was supplied for the later no-confirmation revision or for the Rotom-targeted helper.
+- **Outstanding:** Verify the final no-confirmation helper revision on Mac and install/verify the Rotom-targeted `/usr/local/bin/rpd`. Until Rotom verification is supplied, the already-verified Codex pull path remains `git -C /home/infra/documentation/rpd pull --ff-only`; after helper verification, update `/home/jared/.codex/AGENTS.md` to use `rpd pull`. Also verify an explicit Mac Git `user.name`/`user.email` configuration before relying on `rpd commit`; earlier supplied Git output showed an automatically derived commit identity.
 
 ## 2026-09-28 — Establish Git-backed RPD checkout and Codex discovery
 

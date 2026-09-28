@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-28 — Git-backed RPD checkout/Codex discovery added; JAR-68 final PVE state retained
+**Documentation updated:** 2026-09-28 — `rpd` helper workflow decision/Mac verification added; Git-backed Codex integration retained
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -28,7 +28,7 @@ The accepted Phase B architecture now uses **PVE** as the product abbreviation a
 | PVE administration | `root`; canonical Mac aliases `pve` / `pve.rotom.casa`; `HostName 192.168.1.68`; key `~/.ssh/id_ed25519_pve`; fingerprint `SHA256:xVX+MEAncK6Z2aTbNinSufYpTwyER+NFSp8iIPf11Zg`; old SSH aliases removed |
 | Rotom VM | VMID `100`, name `rotom`; q35 + OVMF; `x86-64-v2-AES`; 8 vCPU; 12 GiB RAM; 100 GiB thin VirtIO SCSI; `onboot: 1` |
 | Rotom guest | Debian 13.7; `rotom.casa`; MAC `BC:24:11:97:10:47`; UniFi-reserved `192.168.1.69/24`; gateway/DNS `192.168.1.1` |
-| RPD / Codex integration | Git checkout `/home/infra/documentation/rpd` from `git@github.com:jaredwines/rotom-project-documentation.git`, branch `main`; Jared-global `/home/jared/.codex/AGENTS.md` directs Codex to the RPD and was functionally verified with Codex CLI `0.158.0` |
+| RPD / Codex integration | Git checkout `/home/infra/documentation/rpd` from `git@github.com:jaredwines/rotom-project-documentation.git`, branch `main`; Jared-global `/home/jared/.codex/AGENTS.md` directs Codex to the RPD and was functionally verified with Codex CLI `0.158.0`; Mac `/usr/local/bin/rpd` helper verified through status/check/diff/log/pull safety behavior, while the final no-confirmation revision and Rotom helper deployment remain Needs Verification |
 | Docker runtime | Docker Engine `29.8.1`; Compose `v5.5.1`; 16 container objects; **14 intended running** because both Palworld containers are intentionally stopped to save resources |
 | Palworld | `palworld-server-jared` and `palworld-server-fran` intentionally stopped, not dead/restarting/OOM; `unless-stopped`; active worlds/saves reverified and preserved |
 | qBittorrentVPN | Running; fail-closed design retained; `wg0` verified `10.2.0.2/32`; Downloader sentinel and NAS mounts verified |

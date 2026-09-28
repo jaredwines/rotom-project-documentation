@@ -8,7 +8,7 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-09-28; Git-backed RPD/Codex discovery integration added, current documentation access refreshed, and JAR-68 final PVE/backup state retained.
+# Documentation revised: 2026-09-28; `rpd` helper workflow decision/Mac verification added, Git-backed RPD/Codex integration retained, and JAR-68 final PVE/backup state retained.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the RPD.
 #
@@ -70,6 +70,17 @@
 #   AGENTS.md                                mode 0600; global Rotom Codex entry point -> /home/infra/documentation/rpd
 # - Codex CLI updated from 0.157.1 to 0.158.0; fresh post-update session loaded AGENTS.md and returned the expected RPD path/first-read/conflict policy.
 # - The older pre-migration top-level /home/infra/documentation/AGENTS.md + README.md state was not re-inspected in this task; preserve it below only as dated historical evidence.
+#
+# MAC RPD ADMINISTRATION TOOLING — outside Rotom filesystem
+# /usr/local/bin/rpd                        verified installed/exercised on Mac against /Users/jared/Documents/ChatGPT/Rotom-Home-Server
+# - Verified behavior: help/status/diff/check/log plus dirty-tree pull refusal; Git output uses --no-pager.
+# - Final supported design also has commit/push with no Y/N prompts, but that exact post-revision script has not yet been reverified.
+#
+# PROPOSED / NEEDS VERIFICATION ON ROTOM
+# /usr/local/bin/rpd                        prepared RPD helper for /home/infra/documentation/rpd; intended root:root mode 0755
+# - Intended commands: status, check, pull, diff, log [N], commit "message", push, help.
+# - Rotom variant includes the existing /home/infra traversal/access verification and refuses unsafe pull/push states.
+# - Until installation and successful Rotom checks are supplied, Codex keeps using the verified raw fast-forward Git command.
 #
 # The dated 2026-09-27 sections below are preserved historical checkpoints and may contain superseded pre-JAR-68 names or then-current 16-running observations.
 #
