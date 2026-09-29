@@ -53,6 +53,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-28 — JAR-37: harden Docker runtime baseline
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `02-Docker-Services.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.** The Phase C Docker runtime gate is complete and its reusable policy is tracked locally at `/srv/rotom/stacks/RUNTIME-POLICY.md`.
+- **Changes:** Docker retains its existing `json-file` `10m` × `3` cap. Arcane's automatic update and auto-heal settings were changed from enabled to disabled after a protected SQLite rollback copy; Arcane remains available only for observation/manual administration. The policy defines target-stack-only controlled updates, restart/healthcheck expectations, protected secret handling, authoritative future appdata binds, and exception-by-workload review.
+- **Evidence:** Docker reports 16 objects / 14 intended running with both Palworld servers intentionally stopped. All long-running current containers use `unless-stopped`; Arcane returned healthy after its targeted restart. Database reads confirm `autoUpdate=false` and `autoHealEnabled=false`, and Arcane logs show both schedules with `nextRun=<nil>`. Socket audit found only Arcane (read-write administration), Homepage (read-only dashboard), and Glances (read-only monitoring); host-network, privileged, capability, and broad-host-path exceptions were explicitly audited. Guest Restic timer remained enabled/active.
+- **Outstanding:** Each Phase D workload must independently justify and verify any exception it retains or introduces; no Phase C-wide migration or socket-proxy was introduced.
+
 ## 2026-09-28 — JAR-36: establish shared Docker network contracts
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
