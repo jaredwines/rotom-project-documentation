@@ -176,8 +176,7 @@
 #     docker/radarr/                ACTIVE
 #     docker/sonarr/                ACTIVE
 #   game/        995:5001  mode 0750  -> nas-game -> /mnt/nas-game
-#     docker/palworld-server-jared/ ACTIVE; world preserved; network 172.27.0.0/16
-#     docker/palworld-server-fran/  ACTIVE; network 172.25.0.0/16
+#     docker/palworld-server-{jared,fran}/ JAR-42 legacy rollback trees retired 2026-09-29
 #     docker/gamarr/                ACTIVE; network 172.23.0.0/16
 #   infra/       997:5002  mode 0750  -> nas-infra -> /mnt/nas-infra
 #     docker/arcane/                ACTIVE; network 172.28.0.0/16
