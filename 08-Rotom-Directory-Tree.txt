@@ -8,7 +8,7 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-09-28; JAR-38 Infra v2 convergence added.
+# Documentation revised: 2026-09-28; Mac and Rotom RPD checkout paths plus ChatGPT handoff workflow updated; JAR-38 state retained.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the RPD.
 #
@@ -55,9 +55,10 @@
 # - Final Rotom acceptance: 16 total / 14 intended running; Palworld Jared+Fran intentionally stopped/preserved; all 12 NFS automounts + RO bindfs passed; qBittorrent sentinel/wg0 passed; Homepage PVE CPU monitoring passed; guest Restic timer active/enabled; zero failed units.
 #
 # CURRENT RPD / CODEX / GITHUB INTEGRATION — 2026-09-28
+# - Current Rotom RPD checkout path (user-reported move): /home/infra/documentation/rotom-project-documentation. Prior verified path /home/infra/documentation/rpd remains historical evidence; renamed path needs terminal revalidation.
 # /home/infra/                              infra:infra; private service home; current named ACL user:jared:--x
 # /home/infra/documentation/                root:root mode 0755 as observed during RPD Git commissioning
-#   rpd/                                    jared:infra mode 0750; Git checkout of current RPD reference set
+#   rotom-project-documentation/            CURRENT Git checkout path by user report; prior `rpd/` checkout was verified jared:infra mode 0750; current path metadata Needs Verification
 #     .git/                                  repository metadata
 #     .gitignore                             repository support metadata; not an RPD member unless added to Available Sources
 #     00-Rotom-Change-Log.md
@@ -69,24 +70,24 @@
 #     06-Maintenance-and-Automation.md
 #     07-Users-and-Permissions.md
 #     08-Rotom-Directory-Tree.txt
-# - Git origin: git@github.com:jaredwines/rotom-project-documentation.git; branch main; clean after verified fast-forward pull.
+# - Prior checkout verification: origin git@github.com:jaredwines/rotom-project-documentation.git; branch main; clean after verified fast-forward pull. Reverify the same properties at the renamed current path.
 # - Tracked .DS_Store was removed upstream; .gitignore was added and pulled successfully.
 # /home/jared/.ssh/d_ed25519_github         Jared general GitHub SSH identity; private contents never document
 # /home/jared/.codex/                       mode 0700 after hardening
-#   AGENTS.md                                mode 0600; global Rotom Codex entry point -> /home/infra/documentation/rpd
+#   AGENTS.md                                mode 0600; global Rotom Codex entry point -> /home/infra/documentation/rotom-project-documentation; prepared replacement adds direct RPD commit/check/push completion when explicitly authorized
 # - Codex CLI updated from 0.157.1 to 0.158.0; fresh post-update session loaded AGENTS.md and returned the expected RPD path/first-read/conflict policy.
 # - The older pre-migration top-level /home/infra/documentation/AGENTS.md + README.md state was not re-inspected in this task; preserve it below only as dated historical evidence.
 #
 # MAC RPD ADMINISTRATION TOOLING — outside Rotom filesystem
-# /usr/local/bin/rpd                        verified installed/exercised on Mac against /Users/jared/Documents/ChatGPT/Rotom-Home-Server
+# /usr/local/bin/rpd                        last verified installed/exercised on Mac against former path /Users/jared/Documents/ChatGPT/Rotom-Home-Server; current checkout moved to /Users/jared/Documents/ChatGPT/rotom-project-documentation, helper revalidation pending
 # - Verified behavior: help/status/diff/check/log plus dirty-tree pull refusal; Git output uses --no-pager.
-# - Final supported design also has commit/push with no Y/N prompts, but that exact post-revision script has not yet been reverified.
+# - Codex-on-Mac RPD policy: edit /Users/jared/Documents/ChatGPT/rotom-project-documentation directly, then relevant rpd commit -> rpd check -> rpd push; verify success. The helper needs terminal reverification against the renamed checkout, and the final no-confirmation helper revision still needs terminal reverification.
 #
 # PROPOSED / NEEDS VERIFICATION ON ROTOM
-# /usr/local/bin/rpd                        prepared RPD helper for /home/infra/documentation/rpd; intended root:root mode 0755
+# /usr/local/bin/rpd                        prior prepared helper targeted /home/infra/documentation/rpd; revise RPD_DIR to /home/infra/documentation/rotom-project-documentation and reverify before routine use
 # - Intended commands: status, check, pull, diff, log [N], commit "message", push, help.
 # - Rotom variant includes the existing /home/infra traversal/access verification and refuses unsafe pull/push states.
-# - Until installation and successful Rotom checks are supplied, Codex keeps using the verified raw fast-forward Git command.
+# - Codex-on-Rotom RPD policy: edit /home/infra/documentation/rotom-project-documentation directly, then relevant rpd commit -> rpd check -> rpd push; verify success. If the helper is unavailable or a guard fails, stop/report rather than bypass it. Renamed checkout/helper integration remains Needs Verification.
 #
 # The dated 2026-09-27 sections below are preserved historical checkpoints and may contain superseded pre-JAR-68 names or then-current 16-running observations.
 #
