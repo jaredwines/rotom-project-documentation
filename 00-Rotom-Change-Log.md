@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — Retire JAR-42 legacy Palworld rollback trees
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** At Jared's explicit request, permanently removed the now-unused legacy `/home/game/docker/palworld-server-jared` and `palworld-server-fran` trees, including their legacy Compose files. The current stopped containers continue to mount only `/srv/rotom/appdata/gameserver/palworld-{jared,fran}`; their v2 stack definitions remain tracked under `/srv/rotom/stacks/gameserver`.
+- **Evidence:** No legacy path was a mount; Docker inspection confirmed both containers use only the v2 appdata paths. The two removed trees were 9.6 GB and 4.8 GB. Root filesystem use fell to 59% with 37 GB free.
+- **Outstanding:** Rollback is now limited to current v2 state and independently verified backups; do not infer that a second local legacy tree remains.
+
 ## 2026-09-29 — Remove validated JAR-31 staging copies
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `08-Rotom-Directory-Tree.txt`.
