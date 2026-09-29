@@ -13,6 +13,10 @@ Record substantive changes to this document in the change log as part of the sam
 
 ## 1. Purpose and Scope
 
+### JAR-45 Web v2 network compatibility — 2026-09-29
+
+Aloha Millworks now joins `rotom-proxy` from its v2 Web Compose module, but retained NPM remains host-networked and cannot use Docker DNS on that bridge. Its established `alohamillworks.com -> 192.168.1.69:7778` compatibility upstream and the `7778` listener therefore remain necessary. No NPM route, DNS, WAN, TLS, certificate, firewall, or VLAN change was made; local and public HTTPS checks returned HTTP 200.
+
 ### JAR-43 Smart Home v2 network compatibility — 2026-09-29
 
 Home Assistant and Homebridge moved only their Compose/application-state paths to the v2 Smart Home domain. Both intentionally remain Docker host-network exceptions, preserving the established TCP listeners on `8123` and `8581` plus Home Assistant SSDP/mDNS and Homebridge/Avahi mDNS discovery behavior. The existing NPM routes remain `home-assistant.rotom.casa -> 192.168.1.69:8123` and `homebridge.rotom.casa -> 192.168.1.69:8581`; no proxy-host, certificate, DNS, WAN-forwarding, VLAN, firewall, or Docker-network change was made. Post-reboot local and HTTPS route probes returned HTTP 200 for both applications.
