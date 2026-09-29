@@ -8,7 +8,7 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-09-28; Mac and Rotom RPD checkout paths plus ChatGPT handoff workflow updated; JAR-38 state retained.
+# Documentation revised: 2026-09-28; universal RPD helper and layered Codex instruction architecture verified; JAR-38 state retained.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the RPD.
 #
@@ -54,13 +54,19 @@
 # - Final PVE acceptance: canonical Restic, whole-VM backup, monitoring and identity PASS; zero failed units.
 # - Final Rotom acceptance: 16 total / 14 intended running; Palworld Jared+Fran intentionally stopped/preserved; all 12 NFS automounts + RO bindfs passed; qBittorrent sentinel/wg0 passed; Homepage PVE CPU monitoring passed; guest Restic timer active/enabled; zero failed units.
 #
-# CURRENT RPD / CODEX / GITHUB INTEGRATION — 2026-09-28
-# - Current Rotom RPD checkout path (user-reported move): /home/infra/documentation/rotom-project-documentation. Prior verified path /home/infra/documentation/rpd remains historical evidence; renamed path needs terminal revalidation.
+# CURRENT RPD / CODEX / GITHUB INTEGRATION — VERIFIED 2026-09-28
+# - Current Rotom RPD checkout: /home/infra/documentation/rotom-project-documentation.
+# - Current Mac RPD checkout: /Users/jared/Documents/ChatGPT/rotom-project-documentation.
+# - Both use origin git@github.com:jaredwines/rotom-project-documentation.git, branch main, upstream origin/main.
+# - Former Rotom /home/infra/documentation/rpd and Mac /Users/jared/Documents/ChatGPT/Rotom-Home-Server paths remain historical evidence only.
 # /home/infra/                              infra:infra; private service home; current named ACL user:jared:--x
 # /home/infra/documentation/                root:root mode 0755 as observed during RPD Git commissioning
-#   rotom-project-documentation/            CURRENT Git checkout path by user report; prior `rpd/` checkout was verified jared:infra mode 0750; current path metadata Needs Verification
+#   rotom-project-documentation/            CURRENT verified Git checkout; operational Git/Codex mirror, not the Available Sources membership boundary
 #     .git/                                  repository metadata
 #     .gitignore                             repository support metadata; not an RPD member unless added to Available Sources
+#     AGENTS.md                              shared repository Codex/RPD instructions; Git support metadata, not an RPD member unless added to Available Sources
+#     tooling/
+#       rpd                                  canonical universal helper source; installed identically at /usr/local/bin/rpd on Mac and Rotom
 #     00-Rotom-Change-Log.md
 #     01-Rotom-Server-Inventory.md
 #     02-Docker-Services.md
@@ -70,24 +76,27 @@
 #     06-Maintenance-and-Automation.md
 #     07-Users-and-Permissions.md
 #     08-Rotom-Directory-Tree.txt
-# - Prior checkout verification: origin git@github.com:jaredwines/rotom-project-documentation.git; branch main; clean after verified fast-forward pull. Reverify the same properties at the renamed current path.
-# - Tracked .DS_Store was removed upstream; .gitignore was added and pulled successfully.
+# - Repository support commit 152fd74 added AGENTS.md + tooling/rpd and was pushed; Rotom fast-forwarded to the same commit.
+# - Universal rpd SHA-256 on verified Mac/Rotom installed + repository copies:
+#   42866ab6dbb5c47f996289d751cb26767dc79c756638cbeb9851c9e45fbdbe7b
+# - Supported commands: path, status, check, pull, diff, log [N], commit "message", push, help.
+# - Resolution: expected current Git working tree first; otherwise ${XDG_CONFIG_HOME:-$HOME/.config}/rpd/repository; then validate expected user/repo/remote/branch/upstream/access/core files.
+# /home/jared/.config/rpd/                   mode 0700; Jared per-machine rpd configuration
+#   repository                               mode 0600; contains /home/infra/documentation/rotom-project-documentation; no credentials
 # /home/jared/.ssh/d_ed25519_github         Jared general GitHub SSH identity; private contents never document
 # /home/jared/.codex/                       mode 0700 after hardening
-#   AGENTS.md                                mode 0600; global Rotom Codex entry point -> /home/infra/documentation/rotom-project-documentation; prepared replacement adds direct RPD commit/check/push completion when explicitly authorized
-# - Codex CLI updated from 0.157.1 to 0.158.0; fresh post-update session loaded AGENTS.md and returned the expected RPD path/first-read/conflict policy.
+#   AGENTS.md                                mode 0600; Rotom machine/live-state safety entry point; resolves RPD with rpd path and delegates shared RPD rules to repository AGENTS.md + document 00
+# - Fresh read-only Rotom Codex session verified machine identification, rpd path resolution, instruction hierarchy, document-00 authority, and pre-change live-state workflow.
 # - The older pre-migration top-level /home/infra/documentation/AGENTS.md + README.md state was not re-inspected in this task; preserve it below only as dated historical evidence.
 #
 # MAC RPD ADMINISTRATION TOOLING — outside Rotom filesystem
-# /usr/local/bin/rpd                        last verified installed/exercised on Mac against former path /Users/jared/Documents/ChatGPT/Rotom-Home-Server; current checkout moved to /Users/jared/Documents/ChatGPT/rotom-project-documentation, helper revalidation pending
-# - Verified behavior: help/status/diff/check/log plus dirty-tree pull refusal; Git output uses --no-pager.
-# - Codex-on-Mac RPD policy: edit /Users/jared/Documents/ChatGPT/rotom-project-documentation directly, then relevant rpd commit -> rpd check -> rpd push; verify success. The helper needs terminal reverification against the renamed checkout, and the final no-confirmation helper revision still needs terminal reverification.
-#
-# PROPOSED / NEEDS VERIFICATION ON ROTOM
-# /usr/local/bin/rpd                        prior prepared helper targeted /home/infra/documentation/rpd; revise RPD_DIR to /home/infra/documentation/rotom-project-documentation and reverify before routine use
-# - Intended commands: status, check, pull, diff, log [N], commit "message", push, help.
-# - Rotom variant includes the existing /home/infra traversal/access verification and refuses unsafe pull/push states.
-# - Codex-on-Rotom RPD policy: edit /home/infra/documentation/rotom-project-documentation directly, then relevant rpd commit -> rpd check -> rpd push; verify success. If the helper is unavailable or a guard fails, stop/report rather than bypass it. Renamed checkout/helper integration remains Needs Verification.
+# /usr/local/bin/rpd                        universal helper; identical to repository tooling/rpd and Rotom installation; verified current
+# ~/.config/rpd/                            mode 0700
+#   repository                              mode 0600; contains /Users/jared/Documents/ChatGPT/rotom-project-documentation; no credentials
+# ~/.codex/AGENTS.md                        Mac-global instruction reduced to command-line vim preference
+# - rpd path/status/check and current-directory/config-fallback resolution verified; a temporary unrelated Git repository was ignored in favor of the configured RPD checkout.
+# - Fresh read-only Mac Codex session verified local-machine identification, rpd checkout resolution, repository AGENTS.md, document-00 authority, and pre-change live-state workflow.
+# - Shared RPD workflow instructions use rpd path; the physical checkout paths above remain verified inventory facts.
 #
 # The dated 2026-09-27 sections below are preserved historical checkpoints and may contain superseded pre-JAR-68 names or then-current 16-running observations.
 #
