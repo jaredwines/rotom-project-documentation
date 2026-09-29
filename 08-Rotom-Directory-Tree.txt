@@ -146,12 +146,14 @@
 #                                     root-owned declarative namespace; migrated domains have owning modules
 #   stacks/NETWORKING.md             JAR-36 shared external-network/Docker-DNS contract
 #   stacks/RUNTIME-POLICY.md         JAR-37 controlled-update, Compose, and exception policy
+#   stacks/documents/DOMAIN-CONTRACT.md JAR-44 Paperless deployment/recovery contract; no Compose placeholder
 #   appdata/<domain>/                service-owned mutable state; migrated domains have owning state trees
 #     smarthome/home-assistant/       JAR-43 authoritative Home Assistant state
 #     smarthome/homebridge/           JAR-43 authoritative Homebridge state
 #     web/alohamillworks.com/          JAR-45 authoritative Aloha content
 #     web/jaredwines.com/              JAR-45 retained unstarted site content
 #   secrets/                         root:root 0700; credentials/private material only, Git-ignored
+#     documents/                     JAR-44 root-only Documents secret boundary
 #   scripts/                         root-owned declarative helper namespace
 #   backup-staging/                  root:root 0700; app-consistent export staging, Git-ignored
 #   .git/                            local history only; no remote configured by JAR-34
