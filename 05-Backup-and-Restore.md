@@ -156,7 +156,7 @@ An earlier Jared launcher under `/home/jared/.local/bin` and a temporary Fran co
 
 ## 5. Preserved Pre-Migration Storage/Identity Changes Affecting Backup
 
-The final pre-migration media identity is **UID `127`, primary GID `5000`**. Jellyfin, Radarr, and Sonarr remain `127:5000`; Gamarr remains `995:5001`. JAR-21 moved Prowlarr and qBittorrentVPN to the Downloads account at `901:5005`, with active project trees `/home/downloads/docker/prowlarr` and `/home/downloads/docker/qbittorrentvpn`. Older snapshots legitimately contain their earlier Media/Rotom/Infra paths and identities; inspect the selected snapshot before startup rather than restoring historical identity/path settings blindly.
+The Media identity is **UID `127`, primary GID `5000`** for Jellyfin, Radarr, Sonarr, and Prowlarr. JAR-52 retains Gamarr UID `995` but uses primary GID `5000` for the Media game-library bind; the Palworld identity remains `995:5001`. JAR-21 moved Prowlarr and qBittorrentVPN to the Downloads account at `901:5005`, with active project trees `/home/downloads/docker/prowlarr` and `/home/downloads/docker/qbittorrentvpn`. Older snapshots legitimately contain earlier Media/Rotom/Infra paths and identities; inspect the selected snapshot before startup rather than restoring historical identity/path settings blindly.
 
 The NAS media root is `988:5000`, mode `2770`. Its `library` and `torrents` trees use GID `5000`, with setgid, group-writable directories and group-writable files. Existing owner UIDs are mixed and were preserved; do not recursively change all NAS owners to UID `127` as a restore shortcut. Numeric IDs are authoritative across NFS. A name such as `fwupd-refresh` displayed on Rotom for UID/GID `988` is a local name lookup, not an instruction to assign the NAS data to that service.
 
@@ -170,7 +170,7 @@ The active Prowlarr tree is `/home/downloads/docker/prowlarr`, within the unchan
 
 ### qBittorrentVPN and Gamarr migration — backup implications
 
-The active local application trees are `/home/downloads/docker/qbittorrentvpn` and `/home/game/docker/gamarr`, both beneath the existing `/home` Restic root. qBittorrent's `.env` is included in encrypted Restic backup scope; never print or paste its credential contents. The old `/home/infra/docker/qbittorrentvpn` rollback tree was removed after guarded acceptance. Final snapshot `a6d86b20` contains the active Downloads-owned qBittorrent configuration and current Gamarr configuration. Active torrent data is `/mnt/nas-downloads/torrents` and final libraries remain under `/mnt/nas-media/library` and `/mnt/nas-game/library`; all are outside host Restic because `/mnt` is excluded.
+JAR-56 moved qBittorrentVPN's active stack/appdata to `/srv/rotom/stacks/downloader/qbittorrentvpn` and `/srv/rotom/appdata/downloader/qbittorrentvpn`; its root-only v2 env file is under `/srv/rotom/secrets/downloader` and must never be displayed. The former `/home/downloaders/docker/qbittorrentvpn` project remains rollback material. JAR-52 moved the active Gamarr game-library contract to `/mnt/nas-media/library/games` while retaining `/mnt/nas-game/library/games` for rollback. JAR-56's active torrent data is `/mnt/nas-media/torrents`, while the complete `/mnt/nas-downloaders/torrents` source remains rollback material. All of those NAS trees are outside host Restic because `/mnt` is excluded; neither JAR-52 nor the in-progress JAR-56 establishes NAS-side protection or recovery behavior.
 
 The 2026-09-19 Homebridge container-name correction changed the then-current `/home/smart-home/docker/homebridge/compose.yaml` and `/home/jared/rotom-manual-verify.sh`; both known paths are within the normal `/home` Restic include scope. That Homebridge tree is now `/home/smarthome/docker/homebridge`. Snapshot `f0d51eaa` predates the correction; final JAR-19 snapshot `e886c55d` supplies the latest documented recovery point after the correction and later identity/JAR-19 work, but it predates final JAR-6 state and the service-home `nas` symlinks.
 
@@ -251,7 +251,7 @@ Historical path listings in snapshot `1a55dd4f` (`2026-09-14 03:09:49 PDT`) veri
 | Media service configuration | `/home/media/docker` (active Jellyfin/Radarr/Sonarr) |
 | Active Prowlarr configuration | `/home/downloads/docker/prowlarr`; covered by final JAR-24 snapshot `fbe1838e` |
 | Active qBittorrentVPN configuration | `/home/downloads/docker/qbittorrentvpn`; covered by final JAR-24 snapshot `fbe1838e` |
-| Active Gamarr configuration | `/home/game/docker/gamarr`; covered by final JAR-24 snapshot `fbe1838e`; earlier restore-era evidence remains historical |
+| Active Gamarr configuration | `/srv/rotom/appdata/media/gamarr`; the declarative stack is `/srv/rotom/stacks/media/gamarr`; pre-JAR-52 `/home/game/docker/gamarr` remains rollback material |
 | Jared's Palworld server | `/home/game/docker/palworld-server-jared` |
 | Fran's Palworld server | `/home/game/docker/palworld-server-fran` |
 | Aloha Millworks website | `/home/web/docker/alohamillworks.com` |
@@ -262,7 +262,7 @@ Historical path listings in snapshot `1a55dd4f` (`2026-09-14 03:09:49 PDT`) veri
 
 **The host Restic job excludes `/mnt`, so `/mnt/nas-media`, `/mnt/nas-game`, `/mnt/nas-shared-drive`, and `/mnt/nas-rotom-restic-backup` are all outside its backup source scope.** The verified include roots do not add any of those mounts back into the job.
 
-This excludes NAS content under `/mnt/nas-media/library`, `/mnt/nas-game/library`, the active downloader torrent tree, and `/mnt/nas-shared-drive`. Backed-up application configuration is not a backup of NAS-resident library, torrent, or shared-drive data, so any non-reproducible NAS data needs a separate NAS protection policy. `/mnt/nas-rotom-restic-backup` is the current destination containing the Restic repository; it is not a source backing itself up. The retained old `Rotom_Home_Server_Backup` share is a rollback copy on the same UNAS, not an independent off-site copy.
+This excludes NAS content under `/mnt/nas-media/library` (including the JAR-52 game library), the retained `/mnt/nas-game/library` rollback source, the active downloader torrent tree, and `/mnt/nas-shared-drive`. Backed-up application configuration is not a backup of NAS-resident library, torrent, or shared-drive data, so any non-reproducible NAS data needs a separate NAS protection policy. `/mnt/nas-rotom-restic-backup` is the current destination containing the Restic repository; it is not a source backing itself up. The retained old `Rotom_Home_Server_Backup` share is a rollback copy on the same UNAS, not an independent off-site copy.
 
 
 ### JAR-22 pre-migration audit artifacts — pending JAR-24 snapshot verification

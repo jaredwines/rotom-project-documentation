@@ -8,7 +8,7 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-09-28; `rpd` helper workflow decision/Mac verification added, Git-backed RPD/Codex integration retained, and JAR-68 final PVE/backup state retained.
+# Documentation revised: 2026-09-28; JAR-38 Infra v2 convergence added.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the RPD.
 #
@@ -18,6 +18,9 @@
 # - PVE monitoring: /usr/local/sbin/pve-cpu-temp-api + /etc/systemd/system/pve-cpu-temp-api.service; 192.168.1.68:8788; Homepage label `PVE CPU Temperature`. Backup status: /usr/local/sbin/pve-backup-status-api + /etc/systemd/system/pve-backup-status-api.service; LAN-only 192.168.1.68:8789; Homepage PVE Restic and Rotom VM schedule cards.
 # - VMID 100 `rotom`: q35/OVMF, x86-64-v2-AES, 8 vCPU, 12 GiB RAM, 100 GiB; onboot=1; guest rotom.casa at reserved 192.168.1.69, MAC BC:24:11:97:10:47.
 # - Docker: 16 total container objects / 14 intended running; both Palworld containers intentionally stopped with worlds preserved; qBittorrentVPN wg0 10.2.0.2/32; final post-reboot guest acceptance 0 failed units.
+# - JAR-38: Infra v2 module Compose roots are `/srv/rotom/stacks/infra/{homepage,glances,arcane,cloudflare-ddns}` (local Git commit `a17a217`); Homepage/Glances/Arcane state is under appdata and protected inputs under `secrets/infra`. Legacy Infra paths and `arcane_arcane-data` remain rollback artifacts. NPM remains active pending JAR-39.
+# - JAR-48: Homepage baseline dashboard includes UNAS ICMP reachability (192.168.1.70) and authoritative Media NFS capacity through Glances (`fs:/mnt/host-root/mnt/nas-media`). No notification delivery or Uptime Kuma component is configured; the pre-change Homepage configuration remains as `services.yaml.pre-jar48-20260928-201236`.
+# - JAR-40: Media v2 Compose roots are `/srv/rotom/stacks/media/{jellyfin,radarr,sonarr,prowlarr,gamarr}` (local commit `f5f2da4`) with configuration under `/srv/rotom/appdata/media`. Prowlarr is Media-owned and NAS-free; storage compatibility views, torrent payloads, and qBittorrentVPN are unchanged.
 #
 # PVE HOST-CONFIG RESTIC — CURRENT
 # /etc/fstab                                  canonical automount -> PVE_Restic_Backup/.data at /mnt/nas-pve-restic-backup
@@ -160,7 +163,7 @@
 #     docker/arcane/                ACTIVE; network 172.28.0.0/16
 #     docker/cloudflare-ddns/       ACTIVE
 #     docker/homepage/              ACTIVE Homepage+Glances; network 172.24.0.0/16
-#       Homepage monitoring: extra_hosts pins rotom/nginx/arcane/home-assistant/homebridge names to 192.168.1.69; guest backup widget -> http://192.168.1.69:8787/backup-status; PVE Restic/Rotom VM schedule widgets -> http://192.168.1.68:8789/pve-restic-backup-status and /rotom-vm-backup-status; Disk Usage -> disk:sda; CPU Temperature -> Glances URL http://192.168.1.68:8788 metric sensor:Package id 0 with charting.
+#       Homepage monitoring: extra_hosts pins rotom/nginx/arcane/home-assistant/homebridge names to 192.168.1.69; guest backup widget -> http://192.168.1.69:8787/backup-status; PVE Restic/Rotom VM schedule widgets -> http://192.168.1.68:8789/pve-restic-backup-status and /rotom-vm-backup-status; Disk Usage -> disk:sda; CPU Temperature -> Glances URL http://192.168.1.68:8788 metric sensor:Package id 0 with charting; JAR-48 Media NAS Storage -> Glances fs:/mnt/host-root/mnt/nas-media and UNAS Reachability -> IPv4 ICMP 192.168.1.70. No alert destination is configured.
 #     docker/nginx-proxy-manager/   ACTIVE
 #   smarthome/   126:5003  mode 0750  -> nas-smarthome -> /mnt/nas-smarthome
 #     docker/home-assistant/        ACTIVE
@@ -300,7 +303,10 @@
 # These are account identities, not a claim that every file has that owner.
 # Media-owned Compose settings (Jellyfin/Radarr/Sonarr): PUID=127, PGID=5000, UMASK=002.
 # Central qBittorrentVPN: /home/downloads/docker/qbittorrentvpn, PUID=901, PGID=5005, UMASK=002.
-# Gamarr: /home/game/docker/gamarr, PUID=995, PGID=5001.
+# JAR-52 Gamarr: /srv/rotom/stacks/media/gamarr, PUID=995, PGID=5000;
+# appdata /srv/rotom/appdata/media/gamarr; Media library bind
+# /mnt/nas-media/library/games -> /game/library/games. The retained
+# /mnt/nas-game/library/games source is rollback-only; Palworld remains 995:5001 local state.
 # NAS media root: numeric 988:5000, mode 2770.
 # Media final library: GID 5000. Active torrents are on Downloads GID 5005.
 # Existing mixed owner UIDs were preserved rather than forced to UID 127.
@@ -541,6 +547,9 @@
 │           └── roms
 ├── nas-media
 │   └── library
+│       ├── games
+│       │   ├── pc
+│       │   └── roms
 │       ├── movies
 │       │   └── Backrooms (2026)
 │       └── shows

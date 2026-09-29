@@ -56,8 +56,8 @@ At the final pre-migration baseline, Rotom used one local NVMe system disk and N
 
 | Mount | Source | Filesystem | Root metadata | Primary purpose |
 |---|---|---|---|---|
-| `/mnt/nas-media` | `192.168.1.70:/var/nfs/shared/Media` | NFSv3 `sec=sys` | `988:5000` mode `2770` | Final movie/show library data; old torrent tree removed by JAR-21 |
-| `/mnt/nas-game` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Game/.data` | NFSv3 `sec=sys` | `988:5001` mode `2770` | Final Game library data; old torrent tree removed by JAR-21 |
+| `/mnt/nas-media` | `192.168.1.70:/var/nfs/shared/Media` | NFSv3 `sec=sys` | `988:5000` mode `2770` | Final movie/show/game library data; JAR-52 game content is under `library/games`; old torrent tree removed by JAR-21 |
+| `/mnt/nas-game` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Game/.data` | NFSv3 `sec=sys` | `988:5001` mode `2770` | Compatibility Game-library source retained intact for JAR-52 rollback; Palworld remains local VM state |
 | `/mnt/nas-infra` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Infra/.data` | NFSv3 `sec=sys` | `988:5002` mode `2770` | Infra storage boundary; currently no workload data |
 | `/mnt/nas-smarthome` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Smarthome/.data` | NFSv3 `sec=sys` | `988:5003` mode `2770` | Smarthome storage boundary; HA/Homebridge remain local |
 | `/mnt/nas-documents` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Documents/.data` | NFSv3 `sec=sys` | `988:5004` mode `2770` | Documents storage boundary; currently empty |
@@ -70,6 +70,18 @@ At the final pre-migration baseline, Rotom used one local NVMe system disk and N
 | `/mnt/nas-shared-drive` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Shared_Drive/.data` | NFSv3 | `988:988` mode `0770` | General Shared Drive |
 
 Seven JAR-6 service shares remain boundary-only. JAR-21 activated the Downloads share for authoritative torrent data at `/mnt/nas-downloads/torrents`. Host Restic excludes `/mnt`, so Downloads torrent data and the other NAS trees are outside the existing host backup source scope.
+
+### JAR-52 Media game-library move — 2026-09-28
+
+JAR-52 copied, without deletion, `/mnt/nas-game/library/games/{pc,roms}` to `/mnt/nas-media/library/games/{pc,roms}`. The target directories are owned `995:5000`, mode `2775`, with setgid, so the retained Gamarr UID 995 uses the Media primary storage GID 5000. The one-file source and target inventories were each 223,408,925 bytes and their SHA-256 manifests matched. Gamarr now binds only the Media games directory at its unchanged in-container library root `/game/library/games`; the existing read-only downloader torrent view remains at `/game/torrents`.
+
+The old Game library remains available and unmodified as rollback material; no Palworld save, `/mnt/nas-gameserver` path, qBittorrentVPN bind, downloader payload, or NAS export was changed. Both the Media and Game mounts had 4.1 TiB free at verification. Guest Restic still excludes `/mnt`, so this content move does not itself prove NAS-side snapshots, replication, or a distinct recovery point; that protection-policy boundary remains for JAR-47.
+
+### JAR-56 Media torrent topology — 2026-09-28 (in progress)
+
+The active qBittorrentVPN payload bind is now `/mnt/nas-media/torrents` at both `/media/torrents` and `/game/torrents`; its v2 stack/appdata are `/srv/rotom/stacks/downloader/qbittorrentvpn` and `/srv/rotom/appdata/downloader/qbittorrentvpn`. The Downloader source tree remains unchanged as rollback material. The copied trees matched SHA-256 manifests at 10,482,680,947 bytes across three files. qBittorrentVPN retains UID 901 with primary GID 5000 for Media writes, its WireGuard design, and its host port.
+
+The former empty Media torrent directory was corrected to `root:5000` mode `2775`; the Media sentinel is `/mnt/nas-media/.rotom-qbt-media-ready` at `901:5000` mode `2750`. Compose requires that sentinel with `create_host_path: false`. The enabled 15-second `rotom-qbittorrent-media-guard.timer` checks the underlying NFS mount and sentinel, then stops a running qBittorrentVPN if either is absent. Radarr/Sonarr/Gamarr now consume the Media torrent tree. Real filesystem hardlink probes passed, but a real authenticated importer flow is still pending; retain all Downloader paths, bindfs views, and source data.
 
 ### Preserved pre-migration service-home NAS convenience links — 2026-09-21
 
@@ -101,7 +113,7 @@ Two persistent bindfs services expose identity-mapped, read-only views of the Do
 - `rotom-downloads-media-ro.service`: `/mnt/nas-downloads` -> `/mnt/nas-downloads-media-ro`, forced `media:media`, read-only.
 - `rotom-downloads-game-ro.service`: `/mnt/nas-downloads` -> `/mnt/nas-downloads-game-ro`, forced `game:game`, read-only.
 
-Radarr and Sonarr mount `/mnt/nas-downloads-media-ro/torrents` at `/media/torrents:ro`; Gamarr mounts `/mnt/nas-downloads-game-ro/torrents` at `/game/torrents:ro`. Their broad final-library mounts remain `/mnt/nas-media -> /media` and `/mnt/nas-game -> /game`. This deliberately crosses filesystems, so imports from Downloads to final libraries are copies rather than hardlinks. The end-to-end Arr workflow was accepted by the user after JAR-21 cutover.
+Radarr and Sonarr mount `/mnt/nas-downloads-media-ro/torrents` at `/media/torrents:ro`; Gamarr mounts `/mnt/nas-downloads-game-ro/torrents` at `/game/torrents:ro`. Radarr/Sonarr retain their broad `/mnt/nas-media -> /media` library bind. Since JAR-52, Gamarr instead has the narrow `/mnt/nas-media/library/games -> /game/library/games` library bind; the old `/mnt/nas-game/library/games` is rollback-only. These current Downloads-to-library paths still cross filesystems, so imports are copies rather than hardlinks until JAR-56. The end-to-end Arr workflow was accepted by the user after JAR-21 cutover.
 
 ## 3. Current UniFi NAS / NFS Server Contract and Preserved History
 

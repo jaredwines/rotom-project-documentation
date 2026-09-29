@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; final JAR-68 post-reboot state is 16 container objects / 14 intended running with both Palworld servers intentionally stopped
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-29 — JAR-70 Homepage Backup Schedule presentation verified
+**Documentation updated:** 2026-09-29 — JAR-70 Homepage presentation and JAR-38 Infra-domain convergence verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -65,7 +65,21 @@ There are **16 total container objects and 14 intended running containers**. Bot
 
 `jaredwines.com` remains intentionally undeployed and has no container object. Final post-reboot acceptance verified all twelve NAS automounts, both read-only bindfs compatibility views, qBittorrentVPN, Homepage PVE CPU monitoring, guest Restic timer state, and zero failed guest systemd units. The earlier 16-running observations below remain valid historical checkpoints but are superseded for the current intended runtime by this 14-running state.
 
+### JAR-38 Infra v2 convergence — 2026-09-28
+
+The four migrated Infra modules each have an independent root-owned Compose definition: `/srv/rotom/stacks/infra/homepage/compose.yaml`, `glances/compose.yaml`, `arcane/compose.yaml`, and `cloudflare-ddns/compose.yaml`. These definitions were validated and recreated without an image pull; the verified cached images are Homepage, Glances, Arcane, and Cloudflare DDNS.
+
+Homepage configuration is now `/srv/rotom/appdata/infra/homepage/config`; Glances configuration is `/srv/rotom/appdata/infra/glances/glances.conf`; Arcane data is `/srv/rotom/appdata/infra/arcane`, owned `997:5002`. Protected inputs are in `/srv/rotom/secrets/infra` and are Git-ignored. Homepage uses the supported `HOMEPAGE_VAR_*` substitution for its protected provider credential; its configuration contains no credential value. Homepage and Glances attach to `rotom-monitoring` and resolve `glances` through Docker DNS. Homepage additionally attaches `rotom-proxy`; Arcane attaches `rotom-proxy`. Glances exposes no host port. Homepage retains host `3001` and Arcane `3552` only as compatibility upstreams for the still-host-networked NPM; those paths returned local/proxied HTTP 200. NPM remains intact on 80/81/443 for JAR-39.
+
+Cloudflare DDNS now uses its ordinary private `cloudflare-ddns_default` bridge, preserves its read-only token mount/capability drop/no-new-privileges contract, and immediately reported `rotom.casa` current. Arcane retains only its documented raw Docker socket and Infra-stack write bind; its original Downloader Compose compatibility bind remains read-only. `autoUpdate=false` and `autoHealEnabled=false` were reverified. To avoid expanding privileged secret access, Arcane has no v2 secret-directory bind; protected-env stack discovery warnings are intentional and do not authorize it to read secrets. The legacy `/home/infra/docker` module directories and `arcane_arcane-data` volume remain untouched rollback artifacts.
+
+A controlled guest reboot recovered all four modules; Homepage/Arcane health, Homepage→Glances DNS/API, local and HTTPS Homepage, Arcane HTTPS, DDNS reconciliation, NPM compatibility, qBittorrent `wg0`, and zero failed systemd units passed. JAR-48 later adds baseline dashboard coverage using these existing components only; notification delivery is intentionally not configured.
+
 ## 2. Core Infrastructure — `infra`
+
+### JAR-40 Media v2 convergence — 2026-09-28
+
+Jellyfin, Radarr, Sonarr, Prowlarr, and Gamarr run from `/srv/rotom/stacks/media/<app>/compose.yaml` (JAR-40 `f5f2da4`; JAR-52 `5ec39bd`; JAR-56 `3a29838`); their mutable configuration copies are under `/srv/rotom/appdata/media/<app>/config`. Prowlarr runs as `127:5000` in Media and has only its `/config` bind. Jellyfin keeps `/mnt/nas-media/library` read-only. Radarr/Sonarr now mount `/mnt/nas-media/torrents` read-only at `/media/torrents`; Gamarr uses Media GID 5000 with `/mnt/nas-media/library/games -> /game/library/games` and `/mnt/nas-media/torrents -> /game/torrents:ro`. qBittorrentVPN retains its VPN architecture but now uses v2 downloader stack/appdata paths and Media payload binds at its unchanged `/media/torrents` and `/game/torrents` paths. The old Game library and Downloader payload remain intact rollback material. JAR-56 application-import/seeding acceptance remains in progress. All proxyable services attach `rotom-proxy`; Radarr/Sonarr/Prowlarr/Gamarr also attach `rotom-arr`; qBittorrentVPN also attaches `rotom-arr`. Existing ports remain NPM compatibility upstreams.
 
 Core infrastructure; Compose files under `/home/infra/docker/`.
 
@@ -189,7 +203,7 @@ Ordinary `jared` access to the media NAS is intentionally excluded. Administrati
 
 ## 4. Game — `game`
 
-Game services are owned by the `game` service account under `/home/game/docker/`. The current host identity is UID/GID `995:5001`. Palworld stays on local storage; Gamarr uses the dedicated Game NAS for library/import work.
+Palworld services retain the `gameserver` identity at UID/GID `995:5001` and local state under `/home/game/docker/`. Palworld stays on local storage. Gamarr retains UID 995 but its active v2 stack uses Media GID 5000 and the Media NAS game-library bind; the old Game library is retained only for JAR-52 rollback.
 
 | Current container name | Observed image | Observed status | Published ports | Container-only ports shown | Compose file |
 | --- | --- | --- | --- | --- | --- |
@@ -228,9 +242,11 @@ PGID=5001
 
 Compose validation succeeded and both existing containers were recreated against their unchanged persistent directories. Live inspection showed `PUID=995`, `PGID=5001`; application processes resolved as `game:game`; both containers returned healthy. A stopped-state SHA-256 manifest covering 234 `.sav` files compared byte-for-byte identical after recreation. The Jared Palworld `.env` still contains stale `PUID=1003` / `PGID=1003` lines, but the current Compose file uses literal `995:5001`, so those `.env` values are not the deployed runtime identity.
 
-### Gamarr deployment — September 19 update
+### Historical Gamarr deployment — September 19 update
 
 Gamarr is deployed at `/home/game/docker/gamarr` with image `ghcr.io/gamarr-app/gamarr:latest`, `PUID=995`, `PGID=5001`, `TZ=America/Los_Angeles`, port `6767`, local config at `/home/game/docker/gamarr/config:/config`, and `/mnt/nas-game:/game`. The application reported version `1.0.3.0` during commissioning. A disposable library write created host ownership `995:5001`.
+
+This historical state was superseded by JAR-40 and JAR-52: Gamarr now uses `/srv/rotom/stacks/media/gamarr/compose.yaml`, appdata at `/srv/rotom/appdata/media/gamarr/config`, `PUID=995` / `PGID=5000`, and only `/mnt/nas-media/library/games:/game/library/games` for its final library. It retains the read-only Downloader Game view at `/game/torrents`; `/mnt/nas-game/library/games` stays intact as rollback material.
 
 The intended Game library roots are `/game/library/games/pc` for PC releases and `/game/library/games/roms` when ROM content is intentionally used. The qBittorrent download client uses the `Games` category and host `192.168.1.69:8080`. Gamarr and qBittorrent share the same `/game` path prefix for completed Game torrents, so no remote path mapping is required.
 
@@ -284,7 +300,7 @@ Production workloads are restored under the current service-account layout. The 
 | Service account | Current guest UID:GID | Current guest NAS mount | Current Docker/application use |
 |---|---:|---|---|
 | media | `127:5000` | `/mnt/nas-media` | Jellyfin/Radarr/Sonarr; Media compatibility view of Downloader torrents is read-only |
-| game | `995:5001` | `/mnt/nas-game` | Both Palworld servers + Gamarr; Game compatibility view of Downloader torrents is read-only |
+| gameserver | `995:5001` | `/mnt/nas-game` | Both Palworld servers; retained Game library is JAR-52 rollback material |
 | infra | `997:5002` | `/mnt/nas-infra` | Arcane/DDNS/Homepage/Glances/NPM configs remain local under `/home/infra/docker` |
 | smarthome | `126:5003` | `/mnt/nas-smarthome` | Home Assistant/Homebridge configs remain local under `/home/smarthome/docker` |
 | documents | `900:5004` | `/mnt/nas-documents` | Storage boundary only |
