@@ -45,7 +45,7 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 
 ### Current PVE backup privilege boundary
 
-PVE host-config Restic is root-operated. `/usr/local/sbin/pve-restic-backup` is the privileged worker; `/usr/local/bin/backup-restic-to-nas` remains the manual root command; `/etc/restic/nas-password` remains protected and its contents are never documented. The repository is `/mnt/nas-pve-restic-backup/pve-restic-backup` and staging is `/var/backups/pve-restic-recovery`. Whole-VM manual backup uses root-owned `/usr/local/bin/backup-rotom-vm-to-nas`, `rotom-vm-vzdump-manual.service`, and `/usr/local/sbin/rotom-vm-vzdump-manual`.
+PVE host-config Restic is root-operated. `/usr/local/sbin/pve-restic-backup` is the privileged worker; root-owned `/usr/local/bin/backup-restic-to-nas` re-executes through `sudo` when a non-root user invokes it, so Jared can start the existing root workflow through normal sudo authentication without direct access to the worker or its protected credential. `/etc/restic/nas-password` remains protected and its contents are never documented. The repository is `/mnt/nas-pve-restic-backup/pve-restic-backup` and staging is `/var/backups/pve-restic-recovery`. Whole-VM manual backup likewise uses root-owned `/usr/local/bin/backup-rotom-vm-to-nas`, which re-executes through `sudo` for non-root invocation, plus `rotom-vm-vzdump-manual.service` and `/usr/local/sbin/rotom-vm-vzdump-manual`. Jared is a PVE member of `systemd-journal`, allowing direct read-only service-log access such as `journalctl -fu rotom-vm-vzdump-manual.service`; this does not grant permission to alter services.
 
 ### Current administrative public-key access
 

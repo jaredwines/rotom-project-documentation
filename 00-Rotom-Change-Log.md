@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-09-29 — JAR-43 Smart Home v2 convergence verified
+**Documentation updated:** 2026-09-29 — Jared PVE backup-launcher access and journal visibility recorded
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -56,6 +56,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-09-29 — Jared PVE backup-launcher access and journal visibility
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** The two root-owned PVE manual launchers, `/usr/local/bin/backup-rotom-vm-to-nas` and `/usr/local/bin/backup-restic-to-nas`, now re-execute themselves through `sudo` when invoked by a non-root user. This keeps their existing root-only workers, service ownership, backup scope, mounts, retention, and protected Restic credential boundary unchanged while allowing routine invocation by the PVE administrator `jared` through normal sudo authentication. `jared` was added to the PVE `systemd-journal` group so the account can directly follow system service logs, including `rotom-vm-vzdump-manual.service`.
+- **Evidence:** Live read-only inspection on 2026-09-29 confirmed `jared` membership in `sudo` and `systemd-journal`, the group membership entry, and both launcher handoffs. Jared reconnected after the group change and confirmed direct `journalctl -fu rotom-vm-vzdump-manual.service` access.
+- **Outstanding:** The manual backup jobs were intentionally not started solely to test access because each can write backup state and apply its existing retention behavior. No dedicated passwordless sudo rule for either PVE launcher was inspected or recorded.
 
 ## 2026-09-29 — JAR-72 Homepage application-card organization
 
