@@ -1,0 +1,683 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/rpd/repository"
+RPD_DIR=""
+EXPECTED_USER="jared"
+EXPECTED_REMOTE="git@github.com:jaredwines/rotom-project-documentation.git"
+EXPECTED_BRANCH="main"
+EXPECTED_UPSTREAM="origin/main"
+
+
+# -----------------------------------------------------------------------------
+# Helpers
+# -----------------------------------------------------------------------------
+
+die() {
+    echo "ERROR: $*" >&2
+    exit 1
+}
+
+resolve_rpd_dir() {
+    local top=""
+    local remote=""
+    local configured=""
+
+    if top="$(git -C "$PWD" rev-parse --show-toplevel 2>/dev/null)"; then
+        remote="$(git -C "$top" remote get-url origin 2>/dev/null || true)"
+
+        if [[ "$remote" == "$EXPECTED_REMOTE" ]]; then
+            RPD_DIR="$top"
+            return 0
+        fi
+    fi
+
+    [[ -r "$CONFIG_FILE" ]] || return 1
+
+    IFS= read -r configured < "$CONFIG_FILE" || true
+    configured="${configured%$'\r'}"
+
+    [[ -n "$configured" ]] || return 1
+
+    RPD_DIR="$configured"
+    return 0
+}
+
+ensure_rpd_dir() {
+    [[ -n "$RPD_DIR" ]] && return 0
+
+    resolve_rpd_dir ||
+        die "Unable to resolve the RPD checkout. Run from the RPD repository or configure $CONFIG_FILE."
+}
+
+git_rpd() {
+    git --no-pager -C "$RPD_DIR" "$@"
+}
+
+require_user() {
+    [[ "$(id -un)" == "$EXPECTED_USER" ]] ||
+        die "Run rpd as $EXPECTED_USER, without sudo."
+}
+
+require_repo() {
+    [[ -d "$RPD_DIR/.git" ]] ||
+        die "RPD Git repository not found at $RPD_DIR."
+
+    git_rpd rev-parse --is-inside-work-tree >/dev/null 2>&1 ||
+        die "$RPD_DIR is not a valid Git working tree."
+}
+
+current_remote() {
+    git_rpd remote get-url origin 2>/dev/null || true
+}
+
+current_branch() {
+    git_rpd branch --show-current
+}
+
+current_upstream() {
+    git_rpd rev-parse \
+        --abbrev-ref \
+        --symbolic-full-name \
+        '@{u}' 2>/dev/null || true
+}
+
+require_expected_repo() {
+    local remote
+    local branch
+    local upstream
+
+    require_user
+    require_repo
+
+    remote="$(current_remote)"
+    branch="$(current_branch)"
+    upstream="$(current_upstream)"
+
+    [[ "$remote" == "$EXPECTED_REMOTE" ]] ||
+        die "Unexpected origin remote: ${remote:-<none>}"
+
+    [[ "$branch" == "$EXPECTED_BRANCH" ]] ||
+        die "Expected branch '$EXPECTED_BRANCH', found '${branch:-<detached>}'"
+
+    [[ "$upstream" == "$EXPECTED_UPSTREAM" ]] ||
+        die "Expected upstream '$EXPECTED_UPSTREAM', found '${upstream:-<none>}'"
+}
+
+require_clean() {
+    if [[ -n "$(git_rpd status --porcelain)" ]]; then
+        echo "RPD checkout has local changes:" >&2
+        git_rpd status --short >&2
+        die "Resolve or commit the local changes before continuing."
+    fi
+}
+
+ahead_behind() {
+    git_rpd rev-list \
+        --left-right \
+        --count \
+        "$EXPECTED_UPSTREAM...HEAD"
+}
+
+require_no_args() {
+    local command="$1"
+    shift
+
+    if (( $# != 0 )); then
+        die "'rpd $command' does not accept arguments."
+    fi
+}
+
+
+# -----------------------------------------------------------------------------
+# rpd path
+# -----------------------------------------------------------------------------
+
+run_path() {
+    require_expected_repo
+    printf '%s\n' "$RPD_DIR"
+}
+
+
+# -----------------------------------------------------------------------------
+# rpd status
+# -----------------------------------------------------------------------------
+
+run_status() {
+    local remote
+    local branch
+    local upstream
+    local latest
+    local behind
+    local ahead
+
+    require_user
+    require_repo
+
+    remote="$(current_remote)"
+    branch="$(current_branch)"
+    upstream="$(current_upstream)"
+    latest="$(git_rpd log -1 --oneline)"
+
+    echo "RPD repository"
+    echo "  Path:     $RPD_DIR"
+    echo "  Remote:   ${remote:-<none>}"
+    echo "  Branch:   ${branch:-<detached>}"
+    echo "  Upstream: ${upstream:-<none>}"
+    echo "  Latest:   $latest"
+    echo
+
+    if [[ -n "$(git_rpd status --porcelain)" ]]; then
+        echo "Working tree: DIRTY"
+        git_rpd status --short
+    else
+        echo "Working tree: clean"
+    fi
+
+    echo
+
+    if git_rpd show-ref \
+        --verify \
+        --quiet "refs/remotes/$EXPECTED_UPSTREAM"; then
+
+        read -r behind ahead <<< "$(ahead_behind)"
+
+        echo "Cached upstream:"
+        echo "  Ahead:  $ahead"
+        echo "  Behind: $behind"
+    else
+        echo "Cached upstream: unavailable"
+    fi
+
+    echo
+    echo "Network was not checked."
+    echo "Use 'rpd check' for a fresh GitHub check."
+}
+
+
+# -----------------------------------------------------------------------------
+# rpd check
+# -----------------------------------------------------------------------------
+
+run_check() {
+    local problems=0
+    local remote
+    local branch
+    local upstream
+    local tracked_ds
+    local behind
+    local ahead
+    local fetch_ok=0
+    local repo_identity_ok=1
+    local missing=0
+    local untracked=0
+    local file
+
+    local required_files=(
+        "00-Rotom-Change-Log.md"
+        "01-Rotom-Server-Inventory.md"
+        "02-Docker-Services.md"
+        "03-Network-and-Domains.md"
+        "04-NAS-and-Storage.md"
+        "05-Backup-and-Restore.md"
+        "06-Maintenance-and-Automation.md"
+        "07-Users-and-Permissions.md"
+        "08-Rotom-Directory-Tree.txt"
+    )
+
+    require_user
+
+    echo "Checking Rotom Project Documentation..."
+    echo
+
+    if [[ -d "$RPD_DIR/.git" ]] &&
+       git_rpd rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        echo "PASS  Git repository: $RPD_DIR"
+    else
+        echo "FAIL  Git repository is missing or invalid"
+        return 1
+    fi
+
+    remote="$(current_remote)"
+
+    if [[ "$remote" == "$EXPECTED_REMOTE" ]]; then
+        echo "PASS  Origin remote: $remote"
+    else
+        echo "FAIL  Origin remote: ${remote:-<none>}"
+        problems=$((problems + 1))
+        repo_identity_ok=0
+    fi
+
+    branch="$(current_branch)"
+
+    if [[ "$branch" == "$EXPECTED_BRANCH" ]]; then
+        echo "PASS  Branch: $branch"
+    else
+        echo "FAIL  Branch: ${branch:-<detached>}"
+        problems=$((problems + 1))
+        repo_identity_ok=0
+    fi
+
+    upstream="$(current_upstream)"
+
+    if [[ "$upstream" == "$EXPECTED_UPSTREAM" ]]; then
+        echo "PASS  Upstream: $upstream"
+    else
+        echo "FAIL  Upstream: ${upstream:-<none>}"
+        problems=$((problems + 1))
+        repo_identity_ok=0
+    fi
+
+    if [[ -z "$(git_rpd status --porcelain)" ]]; then
+        echo "PASS  Working tree: clean"
+    else
+        echo "FAIL  Working tree has local changes"
+        git_rpd status --short
+        problems=$((problems + 1))
+    fi
+
+    if test -x "$RPD_DIR" &&
+       test -r "$RPD_DIR" &&
+       test -w "$RPD_DIR"; then
+        echo "PASS  RPD checkout is readable, writable, and traversable"
+    else
+        echo "FAIL  RPD filesystem access"
+        problems=$((problems + 1))
+    fi
+
+    for file in "${required_files[@]}"; do
+        if [[ ! -f "$RPD_DIR/$file" ]]; then
+            echo "FAIL  Missing RPD file: $file"
+            missing=1
+            continue
+        fi
+
+        if ! git_rpd ls-files \
+            --error-unmatch \
+            -- "$file" >/dev/null 2>&1; then
+
+            echo "FAIL  RPD file exists but is not tracked: $file"
+            untracked=1
+        fi
+    done
+
+    if (( missing == 0 && untracked == 0 )); then
+        echo "PASS  Core RPD set: all 00-08 files exist and are tracked"
+    else
+        problems=$((problems + 1))
+    fi
+
+    tracked_ds="$(
+        git_rpd ls-files |
+            grep -E '(^|/)\.DS_Store$' ||
+            true
+    )"
+
+    if [[ -z "$tracked_ds" ]]; then
+        echo "PASS  No tracked .DS_Store files"
+    else
+        echo "FAIL  Tracked .DS_Store files found:"
+        echo "$tracked_ds"
+        problems=$((problems + 1))
+    fi
+
+    echo
+    echo "Checking GitHub..."
+
+    if (( repo_identity_ok == 0 )); then
+        echo "SKIP  GitHub fetch because repository identity checks failed"
+    else
+        if git_rpd fetch --prune origin; then
+            echo "PASS  GitHub fetch"
+            fetch_ok=1
+        else
+            echo "FAIL  GitHub fetch"
+            problems=$((problems + 1))
+        fi
+    fi
+
+    if (( fetch_ok == 1 )); then
+        if git_rpd show-ref \
+            --verify \
+            --quiet "refs/remotes/$EXPECTED_UPSTREAM"; then
+
+            read -r behind ahead <<< "$(ahead_behind)"
+
+            if (( behind > 0 && ahead > 0 )); then
+                echo "FAIL  Branch has diverged: ahead $ahead, behind $behind"
+                problems=$((problems + 1))
+            elif (( behind > 0 )); then
+                echo "INFO  Update available: behind $behind commit(s)"
+            elif (( ahead > 0 )); then
+                echo "INFO  Local branch is ahead by $ahead commit(s)"
+            else
+                echo "PASS  Local branch matches $EXPECTED_UPSTREAM"
+            fi
+        else
+            echo "FAIL  Remote-tracking branch $EXPECTED_UPSTREAM not found"
+            problems=$((problems + 1))
+        fi
+    fi
+
+    echo
+
+    if (( problems == 0 )); then
+        echo "RPD CHECK: PASS"
+    else
+        echo "RPD CHECK: FAIL ($problems problem(s))"
+        return 1
+    fi
+}
+
+
+# -----------------------------------------------------------------------------
+# rpd pull
+# -----------------------------------------------------------------------------
+
+run_pull() {
+    local behind
+    local ahead
+
+    require_expected_repo
+    require_clean
+
+    echo "Fetching latest RPD from GitHub..."
+    git_rpd fetch --prune origin
+
+    read -r behind ahead <<< "$(ahead_behind)"
+
+    if (( behind > 0 && ahead > 0 )); then
+        die "Local and remote branches have diverged. No changes were made."
+    fi
+
+    if (( ahead > 0 )); then
+        echo "Local RPD is ahead of GitHub by $ahead commit(s)."
+        echo "Nothing was pulled."
+        echo "Use 'rpd push' to publish the local commit(s)."
+        exit 0
+    fi
+
+    if (( behind == 0 )); then
+        echo "RPD is already up to date."
+        git_rpd log -1 --oneline
+        exit 0
+    fi
+
+    echo "Fast-forwarding $EXPECTED_BRANCH by $behind commit(s)..."
+    git_rpd merge --ff-only "$EXPECTED_UPSTREAM"
+
+    echo
+    echo "RPD updated successfully:"
+    git_rpd log -1 --oneline
+}
+
+
+# -----------------------------------------------------------------------------
+# rpd diff
+# -----------------------------------------------------------------------------
+
+run_diff() {
+    require_user
+    require_repo
+
+    if [[ -z "$(git_rpd status --porcelain)" ]]; then
+        echo "RPD working tree is clean. No local diff."
+        exit 0
+    fi
+
+    echo "RPD status:"
+    git_rpd status --short
+    echo
+
+    echo "Unstaged changes:"
+    git_rpd diff
+    echo
+
+    echo "Staged changes:"
+    git_rpd diff --cached
+}
+
+
+# -----------------------------------------------------------------------------
+# rpd log
+# -----------------------------------------------------------------------------
+
+run_log() {
+    local count="${1:-10}"
+
+    [[ "$count" =~ ^[1-9][0-9]*$ ]] ||
+        die "Log count must be a positive integer."
+
+    require_user
+    require_repo
+
+    git_rpd log \
+        -n "$count" \
+        --date=short \
+        --pretty=format:'%h  %ad  %d  %s'
+
+    echo
+}
+
+
+# -----------------------------------------------------------------------------
+# rpd commit
+# -----------------------------------------------------------------------------
+
+run_commit() {
+    local message
+
+    require_expected_repo
+
+    if (( $# != 1 )); then
+        echo 'Usage: rpd commit "commit message"' >&2
+        exit 2
+    fi
+
+    message="$1"
+
+    if [[ -z "${message//[[:space:]]/}" ]]; then
+        die "Commit message cannot be empty."
+    fi
+
+    if [[ -z "$(git_rpd status --porcelain)" ]]; then
+        echo "Nothing to commit. RPD working tree is clean."
+        exit 0
+    fi
+
+    echo "Staging all RPD changes..."
+    git_rpd add -A
+
+    if git_rpd diff --cached --quiet; then
+        echo "Nothing was staged. No commit created."
+        exit 0
+    fi
+
+    git_rpd commit -m "$message"
+
+    echo
+    echo "RPD commit created:"
+    git_rpd log -1 --oneline
+    echo
+    echo "The commit has not been pushed."
+    echo "Run 'rpd push' to publish it."
+}
+
+
+# -----------------------------------------------------------------------------
+# rpd push
+# -----------------------------------------------------------------------------
+
+run_push() {
+    local behind
+    local ahead
+
+    require_expected_repo
+    require_clean
+
+    echo "Fetching GitHub before push..."
+    git_rpd fetch --prune origin
+
+    read -r behind ahead <<< "$(ahead_behind)"
+
+    if (( behind > 0 && ahead > 0 )); then
+        die "Local and remote branches have diverged. Push refused."
+    fi
+
+    if (( behind > 0 )); then
+        die "Local RPD is behind GitHub by $behind commit(s). Run 'rpd pull' first."
+    fi
+
+    if (( ahead == 0 )); then
+        echo "Nothing to push. RPD already matches GitHub."
+        exit 0
+    fi
+
+    echo "Pushing $ahead commit(s) to GitHub..."
+    git_rpd push origin HEAD:main
+
+    echo
+    echo "RPD push completed:"
+    git_rpd log -1 --oneline
+}
+
+
+# -----------------------------------------------------------------------------
+# Help
+# -----------------------------------------------------------------------------
+
+show_help() {
+    cat <<'EOF'
+Rotom Project Documentation helper
+
+Usage:
+  rpd <command>
+
+Commands:
+  path                   Show the resolved local RPD checkout path
+  status                 Show local RPD repository status
+  check                  Verify repository, files, GitHub, and upstream state
+  pull                   Safely fast-forward the local RPD from GitHub
+  diff                   Show local uncommitted RPD changes
+  log [N]                Show recent commits (default: 10)
+  commit "message"       Stage all RPD changes and create a local commit
+  push                   Push existing local commits to GitHub
+  help                   Show this help
+
+Repository resolution:
+  1. If the current directory is inside the expected RPD Git repository,
+     use that checkout.
+  2. Otherwise read the checkout path from:
+     ~/.config/rpd/repository
+     or $XDG_CONFIG_HOME/rpd/repository when XDG_CONFIG_HOME is set.
+
+Examples:
+  rpd path
+  rpd status
+  rpd check
+  rpd pull
+  rpd diff
+  rpd log
+  rpd log 5
+  rpd commit "Update Rotom documentation"
+  rpd push
+
+Behavior:
+  - Git output does not use a pager; no 'q' is required.
+  - status is local-only and does not contact GitHub.
+  - check fetches GitHub but does not modify RPD files.
+  - pull refuses dirty or diverged repositories.
+  - commit automatically stages all changed, deleted, and new non-ignored files.
+  - commit creates a local commit only and does not push.
+  - push refuses dirty, behind, or diverged repositories.
+  - push publishes existing local commits immediately.
+  - no confirmation prompts are used.
+
+Safety:
+  - Run as jared, without sudo.
+  - The expected repository, remote, branch, and upstream are verified.
+  - reset, clean, force-push, automatic merge commits, and rebases are not provided.
+EOF
+}
+
+
+# -----------------------------------------------------------------------------
+# Command dispatcher
+# -----------------------------------------------------------------------------
+
+command="${1:-help}"
+
+case "$command" in
+    path|status|check|pull|diff|log|commit|push)
+        ensure_rpd_dir
+        ;;
+esac
+
+case "$command" in
+    path)
+        shift
+        require_no_args "path" "$@"
+        run_path
+        ;;
+
+    status)
+        shift
+        require_no_args "status" "$@"
+        run_status
+        ;;
+
+    check)
+        shift
+        require_no_args "check" "$@"
+        run_check
+        ;;
+
+    pull)
+        shift
+        require_no_args "pull" "$@"
+        run_pull
+        ;;
+
+    diff)
+        shift
+        require_no_args "diff" "$@"
+        run_diff
+        ;;
+
+    log)
+        shift
+
+        if (( $# > 1 )); then
+            die "Usage: rpd log [N]"
+        fi
+
+        run_log "${1:-10}"
+        ;;
+
+    commit)
+        shift
+        run_commit "$@"
+        ;;
+
+    push)
+        shift
+        require_no_args "push" "$@"
+        run_push
+        ;;
+
+    help|-h|--help)
+        if (( $# > 0 )); then
+            shift
+        fi
+        require_no_args "help" "$@"
+        show_help
+        ;;
+
+    *)
+        echo "Unknown command: $1" >&2
+        echo >&2
+        show_help >&2
+        exit 2
+        ;;
+esac
