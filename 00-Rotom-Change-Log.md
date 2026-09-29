@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — Remove validated JAR-31 staging copies
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Removed the unused JAR-31 migration staging directories from `/var/tmp` after confirming no mount or open file used them. Retained the separately documented root-owned Palworld pre-network-move archive `/var/tmp/jar31-palworld-jared-pre-network-move.tar.gz`. Pruned only Docker images not referenced by containers; stale tags were removed, but their layers were shared and reclaimed negligible unique space.
+- **Evidence:** Root filesystem use fell from 94% to 75% (about 23 GB free); `/var/tmp` is now 60 MB. No active Docker container image was removed.
+- **Outstanding:** Existing legacy Palworld rollback trees and current v2 appdata remain critical data and were not touched.
+
 ## 2026-09-29 — JAR-46 future-domain contracts
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.
