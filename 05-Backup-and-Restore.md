@@ -50,6 +50,8 @@ JAR-44 defines the Documents domain before Paperless deployment. Future database
 
 JAR-46 defines Filesync, Customapps, and Auth as empty future domains. Their future local appdata is within `/srv`, but generic inclusion does not establish application consistency or a NAS recovery claim. Future authoritative NAS data requires a protection/recovery review before use.
 
+JAR-8 Paperless state, PostgreSQL, Valkey, media, exports, and consume paths are VM-local under `/srv/rotom/appdata/documents/paperless`; NAS Documents is unused. A supported local export was produced into protected `/srv/rotom/backup-staging/documents/paperless`, but it is not yet in a verified guest Restic snapshot. JAR-47 must first repair the shared Smart Home SQLite staging discrepancy before a guest backup run.
+
 ## 2B. Current PVE Host-Configuration Restic Repository and Control Files
 
 Canonical current PVE host-config backup state:

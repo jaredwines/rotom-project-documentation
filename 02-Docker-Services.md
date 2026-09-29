@@ -254,6 +254,14 @@ The intended Game library roots are `/game/library/games/pc` for PC releases and
 
 Prowlarr Torznab integration uses base URL `http://192.168.1.69:9696/2`; Gamarr appends `/api` itself. Supplying a URL that already ends in `/api` produced `/api/api`, an HTML login redirect, and XML parsing failure. API keys are secrets and are intentionally omitted. The corrected base successfully returned search results and a release was sent through Prowlarr to qBittorrent. The final commissioning test was user-confirmed for download, import into the intended PC library, hardlink behavior, and continued seeding. A later live audit verified the container as `running` / `healthy`. Docker inspection shows the healthcheck comes from the image (`/etc/s6-overlay/s6-rc.d/svc-gamarr/data/check`, 30-second interval, 10-second timeout, 120-second start period, 3 retries); `/home/game/docker/gamarr/compose.yaml` has no explicit `healthcheck:` directive. Gamarr now also has verified named HTTPS access through Nginx Proxy Manager at `gamarr.rotom.casa -> 192.168.1.69:6767`; the NPM record uses certificate ID `24`, forces SSL, has no access list, and returned HTTP `302` in the route probe.
 
+## 4A. Documents — `documents`
+
+### JAR-8 Paperless-ngx deployment — 2026-09-29
+
+Paperless-ngx `v3.2.1`, PostgreSQL `18`, and Valkey `9` run from `/srv/rotom/stacks/documents/paperless/compose.yaml` (local commit `86a8432`). Mutable data, media, exports, consume, database, and broker state are VM-local below `/srv/rotom/appdata/documents/paperless`; credentials remain only under `/srv/rotom/secrets/documents/paperless`. The web service has loopback-only `8000` access and joins `rotom-proxy`; database/broker have no host ports. NPM route `paperless.rotom.casa -> 127.0.0.1:8000` uses the existing wildcard certificate.
+
+A harmless local PDF import completed OCR, title search, original retrieval, and survived web-service recreation. Its supported export (manifest, metadata, PDF, thumbnail) is protected local backup staging. Generic guest Restic includes `/srv`, but no verified snapshot includes this deployment; public-IP hairpin TLS cannot be tested from Rotom itself, while local SNI TLS returned the login redirect.
+
 ## 5. Smart Home — `smarthome`
 
 ### JAR-43 Smart Home v2 convergence — 2026-09-29

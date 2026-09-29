@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — JAR-8 Paperless-ngx deployment
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Deployed Paperless-ngx v3.2.1 with PostgreSQL 18 and Valkey 9 from `/srv/rotom/stacks/documents/paperless` (local commit `86a8432`). All mutable state is local under `/srv/rotom/appdata/documents/paperless`; secrets are root-only. The web service joins `rotom-proxy`; database and broker remain private. NPM route `paperless.rotom.casa -> 127.0.0.1:8000` uses the existing wildcard certificate and loopback-only web listener.
+- **Evidence:** Paperless became healthy; harmless local PDF import, OCR, title search, original retrieval, and web recreation persistence passed. A supported export containing manifest, metadata, original PDF, and thumbnail was copied to protected local backup staging. Local SNI HTTPS returned login redirect; generic compose and Nginx configuration checks passed and no failed units were present.
+- **Outstanding:** The public-IP hairpin TLS test from Rotom fails before reaching NPM, while local SNI route verification passes; validate from an external client. JAR-47 must safely reconcile guest Restic's pre-v2 Home Assistant SQLite staging path before a full guest backup run. The Paperless export artifact is staged locally but not yet included in a verified Restic snapshot.
+
 ## 2026-09-29 — Retire final JAR-31 Palworld safety archive
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `08-Rotom-Directory-Tree.txt`.
