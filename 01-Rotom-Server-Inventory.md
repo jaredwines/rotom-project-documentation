@@ -52,13 +52,13 @@ ChatGPT-controlled browser work is not part of the Rotom administration or docum
 |---|---|
 | infra | Arcane, Cloudflare DDNS, Homepage, Glances, Nginx Proxy Manager |
 | media | Jellyfin, Radarr, Sonarr |
-| game | Palworld servers for Fran and Jared; Gamarr |
+| gameserver | Palworld servers for Fran and Jared; Gamarr; UID:GID `995:5001`, with compatibility home `/home/game` retained |
 | smarthome | Home Assistant and Homebridge |
 | documents | Service-account skeleton reserved for future document workloads; no application deployed |
-| downloaders | Active Prowlarr/qBittorrentVPN domain; UID:GID `901:5005`; `/mnt/nas-downloaders` currently mounts NAS `Downloader/.data` |
+| downloader | Active Prowlarr/qBittorrentVPN domain; UID:GID `901:5005`; compatibility home and mount remain `/home/downloaders` / `/mnt/nas-downloaders` |
 | web | Aloha Millworks active; Jared Wines project retained but intentionally undeployed |
 | filesync | Service-account skeleton reserved for future synchronization workloads; built-in Linux `sync` remains untouched |
-| apps | Service-account skeleton reserved for future application workloads |
+| customapps | Service-account skeleton reserved for future application workloads; compatibility home `/home/apps` retained |
 | auth | Service-account skeleton reserved for future authentication workloads |
 | jared | Interactive administrator with full sudo; Fran's pre-migration administrator identity is preserved but not yet recreated in the VM |
 

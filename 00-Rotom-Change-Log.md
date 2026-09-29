@@ -53,6 +53,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-28 — JAR-35: reconcile v2 domain names without numeric churn
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.** `game` → `gameserver`, `downloaders` → `downloader`, and `apps` → `customapps` preserve `995:5001`, `901:5005`, and `904:5008`; compatibility homes and existing workload paths remain intact.
+- **Changes:** The sole current name-dependent bindfs service and recovery-helper check now use `gameserver`. Rollback copies were retained before the root-owned definitions changed. No recursive ownership operation, NAS-share rename, container recreation, Docker-group assignment, or home move occurred.
+- **Evidence:** NSS confirms the final names and old names absent; all three identities retain expected homes, UID/GID, locked service model, and no Docker-group membership. A restarted Gameserver bindfs view and the recovery helper both completed successfully; intended per-domain NAS write/delete tests returned `995:5001`, `901:5005`, and `904:5008`, while downloader was denied Game traversal. Production containers remained healthy and zero systemd units failed.
+- **Outstanding:** JAR-55 owns reserved v2 NAS boundaries; existing compatibility mounts `/mnt/nas-game`, `/mnt/nas-downloaders`, and `/mnt/nas-apps` remain until workload migration.
+
 ## 2026-09-28 — JAR-34: establish Rotom v2 `/srv/rotom` foundation
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
