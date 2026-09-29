@@ -25,7 +25,7 @@ PVE job `rotom-vm-daily` is enabled for node `pve`, VMID `100`, storage `nas-rot
 
 JAR-69 monitoring reads this native job through the PVE LAN-only status endpoint `http://192.168.1.68:8789/rotom-vm-backup-status`; the companion host-config Restic endpoint is `/pve-restic-backup-status`. The API is read-only and is only a Homepage presentation layer; it does not change schedules, retention, repositories, storage, or recovery points.
 
-The manual path is `/usr/local/bin/backup-rotom-vm-to-nas` -> `rotom-vm-vzdump-manual.service` -> `/usr/local/sbin/rotom-vm-vzdump-manual`, with non-blocking lock `/run/lock/rotom-vm-vzdump-manual.lock`. Systemd owns the long-running VZDump so it survives SSH disconnect.
+The manual path is `/usr/local/bin/backup-rotom-vm-to-nas` -> `rotom-vm-vzdump-manual.service` -> `/usr/local/sbin/rotom-vm-vzdump-manual`, with non-blocking lock `/run/lock/rotom-vm-vzdump-manual.lock`. The root-owned launcher re-executes through `sudo` when started by a non-root user, preserving the root-only worker and systemd ownership; Jared uses normal sudo authentication when needed. Systemd owns the long-running VZDump so it survives SSH disconnect. Jared can follow it directly with `journalctl -fu rotom-vm-vzdump-manual.service` through PVE `systemd-journal` membership.
 
 All six prior VMID 100 backups on the canonical storage were deliberately deleted after exact safety checks. A single fresh backup was then created: `vzdump-qemu-100-2026_09_28-00_09_19.vma.zst`, size `47,415,540,796` bytes. The service completed `Result=success` / `ExecMainStatus=0`; `zstd -t` passed; full `zstd -dc | vma verify -` passed; VM100 stayed running. This archive is currently **unprotected**, so normal `7/4/6` retention can eventually prune it.
 
@@ -542,7 +542,7 @@ A read-only repository listing after the scheduled 03:01 run showed 17 snapshots
 - Restic status API: `/usr/local/sbin/rotom-restic-backup-status-api` + `/etc/systemd/system/rotom-restic-backup-status-api.service`; Homepage endpoint `http://192.168.1.69:8787/backup-status`.
 - Credential location: `/etc/restic/nas-password`; contents must never be printed or copied into documentation.
 - Current verified guest snapshot: `f666d63c` at `2026-09-27 13:30:28 PDT`; post-run repository check passed 21/21 snapshots.
-- PVE manual launcher: `/usr/local/bin/backup-rotom-vm-to-nas`; starts fixed `rotom-vm-vzdump-manual.service` with `--no-block` and refuses duplicate active manual runs.
+- PVE manual launcher: `/usr/local/bin/backup-rotom-vm-to-nas`; re-executes through `sudo` for non-root invocation, starts fixed `rotom-vm-vzdump-manual.service` with `--no-block`, and refuses duplicate active manual runs. Jared can follow the unit without `sudo` through `systemd-journal` membership.
 - PVE manual worker/service: `/usr/local/sbin/rotom-vm-vzdump-manual` + `/etc/systemd/system/rotom-vm-vzdump-manual.service`; VMID 100 / `nas-rotom-vm-backup` / snapshot / zstd; lock `/run/lock/rotom-vm-vzdump-manual.lock`. The old local `backup-proxmox-to-nas.pre-systemd.*` rollback helper was deliberately removed after final acceptance.
 - PVE automatic scheduler: native job `rotom-vm-daily` in `/etc/pve/jobs.cfg`, node `pve`, VMID 100, `05:00`, snapshot + zstd, `repeat-missed=0`, retention 7 daily / 4 weekly / 6 monthly.
 - Current observed VM archive: `/mnt/pve/nas-rotom-vm-backup/dump/vzdump-qemu-100-2026_09_28-00_09_19.vma.zst`, `47,415,540,796` bytes; zstd integrity PASS; full VMA verify PASS; currently unprotected.
