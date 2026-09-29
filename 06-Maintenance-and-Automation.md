@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-09-28 — universal RPD helper and layered Codex instruction architecture verified
+**Documentation updated:** 2026-09-29 — JAR-72 Homepage application-card organization verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -35,6 +35,8 @@ JAR-38 converted Homepage, Glances, Arcane, and Cloudflare DDNS to independent v
 JAR-40 added independent Media v2 modules at local commit `f5f2da4`. The five migrated services retain `unless-stopped`; Gamarr retains its image healthcheck. NPM remains the established host-networked reverse proxy, so the applications retain host compatibility ports while joining their v2 Docker networks. No update automation, backup schedule, download payload, or VPN behavior changed.
 
 JAR-56 adds `rotom-qbittorrent-media-guard.timer`, enabled and active every 15 seconds, with `/usr/local/sbin/rotom-qbittorrent-media-guard` and its matching systemd service. It validates the underlying Media NFS filesystem and `/mnt/nas-media/.rotom-qbt-media-ready`; if either is absent while qBittorrentVPN is running, it stops that container rather than allowing an accidental local write. The normal check was live-verified after accounting for the autofs/NFS mount layers. The former Downloader payload and configuration remain rollback material.
+
+JAR-72 reorganized Homepage cards without changing monitoring behavior or any application boundary. **Hosted Websites** now includes Paperless and the private Rotom Docs portal; Docs is intentionally a link/container-status card without an HTTP monitor, so Homepage does not receive a trusted-LAN access-policy exemption. **Media** contains Jellyfin, Radarr, Sonarr, and Gamarr, while **Downloader** contains Prowlarr and qBittorrent. The targeted rollback artifact is `/srv/rotom/appdata/infra/homepage/config/services.yaml.pre-jar72-20260929-2224`; only Homepage was force-recreated after YAML and Compose validation.
 
 ### PVE host
 

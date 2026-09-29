@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — JAR-72 Homepage application-card organization
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Homepage now places Paperless and private Rotom Docs under **Hosted Websites**; Media contains Jellyfin, Radarr, Sonarr, and Gamarr; Downloader contains Prowlarr and qBittorrent. Existing card metadata was retained while cards were moved. Docs is a Docker-status/link card without an HTTP monitor, preserving its trusted-LAN policy. Only Homepage was recreated; no workload, proxy, DNS, certificate, storage, network, or credential configuration changed. The rollback copy is `services.yaml.pre-jar72-20260929-2224` beside the live configuration.
+- **Evidence:** The staged YAML parsed, Compose configuration validated, and Homepage became healthy after its targeted recreation. Exact card-section/duplicate assertions passed; local Homepage returned HTTP `200`, Paperless returned its expected `302` login redirect, and Docs returned `200`. No unhealthy/restarting containers, relevant Homepage log errors, or failed systemd units were found.
+- **Outstanding:** None for JAR-72.
+
 ## 2026-09-29 — JAR-8 Paperless external-route closeout
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`.
