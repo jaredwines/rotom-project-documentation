@@ -46,6 +46,8 @@ JAR-43 likewise places the current Smart Home Compose definitions under `/srv/ro
 
 JAR-45 places current Aloha Millworks and retained Jared Wines website content under `/srv/rotom/appdata/web`, with their Compose definitions under `/srv/rotom/stacks/web`; these paths are within the established guest Restic `/srv` source scope. Source-to-target state comparisons passed and the timer is active, but no backup, retention, prune, or restore operation or Restic-policy change was made. The old `/home/web/docker` trees remain local rollback material; a post-JAR-45 backup/restore exercise remains deferred to JAR-47 or a dedicated recovery task.
 
+JAR-44 defines the Documents domain before Paperless deployment. Future database, broker, index, configuration, exports, and originals remain VM-local under `/srv/rotom/appdata/documents` until an authoritative-media decision and recovery test exists; `/mnt/nas-documents` is reserved only. Generic `/srv` inclusion does not substitute for future Paperless application-aware backup/restore validation. A read-only inspection also found the guest backup worker's Home Assistant SQLite staging still points to the pre-JAR-43 path; JAR-47 owns its safe reconciliation and verification.
+
 ## 2B. Current PVE Host-Configuration Restic Repository and Control Files
 
 Canonical current PVE host-config backup state:

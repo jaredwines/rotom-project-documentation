@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — JAR-44 Documents-domain foundation
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Added tracked `/srv/rotom/stacks/documents/DOMAIN-CONTRACT.md` (local commit `916d26d`) and the root-only `/srv/rotom/secrets/documents` boundary. The contract defines `documents` `900:5004`, local Paperless state, `rotom-proxy` expectations, NAS-authority restrictions, and backup/recovery classification. No Compose placeholder, container, secret value, NAS data, or proxy route was created.
+- **Evidence:** Live identity, empty `/mnt/nas-documents` automount, v2 roots, Restic include scope, active backup timer, absence of document containers, and zero failed units were checked. A shared Smart Home backup staging-path discrepancy was recorded for JAR-47; protected Restic behavior was not changed.
+- **Outstanding:** JAR-8 owns Paperless deployment and application-aware backup/restore validation. The Documents NAS share remains reserved until authoritative-media policy is explicitly tested. Available Sources replacement remains manual by Jared.
+
 ## 2026-09-29 — JAR-45 Web v2 convergence
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.
