@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — Retire JAR-45 legacy Web rollback trees
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** At Jared's explicit request, permanently removed `/home/web/docker/alohamillworks.com` and `jaredwines.com`. The Web service home and NAS shortcut remain. Aloha continues running from `/srv/rotom/appdata/web/alohamillworks.com`; Jared Wines remains intentionally unstarted with its v2 content and Compose definition.
+- **Evidence:** Neither legacy path was mounted; source-to-v2 comparisons found no differences; Aloha Docker inspection showed only the v2 content mount. The removed trees were 1.9 GB and 18 MB; root use fell to 56% with 39 GB free.
+- **Outstanding:** Local legacy Web rollback trees no longer exist; rely on v2 state and independently verified backups for recovery.
+
 ## 2026-09-29 — Retire JAR-42 legacy Palworld rollback trees
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.

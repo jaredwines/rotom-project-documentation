@@ -277,7 +277,7 @@ The Homebridge container name was corrected on 2026-09-19 from the historical mi
 
 Aloha Millworks now uses `/srv/rotom/stacks/web/alohamillworks.com/compose.yaml` and a read-only `/srv/rotom/appdata/web/alohamillworks.com:/var/www/html` bind. It remains on its private default bridge plus external `rotom-proxy`, with `unless-stopped`. Retained NPM is host-networked and proxies through the LAN compatibility listener, so the existing `7778:80` mapping remains necessary; no NPM, DNS, TLS, certificate, or network redesign occurred. Local and public HTTPS probes returned HTTP 200 and NPM configuration validated.
 
-Jared Wines has v2 content at `/srv/rotom/appdata/web/jaredwines.com` and an unstarted Compose module at `/srv/rotom/stacks/web/jaredwines.com`; it has no container object or published listener. Both source trees under `/home/web/docker` remain retained rollback material. Metadata-preserving source-to-v2 comparisons found no differences. Guest Restic already covers `/srv`; no backup or restore was run.
+Jared Wines has v2 content at `/srv/rotom/appdata/web/jaredwines.com` and an unstarted Compose module at `/srv/rotom/stacks/web/jaredwines.com`; it has no container object or published listener. Source-to-v2 comparisons found no differences before Jared explicitly retired both `/home/web/docker` legacy project trees on 2026-09-29. Guest Restic already covers `/srv`; no backup or restore was run.
 
 | Service / current container name | Observed image | Observed status | Published ports | Container-only ports shown | Compose file |
 | --- | --- | --- | --- | --- | --- |
