@@ -13,6 +13,10 @@ Record substantive changes to this document in the change log as part of the sam
 
 ## 1. Purpose and Scope
 
+### JAR-8 Paperless route — 2026-09-29
+
+Paperless web service attaches to `rotom-proxy` and exposes only `127.0.0.1:8000`; PostgreSQL and Valkey stay internal. Retained host-networked NPM routes `paperless.rotom.casa` to that loopback endpoint with existing wildcard certificate ID 24. Local SNI HTTPS returned a login redirect. Rotom's own public-IP hairpin path did not reach this host route; validate public access externally.
+
 ### JAR-45 Web v2 network compatibility — 2026-09-29
 
 Aloha Millworks now joins `rotom-proxy` from its v2 Web Compose module, but retained NPM remains host-networked and cannot use Docker DNS on that bridge. Its established `alohamillworks.com -> 192.168.1.69:7778` compatibility upstream and the `7778` listener therefore remain necessary. No NPM route, DNS, WAN, TLS, certificate, firewall, or VLAN change was made; local and public HTTPS checks returned HTTP 200.
