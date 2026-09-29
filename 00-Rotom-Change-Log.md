@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-09-29 — JAR-70 Homepage Backup Schedule presentation verified
+**Documentation updated:** 2026-09-29 — JAR-43 Smart Home v2 convergence verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -56,6 +56,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-09-29 — JAR-43 Smart Home v2 convergence
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Home Assistant and Homebridge now run from independent root-administered Compose modules under `/srv/rotom/stacks/smarthome`, with mutable application state bound explicitly from `/srv/rotom/appdata/smarthome`. The existing `/home/smarthome/docker/{home-assistant,homebridge}` trees are retained unchanged as rollback material. Host networking, discovery, NPM routes, NAS boundaries, service identity, Docker restart policy, and guest Restic policy were retained; no NPM mutation was required.
+- **Evidence:** SQLite `quick_check` passed before staging and after cutover for Home Assistant and Homebridge databases. Post-reboot, both containers were `running`, `network_mode=host`, `restart=unless-stopped`, and mounted only the documented v2 appdata paths. Local and HTTPS proxy requests to both applications returned HTTP 200; Compose configurations parsed; Home Assistant SSDP/mDNS and Homebridge/Avahi mDNS listeners were present; `rotom-restic-backup.timer` was active; and zero failed systemd units were reported. The scheduled normal reboot completed with a new boot ID.
+- **Outstanding:** The guest Restic source scope includes `/srv`, but no backup, retention, prune, or restore operation was run for this ticket. Observe a later backup/restore exercise under JAR-47 or a dedicated recovery task. Available Sources replacement remains manual by Jared.
 
 ## 2026-09-29 — Adopt Jared's routine PVE administration identity
 

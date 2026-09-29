@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-28 — current host header corrected to canonical PVE `pve`; JAR-68 network state retained
+**Documentation updated:** 2026-09-29 — JAR-43 Smart Home v2 network compatibility verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -12,6 +12,10 @@
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
 
 ## 1. Purpose and Scope
+
+### JAR-43 Smart Home v2 network compatibility — 2026-09-29
+
+Home Assistant and Homebridge moved only their Compose/application-state paths to the v2 Smart Home domain. Both intentionally remain Docker host-network exceptions, preserving the established TCP listeners on `8123` and `8581` plus Home Assistant SSDP/mDNS and Homebridge/Avahi mDNS discovery behavior. The existing NPM routes remain `home-assistant.rotom.casa -> 192.168.1.69:8123` and `homebridge.rotom.casa -> 192.168.1.69:8581`; no proxy-host, certificate, DNS, WAN-forwarding, VLAN, firewall, or Docker-network change was made. Post-reboot local and HTTPS route probes returned HTTP 200 for both applications.
 
 ### JAR-38 Infra v2 network convergence — 2026-09-28
 
