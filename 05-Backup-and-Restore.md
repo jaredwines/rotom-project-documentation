@@ -48,6 +48,8 @@ JAR-45 places current Aloha Millworks and retained Jared Wines website content u
 
 JAR-44 defines the Documents domain before Paperless deployment. Future database, broker, index, configuration, exports, and originals remain VM-local under `/srv/rotom/appdata/documents` until an authoritative-media decision and recovery test exists; `/mnt/nas-documents` is reserved only. Generic `/srv` inclusion does not substitute for future Paperless application-aware backup/restore validation. A read-only inspection also found the guest backup worker's Home Assistant SQLite staging still points to the pre-JAR-43 path; JAR-47 owns its safe reconciliation and verification.
 
+JAR-46 defines Filesync, Customapps, and Auth as empty future domains. Their future local appdata is within `/srv`, but generic inclusion does not establish application consistency or a NAS recovery claim. Future authoritative NAS data requires a protection/recovery review before use.
+
 ## 2B. Current PVE Host-Configuration Restic Repository and Control Files
 
 Canonical current PVE host-config backup state:
