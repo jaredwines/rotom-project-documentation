@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — JAR-71 Remote Desktop Commander deployment
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Deployed the pinned Remote Desktop Commander agent `@wonderwhy-er/desktop-commander` `0.2.52` as native `desktop-commander.service`, running under the dedicated `desktopcmd` account. Its private `/home/desktopcmd` contains the application, workspace, and sensitive device-registration state; the service is outbound-only and introduces no Docker, NAS, proxy, DNS, subdomain, or inbound listener.
+- **Evidence:** The locked `desktopcmd` `1001:1001` identity has a `0700` home and no sudo, Docker, service-group, NAS, or protected-path access. The enabled service ran with `UMask=0077`, `NoNewPrivileges=true`, and `PrivateTmp=true`, reconnected after a controlled restart, and the paired remote connection executed `id` plus a harmless workspace-file write as `desktopcmd` (created file `0600`). Existing services and NAS mounts remained unchanged; no unexpected failed unit was reported during acceptance.
+- **Outstanding:** `/home/desktopcmd` and `/etc/systemd/system/desktop-commander.service` are within the established guest Restic source roots, but no backup/restore run was performed. Treat device-registration state as sensitive: recovery should re-pair rather than copying its contents into documentation or logs.
+
 ## 2026-09-29 — JAR-5 private Rotom documentation portal
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.

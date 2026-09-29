@@ -56,6 +56,8 @@ JAR-10 RomM database and application state are VM-local under `/srv/rotom/appdat
 
 JAR-5 keeps its documentation portal Compose definition and controlled-publish script under `/srv/rotom/stacks/infra/rotom-docs` and its generated source/site output under `/srv/rotom/appdata/infra/rotom-docs`; these VM-local paths are within the established guest Restic `/srv` source scope. The portal source is a deliberately derived, reproducible copy of canonical RPD material, not a new authority or a NAS dataset. JAR-5 did not run, modify, or validate Restic, retention, pruning, repositories, credentials, schedules, or restores.
 
+JAR-71 places the Remote Desktop Commander application, workspace, and sensitive device-registration state under `/home/desktopcmd`, which is within the established `/home` guest Restic source root; its native unit is `/etc/systemd/system/desktop-commander.service`, also within scope. No JAR-71 backup, retention, prune, or restore was run. Treat a recovered device-registration state as sensitive and re-pair the agent when restoring rather than copying its contents into any record.
+
 ## 2B. Current PVE Host-Configuration Restic Repository and Control Files
 
 Canonical current PVE host-config backup state:

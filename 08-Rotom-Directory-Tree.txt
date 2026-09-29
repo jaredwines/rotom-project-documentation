@@ -203,6 +203,13 @@
 #   filesync/    903:5007  mode 0750  -> nas-filesync -> /mnt/nas-filesync
 #   apps/        904:5008  mode 0750  -> nas-apps -> /mnt/nas-apps
 #   auth/        905:5009  mode 0750  -> nas-auth -> /mnt/nas-auth
+#   desktopcmd/  1001:1001 mode 0700  JAR-71 Remote Desktop Commander native identity
+#     app/                        pinned @wonderwhy-er/desktop-commander 0.2.52 installation
+#     workspace/                  sole intended writable remote work area; acceptance file mode 0600
+#     .desktop-commander-device/  sensitive pairing state; never record contents
+# /etc/systemd/system/desktop-commander.service
+#   enabled outbound-only native service as desktopcmd; UMask=0077, NoNewPrivileges=true, PrivateTmp=true;
+#   no Docker, NAS, proxy, DNS, or inbound listener dependency
 #
 # /mnt/
 #   nas-media/         NFSv3 Media/.data; root 988:5000 mode 2770

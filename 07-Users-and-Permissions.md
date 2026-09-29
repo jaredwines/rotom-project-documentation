@@ -40,6 +40,7 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 | downloaders | `901:5005`, `/home/downloaders`; Prowlarr/qBittorrentVPN |
 | web | `902:5006`, `/home/web`; Aloha active; Jared Wines undeployed |
 | filesync/apps/auth | `903:5007`, `904:5008`, `905:5009` respectively |
+| desktopcmd | `1001:1001`, locked non-human account with `/home/desktopcmd` mode `0700`; Remote Desktop Commander only; no sudo, SSH authorized keys, Docker/socket, service-group, or NAS-specific access |
 | Docker group | GID `989`, no members |
 
 ### Current PVE backup privilege boundary

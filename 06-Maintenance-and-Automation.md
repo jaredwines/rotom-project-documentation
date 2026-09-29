@@ -51,6 +51,7 @@ JAR-56 adds `rotom-qbittorrent-media-guard.timer`, enabled and active every 15 s
 - Docker/containerd remain enabled. Current intended runtime is 16 container objects / 14 running because both Palworld containers are intentionally stopped; their worlds remain preserved.
 - `rotom-nas-docker-recovery.service` remains the NAS-backed container recovery helper. Final post-reboot checks passed all twelve NFS automounts, both read-only bindfs views, qBittorrent sentinel, and qBittorrentVPN `wg0` `10.2.0.2/32`.
 - Guest Restic remains `rotom-restic-backup.service` / `.timer` around `03:00`, with manual `backup-restic-to-nas`; guest naming was intentionally not changed by JAR-68.
+- JAR-71 Remote Desktop Commander is the native enabled `desktop-commander.service`, running outbound-only as `desktopcmd` with `UMask=0077`, `NoNewPrivileges=true`, and `PrivateTmp=true`. It has no Docker, NAS, proxy, DNS, or inbound-listener dependency; `/home/desktopcmd/workspace` is its only intended writable work area.
 - Weekly Linux update script remains present but the reboot-capable cron schedule remains absent unless separately recommissioned.
 
 ### Current PVE recovery points
