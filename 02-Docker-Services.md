@@ -270,7 +270,7 @@ Prowlarr Torznab integration uses base URL `http://192.168.1.69:9696/2`; Gamarr 
 
 Paperless-ngx `v3.2.1`, PostgreSQL `18`, and Valkey `9` run from `/srv/rotom/stacks/documents/paperless/compose.yaml` (local commit `86a8432`). Mutable data, media, exports, consume, database, and broker state are VM-local below `/srv/rotom/appdata/documents/paperless`; credentials remain only under `/srv/rotom/secrets/documents/paperless`. The web service has loopback-only `8000` access and joins `rotom-proxy`; database/broker have no host ports. NPM route `paperless.rotom.casa -> 127.0.0.1:8000` uses the existing wildcard certificate.
 
-A harmless local PDF import completed OCR, title search, original retrieval, and survived web-service recreation. Its supported export (manifest, metadata, PDF, thumbnail) is protected local backup staging. Generic guest Restic includes `/srv`, but no verified snapshot includes this deployment; public-IP hairpin TLS cannot be tested from Rotom itself, while local SNI TLS returned the login redirect.
+A harmless local PDF import completed OCR, title search, original retrieval, and survived web-service recreation. Its supported export (manifest, metadata, PDF, thumbnail) is protected local backup staging. Generic guest Restic includes `/srv`, but no verified snapshot includes this deployment. Rotom's public-IP hairpin TLS cannot test the route locally, but an independent public TLS assessment verified the expected login redirect and HTTP `200` login page through `paperless.rotom.casa`.
 
 ## 5. Smart Home — `smarthome`
 

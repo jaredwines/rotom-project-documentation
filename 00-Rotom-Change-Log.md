@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — JAR-8 Paperless external-route closeout
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`.
+- **Status:** **Verified.**
+- **Changes:** Closed JAR-8's sole remaining acceptance item without changing Paperless, NPM, storage, secrets, or backup behavior. `paperless.rotom.casa` is now externally verified in addition to the prior local-SNI and functional application checks.
+- **Evidence:** An independent public TLS assessment reached the route at the public endpoint, presented the trusted `*.rotom.casa` certificate, received the expected `302` login redirect, and followed it to the Paperless login page with HTTP `200`. Final live checks found Paperless healthy with zero restarts, PostgreSQL and Valkey without host-published ports, valid Nginx configuration, no unhealthy/restarting Docker containers, and zero failed systemd units.
+- **Outstanding:** JAR-47 still owns safe repair of the Smart Home SQLite staging-path discrepancy before a guest Restic run can capture the local Paperless export; no NAS Documents data is in use.
+
 ## 2026-09-29 — JAR-71 Remote Desktop Commander deployment
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
