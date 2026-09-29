@@ -53,6 +53,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-28 — JAR-34: establish Rotom v2 `/srv/rotom` foundation
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.** JAR-34 created the Phase C filesystem and local declarative-history foundation without migrating production workloads.
+- **Changes:** `/srv/rotom` is `root:root` `0755`; it contains root-administered `stacks/` and `scripts/`, root-only `secrets/` and `backup-staging/` (`0700`), plus empty domain roots under `appdata/` at `0750` owned by the applicable current numeric service identity/storage group. A local root-owned Git repository contains only non-secret support/readme material and has no remote. Its ignore policy excludes appdata, secrets, staging, databases, logs, caches, generated state, and environment files. The recorded migration pattern is one workload at a time with backup, validation, targeted recreation, verification, and stack-only rollback; legacy `/home/<service>/docker` paths remain until each owning Phase D acceptance.
+- **Evidence:** Live permission inventory confirmed all required namespace roots and ownership/mode contracts. `git status` was clean; the initial local commit was `5811ce1`; `git check-ignore` proved the three mutable/sensitive top-level trees are excluded. Docker mount inspection confirmed all current production bind sources remain under compatibility `/home`, `/mnt`, or existing Docker-volume paths with no `/srv/rotom` production bind; the VM had zero failed systemd units.
+- **Outstanding:** JAR-35 owns renaming the three compatibility identities while preserving their numeric contracts; later workload tickets own actual stack/appdata migration.
+
 ## 2026-09-29 — JAR-70: organize Homepage Backup Schedule section
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`.

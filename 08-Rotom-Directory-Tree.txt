@@ -126,6 +126,16 @@
 #   current Docker runtime on VM-local ext4
 #   volumes/arcane_arcane-data/     restored Arcane persistent named-volume data
 #
+# /srv/rotom/                       JAR-34 v2 foundation; root:root 0755
+#   stacks/{infra,media,downloader,gameserver,smarthome,documents,web,filesync,customapps,auth}/
+#                                     empty root-owned declarative namespace reservations
+#   appdata/<domain>/                empty service-owned 0750 roots; no production state moved
+#   secrets/                         root:root 0700; credentials/private material only, Git-ignored
+#   scripts/                         root-owned declarative helper namespace
+#   backup-staging/                  root:root 0700; app-consistent export staging, Git-ignored
+#   .git/                            local history only; no remote configured by JAR-34
+#   .gitignore                       excludes mutable/sensitive/generated state
+#
 # /home/
 #   media/       127:5000  mode 0750  -> nas-media -> /mnt/nas-media
 #     docker/jellyfin/              ACTIVE
