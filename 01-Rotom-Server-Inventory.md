@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-29 — JAR-70 Homepage Backup Schedule presentation verified
+**Documentation updated:** 2026-09-28 — JAR-34 Rotom v2 declarative filesystem foundation verified
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -30,6 +30,7 @@ The accepted Phase B architecture now uses **PVE** as the product abbreviation a
 | Rotom guest | Debian 13.7; `rotom.casa`; MAC `BC:24:11:97:10:47`; UniFi-reserved `192.168.1.69/24`; gateway/DNS `192.168.1.1` |
 | RPD / Codex integration | Git checkout `/home/infra/documentation/rpd` from `git@github.com:jaredwines/rotom-project-documentation.git`, branch `main`; Jared-global `/home/jared/.codex/AGENTS.md` directs Codex to the RPD and was functionally verified with Codex CLI `0.158.0`; Mac `/usr/local/bin/rpd` helper verified through status/check/diff/log/pull safety behavior, while the final no-confirmation revision and Rotom helper deployment remain Needs Verification |
 | Docker runtime | Docker Engine `29.8.1`; Compose `v5.5.1`; 16 container objects; **14 intended running** because both Palworld containers are intentionally stopped to save resources |
+| Rotom v2 filesystem foundation | JAR-34 created `/srv/rotom` as an empty, root-administered v2 namespace. `stacks/` and `scripts/` are locally Git-versioned declarative content; `appdata/` contains service-owned empty domain roots; `secrets/` and `backup-staging/` are root-only. Existing `/home/<service>/docker` workloads remain authoritative compatibility paths until their owning Phase D migrations. |
 | Palworld | `palworld-server-jared` and `palworld-server-fran` intentionally stopped, not dead/restarting/OOM; `unless-stopped`; active worlds/saves reverified and preserved |
 | qBittorrentVPN | Running; fail-closed design retained; `wg0` verified `10.2.0.2/32`; Downloader sentinel and NAS mounts verified |
 | Guest NAS | Twelve fstab-backed systemd automounts plus read-only Media/Game bindfs compatibility views; post-reboot verification passed |
