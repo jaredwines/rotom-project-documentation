@@ -24,6 +24,8 @@ This is the canonical detailed owner of Rotom account identity and permission fa
 
 ## 2. Current Phase B Identity and Access Model — 2026-09-28 JAR-68 final
 
+**Current JAR-35 correction:** The final v2 service account names are `gameserver` (`995:5001`), `downloader` (`901:5005`), and `customapps` (`904:5008`). Their prior names `game`, `downloaders`, and `apps` are absent from NSS; no UID/GID, Docker-group membership, or ownership rewrite was performed. Their compatibility homes deliberately remain `/home/game`, `/home/downloaders`, and `/home/apps` until workload-specific migration. Current service processes resolve to the new account names because the underlying numeric identities were preserved.
+
 Guest service-account identities and Docker-group policy remain unchanged. Docker group is package-created GID `989` with no members; administrative Docker use remains `sudo docker`. No permission broadening was introduced.
 
 | Layer/account | Verified current state |

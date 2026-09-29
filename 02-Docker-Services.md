@@ -32,6 +32,8 @@ The Proxmox VE host `pve` remains hypervisor-only; the application Docker runtim
 
 JAR-34 created the non-migrating v2 declarative namespace at `/srv/rotom`. It contains empty domain reservations under `stacks/` and service-owned empty domain roots under `appdata/`; it contains no placeholder Compose files, containers, databases, or production bind mounts. Existing production projects under `/home/<service>/docker` remain current until their individual Phase D workload tickets migrate and verify them. `/srv/rotom` is a local Git repository for only `stacks/`, `scripts/`, and support files; `.gitignore` excludes `appdata/`, `secrets/`, `backup-staging/`, databases, logs, caches, generated state, and environment files.
 
+JAR-35 renamed the three service identities without changing their numeric runtime identities: `gameserver` is `995:5001`, `downloader` is `901:5005`, and `customapps` is `904:5008`. Compatibility homes remain `/home/game`, `/home/downloaders`, and `/home/apps`, respectively. The Gameserver bindfs unit and NAS-recovery helper use `gameserver`; their successful post-change run confirmed no container recreation was needed. Existing Compose PUID/PGID and bind paths remain unchanged.
+
 ### Verified current intended state
 
 There are **16 total container objects and 14 intended running containers**. Both Palworld containers were intentionally stopped by the administrator to save resources; they remain preserved with `unless-stopped`, are not dead/restarting/OOM, and their current world save trees were reverified during final JAR-68 acceptance. All other expected production containers are running.
