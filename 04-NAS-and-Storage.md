@@ -77,11 +77,11 @@ JAR-52 copied, without deletion, `/mnt/nas-game/library/games/{pc,roms}` to `/mn
 
 The old Game library remains available and unmodified as rollback material; no Palworld save, `/mnt/nas-gameserver` path, qBittorrentVPN bind, downloader payload, or NAS export was changed. Both the Media and Game mounts had 4.1 TiB free at verification. Guest Restic still excludes `/mnt`, so this content move does not itself prove NAS-side snapshots, replication, or a distinct recovery point; that protection-policy boundary remains for JAR-47.
 
-### JAR-56 Media torrent topology — 2026-09-28 (in progress)
+### JAR-56 Media torrent topology — 2026-09-28
 
 The active qBittorrentVPN payload bind is now `/mnt/nas-media/torrents` at both `/media/torrents` and `/game/torrents`; its v2 stack/appdata are `/srv/rotom/stacks/downloader/qbittorrentvpn` and `/srv/rotom/appdata/downloader/qbittorrentvpn`. The Downloader source tree remains unchanged as rollback material. The copied trees matched SHA-256 manifests at 10,482,680,947 bytes across three files. qBittorrentVPN retains UID 901 with primary GID 5000 for Media writes, its WireGuard design, and its host port.
 
-The former empty Media torrent directory was corrected to `root:5000` mode `2775`; the Media sentinel is `/mnt/nas-media/.rotom-qbt-media-ready` at `901:5000` mode `2750`. Compose requires that sentinel with `create_host_path: false`. The enabled 15-second `rotom-qbittorrent-media-guard.timer` checks the underlying NFS mount and sentinel, then stops a running qBittorrentVPN if either is absent. Radarr/Sonarr/Gamarr now consume the Media torrent tree. Real filesystem hardlink probes passed, but a real authenticated importer flow is still pending; retain all Downloader paths, bindfs views, and source data.
+The former empty Media torrent directory was corrected to `root:5000` mode `2775`; the Media sentinel is `/mnt/nas-media/.rotom-qbt-media-ready` at `901:5000` mode `2750`. Compose requires that sentinel with `create_host_path: false`. The enabled 15-second `rotom-qbittorrent-media-guard.timer` checks the underlying NFS mount and sentinel, then stops a running qBittorrentVPN if either is absent. Radarr/Sonarr/Gamarr now consume the Media torrent tree. Real filesystem hardlink probes passed. Jared deferred authenticated application-driven import and post-import seeding validation for later manual completion; retain all Downloader paths, bindfs views, and source data until that validation and JAR-47 policy review.
 
 ### Preserved pre-migration service-home NAS convenience links — 2026-09-21
 

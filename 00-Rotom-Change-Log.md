@@ -53,13 +53,13 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
-## 2026-09-28 — JAR-56: Media hardlink topology (in progress)
+## 2026-09-28 — JAR-56: Media hardlink topology
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`.
-- **Status:** **Implemented / Verified in part / In progress.** The active payload and importer topology is now Media-backed; application-level import acceptance remains outstanding.
+- **Status:** **Implemented / Verified.** The active payload and importer topology is Media-backed, with authenticated application-driven import/seeding validation explicitly deferred by Jared for later manual completion.
 - **Changes:** The retained qBittorrentVPN design now uses v2 stack/appdata paths and Media GID 5000 for `/mnt/nas-media/torrents`. Radarr, Sonarr, and Gamarr use the Media torrent tree at their existing in-container paths. A guarded Media sentinel and 15-second runtime NFS check stop qBittorrentVPN on an absent Media mount/sentinel. The legacy Downloader stack/config and payload remain rollback material.
-- **Evidence:** The 10,482,680,947-byte / three-file Downloader and Media payload trees SHA-256 matched. qBittorrentVPN retained WireGuard `10.2.0.2/32`; all importer routes passed and Gamarr was healthy. Media and game hardlink probes showed shared device/inode/link-count evidence and were removed. The first guard implementation safely stopped qBittorrentVPN on the autofs/NFS two-layer result; it was corrected to inspect the underlying NFS layer and its normal check passed.
-- **Outstanding:** The recorded local Radarr API key returns HTTP 401, so no real authenticated Radarr/Sonarr/Gamarr import or seeding-after-import proof has been performed. Do not mark JAR-56 Done or retire Downloader rollback material until valid application access permits that acceptance.
+- **Evidence:** The 10,482,680,947-byte / three-file Downloader and Media payload trees SHA-256 matched; final live audit again found matching three-file/byte inventories and 4.4 TB free on Media. qBittorrentVPN retained WireGuard `10.2.0.2/32`; all importer routes passed and Gamarr was healthy. Media and game hardlink probes showed shared device/inode/link-count evidence and were removed. The first guard implementation safely stopped qBittorrentVPN on the autofs/NFS two-layer result; it was corrected to inspect the underlying NFS layer and its normal check passed.
+- **Outstanding:** Jared elected not to provide application API access in this ticket. Jared will later perform authenticated Radarr/Sonarr/Gamarr import and post-import qBittorrent-seeding validation. Keep the former Downloader stack/config, source payload, and compatibility views until that manual validation and JAR-47 policy review authorize retirement.
 
 ## 2026-09-28 — JAR-52: move Game library into the Media storage domain
 
