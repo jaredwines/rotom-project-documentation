@@ -53,6 +53,46 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-28 — JAR-56: Media hardlink topology (in progress)
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`.
+- **Status:** **Implemented / Verified in part / In progress.** The active payload and importer topology is now Media-backed; application-level import acceptance remains outstanding.
+- **Changes:** The retained qBittorrentVPN design now uses v2 stack/appdata paths and Media GID 5000 for `/mnt/nas-media/torrents`. Radarr, Sonarr, and Gamarr use the Media torrent tree at their existing in-container paths. A guarded Media sentinel and 15-second runtime NFS check stop qBittorrentVPN on an absent Media mount/sentinel. The legacy Downloader stack/config and payload remain rollback material.
+- **Evidence:** The 10,482,680,947-byte / three-file Downloader and Media payload trees SHA-256 matched. qBittorrentVPN retained WireGuard `10.2.0.2/32`; all importer routes passed and Gamarr was healthy. Media and game hardlink probes showed shared device/inode/link-count evidence and were removed. The first guard implementation safely stopped qBittorrentVPN on the autofs/NFS two-layer result; it was corrected to inspect the underlying NFS layer and its normal check passed.
+- **Outstanding:** The recorded local Radarr API key returns HTTP 401, so no real authenticated Radarr/Sonarr/Gamarr import or seeding-after-import proof has been performed. Do not mark JAR-56 Done or retire Downloader rollback material until valid application access permits that acceptance.
+
+## 2026-09-28 — JAR-52: move Game library into the Media storage domain
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.** Gamarr now uses the Media game-library contract; Palworld and downloader storage were not changed.
+- **Changes:** Source `/mnt/nas-game/library/games/{pc,roms}` was copied without deletion to `/mnt/nas-media/library/games/{pc,roms}`. Target directories are `995:5000`, mode `2775` with setgid; Gamarr now uses `PUID=995`, `PGID=5000` and the narrow `/mnt/nas-media/library/games -> /game/library/games` bind. The Game source remains intact rollback material; `/mnt/nas-gameserver` and Palworld paths were untouched.
+- **Evidence:** The source and target are each 223,408,925 bytes with one file and identical SHA-256 manifests. Gamarr is healthy, reports UID 995/GID 5000, sees the Media library mount, and returns expected local/proxied HTTP 302 responses. Both NAS mounts have 4.1 TiB free; zero guest systemd units failed.
+- **Outstanding:** Host Restic excludes `/mnt`; this move does not establish NAS-side protection. JAR-47 must retain that boundary in its recovery-policy decision. JAR-56 owns the downloader/torrent move and hardlink proof. The timestamped `/srv/rotom/stacks/media/gamarr/compose.yaml.pre-jar52-20260928-205502` and old Game library remain rollback artifacts.
+
+## 2026-09-28 — JAR-40: converge Media domain to Rotom v2
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.** Jellyfin, Radarr, Sonarr, Prowlarr, and Gamarr now use independent v2 Media Compose modules; NPM is retained as the production reverse proxy.
+- **Changes:** Non-secret stack definitions are local commit `f5f2da4`; mutable configuration is under `/srv/rotom/appdata/media`. Prowlarr moved from Downloader to Media with no NAS mount. Jellyfin remains read-only on the library; Radarr/Sonarr and Gamarr retain their existing read-only download compatibility views. Existing host ports remain NPM compatibility upstreams.
+- **Evidence:** All five containers are running (Gamarr healthy), use the same cached image IDs, resolve peers through `rotom-arr`, and return their expected local/HTTPS redirects. Prowlarr, Radarr, and Sonarr local APIs returned HTTP 200; configured Prowlarr integrations include Radarr and Sonarr. qBittorrentVPN `wg0` and the Downloader NFS mount remain unchanged; zero guest units failed.
+- **Outstanding:** JAR-52 owns Game-library movement; JAR-56 owns torrent payload/hardlink layout; no downloader/VPN migration was performed. Original compatibility appdata and timestamped legacy Compose copies remain rollback artifacts.
+
+## 2026-09-28 — JAR-48: baseline monitoring convergence
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `02-Docker-Services.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.** JAR-48 deliberately uses the existing Homepage, Glances, and PVE monitoring components; no Uptime Kuma deployment, notification delivery, alert destination, or external credential was added.
+- **Changes:** Homepage now shows `Media NAS Storage` from Glances' authoritative `/mnt/host-root/mnt/nas-media` NFS metric and `UNAS Reachability` using ICMP to `192.168.1.70`. Existing local-disk, CPU, memory, container, PVE temperature, backup-status, and HTTPS/internal service checks remain in place. Reserved empty shares are intentionally not dashboard checks. The timestamped pre-change Homepage configuration copy `services.yaml.pre-jar48-20260928-201236` remains as rollback material.
+- **Evidence:** Homepage resolved `glances` over `rotom-monitoring`, returned the Media NFS metric, and successfully pinged UNAS. The Media and Downloader NFS mounts resolved to their live NFSv3 sources. NPM, Arcane, Home Assistant, and Homebridge HTTPS routes returned HTTP 200; PVE temperature and backup-status health APIs responded; Homepage was healthy; and the VM had zero failed systemd units.
+- **Outstanding:** Baseline monitoring is dashboard/visibility coverage only. No unattended notification or alert-delivery feature is configured. Workload-specific monitoring remains JAR-54 after the owning workload migrations.
+
+## 2026-09-28 — JAR-38: converge Infra domain to Rotom v2
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.** Homepage, Glances, Arcane, and Cloudflare DDNS now run from independent declarative v2 stacks; Nginx Proxy Manager remains the active reverse proxy pending JAR-39.
+- **Changes:** Non-secret Compose definitions are tracked at `/srv/rotom/stacks/infra/{homepage,glances,arcane,cloudflare-ddns}` in local commit `a17a217`. Mutable Homepage, Glances, and Arcane state moved to `/srv/rotom/appdata/infra`; protected Infra inputs are under `/srv/rotom/secrets/infra`. Homepage and Glances use `rotom-monitoring`; Homepage and Arcane use `rotom-proxy`; Glances no longer publishes a host port; DDNS moved from host networking to its private outbound bridge. A previously inline Homepage credential was converted to Homepage's supported protected environment substitution without recording its value.
+- **Evidence:** Each Compose definition validated and was recreated with the cached pre-cutover image. Homepage and Arcane were healthy; Homepage resolved Glances through Docker DNS and received the Glances v4 status response; local and HTTPS Homepage plus Arcane proxy routes returned HTTP 200; DDNS immediately reported the record current; Arcane `autoUpdate=false` and `autoHealEnabled=false`; NPM retained 80/81/443. A guest reboot recovered all migrated modules, NPM, NAS-backed workloads, and qBittorrent `wg0`; zero systemd units failed.
+- **Outstanding:** Legacy `/home/infra/docker/{homepage,arcane,cloudflare-ddns}` paths and the original `arcane_arcane-data` volume are retained as rollback artifacts. Arcane intentionally has no v2 secret-directory bind; its project scanner may report protected-env v2 stacks as non-actionable. Uptime Kuma and alert delivery remain JAR-48 scope.
+
 ## 2026-09-28 — JAR-37: harden Docker runtime baseline
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `02-Docker-Services.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.

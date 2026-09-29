@@ -30,6 +30,10 @@ JAR-36 maintains three empty Docker network contracts; they are not scheduled au
 
 JAR-37 disables Arcane automatic updates and auto-heal. Arcane remains a manual/observational Docker-administration tool, so no unattended service mutation is part of the current automation baseline. Deliberate container updates follow `/srv/rotom/stacks/RUNTIME-POLICY.md`: verify backup/recovery readiness, inspect the target configuration, pull and recreate only that stack, wait for readiness, verify its application/storage/network/proxy behavior, and roll back only that stack if required.
 
+JAR-38 converted Homepage, Glances, Arcane, and Cloudflare DDNS to independent v2 Compose lifecycles under `/srv/rotom/stacks/infra`; the non-secret definitions are local-Git commit `a17a217`. The migrated modules retain `unless-stopped`. Homepage and Glances recover on `rotom-monitoring`; Arcane on `rotom-proxy`; Cloudflare DDNS on its private bridge. Their post-reboot acceptance passed. Arcane’s automatic update/heal settings remain false. JAR-48 uses Homepage, Glances, and PVE for dashboard visibility only; no alert destination, notification delivery, or alert scheduling is configured.
+
+JAR-40 added independent Media v2 modules at local commit `f5f2da4`. The five migrated services retain `unless-stopped`; Gamarr retains its image healthcheck. NPM remains the established host-networked reverse proxy, so the applications retain host compatibility ports while joining their v2 Docker networks. No update automation, backup schedule, download payload, or VPN behavior changed.
+
 ### PVE host
 
 - Host identity is `pve` / `pve.rotom.casa`; canonical Mac SSH aliases are `pve` / `pve.rotom.casa`.
@@ -189,6 +193,12 @@ Homepage and Glances remain in the same Compose project. Glances has a read-only
 No Glances warning or critical threshold was found. A read-only Arcane database query found no notification-provider records, so Arcane currently has no configured alert destination.
 
 No active Home Assistant YAML configuration for email, Telegram, Discord, Slack, mobile app, webhook, or alert delivery was found. Built-in notification blueprints exist but do not prove active alert delivery.
+
+### JAR-48 baseline dashboard monitoring — 2026-09-28
+
+Homepage's `Rotom Monitoring` section uses Glances v4 through Docker DNS on `rotom-monitoring` for Rotom system information, CPU, memory, container activity, local disk I/O and capacity, and host network traffic. It now includes **Media NAS Storage**, the authoritative Glances filesystem metric `fs:/mnt/host-root/mnt/nas-media`, and **UNAS Reachability**, an IPv4 ICMP check to `192.168.1.70`. The active Media and Downloader mounts are NFSv3 runtime dependencies; empty reserved `nas-auth`, `nas-customapps`, and `nas-gameserver` shares intentionally have no checks.
+
+Homepage retains active HTTPS/internal site monitors for Nginx Proxy Manager, Arcane, Home Assistant, and Homebridge; backup-status and PVE temperature/backup-status cards remain read-only. The scope is visibility only: no Uptime Kuma component, alert destination, notification delivery, external credential, or unattended alert policy is configured. The retained rollback artifact is `/srv/rotom/appdata/infra/homepage/config/services.yaml.pre-jar48-20260928-201236`; it can restore the prior dashboard configuration without affecting workloads.
 
 Nginx Proxy Manager checks certificate renewal hourly for certificates expiring within 30 days. A direct TLS inspection verified the currently served `*.rotom.casa`/`rotom.casa` Let's Encrypt certificate is valid from 2026-09-11 through 2026-12-10. No recent renewal error was found; a real future renewal event has not yet been observed.
 

@@ -13,6 +13,12 @@ Record substantive changes to this document in the change log as part of the sam
 
 ## 1. Purpose and Scope
 
+### JAR-38 Infra v2 network convergence — 2026-09-28
+
+JAR-40 attaches Jellyfin, Radarr, Sonarr, Prowlarr, and Gamarr to `rotom-proxy`; Radarr/Sonarr/Prowlarr/Gamarr also attach `rotom-arr` and resolve peer service names through Docker DNS. NPM is retained in host networking, so existing application ports remain its verified compatibility upstreams; no proxy listener change was made.
+
+Homepage and Glances now use the external `rotom-monitoring` bridge (`172.31.0.0/16`) and resolve each other through Docker service DNS; Glances has no host-published listener. Homepage and Arcane also attach to `rotom-proxy` (`172.29.0.0/16`) for the Caddy-era proxy handoff, while their current host ports `3001` and `3552` remain only because the existing NPM host-network proxy still consumes them. Cloudflare DDNS moved from host networking to its ordinary private `cloudflare-ddns_default` bridge; it needs no inbound listener and its immediate update confirmed outbound/DNS operation. NPM remains the only Infra reverse proxy listener on 80/81/443 until JAR-39. No DNS, WAN forwarding, VLAN, certificate, or NPM route configuration changed.
+
 ### JAR-36 v2 Docker network contract — 2026-09-28
 
 Three empty external local bridge networks now reserve v2 cross-stack roles: `rotom-proxy` for a future reverse proxy and proxied HTTP applications, `rotom-arr` for Arr/qBittorrent control-plane traffic, and `rotom-monitoring` for dashboard/monitoring integrations. Phase D stacks use service/container DNS on these networks rather than LAN host ports where practical. Existing production bridges and ports were retained. Home Assistant and Homebridge remain intentional host-network discovery exceptions; no VLAN redesign occurred.
