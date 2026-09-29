@@ -241,6 +241,7 @@
 # - Jared Palworld active-save gate: JAR-26 active paths=5, live active paths=5, missing=0, extra=0 before network relocation.
 # - Jared Palworld was cleanly stopped; stopped-state archive /var/tmp/jar31-palworld-jared-pre-network-move.tar.gz was created (observed 51681150 bytes, root:root, mode 0644); server returned healthy after recreation.
 # - Archive in /var/tmp is a migration safety artifact, not a substitute for the canonical Palworld backup/Restic recovery strategy.
+# - 2026-09-29: the separate JAR-31 staging-copy directories were validated unused and removed to recover root-disk capacity; this archive remains retained.
 # - zsh: never use `path` as an interactive loop/scalar variable; it mutates $PATH. JAR-31 diagnostics reconfirmed this; restoring/exporting PATH and `rehash` fixed command lookup.
 #
 # The large filesystem/NAS tree below is the verified PRE-MIGRATION RESTORATION TARGET and
