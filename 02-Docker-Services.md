@@ -273,12 +273,16 @@ The Homebridge container name was corrected on 2026-09-19 from the historical mi
 
 ## 6. Web Hosting — `web`
 
-Website stacks; Compose files under `/home/web/docker/`. JAR-19 retired the legacy `web-host` identity after migration and verification.
+### JAR-45 Web v2 convergence — 2026-09-29
+
+Aloha Millworks now uses `/srv/rotom/stacks/web/alohamillworks.com/compose.yaml` and a read-only `/srv/rotom/appdata/web/alohamillworks.com:/var/www/html` bind. It remains on its private default bridge plus external `rotom-proxy`, with `unless-stopped`. Retained NPM is host-networked and proxies through the LAN compatibility listener, so the existing `7778:80` mapping remains necessary; no NPM, DNS, TLS, certificate, or network redesign occurred. Local and public HTTPS probes returned HTTP 200 and NPM configuration validated.
+
+Jared Wines has v2 content at `/srv/rotom/appdata/web/jaredwines.com` and an unstarted Compose module at `/srv/rotom/stacks/web/jaredwines.com`; it has no container object or published listener. Both source trees under `/home/web/docker` remain retained rollback material. Metadata-preserving source-to-v2 comparisons found no differences. Guest Restic already covers `/srv`; no backup or restore was run.
 
 | Service / current container name | Observed image | Observed status | Published ports | Container-only ports shown | Compose file |
 | --- | --- | --- | --- | --- | --- |
-| `alohamillworks.com` | `php:8.4-apache` | Running after JAR-19 migration; local and proxied HTTP verification passed | `0.0.0.0:7778->80/tcp`, `[::]:7778->80/tcp` | None shown | `/home/web/docker/alohamillworks.com/compose.yaml` |
-| `jaredwines.com` | `nginx:alpine` | Stopped; JAR-19 intentionally preserved the pre-change stopped state | No active mapping while stopped | None shown | `/home/web/docker/jaredwines.com/compose.yaml` |
+| `alohamillworks.com` | `php:8.4-apache` | Running; JAR-45 local/public verification passed | `0.0.0.0:7778->80/tcp`, `[::]:7778->80/tcp` | None shown | `/srv/rotom/stacks/web/alohamillworks.com/compose.yaml` |
+| `jaredwines.com` | `nginx:alpine` | Intentionally unstarted; no container object | No active mapping | None shown | `/srv/rotom/stacks/web/jaredwines.com/compose.yaml` |
 
 JAR-19 verified `web` remains UID/GID `902:902` with Docker membership. Aloha Compose metadata points to `/home/web/docker/alohamillworks.com`; both local port `7778` and `https://alohamillworks.com` returned HTTP 200 after cutover. The old `web-host 128:130` user/group/home were removed only after dependency and ownership guards passed. Rollback evidence remains at `/root/jar-19-20260921-024634`; final Restic snapshot `e886c55d` captures the accepted state.
 

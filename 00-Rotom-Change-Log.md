@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — JAR-45 Web v2 convergence
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Aloha Millworks now runs from `/srv/rotom/stacks/web/alohamillworks.com` with immutable site content bound from `/srv/rotom/appdata/web/alohamillworks.com`; it also joins `rotom-proxy`. Jared Wines content and a v2 Compose module were migrated to `/srv/rotom`, while the site remains intentionally unstarted and unpublished. Legacy `/home/web/docker` trees remain rollback material.
+- **Evidence:** State-tree comparisons found no differences after metadata-preserving copies. Aloha is running with its v2 bind, private/default network plus `rotom-proxy`, and `unless-stopped`; local and public HTTPS requests returned HTTP 200; NPM configuration validated; the Restic timer is active; and no systemd units are failed. The retained host-networked NPM route requires Aloha's existing `7778` listener, so no proxy/network redesign was made.
+- **Outstanding:** Guest Restic covers `/srv`, but no new backup/restore exercise was run; retain this non-blocking verification for JAR-47 or a dedicated recovery task. Available Sources replacement remains manual by Jared.
+
 ## 2026-09-29 — JAR-43 Smart Home v2 convergence
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.

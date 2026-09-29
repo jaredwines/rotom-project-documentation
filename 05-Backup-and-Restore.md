@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Restic backup architecture, scope, retention, verification, restore evidence, and recovery boundaries  
 **Recovery scope:** pre-migration Rotom plus current Proxmox/VM foundation  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-29 — JAR-43 Smart Home v2 recovery-path convergence verified
+**Documentation updated:** 2026-09-29 — JAR-45 Web v2 recovery-path convergence verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -43,6 +43,8 @@ Guest Restic remains intentionally unchanged by JAR-68:
 JAR-42 stores the current Palworld Compose definitions under `/srv/rotom/stacks/gameserver` and authoritative local world/runtime trees under `/srv/rotom/appdata/gameserver`; both `/srv` locations are within the established guest Restic source scope. The ticket's controlled validation did not run a backup, retention, prune, or restore. The timer was verified enabled/active, but a fresh post-JAR-42 snapshot-path verification is intentionally deferred to the broader JAR-47 recovery policy or a dedicated recovery task. The legacy `/home/game/docker/palworld-server-*` trees remain separate local rollback material; `/mnt/nas-gameserver` is not used for live worlds.
 
 JAR-43 likewise places the current Smart Home Compose definitions under `/srv/rotom/stacks/smarthome` and its authoritative Home Assistant/Homebridge mutable state under `/srv/rotom/appdata/smarthome`; both are covered by the established guest Restic `/srv` source scope. The old `/home/smarthome/docker/{home-assistant,homebridge}` trees remain local rollback material. JAR-43 verified the timer active and database consistency before and after cutover, but did not run a backup, retention, prune, or restore and did not change any protected Restic behavior, repository, credential, or schedule. A post-JAR-43 backup/restore exercise remains deferred to JAR-47 or a dedicated recovery task.
+
+JAR-45 places current Aloha Millworks and retained Jared Wines website content under `/srv/rotom/appdata/web`, with their Compose definitions under `/srv/rotom/stacks/web`; these paths are within the established guest Restic `/srv` source scope. Source-to-target state comparisons passed and the timer is active, but no backup, retention, prune, or restore operation or Restic-policy change was made. The old `/home/web/docker` trees remain local rollback material; a post-JAR-45 backup/restore exercise remains deferred to JAR-47 or a dedicated recovery task.
 
 ## 2B. Current PVE Host-Configuration Restic Repository and Control Files
 

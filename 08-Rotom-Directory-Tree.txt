@@ -149,6 +149,8 @@
 #   appdata/<domain>/                service-owned mutable state; migrated domains have owning state trees
 #     smarthome/home-assistant/       JAR-43 authoritative Home Assistant state
 #     smarthome/homebridge/           JAR-43 authoritative Homebridge state
+#     web/alohamillworks.com/          JAR-45 authoritative Aloha content
+#     web/jaredwines.com/              JAR-45 retained unstarted site content
 #   secrets/                         root:root 0700; credentials/private material only, Git-ignored
 #   scripts/                         root-owned declarative helper namespace
 #   backup-staging/                  root:root 0700; app-consistent export staging, Git-ignored
@@ -187,8 +189,8 @@
 #     docker/prowlarr/              ACTIVE
 #     docker/qbittorrentvpn/        ACTIVE; wg0 verified
 #   web/         902:5006  mode 0750  -> nas-web -> /mnt/nas-web
-#     docker/alohamillworks.com/    ACTIVE
-#     docker/jaredwines.com/        project retained; intentionally NO container
+#     docker/alohamillworks.com/    JAR-45 retained local rollback tree
+#     docker/jaredwines.com/        JAR-45 retained local rollback tree; intentionally NO container
 #   filesync/    903:5007  mode 0750  -> nas-filesync -> /mnt/nas-filesync
 #   apps/        904:5008  mode 0750  -> nas-apps -> /mnt/nas-apps
 #   auth/        905:5009  mode 0750  -> nas-auth -> /mnt/nas-auth
