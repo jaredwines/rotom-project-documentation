@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-29 — JAR-42 dedicated gameserver convergence verified
+**Documentation updated:** 2026-09-29 — JAR-43 Smart Home v2 convergence verified
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -33,6 +33,7 @@ The accepted Phase B architecture now uses **PVE** as the product abbreviation a
 | v2 Infra / proxy | Homepage, Glances, Arcane, and Cloudflare DDNS use independent Compose files under `/srv/rotom/stacks/infra`; v2 mutable state is under `/srv/rotom/appdata/infra`, secrets under protected `/srv/rotom/secrets/infra`. Homepage/Glances share `rotom-monitoring`; Homepage/Arcane attach `rotom-proxy`; DDNS is bridge/outbound-only. NPM is retained as the production reverse proxy. |
 | JAR-40/JAR-52/JAR-56 Media v2 | Jellyfin, Radarr, Sonarr, Prowlarr, Gamarr, and retained qBittorrentVPN use v2 Compose modules under `/srv/rotom/stacks`. Gamarr's game library and active torrent payload are now on `/mnt/nas-media` at Media GID 5000; the Game library and Downloader payload remain intact rollback material. Jared deferred authenticated app-level import/seeding validation for later manual completion. |
 | JAR-42 Gameserver v2 | Independent Palworld Jared and Fran Compose modules are current under `/srv/rotom/stacks/gameserver`, with local live state under `/srv/rotom/appdata/gameserver`; protected environment files remain under the root-only Gameserver secrets boundary. Both containers are intentionally stopped after controlled validation; their legacy `/home/game/docker/palworld-server-*` trees remain rollback material. Reserved `/mnt/nas-gameserver` is not a live-world dependency. |
+| JAR-43 Smart Home v2 | Home Assistant and Homebridge run from independent modules under `/srv/rotom/stacks/smarthome`, with authoritative mutable state under `/srv/rotom/appdata/smarthome`. They retain host networking for discovery and the established NPM compatibility routes. The prior `/home/smarthome/docker/{home-assistant,homebridge}` state/Compose trees are untouched rollback material; `/mnt/nas-smarthome` remains an unused reserved boundary. |
 | Rotom v2 filesystem foundation | JAR-34 created `/srv/rotom` as an empty, root-administered v2 namespace. `stacks/` and `scripts/` are locally Git-versioned declarative content; `appdata/` contains service-owned empty domain roots; `secrets/` and `backup-staging/` are root-only. Existing `/home/<service>/docker` workloads remain authoritative compatibility paths until their owning Phase D migrations. |
 | Reserved v2 NAS boundaries | JAR-55 added empty `Gameserver`, `Downloads`, and `Customapps` exports as `/mnt/nas-gameserver`, `/mnt/nas-downloads`, and `/mnt/nas-customapps`. They use the established nofail automount/NFSv3 contract and do not replace active `Game`, `Downloader`, or `Apps` compatibility storage. |
 | Palworld | `palworld-server-jared` and `palworld-server-fran` intentionally stopped, not dead/restarting/OOM; `unless-stopped`; active worlds/saves reverified and preserved |
@@ -77,7 +78,7 @@ The ten storage-facing service accounts retain their JAR-29 numeric identity con
 | media | 127 : 5000 | `/mnt/nas-media` | Active Jellyfin/Radarr/Sonarr owner; NFSv3 on demand; ordinary storage boundary retained |
 | gameserver | 995 : 5001 | `/mnt/nas-game` | Active Jared/Fran Palworld identity; the retained Game library is JAR-52 rollback material, while Gamarr uses UID 995 with Media GID 5000 against `/mnt/nas-media/library/games` |
 | infra | 997 : 5002 | `/mnt/nas-infra` | Active core infrastructure owner; Arcane restored with preserved named volume |
-| smarthome | 126 : 5003 | `/mnt/nas-smarthome` | Active Home Assistant/Homebridge owner; application state remains local |
+| smarthome | 126 : 5003 | `/mnt/nas-smarthome` | Active Home Assistant/Homebridge owner; authoritative application state is local under `/srv/rotom/appdata/smarthome` |
 | documents | 900 : 5004 | `/mnt/nas-documents` | Restored storage boundary; no application deployed |
 | downloaders | 901 : 5005 | `/mnt/nas-downloaders` | Active Prowlarr/qBittorrentVPN owner; current backing export `Downloader/.data`; qBittorrent `wg0` verified after reboot |
 | web | 902 : 5006 | `/mnt/nas-web` | Aloha active; Jared Wines intentionally undeployed |

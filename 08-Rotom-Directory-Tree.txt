@@ -147,6 +147,8 @@
 #   stacks/NETWORKING.md             JAR-36 shared external-network/Docker-DNS contract
 #   stacks/RUNTIME-POLICY.md         JAR-37 controlled-update, Compose, and exception policy
 #   appdata/<domain>/                service-owned mutable state; migrated domains have owning state trees
+#     smarthome/home-assistant/       JAR-43 authoritative Home Assistant state
+#     smarthome/homebridge/           JAR-43 authoritative Homebridge state
 #   secrets/                         root:root 0700; credentials/private material only, Git-ignored
 #   scripts/                         root-owned declarative helper namespace
 #   backup-staging/                  root:root 0700; app-consistent export staging, Git-ignored
@@ -178,8 +180,8 @@
 #       Homepage monitoring: extra_hosts pins rotom/nginx/arcane/home-assistant/homebridge names to 192.168.1.69; guest backup widget -> http://192.168.1.69:8787/backup-status; PVE Restic/Rotom VM schedule widgets -> http://192.168.1.68:8789/pve-restic-backup-status and /rotom-vm-backup-status; Disk Usage -> disk:sda; CPU Temperature -> Glances URL http://192.168.1.68:8788 metric sensor:Package id 0 with charting; JAR-48 Media NAS Storage -> Glances fs:/mnt/host-root/mnt/nas-media and UNAS Reachability -> IPv4 ICMP 192.168.1.70. No alert destination is configured.
 #     docker/nginx-proxy-manager/   ACTIVE
 #   smarthome/   126:5003  mode 0750  -> nas-smarthome -> /mnt/nas-smarthome
-#     docker/home-assistant/        ACTIVE
-#     docker/homebridge/            ACTIVE
+#     docker/home-assistant/        JAR-43 retained local rollback tree
+#     docker/homebridge/            JAR-43 retained local rollback tree
 #   documents/   900:5004  mode 0750  -> nas-documents -> /mnt/nas-documents
 #   downloaders/ 901:5005  mode 0750  -> nas-downloaders -> /mnt/nas-downloaders
 #     docker/prowlarr/              ACTIVE

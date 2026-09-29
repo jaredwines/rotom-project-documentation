@@ -256,12 +256,18 @@ Prowlarr Torznab integration uses base URL `http://192.168.1.69:9696/2`; Gamarr 
 
 ## 5. Smart Home — `smarthome`
 
-Smarthome services; Compose files under `/home/smarthome/docker/`.
+### JAR-43 Smart Home v2 convergence — 2026-09-29
+
+Home Assistant and Homebridge now use independent root-administered Compose modules at `/srv/rotom/stacks/smarthome/home-assistant/compose.yaml` and `/srv/rotom/stacks/smarthome/homebridge/compose.yaml`. Their authoritative mutable state is explicitly bound from `/srv/rotom/appdata/smarthome/home-assistant:/config` and `/srv/rotom/appdata/smarthome/homebridge:/homebridge`, respectively. The state was copied with preserved numeric metadata while each service was stopped, and the legacy `/home/smarthome/docker/{home-assistant,homebridge}` trees remain untouched rollback material.
+
+Both services retain `network_mode: host` and `restart: unless-stopped`; this preserves Home Assistant discovery and Homebridge/Avahi mDNS behavior. No Docker bridge/network, port, NPM proxy-host, certificate, NAS mount, service UID/GID, or backup-policy change was made. Home Assistant's `/etc/localtime` and `/run/dbus` read-only binds remain intact. Homebridge retains its explicit JSON-file limit of 10 MB with one retained file.
+
+Post-reboot verification confirmed both containers running from the v2 mounts; local `8123`/`8581` and `https://home-assistant.rotom.casa` / `https://homebridge.rotom.casa` each returned HTTP 200. Both Compose modules parsed, Home Assistant and Homebridge SQLite `quick_check` results were `ok`, mDNS/SSDP listeners were present, the guest Restic timer was active, and zero failed systemd units were reported. The existing guest Restic `/srv` source scope covers the v2 state; no backup or restore was run in JAR-43.
 
 | Current container name | Observed image | Observed status | Published ports | Container-only ports shown | Compose file |
 | --- | --- | --- | --- | --- | --- |
-| `home-assistant` | `ghcr.io/home-assistant/home-assistant:stable` | Up 3 days | None shown | None shown | `/home/smarthome/docker/home-assistant/compose.yaml` |
-| `homebridge` | `homebridge/homebridge:latest` | Running; rename/restart verified 2026-09-19 | None shown | None shown | `/home/smarthome/docker/homebridge/compose.yaml` |
+| `home-assistant` | `ghcr.io/home-assistant/home-assistant:stable` | Running; JAR-43 post-reboot verification passed | None shown (host network) | None shown | `/srv/rotom/stacks/smarthome/home-assistant/compose.yaml` |
+| `homebridge` | `homebridge/homebridge:latest` | Running; JAR-43 post-reboot verification passed | None shown (host network) | None shown | `/srv/rotom/stacks/smarthome/homebridge/compose.yaml` |
 
 The Homebridge container name was corrected on 2026-09-19 from the historical misspelling `homebrige` to `homebridge`. The Compose directory and image name were already correct. Homebridge started successfully after the change and restored its cached accessories; the whole-home scan reported no remaining `homebrige` references.
 
