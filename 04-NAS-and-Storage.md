@@ -105,6 +105,10 @@ Radarr and Sonarr mount `/mnt/nas-downloads-media-ro/torrents` at `/media/torren
 
 ## 3. Current UniFi NAS / NFS Server Contract and Preserved History
 
+### JAR-55 reserved v2 domain boundaries — 2026-09-28
+
+The guest now has fifteen fstab-backed systemd automounts. JAR-55 added the empty reserved exports `Gameserver/.data`, `Downloads/.data`, and `Customapps/.data`, authorized only to `192.168.1.69`, at `/mnt/nas-gameserver`, `/mnt/nas-downloads`, and `/mnt/nas-customapps`. They use NFSv3 `sec=sys`, `_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s`, roots `988:5001`, `988:5005`, and `988:5008`, and mode `2770`. Each owning identity can write while unrelated service identities are denied. `Game`, `Downloader`, and `Apps` remain active compatibility shares; no data/workload was moved. Guest Restic excludes `/mnt`, so these NAS-resident boundaries require a separate NAS protection policy.
+
 **NFS server:** `192.168.1.70`
 
 ### Current NAS NFS management observations — JAR-66

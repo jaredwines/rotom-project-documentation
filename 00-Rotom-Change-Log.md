@@ -53,6 +53,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-28 — JAR-55: commission reserved v2 NAS boundaries
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.** Empty UniFi Drive exports `Gameserver`, `Downloads`, and `Customapps` now form the reserved v2 boundaries at `/mnt/nas-gameserver`, `/mnt/nas-downloads`, and `/mnt/nas-customapps`.
+- **Changes:** Each export is authorized only to Rotom `192.168.1.69`, uses NFSv3 `sec=sys` and the established non-squashing service-share policy, and is mounted through the established nofail/systemd-automount fstab pattern. Roots are `988:5001`, `988:5005`, and `988:5008`, each mode `2770`. Existing `Game`, `Downloader`, and `Apps` compatibility shares remain unchanged and active; no container was bound to a new path.
+- **Evidence:** Live `showmount`, `findmnt`, mounted metadata, owning-identity disposable write/delete tests, and unrelated-identity denials passed. A normal guest reboot produced a new boot ID, zero failed units, all three new automounts waiting, successful post-boot on-demand mounts, and the expected 16-container object baseline. Guest Restic still excludes `/mnt`; NAS content therefore remains a separate protection domain.
+- **Outstanding:** JAR-36 owns Docker network contracts. The reserved shares remain empty until their owning workload migrations.
+
 ## 2026-09-28 — JAR-35: reconcile v2 domain names without numeric churn
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.

@@ -138,6 +138,9 @@
 # /home/game, /home/downloaders, /home/apps
 #   JAR-35 retained compatibility homes after identities became gameserver,
 #   downloader, and customapps respectively; numeric ownership is unchanged.
+# /mnt/nas-gameserver, /mnt/nas-downloads, /mnt/nas-customapps
+#   JAR-55 empty reserved NFSv3/service-GID boundaries; active compatibility
+#   /mnt/nas-game, /mnt/nas-downloaders, and /mnt/nas-apps remain unchanged.
 #
 # /home/
 #   media/       127:5000  mode 0750  -> nas-media -> /mnt/nas-media
