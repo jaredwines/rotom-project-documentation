@@ -147,6 +147,7 @@
 #   stacks/NETWORKING.md             JAR-36 shared external-network/Docker-DNS contract
 #   stacks/RUNTIME-POLICY.md         JAR-37 controlled-update, Compose, and exception policy
 #   stacks/documents/DOMAIN-CONTRACT.md JAR-44 Paperless deployment/recovery contract; no Compose placeholder
+#   stacks/{filesync,customapps,auth}/DOMAIN-CONTRACT.md JAR-46 future-domain contracts; no Compose placeholders
 #   appdata/<domain>/                service-owned mutable state; migrated domains have owning state trees
 #     smarthome/home-assistant/       JAR-43 authoritative Home Assistant state
 #     smarthome/homebridge/           JAR-43 authoritative Homebridge state
@@ -154,6 +155,7 @@
 #     web/jaredwines.com/              JAR-45 retained unstarted site content
 #   secrets/                         root:root 0700; credentials/private material only, Git-ignored
 #     documents/                     JAR-44 root-only Documents secret boundary
+#     {filesync,customapps,auth}/    JAR-46 root-only future-domain secret boundaries
 #   scripts/                         root-owned declarative helper namespace
 #   backup-staging/                  root:root 0700; app-consistent export staging, Git-ignored
 #   .git/                            local history only; no remote configured by JAR-34

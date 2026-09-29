@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — JAR-46 future-domain contracts
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Added tracked contracts for `filesync`, `customapps`, and `auth` beneath `/srv/rotom/stacks` (local commit `77fde68`) and root-only secret boundaries. They define preserved numeric identities, VM-local state, reserved NAS use, `rotom-proxy` expectations, and mandatory protection/recovery review before NAS-authoritative data. No workload, Compose placeholder, NAS data, or secret was created.
+- **Evidence:** The three identities, v2 paths, reserved automount boundaries, absent matching containers, and zero failed units were checked.
+- **Outstanding:** JAR-20/JAR-53 and future auth/filesync work must implement application-specific backup/restore validation. Available Sources replacement remains manual by Jared.
+
 ## 2026-09-29 — JAR-44 Documents-domain foundation
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.
