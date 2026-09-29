@@ -60,6 +60,8 @@ Password authentication policy was not changed. Key contents and credentials are
 
 The read-only physical CPU temperature helper is `/usr/local/sbin/pve-cpu-temp-api` with `pve-cpu-temp-api.service`, listening on `192.168.1.68:8788`. Homepage uses the exact label **`PVE CPU Temperature`** and the Glances-compatible sensor endpoint. Final post-reboot monitoring verification passed.
 
+JAR-69 adds the separate read-only `/usr/local/sbin/pve-backup-status-api` with `pve-backup-status-api.service`, listening only on `192.168.1.68:8789`. Its `/health`, `/pve-restic-backup-status`, and `/rotom-vm-backup-status` endpoints are reachable from Rotom and the Homepage container; it exposes status only and has no backup-control endpoint. Homepage consumes the two schedule endpoints as **PVE Restic Backup Schedule** and **Rotom VM Backup Schedule**.
+
 ### Current NAS / NFS connectivity
 
 The Rotom guest retains its twelve fstab-backed NFS systemd automounts and two read-only bindfs compatibility views. Two PVE-only backup exports are canonical:

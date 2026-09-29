@@ -31,6 +31,7 @@ Documentation updated: **2026-09-28** through the verified Git-backed RPD checko
 - Whole-VM automatic job: `rotom-vm-daily`, enabled at `05:00`, VMID 100, storage `nas-rotom-vm-backup`, snapshot + zstd, `repeat-missed=0`, retention `7 daily / 4 weekly / 6 monthly`.
 - Whole-VM manual launcher/service/worker: `/usr/local/bin/backup-rotom-vm-to-nas`, `rotom-vm-vzdump-manual.service`, `/usr/local/sbin/rotom-vm-vzdump-manual`; lock `/run/lock/rotom-vm-vzdump-manual.lock`. Disconnect-safe ownership and duplicate-run guard were verified.
 - PVE temperature bridge: `/usr/local/sbin/pve-cpu-temp-api` + `pve-cpu-temp-api.service`, endpoint `192.168.1.68:8788`; Homepage label `PVE CPU Temperature`.
+- PVE backup-status bridge: `/usr/local/sbin/pve-backup-status-api` + `pve-backup-status-api.service`, LAN-only endpoint `192.168.1.68:8789`; `/pve-restic-backup-status` and `/rotom-vm-backup-status` supply Homepage's PVE Restic and Rotom VM Schedule cards. It is read-only and has no backup-control endpoint.
 - NIC WOL/offload mitigation remains as previously documented. Final physical reboot/post-reboot acceptance returned zero failed PVE units and VM100 auto-started.
 
 ### Rotom VM

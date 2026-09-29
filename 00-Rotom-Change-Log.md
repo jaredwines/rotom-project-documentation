@@ -53,6 +53,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-28 — JAR-69: add PVE backup schedule monitoring to Homepage
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified / Documentation only.** Two read-only PVE backup-schedule cards were added to Homepage; this RPD update records the final verified monitoring state and makes no further live change.
+- **Changes:** Homepage now presents `PVE Restic Backup Schedule` from `http://192.168.1.68:8789/pve-restic-backup-status` and `Rotom VM Backup Schedule` from `http://192.168.1.68:8789/rotom-vm-backup-status`, alongside the unchanged guest `Rotom Backup Schedule`. Both use the existing custom-API presentation: Schedule, Last Result, Next Run, and Last Run; `mdi-backup-restore`; 60-second refresh. The PVE read-only service is `/usr/local/sbin/pve-backup-status-api` with `pve-backup-status-api.service`, LAN-bound only to `192.168.1.68:8789`; it exposes `/health` plus the two status endpoints and does not operate backup controls.
+- **Evidence:** The rollback diff contained only the two new Homepage cards. Both endpoints returned enabled/Active status, successful last runs, and the authoritative 04:00 PVE Restic / 05:00 native VZDump schedule from Rotom and inside the Homepage container. Homepage Compose validation passed, the container was healthy, the canonical local Host-header request and `https://rotom.casa` both returned HTTP 200, and Rotom had zero failed systemd units. No backup schedule, retention, repository, NAS, VZDump job, recovery point, or Glances state was changed.
+- **Outstanding:** Direct PVE SSH revalidation from Rotom was intentionally not bypassed because this VM rejected the PVE host key; the already-verified API reachability remains intact. Reconcile that client trust separately, using the documented SSH-key procedure, if direct PVE administration from Rotom is required.
+
 ## 2026-09-28 — Adopt `rpd` helper workflow for routine RPD Git operations
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.

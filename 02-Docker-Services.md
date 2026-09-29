@@ -80,6 +80,10 @@ description: Home automation and server management
 
 The chat confirms the apex URL works and records the user's selected title and description. The final verification did not separately print these settings or the exact environment value; do not treat this documentation update as a fresh configuration inspection. See document 03 for DNS and HTTPS evidence.
 
+### JAR-69 backup schedule cards — 2026-09-28
+
+The existing **Rotom Backup Schedule** custom API card remains unchanged. Homepage now also reads two LAN-only, read-only PVE API endpoints: **PVE Restic Backup Schedule** at `http://192.168.1.68:8789/pve-restic-backup-status` and **Rotom VM Backup Schedule** at `http://192.168.1.68:8789/rotom-vm-backup-status`. Each uses `mdi-backup-restore`, a 60-second refresh, and the same custom API mappings: Schedule, Last Result, Next Run, and Last Run. Compose validation passed; Homepage was healthy, both cards' endpoints succeeded from inside the container, and the apex HTTPS check returned 200. No Compose project recreation or Glances restart was required.
+
 
 ### Glances backup-mount removal — September 18 update
 
