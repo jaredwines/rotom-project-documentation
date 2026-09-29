@@ -81,7 +81,7 @@ A controlled guest reboot recovered all four modules; Homepage/Arcane health, Ho
 
 ### JAR-5 private Rotom documentation portal — 2026-09-29
 
-`rotom-docs` runs the pinned Nginx static image from `/srv/rotom/stacks/infra/rotom-docs/compose.yaml`. The portal binds only `127.0.0.1:8082` for retained host-networked NPM compatibility and joins `rotom-proxy`; it has no Docker socket, privileges, or NAS mount. Its root filesystem and `/srv/rotom/appdata/infra/rotom-docs/site` bind are read-only. A one-shot pinned MkDocs Material builder reads `/srv/rotom/appdata/infra/rotom-docs/source` read-only and writes the generated site only; it runs with all capabilities dropped and no network.
+`rotom-docs` runs the pinned Nginx static image from `/srv/rotom/stacks/infra/rotom-docs/compose.yaml`; its pinned `mkdocs.yml` lives beside that Compose definition. The portal binds only `127.0.0.1:8082` for retained host-networked NPM compatibility and joins `rotom-proxy`; it has no Docker socket, privileges, or NAS mount. Its root filesystem and `/srv/rotom/appdata/infra/rotom-docs/site` bind are read-only. A one-shot pinned MkDocs Material builder reads `/srv/rotom/appdata/infra/rotom-docs/source` read-only and writes the generated site only; it runs with all capabilities dropped and no network.
 
 The root-owned `scripts/publish-source` is the controlled publication mechanism. It copies only the nine approved RPD members `00`–`08` from the canonical checkout into a derived local source tree, produces the portal landing page, and wraps the canonical `08` text tree in rendered Markdown without modifying the canonical source. Run it deliberately followed by the build profile after future verified RPD changes; the live portal is not a write path into the RPD.
 
