@@ -62,7 +62,7 @@ JAR-68 renamed only the physical PVE identity and PVE-only support components. P
 | Target | Mac aliases | Destination/user | Identity file | Verification |
 |---|---|---|---|---|
 | Rotom VM | `rotom`, `rotom.casa` | `rotom.casa` / `jared` | `~/.ssh/id_ed25519_rotom` | key-only login previously verified |
-| PVE host | `pve`, `pve.rotom.casa` | `192.168.1.68` / `root` | `~/.ssh/id_ed25519_pve` | fingerprint preserved as `SHA256:xVX+MEAncK6Z2aTbNinSufYpTwyER+NFSp8iIPf11Zg`; both canonical aliases logged into `pve` / `pve.rotom.casa`; old Mac aliases removed |
+| PVE host | `pve`, `pve.rotom.casa` | `192.168.1.68` / `jared` | `~/.ssh/id_ed25519_pve` | Jared's PVE `sudo` and `jared@pam` Administrator access verified; Jared confirmed the canonical alias now targets this account and the matching root-authorized key was removed |
 
 Password authentication policy was not changed. Key contents and credentials are never recorded. The public-key comment may retain historical wording; it is metadata only and not an active alias.
 
