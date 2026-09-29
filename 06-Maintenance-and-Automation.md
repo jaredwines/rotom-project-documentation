@@ -75,7 +75,7 @@ The NAS backup service is a root oneshot service. It requires /mnt/nas-rotom-bac
 
 The backup status API service is enabled and active. It restarts on failure and starts after networking, but has no explicit NAS mount dependency.
 
-All twelve fstab-backed NAS paths keep their existing automount model. JAR-21 additionally created two persistent bindfs units: `rotom-downloads-media-ro.service` and `rotom-downloads-game-ro.service`. They are enabled and active and expose `/mnt/nas-downloads` read-only at `/mnt/nas-downloads-media-ro` and `/mnt/nas-downloads-game-ro` with forced Media/Game identities for the Arr applications.
+All fifteen fstab-backed NAS paths keep their existing automount model. JAR-55 added unused v2 boundary mounts `/mnt/nas-gameserver`, `/mnt/nas-downloads`, and `/mnt/nas-customapps`; they do not create a global Docker NAS dependency. JAR-21 additionally created two persistent bindfs units: `rotom-downloads-media-ro.service` and `rotom-downloads-game-ro.service`.
 
 qBittorrent uses a service-specific Docker/Compose startup guard rather than a global Docker→NAS systemd dependency. The active `/mnt/nas-downloads/torrents` bind and Downloads sentinel bind use `create_host_path: false`; deliberate removal of the Downloads sentinel caused recreation to fail as required. This prevents local-directory fallback on recreation. A live runtime NFS-loss watchdog was not implemented.
 
