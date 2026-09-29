@@ -23,6 +23,8 @@ Current recovery is layered: guest Restic, PVE host-configuration Restic, whole-
 
 PVE job `rotom-vm-daily` is enabled for node `pve`, VMID `100`, storage `nas-rotom-vm-backup`, daily `05:00`, snapshot mode, zstd, `repeat-missed=0`, retention `keep-daily=7,keep-weekly=4,keep-monthly=6`, and the scheduled note template `Scheduled Rotom VM backup - {{guestname}} VM {{vmid}} on {{node}}`.
 
+JAR-69 monitoring reads this native job through the PVE LAN-only status endpoint `http://192.168.1.68:8789/rotom-vm-backup-status`; the companion host-config Restic endpoint is `/pve-restic-backup-status`. The API is read-only and is only a Homepage presentation layer; it does not change schedules, retention, repositories, storage, or recovery points.
+
 The manual path is `/usr/local/bin/backup-rotom-vm-to-nas` -> `rotom-vm-vzdump-manual.service` -> `/usr/local/sbin/rotom-vm-vzdump-manual`, with non-blocking lock `/run/lock/rotom-vm-vzdump-manual.lock`. Systemd owns the long-running VZDump so it survives SSH disconnect.
 
 All six prior VMID 100 backups on the canonical storage were deliberately deleted after exact safety checks. A single fresh backup was then created: `vzdump-qemu-100-2026_09_28-00_09_19.vma.zst`, size `47,415,540,796` bytes. The service completed `Result=success` / `ExecMainStatus=0`; `zstd -t` passed; full `zstd -dc | vma verify -` passed; VM100 stayed running. This archive is currently **unprotected**, so normal `7/4/6` retention can eventually prune it.
