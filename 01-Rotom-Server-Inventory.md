@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-28 — `rpd` helper workflow decision/Mac verification added; Git-backed Codex integration retained
+**Documentation updated:** 2026-09-29 — JAR-70 Homepage Backup Schedule presentation verified
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -38,7 +38,7 @@ The accepted Phase B architecture now uses **PVE** as the product abbreviation a
 | PVE Restic current recovery point | Snapshot `35d4b0c2`, host `pve`, path `/var/backups/pve-restic-recovery`; pre-rename `0cf1c62a` and `3db28d41` deliberately forgotten; subsequent `restic check` found no errors |
 | Whole-VM backup | NAS `Rotom_VM_Backup/.data`; PVE storage `nas-rotom-vm-backup`; mount `/mnt/pve/nas-rotom-vm-backup`; launcher `backup-rotom-vm-to-nas`; service/worker `rotom-vm-vzdump-manual*`; job `rotom-vm-daily` enabled at `05:00`, `repeat-missed=0`, retention `7 daily / 4 weekly / 6 monthly` |
 | Current whole-VM recovery point | Exactly one VMID 100 backup after deliberate cleanup: `vzdump-qemu-100-2026_09_28-00_09_19.vma.zst`, `47,415,540,796` bytes; zstd integrity PASS; full VMA verification PASS; VM100 remained running; currently unprotected |
-| PVE monitoring | CPU: `/usr/local/sbin/pve-cpu-temp-api`; `pve-cpu-temp-api.service`; endpoint `192.168.1.68:8788`; Homepage label `PVE CPU Temperature`. Backup schedules: `/usr/local/sbin/pve-backup-status-api`; `pve-backup-status-api.service`; LAN-only `192.168.1.68:8789`; Homepage cards for PVE Restic and Rotom VM schedules |
+| PVE monitoring | CPU: `/usr/local/sbin/pve-cpu-temp-api`; `pve-cpu-temp-api.service`; endpoint `192.168.1.68:8788`; Homepage label `PVE CPU Temperature`. Backup schedules: `/usr/local/sbin/pve-backup-status-api`; `pve-backup-status-api.service`; LAN-only `192.168.1.68:8789`; Homepage `Backup Schedule` section orders Rotom VM, guest Rotom Restic, then PVE Restic cards |
 | Final JAR-68 acceptance | Physical reboot proven; PVE core services active; VM100 autostart passed; final PVE and Rotom post-reboot checks passed; zero failed PVE and Rotom systemd units at acceptance |
 
 ## 3. Current Workload Ownership — Restored Through JAR-31

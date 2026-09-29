@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-09-28 — `rpd` helper workflow decision and Mac verification added; Git-backed Codex integration retained
+**Documentation updated:** 2026-09-29 — JAR-70 Homepage Backup Schedule presentation verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -52,6 +52,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-09-29 — JAR-70: organize Homepage Backup Schedule section
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`.
+- **Status:** **Implemented / Verified / Documentation only.** Homepage's backup-status presentation was reorganized; this RPD update records the final verified layout and makes no further live change.
+- **Changes:** A top-level `Backup Schedule` section now appears immediately above `Rotom Monitoring`. It contains exactly `Rotom VM Backup Schedule`, `Rotom Restic Backup Schedule`, and `PVE Restic Backup Schedule`, in that order. The former `Rotom Backup Schedule` label was renamed only to `Rotom Restic Backup Schedule`; its custom-API endpoint, mappings, icon, and refresh interval remain unchanged. The three backup cards were removed from `Rotom Monitoring`; its non-backup cards remain unchanged.
+- **Evidence:** A metadata-preserving rollback copy `services.yaml.pre-jar70-20260929-0059` was made before the edit. The precise diff only moved the three cards and renamed the guest Restic card. Homepage hot-reloaded the matching mounted configuration; Compose validation passed; Homepage was healthy; its API exposed the new section/card order with no old label; all three status APIs reported `Active` and `success`; local Host-header and public `https://rotom.casa` checks returned HTTP 200.
+- **Outstanding:** None.
 
 ## 2026-09-28 — JAR-69: add PVE backup schedule monitoring to Homepage
 
