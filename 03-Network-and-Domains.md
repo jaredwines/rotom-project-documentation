@@ -13,6 +13,10 @@ Record substantive changes to this document in the change log as part of the sam
 
 ## 1. Purpose and Scope
 
+### JAR-36 v2 Docker network contract — 2026-09-28
+
+Three empty external local bridge networks now reserve v2 cross-stack roles: `rotom-proxy` for a future reverse proxy and proxied HTTP applications, `rotom-arr` for Arr/qBittorrent control-plane traffic, and `rotom-monitoring` for dashboard/monitoring integrations. Phase D stacks use service/container DNS on these networks rather than LAN host ports where practical. Existing production bridges and ports were retained. Home Assistant and Homebridge remain intentional host-network discovery exceptions; no VLAN redesign occurred.
+
 ### Evidence provenance
 
 Last updated: 2026-09-27 (Proxmox host-config Restic NFS boundary added; JAR-66/JAR-33 VZDump boundary, JAR-32 guest Restic cutover, and JAR-31 application networking/reboot acceptance retained; pre-migration sections remain historical evidence)

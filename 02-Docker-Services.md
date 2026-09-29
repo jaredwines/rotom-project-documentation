@@ -34,6 +34,8 @@ JAR-34 created the non-migrating v2 declarative namespace at `/srv/rotom`. It co
 
 JAR-35 renamed the three service identities without changing their numeric runtime identities: `gameserver` is `995:5001`, `downloader` is `901:5005`, and `customapps` is `904:5008`. Compatibility homes remain `/home/game`, `/home/downloaders`, and `/home/apps`, respectively. The Gameserver bindfs unit and NAS-recovery helper use `gameserver`; their successful post-change run confirmed no container recreation was needed. Existing Compose PUID/PGID and bind paths remain unchanged.
 
+JAR-36 created unused external bridge networks `rotom-proxy` (`172.29.0.0/16`), `rotom-arr` (`172.30.0.0/16`), and `rotom-monitoring` (`172.31.0.0/16`). Future migrated stacks attach only services needing cross-stack connectivity, use Docker DNS/service names, and may retain private default networks. No current container is attached; current ports and bridge networks remain authoritative until owning workload migration tickets.
+
 ### Verified current intended state
 
 There are **16 total container objects and 14 intended running containers**. Both Palworld containers were intentionally stopped by the administrator to save resources; they remain preserved with `unless-stopped`, are not dead/restarting/OOM, and their current world save trees were reverified during final JAR-68 acceptance. All other expected production containers are running.
