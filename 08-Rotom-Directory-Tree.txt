@@ -129,6 +129,8 @@
 # /srv/rotom/                       JAR-34 v2 foundation; root:root 0755
 #   stacks/{infra,media,downloader,gameserver,smarthome,documents,web,filesync,customapps,auth}/
 #                                     empty root-owned declarative namespace reservations
+#   stacks/NETWORKING.md             JAR-36 shared external-network/Docker-DNS contract
+#   stacks/RUNTIME-POLICY.md         JAR-37 controlled-update, Compose, and exception policy
 #   appdata/<domain>/                empty service-owned 0750 roots; no production state moved
 #   secrets/                         root:root 0700; credentials/private material only, Git-ignored
 #   scripts/                         root-owned declarative helper namespace

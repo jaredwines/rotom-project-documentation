@@ -28,6 +28,8 @@ JAR-35 updated the only current Game-name-dependent automation references: `roto
 
 JAR-36 maintains three empty Docker network contracts; they are not scheduled automation and have no container attachments. The tracked `/srv/rotom/stacks/NETWORKING.md` contract directs later workload tickets to attach only required services and use Docker DNS.
 
+JAR-37 disables Arcane automatic updates and auto-heal. Arcane remains a manual/observational Docker-administration tool, so no unattended service mutation is part of the current automation baseline. Deliberate container updates follow `/srv/rotom/stacks/RUNTIME-POLICY.md`: verify backup/recovery readiness, inspect the target configuration, pull and recreate only that stack, wait for readiness, verify its application/storage/network/proxy behavior, and roll back only that stack if required.
+
 ### PVE host
 
 - Host identity is `pve` / `pve.rotom.casa`; canonical Mac SSH aliases are `pve` / `pve.rotom.casa`.

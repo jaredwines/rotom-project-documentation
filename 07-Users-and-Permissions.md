@@ -374,6 +374,12 @@ The human-facing `/usr/local/bin/backup-restic-to-nas` launcher is `root:root` m
 
 Read-only post-boot checks refreshed all ten service-account UID:GID pairs and confirmed every service home remains mode `0750`. Every convenience link `/home/<service>/nas-<service> -> /mnt/nas-<service>` resolved correctly, including Downloaders. `docker:x:989:` still has no members; Jared remains in `sudo` but not Docker; Fran remains absent. The Media/Game read-only bindfs compatibility traversals passed under their respective service identities.
 
+### JAR-37 Docker-access exception verification — 2026-09-28
+
+The current Docker-socket audit found exactly three consumers: Arcane has the raw read-write socket as the explicit manual Docker-administration exception; Homepage has a read-only socket for dashboard metadata; and Glances has a read-only socket plus a read-only host-root bind for monitoring. Read-only socket flags do not establish read-only Docker API behavior. No ordinary application container has a Docker socket. Arcane's unattended update and auto-heal controls are disabled; its protected named-volume database has a root-only pre-change rollback copy.
+
+Current non-socket exception fields are Home Assistant's host networking, privileged mode, and read-only D-Bus bind; Homebridge, Nginx Proxy Manager, and Cloudflare DDNS host networking; and qBittorrentVPN's `CAP_NET_ADMIN` for WireGuard. These are current workload-specific exceptions, not defaults. The Phase D owning ticket must justify and verify every retained or new privileged field.
+
 ## 4. Outstanding / Needs Verification
 
 - **Intentional:** Fran is not yet recreated; her historical exact-command backup sudoers rule remains deferred.
