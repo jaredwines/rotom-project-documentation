@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; final JAR-68 post-reboot state is 16 container objects / 14 intended running with both Palworld servers intentionally stopped
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-28 — JAR-68 final post-reboot Docker state and intentional Palworld stop documented
+**Documentation updated:** 2026-09-29 — JAR-70 Homepage Backup Schedule presentation verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -80,9 +80,9 @@ description: Home automation and server management
 
 The chat confirms the apex URL works and records the user's selected title and description. The final verification did not separately print these settings or the exact environment value; do not treat this documentation update as a fresh configuration inspection. See document 03 for DNS and HTTPS evidence.
 
-### JAR-69 backup schedule cards — 2026-09-28
+### JAR-69/JAR-70 backup schedule cards — 2026-09-28/29
 
-The existing **Rotom Backup Schedule** custom API card remains unchanged. Homepage now also reads two LAN-only, read-only PVE API endpoints: **PVE Restic Backup Schedule** at `http://192.168.1.68:8789/pve-restic-backup-status` and **Rotom VM Backup Schedule** at `http://192.168.1.68:8789/rotom-vm-backup-status`. Each uses `mdi-backup-restore`, a 60-second refresh, and the same custom API mappings: Schedule, Last Result, Next Run, and Last Run. Compose validation passed; Homepage was healthy, both cards' endpoints succeeded from inside the container, and the apex HTTPS check returned 200. No Compose project recreation or Glances restart was required.
+Homepage's top-level **Backup Schedule** section appears immediately above **Rotom Monitoring** and contains exactly these custom-API cards in order: **Rotom VM Backup Schedule**, **Rotom Restic Backup Schedule**, and **PVE Restic Backup Schedule**. JAR-70 renamed the former **Rotom Backup Schedule** card only; its guest Restic endpoint remains `http://192.168.1.69:8787/backup-status`. The PVE cards use the LAN-only, read-only endpoints **Rotom VM Backup Schedule** at `http://192.168.1.68:8789/rotom-vm-backup-status` and **PVE Restic Backup Schedule** at `http://192.168.1.68:8789/pve-restic-backup-status`. Each preserves `mdi-backup-restore`, a 60-second refresh, and mappings for Schedule, Last Result, Next Run, and Last Run. JAR-70's configuration diff changed only the section placement/order and guest-card label; Rotom Monitoring's non-backup cards, all endpoints, custom API behavior, Compose project, Glances, backup controls/schedules/retention/repositories/storage, VZDump configuration, and recovery points remained unchanged. Homepage hot reload, Compose validation, API/status checks, and the apex HTTPS check passed.
 
 
 ### Glances backup-mount removal — September 18 update
