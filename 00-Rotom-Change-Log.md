@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — Retire final JAR-31 Palworld safety archive
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** At Jared's explicit request, permanently removed `/var/tmp/jar31-palworld-jared-pre-network-move.tar.gz`, the final retained JAR-31 local migration safety archive.
+- **Evidence:** The root-owned 51,681,150-byte file had no open handle before deletion; `/var/tmp` is now 11 MB. Current Palworld containers retain only their v2 appdata mounts.
+- **Outstanding:** No JAR-31 local archive/rollback artifact remains; recovery relies on current v2 state and independently verified backups.
+
 ## 2026-09-29 — Retire JAR-45 legacy Web rollback trees
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.
