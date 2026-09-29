@@ -8,7 +8,7 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-09-28; universal RPD helper and layered Codex instruction architecture verified; JAR-38 state retained.
+# Documentation revised: 2026-09-29; JAR-42 dedicated gameserver convergence verified.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the RPD.
 #
@@ -21,6 +21,7 @@
 # - JAR-38: Infra v2 module Compose roots are `/srv/rotom/stacks/infra/{homepage,glances,arcane,cloudflare-ddns}` (local Git commit `a17a217`); Homepage/Glances/Arcane state is under appdata and protected inputs under `secrets/infra`. Legacy Infra paths and `arcane_arcane-data` remain rollback artifacts. NPM remains active pending JAR-39.
 # - JAR-48: Homepage baseline dashboard includes UNAS ICMP reachability (192.168.1.70) and authoritative Media NFS capacity through Glances (`fs:/mnt/host-root/mnt/nas-media`). No notification delivery or Uptime Kuma component is configured; the pre-change Homepage configuration remains as `services.yaml.pre-jar48-20260928-201236`.
 # - JAR-40: Media v2 Compose roots are `/srv/rotom/stacks/media/{jellyfin,radarr,sonarr,prowlarr,gamarr}` (local commit `f5f2da4`) with configuration under `/srv/rotom/appdata/media`. Prowlarr is Media-owned and NAS-free; storage compatibility views, torrent payloads, and qBittorrentVPN are unchanged.
+# - JAR-42: Palworld Jared and Fran Compose roots are `/srv/rotom/stacks/gameserver/palworld-{jared,fran}` (local commit `50bb937`); current local state is `/srv/rotom/appdata/gameserver/palworld-{jared,fran}` and protected environment files are under `/srv/rotom/secrets/gameserver`. Both containers are intentionally stopped after controlled health/readiness validation. Their private networks retain Jared `172.27.0.0/16` and Fran `172.25.0.0/16`; `/mnt/nas-gameserver` is not a live-world mount. `/home/game/docker/palworld-server-*` remains rollback material.
 # - JAR-56: qBittorrentVPN production Compose is `/srv/rotom/stacks/downloader/qbittorrentvpn/compose.yaml`, appdata is `/srv/rotom/appdata/downloader/qbittorrentvpn`, and active payload is `/mnt/nas-media/torrents`; former `/home/downloaders/docker/qbittorrentvpn` and `/mnt/nas-downloaders/torrents` remain rollback material. `/usr/local/sbin/rotom-qbittorrent-media-guard` with matching service/timer checks Media NFS/sentinel every 15 seconds and stops qBittorrentVPN on a missing mount. Authenticated application-import/seeding validation is Jared's deferred manual follow-up.
 #
 # PVE HOST-CONFIG RESTIC — CURRENT
@@ -142,10 +143,10 @@
 #
 # /srv/rotom/                       JAR-34 v2 foundation; root:root 0755
 #   stacks/{infra,media,downloader,gameserver,smarthome,documents,web,filesync,customapps,auth}/
-#                                     empty root-owned declarative namespace reservations
+#                                     root-owned declarative namespace; migrated domains have owning modules
 #   stacks/NETWORKING.md             JAR-36 shared external-network/Docker-DNS contract
 #   stacks/RUNTIME-POLICY.md         JAR-37 controlled-update, Compose, and exception policy
-#   appdata/<domain>/                empty service-owned 0750 roots; no production state moved
+#   appdata/<domain>/                service-owned mutable state; migrated domains have owning state trees
 #   secrets/                         root:root 0700; credentials/private material only, Git-ignored
 #   scripts/                         root-owned declarative helper namespace
 #   backup-staging/                  root:root 0700; app-consistent export staging, Git-ignored

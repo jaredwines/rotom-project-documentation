@@ -40,6 +40,8 @@ Guest Restic remains intentionally unchanged by JAR-68:
 - Retention: `7 daily / 4 weekly / 12 monthly`.
 - Password path: `/etc/restic/nas-password`; credential contents are never documented.
 
+JAR-42 stores the current Palworld Compose definitions under `/srv/rotom/stacks/gameserver` and authoritative local world/runtime trees under `/srv/rotom/appdata/gameserver`; both `/srv` locations are within the established guest Restic source scope. The ticket's controlled validation did not run a backup, retention, prune, or restore. The timer was verified enabled/active, but a fresh post-JAR-42 snapshot-path verification is intentionally deferred to the broader JAR-47 recovery policy or a dedicated recovery task. The legacy `/home/game/docker/palworld-server-*` trees remain separate local rollback material; `/mnt/nas-gameserver` is not used for live worlds.
+
 ## 2B. Current PVE Host-Configuration Restic Repository and Control Files
 
 Canonical current PVE host-config backup state:

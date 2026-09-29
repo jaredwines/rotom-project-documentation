@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — JAR-42 dedicated gameserver convergence
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.** JAR-42's already-deployed Palworld convergence is recorded as current as-built state after a fresh protected live-state review and controlled validation starts; no configuration, identity, NAS, backup-policy, or network change was made by this documentation closeout.
+- **Changes:** The two independent Palworld Compose modules are now current at `/srv/rotom/stacks/gameserver/palworld-{jared,fran}` (local commit `50bb937`), with local authoritative appdata at `/srv/rotom/appdata/gameserver/palworld-{jared,fran}`. Root-only environment files remain in the protected Gameserver secrets boundary. The legacy `/home/game/docker/palworld-server-*` trees remain retained rollback material. The reserved `/mnt/nas-gameserver` NFS automount is not mounted into either live container and is not a live-world dependency.
+- **Evidence:** Both Compose configurations validated through the protected secrets boundary; UID:GID `gameserver` remained `995:5001`; current binds, ports, restart policies, and private networks matched the ticket; active world IDs `DB40338954B844C28CEA21471A392F98` (Jared) and `396F5898378F4E9CAE89461F403653D9` (Fran) were present. Each server reached its image healthcheck, REST API, and dedicated-server readiness during a controlled one-at-a-time start, then both were returned to the intended stopped state. Native backup trees were present, the guest Restic timer was enabled/active, and zero failed systemd units were reported. The controlled Jared start updated active runtime-save checksums; this is expected runtime state, while the original compatibility trees remain rollback material.
+- **Outstanding:** The existing Restic source scope includes `/srv`, but this closeout did not run a backup or change retention; observe a later backup/restore exercise as part of JAR-47 or a dedicated recovery task. Available Sources replacement remains manual by Jared.
+
 ## 2026-09-28 — Verify universal RPD helper and layered Codex instructions
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
