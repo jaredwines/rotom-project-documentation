@@ -81,6 +81,10 @@ A controlled guest reboot recovered all four modules; Homepage/Arcane health, Ho
 
 ### JAR-40 Media v2 convergence — 2026-09-28
 
+### JAR-10 RomM deployment — 2026-09-29
+
+RomM 5.3.1 with MariaDB 11 and Valkey 9 runs from `/srv/rotom/stacks/media/romm/compose.yaml`. Its state, database, config, assets, resources, cache, and verified logical export are VM-local under `/srv/rotom/appdata/media/romm`; protected database/application inputs are root-only under `/srv/rotom/secrets/media/romm`. It mounts `/mnt/nas-media/library/games` read-only, has no Docker socket or privileged mode, and exposes only loopback `127.0.0.1:8081` for retained host-networked NPM.
+
 Jellyfin, Radarr, Sonarr, Prowlarr, and Gamarr run from `/srv/rotom/stacks/media/<app>/compose.yaml` (JAR-40 `f5f2da4`; JAR-52 `5ec39bd`; JAR-56 `3a29838`); their mutable configuration copies are under `/srv/rotom/appdata/media/<app>/config`. Prowlarr runs as `127:5000` in Media and has only its `/config` bind. Jellyfin keeps `/mnt/nas-media/library` read-only. Radarr/Sonarr now mount `/mnt/nas-media/torrents` read-only at `/media/torrents`; Gamarr uses Media GID 5000 with `/mnt/nas-media/library/games -> /game/library/games` and `/mnt/nas-media/torrents -> /game/torrents:ro`. qBittorrentVPN retains its VPN architecture but now uses v2 downloader stack/appdata paths and Media payload binds at its unchanged `/media/torrents` and `/game/torrents` paths. The old Game library and Downloader payload remain intact rollback material. Jared deferred authenticated application-import and post-import seeding validation for later manual completion; the direct paths and filesystem-level hardlink capability are verified. All proxyable services attach `rotom-proxy`; Radarr/Sonarr/Prowlarr/Gamarr also attach `rotom-arr`; qBittorrentVPN also attaches `rotom-arr`. Existing ports remain NPM compatibility upstreams.
 
 Core infrastructure; Compose files under `/home/infra/docker/`.

@@ -57,6 +57,12 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — JAR-10 RomM deployment
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.** RomM 5.3.1, MariaDB 11, and Valkey 9 run from `/srv/rotom/stacks/media/romm`; authoritative state and a verified logical MariaDB export are under `/srv/rotom/appdata/media/romm`. The Media game library is mounted read-only, and NPM routes `romm.rotom.casa` to loopback `127.0.0.1:8081` with the retained wildcard certificate.
+- **Evidence:** Database health/migrations, read-only write denial, export gzip integrity, controlled RomM recreation persistence, Compose/Nginx validation, external HTTPS success, existing-workload checks, and zero failed units passed. No Docker socket or privileged mode was added.
+
 ## 2026-09-29 — JAR-8 Paperless-ngx deployment
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.

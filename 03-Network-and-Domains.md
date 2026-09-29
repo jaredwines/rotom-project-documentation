@@ -15,6 +15,10 @@ Record substantive changes to this document in the change log as part of the sam
 
 ### JAR-8 Paperless route — 2026-09-29
 
+### JAR-10 RomM route — 2026-09-29
+
+RomM joins `rotom-proxy` and its database/broker remain private. Retained host-networked NPM routes `romm.rotom.casa` to the loopback-only `127.0.0.1:8081` compatibility listener using wildcard certificate ID 24; external HTTPS validation passed.
+
 Paperless web service attaches to `rotom-proxy` and exposes only `127.0.0.1:8000`; PostgreSQL and Valkey stay internal. Retained host-networked NPM routes `paperless.rotom.casa` to that loopback endpoint with existing wildcard certificate ID 24. Local SNI HTTPS returned a login redirect. Rotom's own public-IP hairpin path did not reach this host route; validate public access externally.
 
 ### JAR-45 Web v2 network compatibility — 2026-09-29
