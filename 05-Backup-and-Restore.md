@@ -52,6 +52,8 @@ JAR-46 defines Filesync, Customapps, and Auth as empty future domains. Their fut
 
 JAR-8 Paperless state, PostgreSQL, Valkey, media, exports, and consume paths are VM-local under `/srv/rotom/appdata/documents/paperless`; NAS Documents is unused. A supported local export was produced into protected `/srv/rotom/backup-staging/documents/paperless`, but it is not yet in a verified guest Restic snapshot. JAR-47 must first repair the shared Smart Home SQLite staging discrepancy before a guest backup run.
 
+JAR-10 RomM database and application state are VM-local under `/srv/rotom/appdata/media/romm`; a single-transaction MariaDB export is retained under its `backup` directory and gzip integrity was verified. The Media NAS game library is read-only in RomM and remains outside guest Restic because `/mnt` is excluded.
+
 ## 2B. Current PVE Host-Configuration Restic Repository and Control Files
 
 Canonical current PVE host-config backup state:
