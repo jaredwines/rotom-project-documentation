@@ -53,6 +53,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-28 — JAR-36: establish shared Docker network contracts
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.** Empty external bridge networks `rotom-proxy`, `rotom-arr`, and `rotom-monitoring` are available for Phase D workload convergence.
+- **Changes:** The networks respectively reserve reverse-proxy/application, Arr/qBittorrent control-plane, and monitoring/dashboard connectivity. The local `/srv/rotom` Git repository now contains the reusable external-network/Compose/Docker-DNS pattern. Current stack bridges, ports, host-network services, and VLAN design were not changed.
+- **Evidence:** Docker reports all three as local bridge networks, each with zero attached containers; their allocated subnets are `172.29.0.0/16`, `172.30.0.0/16`, and `172.31.0.0/16`. Current host-network exceptions remain Cloudflare DDNS, Nginx Proxy Manager, Home Assistant, and Homebridge; zero systemd units failed.
+- **Outstanding:** Service attachments and port reductions belong to Phase D workload tickets.
+
 ## 2026-09-28 — JAR-55: commission reserved v2 NAS boundaries
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.

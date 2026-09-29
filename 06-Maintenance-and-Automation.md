@@ -26,6 +26,8 @@ Documentation updated: **2026-09-28** through JAR-34's verified non-migrating `/
 
 JAR-35 updated the only current Game-name-dependent automation references: `rotom-downloads-game-ro.service` now forces the `gameserver` identity and `rotom-nas-docker-recovery` validates its read-only view with `runuser -u gameserver`. The helper was restarted after the rename and completed successfully while all affected containers were already running. Compatibility storage/mount names remain unchanged pending their owning migration tickets.
 
+JAR-36 maintains three empty Docker network contracts; they are not scheduled automation and have no container attachments. The tracked `/srv/rotom/stacks/NETWORKING.md` contract directs later workload tickets to attach only required services and use Docker DNS.
+
 ### PVE host
 
 - Host identity is `pve` / `pve.rotom.casa`; canonical Mac SSH aliases are `pve` / `pve.rotom.casa`.
