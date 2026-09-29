@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — Adopt Jared's routine PVE administration identity
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified / Documentation policy.**
+- **Changes:** Created PVE Linux account `jared`, added it to `sudo`, created enabled Proxmox identity `jared@pam`, and granted it propagated `Administrator` access at `/`. Moved the existing PVE SSH public key to Jared's PVE account, removed the matching root-authorized key, and changed the canonical Mac `pve` shortcut to use `jared@pve`. Adopted the policy that UniFi Gateway and UNAS routine administration uses UniFi roles; appliance SSH remains supported root-console access only for targeted troubleshooting, with no unsupported local Linux Jared account.
+- **Evidence:** Supplied 2026-09-29 terminal output shows `jared` as UID/GID `1000:1000` with `sudo` membership, enabled `jared@pam`, its `/` Administrator ACL, and successful `sudo pveversion` output for PVE Manager `9.2.20` / kernel `7.0.14-19-pve`. Jared confirmed the PVE key is on the new account, the canonical shortcut targets Jared, and the root key was removed. No credential or key material was recorded.
+- **Outstanding:** Zsh/Oh My Zsh installation for PVE Jared was requested but its completion was not supplied, so it is not recorded as implemented. No fresh direct configuration audit of the UniFi Gateway or UNAS was performed.
+
 ## 2026-09-29 — JAR-42 dedicated gameserver convergence
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.

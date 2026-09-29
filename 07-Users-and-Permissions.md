@@ -30,7 +30,7 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 
 | Layer/account | Verified current state |
 |---|---|
-| PVE host | hostname `pve`; administration as `root`; canonical Mac aliases `pve` / `pve.rotom.casa`; key `~/.ssh/id_ed25519_pve`; fingerprint `SHA256:xVX+MEAncK6Z2aTbNinSufYpTwyER+NFSp8iIPf11Zg`; old Mac aliases removed |
+| PVE host | hostname `pve`; routine administration as Linux user `jared` (UID/GID `1000:1000`, groups `sudo` and `users`); canonical Mac aliases `pve` / `pve.rotom.casa`; key `~/.ssh/id_ed25519_pve`; PVE identity `jared@pam` has propagated `Administrator` access at `/`; matching root-authorized key removed; root retained for emergency recovery |
 | Debian VM `jared` | UID/GID `1000:1000`; supplementary `sudo`; key-only Mac login via `~/.ssh/id_ed25519_rotom` |
 | media | `127:5000`, `/home/media`; Jellyfin/Radarr/Sonarr |
 | game | `995:5001`, `/home/game`; Gamarr running; both Palworld containers intentionally stopped with worlds preserved |
@@ -48,7 +48,11 @@ PVE host-config Restic is root-operated. `/usr/local/sbin/pve-restic-backup` is 
 
 ### Current administrative public-key access
 
-The Mac SSH config maps `pve` / `pve.rotom.casa` to `192.168.1.68` as `root` using `~/.ssh/id_ed25519_pve`, `IdentitiesOnly yes`, `AddKeysToAgent yes`, and `UseKeychain yes`. Both aliases were verified after cleanup. The old `proxmox` / `proxmox.rotom.casa` SSH aliases and old `~/.ssh/id_ed25519_proxmox{,.pub}` filenames are absent. PVE `/etc/hosts` likewise contains only the canonical `pve.rotom.casa pve` names for `.68`. Password-auth policy was not changed.
+The Mac SSH config maps `pve` / `pve.rotom.casa` to `192.168.1.68` as `jared` using `~/.ssh/id_ed25519_pve`, `IdentitiesOnly yes`, `AddKeysToAgent yes`, and `UseKeychain yes`. Supplied output verified PVE Jared's `sudo` membership, enabled `jared@pam` identity, propagated `Administrator` ACL at `/`, and successful `sudo pveversion`; Jared confirmed both aliases now use this account. The matching public key was removed from PVE root. The old `proxmox` / `proxmox.rotom.casa` SSH aliases and old `~/.ssh/id_ed25519_proxmox{,.pub}` filenames remain absent. PVE `/etc/hosts` likewise contains only the canonical `pve.rotom.casa pve` names for `.68`. Password-auth policy was not changed.
+
+### UniFi appliance administration — 2026-09-29
+
+The UniFi Gateway and UNAS are appliance-managed systems, not general-purpose Linux hosts. Routine management uses the appropriate UniFi UI account and administrator role. If SSH is required for targeted troubleshooting, use the appliance's supported root-console access. Do not create unsupported local Linux `jared` accounts or rely on custom local account state surviving appliance updates.
 
 The Rotom VM continues to use `rotom` / `rotom.casa`, user `jared`, and `~/.ssh/id_ed25519_rotom`. Private-key contents, passwords, and other authentication secrets are never recorded.
 
