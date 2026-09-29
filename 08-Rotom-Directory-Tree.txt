@@ -17,10 +17,11 @@
 # - Canonical Mac PVE SSH: aliases `pve` / `pve.rotom.casa` -> 192.168.1.68 Jared using ~/.ssh/id_ed25519_pve. PVE Jared has sudo plus `jared@pam` Administrator access; the matching root-authorized key was removed, while root remains emergency recovery. Old `proxmox*` aliases/key filenames are absent. PVE /etc/hosts contains canonical `192.168.1.68 pve.rotom.casa pve`.
 # - PVE monitoring: /usr/local/sbin/pve-cpu-temp-api + /etc/systemd/system/pve-cpu-temp-api.service; 192.168.1.68:8788; Homepage label `PVE CPU Temperature`. Backup status: /usr/local/sbin/pve-backup-status-api + /etc/systemd/system/pve-backup-status-api.service; LAN-only 192.168.1.68:8789; Homepage PVE Restic and Rotom VM schedule cards.
 # - VMID 100 `rotom`: q35/OVMF, x86-64-v2-AES, 8 vCPU, 12 GiB RAM, 100 GiB; onboot=1; guest rotom.casa at reserved 192.168.1.69, MAC BC:24:11:97:10:47.
-# - Docker: 16 total container objects / 14 intended running; both Palworld containers intentionally stopped with worlds preserved; qBittorrentVPN wg0 10.2.0.2/32; final post-reboot guest acceptance 0 failed units.
+# - Docker: 17 total container objects / 15 intended running; both Palworld containers intentionally stopped with worlds preserved; qBittorrentVPN wg0 10.2.0.2/32; JAR-5 local acceptance found 0 failed units.
 # - JAR-38: Infra v2 module Compose roots are `/srv/rotom/stacks/infra/{homepage,glances,arcane,cloudflare-ddns}` (local Git commit `a17a217`); Homepage/Glances/Arcane state is under appdata and protected inputs under `secrets/infra`. Legacy Infra paths and `arcane_arcane-data` remain rollback artifacts. NPM remains active pending JAR-39.
 # - JAR-48: Homepage baseline dashboard includes UNAS ICMP reachability (192.168.1.70) and authoritative Media NFS capacity through Glances (`fs:/mnt/host-root/mnt/nas-media`). No notification delivery or Uptime Kuma component is configured; the pre-change Homepage configuration remains as `services.yaml.pre-jar48-20260928-201236`.
 # - JAR-10: RomM/MariaDB/Valkey are deployed at `/srv/rotom/stacks/media/romm`; all mutable state and verified logical export are local below `/srv/rotom/appdata/media/romm`, protected inputs are under `secrets/media/romm`, and `/mnt/nas-media/library/games` is read-only in RomM. NPM uses loopback `8081` for `romm.rotom.casa`.
+# - JAR-5: private `rotom-docs` static portal is deployed at `/srv/rotom/stacks/infra/rotom-docs`, with controlled derived source and generated site under `/srv/rotom/appdata/infra/rotom-docs`. Its root-owned publisher permits only RPD members `00`–`08`; NPM routes `docs.rotom.casa` through loopback `8082` and allows only loopback plus the trusted LAN.
 # - JAR-42: Palworld Jared and Fran Compose roots are `/srv/rotom/stacks/gameserver/palworld-{jared,fran}` (local commit `50bb937`); current local state is `/srv/rotom/appdata/gameserver/palworld-{jared,fran}` and protected environment files are under `/srv/rotom/secrets/gameserver`. Both containers are intentionally stopped after controlled health/readiness validation. Their private networks retain Jared `172.27.0.0/16` and Fran `172.25.0.0/16`; `/mnt/nas-gameserver` is not a live-world mount. `/home/game/docker/palworld-server-*` remains rollback material.
 # - JAR-56: qBittorrentVPN production Compose is `/srv/rotom/stacks/downloader/qbittorrentvpn/compose.yaml`, appdata is `/srv/rotom/appdata/downloader/qbittorrentvpn`, and active payload is `/mnt/nas-media/torrents`; former `/home/downloaders/docker/qbittorrentvpn` and `/mnt/nas-downloaders/torrents` remain rollback material. `/usr/local/sbin/rotom-qbittorrent-media-guard` with matching service/timer checks Media NFS/sentinel every 15 seconds and stops qBittorrentVPN on a missing mount. Authenticated application-import/seeding validation is Jared's deferred manual follow-up.
 #
@@ -146,6 +147,10 @@
 #                                     root-owned declarative namespace; migrated domains have owning modules
 #   stacks/NETWORKING.md             JAR-36 shared external-network/Docker-DNS contract
 #   stacks/RUNTIME-POLICY.md         JAR-37 controlled-update, Compose, and exception policy
+#   stacks/infra/rotom-docs/         JAR-5 root-owned Compose definition and controlled-publish script
+#   appdata/infra/rotom-docs/
+#     source/                        generated controlled RPD source copy; not canonical authority
+#     site/                          generated static portal output; served read-only
 #   stacks/documents/DOMAIN-CONTRACT.md JAR-44 Paperless deployment/recovery contract; no Compose placeholder
 #   stacks/documents/paperless/compose.yaml JAR-8 Paperless/PostgreSQL/Valkey stack
 #   stacks/{filesync,customapps,auth}/DOMAIN-CONTRACT.md JAR-46 future-domain contracts; no Compose placeholders

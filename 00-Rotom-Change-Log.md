@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — JAR-5 private Rotom documentation portal
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Deployed the private, static `docs.rotom.casa` portal from `/srv/rotom/stacks/infra/rotom-docs`. A root-owned publisher creates an explicit controlled derived copy of the complete approved nine-file RPD set (`00`–`08`) beneath local Infra appdata; the canonical Git checkout is neither mounted nor editable by the portal. MkDocs Material renders the source, including a generated Markdown wrapper for the canonical directory-tree text, and Nginx serves the generated site read-only. Retained host-networked NPM reaches only loopback `127.0.0.1:8082`; proxy host 22 forces TLS with certificate 24 and the dedicated access list permits only loopback and `192.168.1.0/24`.
+- **Evidence:** Pinned-image Compose and Nginx validation passed; the generated site built cleanly; direct and local-SNI TLS requests returned `200`, the rendered directory-tree page returned `200`, an untrusted `rotom-proxy` bridge request returned `403`, the site bind and container root filesystem are read-only, both containers are running, and no failed systemd units were present.
+- **Outstanding:** Public Internet access is intentionally denied by the trusted-LAN policy. The external browser service cannot reach the private endpoint; validate ordinary LAN-browser usability when convenient. The source publisher must be run deliberately after future verified RPD changes before rebuilding the portal.
+
 ## 2026-09-29 — JAR-10 RomM deployment
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.

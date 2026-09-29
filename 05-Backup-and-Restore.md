@@ -54,6 +54,8 @@ JAR-8 Paperless state, PostgreSQL, Valkey, media, exports, and consume paths are
 
 JAR-10 RomM database and application state are VM-local under `/srv/rotom/appdata/media/romm`; a single-transaction MariaDB export is retained under its `backup` directory and gzip integrity was verified. The Media NAS game library is read-only in RomM and remains outside guest Restic because `/mnt` is excluded.
 
+JAR-5 keeps its documentation portal Compose definition and controlled-publish script under `/srv/rotom/stacks/infra/rotom-docs` and its generated source/site output under `/srv/rotom/appdata/infra/rotom-docs`; these VM-local paths are within the established guest Restic `/srv` source scope. The portal source is a deliberately derived, reproducible copy of canonical RPD material, not a new authority or a NAS dataset. JAR-5 did not run, modify, or validate Restic, retention, pruning, repositories, credentials, schedules, or restores.
+
 ## 2B. Current PVE Host-Configuration Restic Repository and Control Files
 
 Canonical current PVE host-config backup state:

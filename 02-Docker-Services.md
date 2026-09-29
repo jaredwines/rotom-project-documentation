@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; final JAR-68 post-reboot state is 16 container objects / 14 intended running with both Palworld servers intentionally stopped
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-29 — JAR-70 Homepage presentation and JAR-38 Infra-domain convergence verified
+**Documentation updated:** 2026-09-29 — JAR-5 private documentation portal verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -78,6 +78,12 @@ Cloudflare DDNS now uses its ordinary private `cloudflare-ddns_default` bridge, 
 A controlled guest reboot recovered all four modules; Homepage/Arcane health, Homepage→Glances DNS/API, local and HTTPS Homepage, Arcane HTTPS, DDNS reconciliation, NPM compatibility, qBittorrent `wg0`, and zero failed systemd units passed. JAR-48 later adds baseline dashboard coverage using these existing components only; notification delivery is intentionally not configured.
 
 ## 2. Core Infrastructure — `infra`
+
+### JAR-5 private Rotom documentation portal — 2026-09-29
+
+`rotom-docs` runs the pinned Nginx static image from `/srv/rotom/stacks/infra/rotom-docs/compose.yaml`. The portal binds only `127.0.0.1:8082` for retained host-networked NPM compatibility and joins `rotom-proxy`; it has no Docker socket, privileges, or NAS mount. Its root filesystem and `/srv/rotom/appdata/infra/rotom-docs/site` bind are read-only. A one-shot pinned MkDocs Material builder reads `/srv/rotom/appdata/infra/rotom-docs/source` read-only and writes the generated site only; it runs with all capabilities dropped and no network.
+
+The root-owned `scripts/publish-source` is the controlled publication mechanism. It copies only the nine approved RPD members `00`–`08` from the canonical checkout into a derived local source tree, produces the portal landing page, and wraps the canonical `08` text tree in rendered Markdown without modifying the canonical source. Run it deliberately followed by the build profile after future verified RPD changes; the live portal is not a write path into the RPD.
 
 ### JAR-40 Media v2 convergence — 2026-09-28
 
