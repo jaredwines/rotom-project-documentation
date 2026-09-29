@@ -34,6 +34,8 @@ JAR-38 converted Homepage, Glances, Arcane, and Cloudflare DDNS to independent v
 
 JAR-40 added independent Media v2 modules at local commit `f5f2da4`. The five migrated services retain `unless-stopped`; Gamarr retains its image healthcheck. NPM remains the established host-networked reverse proxy, so the applications retain host compatibility ports while joining their v2 Docker networks. No update automation, backup schedule, download payload, or VPN behavior changed.
 
+JAR-56 adds `rotom-qbittorrent-media-guard.timer`, enabled and active every 15 seconds, with `/usr/local/sbin/rotom-qbittorrent-media-guard` and its matching systemd service. It validates the underlying Media NFS filesystem and `/mnt/nas-media/.rotom-qbt-media-ready`; if either is absent while qBittorrentVPN is running, it stops that container rather than allowing an accidental local write. The normal check was live-verified after accounting for the autofs/NFS mount layers. The former Downloader payload and configuration remain rollback material.
+
 ### PVE host
 
 - Host identity is `pve` / `pve.rotom.casa`; canonical Mac SSH aliases are `pve` / `pve.rotom.casa`.
