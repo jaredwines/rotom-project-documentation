@@ -58,7 +58,7 @@ The separate `Downloads/.data` drive was mounted for final inspection and contai
 
 ### Retired stale `Apps` guest boundary; retained `Customapps` — 2026-09-29
 
-Live account evidence identifies the service identity as `customapps` (`904:5008`) with compatibility home `/home/apps`. The separate obsolete `Apps/.data -> /mnt/nas-apps` target was unavailable, had no workload configuration reference beyond fstab, and was the sole failed mount unit. Its fstab/automount contract, empty local mountpoint, and stale `/home/apps/nas-apps` shortcut were removed. `/home/apps/nas-customapps` now points to the retained empty `Customapps/.data` export at `/mnt/nas-customapps`, which mounted successfully. The unavailable Apps export is consistent with NAS removal, but NAS-side drive deletion remains unverified; do not remove `Customapps`.
+Live account evidence identifies the service identity as `customapps` (`904:5008`) with compatibility home `/home/apps`. The separate obsolete `Apps/.data -> /mnt/nas-apps` target was unavailable, had no workload configuration reference beyond fstab, and was the sole failed mount unit. Its fstab/automount contract, empty local mountpoint, and stale `/home/apps/nas-apps` shortcut were removed. `/home/apps/nas-customapps` now points to the retained empty `Customapps/.data` export at `/mnt/nas-customapps`, which mounted successfully. Jared confirmed the NAS `Apps` drive was deleted; do not remove `Customapps`.
 
 The old PVE backup share names are no longer part of active PVE configuration. Historical sections below may preserve their dated names as evidence.
 
