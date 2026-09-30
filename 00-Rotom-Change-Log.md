@@ -57,6 +57,12 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — Retire final verified Rotom staging and Compose rollback copies
+
+- **Implemented / Verified:** With Jared's explicit authorization, retired Phase C staging copies under `/home/jared/.phasec-jar34` and `.phasec-jar35`, their Network/Runtime/fstab copies, the superseded Codex instruction copy, and four inactive Media Compose rollback copies for Radarr, Sonarr, and Gamarr.
+- **Verified:** The retired paths had no active reference. Current Radarr, Sonarr, and Gamarr Compose definitions validated after cleanup; no failed systemd unit was reported. No active Compose file, container, NAS data, media library, backup repository, or current RPD configuration was changed.
+- **Historical note:** Earlier JAR-52/JAR-56 entries that name the Compose copies remain valid historical evidence; their rollback-copy retention statements are superseded by this authorized retirement.
+
 ## 2026-09-29 — Retire superseded PVE rollback copies
 
 - **Implemented / Verified:** With Jared's explicit authorization, retired inactive PVE rollback copies `/etc/fstab.pre-proxmox-restic-backup.20260927-152218`, `/etc/network/interfaces.pre-wol`, and `/etc/network/interfaces.pre-e1000e-offload-20260927` after confirming the active fstab/network replacements exist, differ as historical copies should, and have no active reference.
