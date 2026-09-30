@@ -35,6 +35,12 @@ JAR-57 selected the available archive `vzdump-qemu-100-2026_09_28-19_28_32.vma.z
 
 The restored guest booted to the Debian 13 console and accepted a normal login. `qm agent 101 ping` did not report an available agent, so guest-agent, `/srv/rotom`, Docker, and deeper filesystem checks are deliberately deferred to the JAR-50 DR rehearsal; this result is console-boot portability evidence, not a replacement for that full rehearsal. After inspection, VMID `101`, `jar57-test`, and its empty `images/` directory were removed. Do not reuse the removed storage name; create fresh isolated temporary storage only when a later rehearsal requires it.
 
+### JAR-50 DR rehearsal scope decision — 2026-09-29
+
+Jared accepted the JAR-50 rehearsal using the cumulative evidence from JAR-57's isolated VM restore/boot and JAR-47's representative restricted Restic restore, Home Assistant SQLite integrity check, Paperless export-manifest recovery, and Palworld SaveGames checksum validation. The safe source/destination rules for future NAS recovery remain: do not restore over `Media/library`; use snapshot browse/clone/copy semantics into a newly created isolated test location; verify the recovered copy; then remove only that exact test location.
+
+No authoritative NAS Media recovery was performed for JAR-50. Jared explicitly waived that criterion; no snapshot was restored or cloned, no test directory was created, and no snapshot policy or production NAS data was changed. This is a closeout limitation, not verification that UNAS Media can be restored end-to-end.
+
 ## 2A. Current VM-Era Guest Restic Repository and Control Files
 
 Guest Restic remains intentionally unchanged by JAR-68:

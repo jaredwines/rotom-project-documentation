@@ -57,6 +57,12 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — JAR-50 disaster-recovery rehearsal closeout
+
+- **Verified:** The accepted evidence set combines JAR-57's isolated VZDump restore/console boot and cleanup with JAR-47's restricted Restic restore, Home Assistant SQLite `PRAGMA quick_check`, Paperless export-manifest recovery, and stopped-state Palworld SaveGames checksum validation. No production workload, production IP, or production data was overwritten during those exercises.
+- **Decision:** Jared explicitly accepted JAR-50 without an authoritative NAS Media recovery exercise. No Media snapshot was restored, cloned, browsed into a test directory, or used to change backup/snapshot policy. The NAS recovery criterion is **waived by owner, not verified**; future recovery work must not rely on this closeout as proof of an end-to-end UNAS Media restore.
+- **Documentation updated:** `05-Backup-and-Restore.md` records the accepted scope and limitation. `JAR-50` is closed in Linear with this limitation recorded.
+
 ## 2026-09-29 — JAR-57 portable VM restore test
 
 - **Verified / Implemented:** Recorded JAR-57's isolated restore of `vzdump-qemu-100-2026_09_28-19_28_32.vma.zst` into disposable VMID `101`. The test retained the portable `q35`/OVMF/`x86-64-v2-AES` baseline, had no `hostpci`, `usb`, or `args` attachment, used `onboot: 0`, and was given a distinct VirtIO MAC with `link_down=1` before boot. The Proxmox console showed a successful Debian 13 login; production IP `192.168.1.69` was never exposed.
