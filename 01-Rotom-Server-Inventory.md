@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-29 — empty Downloads NAS boundary retired
+**Documentation updated:** 2026-09-29 — Codex SSH and PVE execution lanes adopted
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -262,6 +262,8 @@ RPD maintenance is governed exclusively by [00-Rotom-Change-Log.md](00-Rotom-Cha
 The September 16 update also incorporates “Change Homepage URL” plus the user's confirmation that Ghostty was removed. Homepage routing is verified by the supplied chat output. Earlier browser-workflow decisions are historical and are superseded by the current no-browser-automation policy.
 
 For project-wide Rotom command execution guidance, large or multi-step command blocks should be isolated in a child Bash process by default so errors and shell-control statements cannot terminate the interactive SSH session. Small single-purpose commands may run directly. The detailed convention is maintained in `06-Maintenance-and-Automation.md`.
+
+The adopted execution model assigns routine live Rotom work to Codex through the concrete SSH alias `rotom`, using the `jared` account and `sudo` only when required. PVE is deliberately different: Jared manually runs every PVE check or change through `pve`; Codex supplies concise, ticket-specific paste-ready preflight, action, and verification blocks, then evaluates the returned output as the PVE evidence source. The detailed guardrails, access preflight, and stop conditions are canonical in `06-Maintenance-and-Automation.md`.
 
 ## 11. Current Source Map
 
