@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-09-29 — unused Auth account and guest boundary retired
+**Documentation updated:** 2026-09-30 — PVE web UI NPM route and Homepage link verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -41,6 +41,7 @@ JAR-72 reorganized Homepage cards without changing monitoring behavior or any ap
 ### PVE host
 
 - Host identity is `pve` / `pve.rotom.casa`; canonical Mac SSH aliases are `pve` / `pve.rotom.casa`.
+- `pvedaemon` and `pveproxy` are enabled for the PVE HTTPS UI. NPM serves it at `https://pve.rotom.casa` through HTTPS to `192.168.1.68:8006`, with forced TLS, WebSocket upgrade, and an enabled access list. Homepage links to it from **Rotom Management** without a monitor. This is an administrative access path, not an automation or a PVE control API.
 - PVE host-config Restic: `pve-restic-backup.timer` enabled/active at `04:00`, `Persistent=true`, `AccuracySec=1min`; service `pve-restic-backup.service`; worker `/usr/local/sbin/pve-restic-backup`; mount `/mnt/nas-pve-restic-backup`; staging `/var/backups/pve-restic-recovery`; retention `7 daily / 4 weekly / 12 monthly`.
 - Whole-VM automatic job: `rotom-vm-daily`, enabled at `05:00`, VMID 100, storage `nas-rotom-vm-backup`, snapshot + zstd, `repeat-missed=0`, retention `7 daily / 4 weekly / 6 monthly`.
 - Whole-VM manual launcher/service/worker: `/usr/local/bin/backup-rotom-vm-to-nas`, `rotom-vm-vzdump-manual.service`, `/usr/local/sbin/rotom-vm-vzdump-manual`; lock `/run/lock/rotom-vm-vzdump-manual.lock`. The launcher re-executes through `sudo` for non-root invocation, while the worker and systemd service remain root-owned. Jared can follow the service with `journalctl -fu rotom-vm-vzdump-manual.service` through `systemd-journal` membership. Disconnect-safe ownership and duplicate-run guard were verified.

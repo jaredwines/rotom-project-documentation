@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-09-29 — JAR-75 rollback artifacts retired
+**Documentation updated:** 2026-09-30 — PVE web UI NPM route and Homepage management card verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -56,6 +56,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-09-30 — PVE web UI NPM route and Homepage card
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** PVE's `pvedaemon` and `pveproxy` were started and enabled, and NPM proxy host `pve.rotom.casa` provides the PVE web UI through HTTPS to `192.168.1.68:8006`, with its existing certificate, forced TLS, WebSocket upgrade, and an enabled access list. Homepage now includes an unmonitored **PVE** link under **Rotom Management**. No DNS, certificate, firewall, WAN, or storage configuration was changed.
+- **Evidence:** Supplied PVE output confirmed both services active and enabled, with the local PVE API responding. The live NPM record was enabled with HTTPS upstream `192.168.1.68:8006`, certificate ID `24`, access-list ID `1`, forced TLS, and WebSocket upgrade. Local-SNI `https://pve.rotom.casa` returned the Proxmox Virtual Environment page; direct PVE HTTPS also returned HTTP `200`. Homepage was healthy and its local canonical request returned HTTP `200` after the card change.
+- **Outstanding:** Interactive PVE authentication and VM-console WebSocket use were not exercised because no administrator credentials were used by this task.
 
 ## 2026-09-30 — JAR-73 high-signal alerting
 

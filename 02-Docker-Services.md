@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; final JAR-68 post-reboot state is 16 container objects / 14 intended running with both Palworld servers intentionally stopped
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-29 — JAR-75 Filesync Syncthing deployed
+**Documentation updated:** 2026-09-30 — PVE web UI NPM route and Homepage link verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -41,6 +41,10 @@ JAR-37 is the accepted Phase C runtime gate. Docker's daemon-wide `json-file` ca
 ### JAR-75 Filesync Syncthing — 2026-09-29
 
 ### JAR-73 Uptime Kuma — 2026-09-30
+
+### PVE web UI Homepage entry — 2026-09-30
+
+NPM serves the PVE HTTPS UI at `https://pve.rotom.casa`, forwarding over HTTPS to `192.168.1.68:8006`; the route has forced TLS, WebSocket upgrade, and an enabled access list. Homepage's **Rotom Management** section includes a **PVE** link to that URL without a `siteMonitor`, so the dashboard does not create a separate monitor request to the privileged PVE UI. Local-SNI HTTPS returned the Proxmox login page; Homepage stayed healthy and returned local HTTP `200`. The route did not require a Compose, container, listener, DNS, certificate, PVE-service, or network-policy change.
 
 `uptime-kuma` uses `louislam/uptime-kuma:2` from `/srv/rotom/stacks/infra/uptime-kuma/compose.yaml`. Its SQLite data is VM-local at `/srv/rotom/appdata/infra/uptime-kuma`; it joins `rotom-proxy` and publishes only `127.0.0.1:3002:3001` for retained host-networked NPM compatibility. It has no Docker socket, NAS mount, or broad host listener. NPM routes `uptime.rotom.casa` with TLS and WebSockets; the administrative UI is authenticated and no public status page is enabled.
 

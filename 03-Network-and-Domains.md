@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-29 — JAR-75 Syncthing proxy route verified
+**Documentation updated:** 2026-09-30 — PVE web UI NPM route verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -12,6 +12,10 @@
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
 
 ## 1. Purpose and Scope
+
+### PVE web UI NPM route — 2026-09-30
+
+NPM proxy host `pve.rotom.casa` forwards using **HTTPS** to the PVE host at `192.168.1.68:8006`. The enabled route uses certificate ID `24`, forced TLS, WebSocket upgrade, and access-list ID `1`. A local-SNI HTTPS request returned the Proxmox Virtual Environment page, while direct `https://192.168.1.68:8006` returned HTTP `200`. This confirms the Rotom-to-PVE proxy path; it does not establish public-WAN reachability or test authenticated VM-console WebSocket use. No DNS, certificate, firewall, VLAN, WAN-forwarding, PVE-service, or other network configuration changed in this verification.
 
 ### JAR-5 private documentation route — 2026-09-29
 

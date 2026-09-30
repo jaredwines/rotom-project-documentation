@@ -8,12 +8,13 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-09-29; unused Auth account and guest boundary retired.
+# Documentation revised: 2026-09-30; PVE web UI NPM route and Homepage management card verified.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the RPD.
 #
 # CURRENT TOPOLOGY — JAR-68 FINAL, 2026-09-28
 # - Physical NUC runs Proxmox VE as `pve` / `pve.rotom.casa` at 192.168.1.68. `nic0` is Intel I219-V/e1000e MAC 1c:69:7a:0e:f2:f7; WOL `g`; previously documented TSO/GSO mitigation retained.
+# - PVE `pvedaemon` and `pveproxy` are enabled. NPM proxy host `pve.rotom.casa` forwards HTTPS to the PVE UI at `192.168.1.68:8006`, with certificate ID `24`, forced TLS, WebSocket upgrade, and access-list ID `1`; Homepage links to it under `Rotom Management` without a monitor.
 # - Canonical Mac PVE SSH: aliases `pve` / `pve.rotom.casa` -> 192.168.1.68 Jared using ~/.ssh/id_ed25519_pve. PVE Jared has sudo plus `jared@pam` Administrator access; the matching root-authorized key was removed, while root remains emergency recovery. Old `proxmox*` aliases/key filenames are absent. PVE /etc/hosts contains canonical `192.168.1.68 pve.rotom.casa pve`.
 # - PVE monitoring: /usr/local/sbin/pve-cpu-temp-api + /etc/systemd/system/pve-cpu-temp-api.service; 192.168.1.68:8788; Homepage label `PVE CPU Temperature`. Backup status: /usr/local/sbin/pve-backup-status-api + /etc/systemd/system/pve-backup-status-api.service; LAN-only 192.168.1.68:8789; Homepage PVE Restic and Rotom VM schedule cards.
 # - VMID 100 `rotom`: q35/OVMF, x86-64-v2-AES, 8 vCPU, 12 GiB RAM, 100 GiB; onboot=1; optional JAR-49 host attachment `hostpci0: 0000:00:02.0,pcie=1` exposes the NUC Iris Plus 655 as guest `01:00.0` / `/dev/dri/renderD128`; guest rotom.casa at reserved 192.168.1.69, MAC BC:24:11:97:10:47. Removing hostpci0 preserves the portable baseline.
