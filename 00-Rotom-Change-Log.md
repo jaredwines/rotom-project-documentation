@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — JAR-47 final Rotom v2 recovery policy
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Repaired the guest Restic worker's Home Assistant SQLite staging paths to the v2 Smart Home appdata tree, retaining a dated root-owned rollback copy. Added stopped-state Palworld SaveGames archives in protected local staging. The existing guest Restic retention policy remained `7 daily / 4 weekly / 12 monthly`. Media NAS protection is now explicitly classified: `Media/library` (including `library/games`) is authoritative and protected by UniFi Drive snapshots; `Media/torrents` is reproducible/transient and outside that snapshot-backed recovery claim. Documents and the other reserved-domain NAS shares remain empty/non-authoritative. Snapshot rollback remains on the same UNAS failure domain and is not represented as off-site protection.
+- **Evidence:** Guest backup snapshot `aedd8e57` (2026-09-29 17:28 PDT) completed with retention/prune and `restic check` passed all 21 snapshots. A restricted scratch restore verified both Palworld archive checksums and restored Home Assistant SQLite `quick_check`; the Paperless staged manifest was restored. The Media UniFi Drive configuration screenshot supplied by Jared shows snapshots enabled daily at 12:00 AM UNAS local time with a limit of 16; Jared confirmed every NAS drive uses the same snapshot policy. PVE's read-only status API reported the 04:00 host-config Restic and 05:00 VM VZDump jobs successful on 2026-09-29. Guest service health was clean with no failed systemd units.
+- **Outstanding:** JAR-57 owns a separate portable-VM restore proof. NAS snapshots provide local rollback, not a separate-site copy.
+
 ## 2026-09-29 — Jared PVE backup-launcher access and journal visibility
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`.

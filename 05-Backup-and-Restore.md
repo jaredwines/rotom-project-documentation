@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Restic backup architecture, scope, retention, verification, restore evidence, and recovery boundaries  
 **Recovery scope:** pre-migration Rotom plus current Proxmox/VM foundation  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-29 — JAR-45 Web v2 recovery-path convergence verified
+**Documentation updated:** 2026-09-29 — JAR-47 final Rotom v2 recovery policy verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -15,9 +15,9 @@ Record substantive changes to this document in the change log as part of the sam
 
 This document is the canonical detailed owner for Rotom recovery state plus the preserved pre-migration backup/restore design. It distinguishes guest Restic snapshots, Proxmox host-configuration Restic snapshots, NAS data protection, representative restore evidence, the JAR-25 whole-disk rollback image, and current Proxmox whole-VM VZDump protection; those claims must not be treated as interchangeable.
 
-## 2. Current Recovery State — JAR-68 final, 2026-09-28
+## 2. Current Recovery State — JAR-47 final, 2026-09-29
 
-Current recovery is layered: guest Restic, PVE host-configuration Restic, whole-VM VZDump, plus preserved pre-migration recovery artifacts. JAR-68 normalized the PVE identity and PVE-only backup names without changing the guest Restic naming.
+Current recovery is layered: application-aware artifacts, guest Restic, PVE host-configuration Restic, whole-VM VZDump, UNAS snapshots for authoritative NAS Media, plus preserved pre-migration recovery artifacts. JAR-68 normalized the PVE identity and PVE-only backup names without changing the guest Restic naming.
 
 ### Current recurring PVE whole-VM backup schedule
 
@@ -39,6 +39,14 @@ Guest Restic remains intentionally unchanged by JAR-68:
 - Timer: around `03:00`, `Persistent=true`, randomized delay up to ten minutes.
 - Retention: `7 daily / 4 weekly / 12 monthly`.
 - Password path: `/etc/restic/nas-password`; credential contents are never documented.
+
+### JAR-47 verified v2 guest recovery point
+
+JAR-47 corrected the worker's Home Assistant SQLite staging sources from the retired `/home/smarthome/docker/home-assistant` tree to `/srv/rotom/appdata/smarthome/home-assistant`; the former root-owned worker is retained as `/usr/local/sbin/rotom-restic-backup.pre-jar47-20260929-1725`. The controlled run created snapshot `aedd8e57` at `2026-09-29 17:28 PDT`, tag `automatic`, with the existing `7 daily / 4 weekly / 12 monthly` retention/prune policy. It covers `/etc`, `/home`, `/root`, `/opt`, `/srv`, `/usr/local`, `/var/lib/docker/volumes`, and `/var/backups/system-info`; `/mnt` remains excluded.
+
+Application-aware evidence captured before the run included a current Home Assistant native backup, the Paperless supported export staging, a gzip-tested RomM MariaDB export, and stopped-state Palworld SaveGames archives with SHA-256 manifest under `/srv/rotom/backup-staging/gameserver/jar47-20260929`. `restic check` passed all 21 snapshots. A restricted non-secret restore of `aedd8e57` recovered 113.427 MiB, verified both Palworld archive checksums, restored the Paperless manifest, and passed `PRAGMA quick_check` on the restored Home Assistant SQLite database; its scratch tree was removed afterwards.
+
+For NAS-resident data, UniFi Drive snapshots are enabled on all drives. Media is verified daily at 12:00 AM UNAS local time with a retention limit of 16 snapshots. `Media/library`, including `library/games`, is authoritative and receives this local rollback protection; `Media/torrents` is transient/reproducible. Paperless remains VM-local and `nas-documents` is reserved/empty. Snapshots are a separate recovery layer from guest Restic but share the UNAS failure domain and are not off-site protection.
 
 JAR-42 stores the current Palworld Compose definitions under `/srv/rotom/stacks/gameserver` and authoritative local world/runtime trees under `/srv/rotom/appdata/gameserver`; both `/srv` locations are within the established guest Restic source scope. The ticket's controlled validation did not run a backup, retention, prune, or restore. The timer was verified enabled/active, but a fresh post-JAR-42 snapshot-path verification is intentionally deferred to the broader JAR-47 recovery policy or a dedicated recovery task. At Jared's explicit request on 2026-09-29, the legacy `/home/game/docker/palworld-server-*` rollback trees were retired after mount/current-v2-path verification; `/mnt/nas-gameserver` is not used for live worlds.
 

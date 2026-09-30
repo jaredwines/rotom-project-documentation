@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-09-29 — JAR-72 Homepage application-card organization verified
+**Documentation updated:** 2026-09-29 — JAR-47 final recovery verification recorded
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -53,6 +53,7 @@ JAR-72 reorganized Homepage cards without changing monitoring behavior or any ap
 - Docker/containerd remain enabled. Current intended runtime is 16 container objects / 14 running because both Palworld containers are intentionally stopped; their worlds remain preserved.
 - `rotom-nas-docker-recovery.service` remains the NAS-backed container recovery helper. Final post-reboot checks passed all twelve NFS automounts, both read-only bindfs views, qBittorrent sentinel, and qBittorrentVPN `wg0` `10.2.0.2/32`.
 - Guest Restic remains `rotom-restic-backup.service` / `.timer` around `03:00`, with manual `backup-restic-to-nas`; guest naming was intentionally not changed by JAR-68.
+- JAR-47 repaired the v2 Home Assistant SQLite staging path and verified snapshot `aedd8e57`; its restricted restore passed Palworld archive checksums and Home Assistant SQLite integrity. Media uses daily 12:00 AM UNAS-local snapshots with a 16-snapshot limit for authoritative library rollback.
 - JAR-71 Remote Desktop Commander is the native enabled `desktop-commander.service`, running outbound-only as `desktopcmd` with `UMask=0077`, `NoNewPrivileges=true`, and `PrivateTmp=true`. It has no Docker, NAS, proxy, DNS, or inbound-listener dependency; `/home/desktopcmd/workspace` is its only intended writable work area.
 - Weekly Linux update script remains present but the reboot-capable cron schedule remains absent unless separately recommissioned.
 
@@ -454,7 +455,7 @@ The Homebridge container-name typo was corrected on 2026-09-19 from `homebrige` 
 
 Phase B virtualization is accepted, guest Restic automation has been recommissioned under the normalized names, Proxmox host-config Restic is commissioned at `04:00`, and JAR-67 native Proxmox VZDump scheduling remains active. Remaining maintenance/automation items are deliberately separated by state:
 
-- **Verified / commissioned:** guest `rotom-restic-backup.timer` is enabled/active on the daily `03:00` schedule; current verified snapshot is `f666d63c`, and post-run `restic check` passed 21/21 snapshots.
+- **Verified / commissioned:** guest `rotom-restic-backup.timer` is enabled/active on the daily `03:00` schedule; JAR-47 snapshot `aedd8e57` completed after v2 application-aware staging, and `restic check` passed 21/21 snapshots.
 - **Needs Verification — first post-rename Restic scheduled run:** the timer has a populated next trigger, but the first timer-triggered run under `rotom-restic-backup.timer` has not yet been observed. Manual execution of the same privileged implementation is verified.
 - **Verified / commissioned:** PVE host-config Restic manual/service execution, rename, snapshot cleanup, and repository integrity are verified; `pve-restic-backup.timer` is enabled/active for daily `04:00`, and current surviving snapshot is `35d4b0c2`.
 - **Needs Verification — future unattended PVE Restic run:** a future timer-triggered execution under final `pve-restic-backup.timer` may be observed for operational evidence.

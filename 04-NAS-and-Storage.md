@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-28 — current host header corrected to canonical PVE `pve`; JAR-68 storage state retained
+**Documentation updated:** 2026-09-29 — JAR-47 Media snapshot policy verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -25,9 +25,13 @@ This document records the current Phase B storage architecture and preserves the
 
 The original audit was read-only. It did not recursively enumerate the NAS, modify mounts or permissions, restart containers, inspect secrets, traverse Restic repository internals, or create a hardlink test file. Later user-supplied checks, completed media GID changes, and the 2026-09-18 backup-share access-protection deployment are recorded below; they are separate from that audit. Unchanged capacity, mount, and systemd observations retain their original evidence dates.
 
-## 2. Current Storage State — 2026-09-28 JAR-68 final
+## 2. Current Storage State — 2026-09-29 JAR-47 final recovery policy
 
 The Rotom guest storage contract remains unchanged: twelve NFS systemd automounts plus read-only Media/Game bindfs compatibility views. PVE has only backup-specific NAS mounts; it does not host the guest application shares.
+
+### NAS protection classification — JAR-47
+
+UniFi Drive snapshots are enabled for every NAS drive. The supplied Media settings evidence records a **daily 12:00 AM UNAS-local** snapshot schedule with a **16-snapshot** limit. `Media/library` (including `library/games`) is authoritative NAS data and uses this snapshot policy for local rollback. `Media/torrents` is transient/reproducible payload and is deliberately outside the authoritative-library claim. The current Documents, Gameserver, Downloads, Customapps, Filesync, Auth, Web, Smarthome, and Infra reserved shares may remain empty; empty boundaries are not represented as backup-protected data. Paperless remains VM-local, so `nas-documents` has no current authoritative Paperless content. Snapshot retention protects against ordinary deletion/corruption but remains on the same UNAS appliance and is not off-site protection.
 
 ### PVE host-config Restic storage
 
@@ -75,7 +79,7 @@ Seven JAR-6 service shares remain boundary-only. JAR-21 activated the Downloads 
 
 JAR-52 copied, without deletion, `/mnt/nas-game/library/games/{pc,roms}` to `/mnt/nas-media/library/games/{pc,roms}`. The target directories are owned `995:5000`, mode `2775`, with setgid, so the retained Gamarr UID 995 uses the Media primary storage GID 5000. The one-file source and target inventories were each 223,408,925 bytes and their SHA-256 manifests matched. Gamarr now binds only the Media games directory at its unchanged in-container library root `/game/library/games`; the existing read-only downloader torrent view remains at `/game/torrents`.
 
-The old Game library remains available and unmodified as rollback material; no Palworld save, `/mnt/nas-gameserver` path, qBittorrentVPN bind, downloader payload, or NAS export was changed. Both the Media and Game mounts had 4.1 TiB free at verification. Guest Restic still excludes `/mnt`, so this content move does not itself prove NAS-side snapshots, replication, or a distinct recovery point; that protection-policy boundary remains for JAR-47.
+The old Game library remains available and unmodified as rollback material; no Palworld save, `/mnt/nas-gameserver` path, qBittorrentVPN bind, downloader payload, or NAS export was changed. Both the Media and Game mounts had 4.1 TiB free at verification. Guest Restic excludes `/mnt`; JAR-47 subsequently established the separate Media snapshot policy described above.
 
 ### JAR-56 Media torrent topology — 2026-09-28
 
