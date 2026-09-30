@@ -118,7 +118,6 @@
 # CURRENT GUEST RUNTIME/STORAGE/IDENTITY TOPOLOGY — 2026-09-27 REFRESH
 # /etc/
 #   fstab                          current Restic entry -> Rotom_Restic_Backup/.data at /mnt/nas-rotom-restic-backup
-#   fstab.pre-restic-share-cutover.20260926-235232  rollback copy from immediately before Restic mount cutover
 #   docker/daemon.json             root-owned; global json-file 10m x 3
 #   restic/include.txt             restored; /mnt remains outside host Restic scope
 #   restic/exclude.txt             restored
@@ -131,11 +130,9 @@
 #     rotom-restic-backup.service              current oneshot; RequiresMountsFor=/mnt/nas-rotom-restic-backup; ExecStart=/usr/local/sbin/rotom-restic-backup
 #     rotom-restic-backup.timer                ENABLED/ACTIVE; daily 03:00; Persistent=true; RandomizedDelaySec=10m
 #     rotom-restic-backup-status-api.service   enabled/active; TCP 8787; Homepage /backup-status
-#     unas-backup.service.pre-restic-share-cutover.20260926-235232  historical rollback copy; old name intentionally preserved
 # /usr/local/
 #   sbin/rotom-nas-docker-recovery       current helper; uses /mnt/nas-downloaders and compatibility views
 #   sbin/rotom-restic-backup             current root-protected backup implementation; repository /mnt/nas-rotom-restic-backup/rotom-restic-backup
-#   sbin/backup-to-unas.pre-restic-share-cutover.20260926-235232  historical rollback copy; old name intentionally preserved
 #   sbin/rotom-restic-backup-status-api  current root-protected status API
 #   sbin/weekly-linux-update             restored script; cron not installed
 #   bin/backup-restic-to-nas             current shared manual launcher

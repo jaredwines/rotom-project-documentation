@@ -57,6 +57,13 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — Retire superseded Rotom backup rollback copies
+
+- **Implemented / Verified:** With Jared's explicit authorization, retired two superseded `rpd` helper copies and ten inactive legacy Restic/backup rollback copies: historical `update-to-nas` sudoers, `unas-backup` units/status API, legacy backup helpers, and the pre-Restic-share-cutover fstab copy. Each had a current replacement and no active reference.
+- **Verified:** The current RPD helper/check remained healthy before and after the helper-copy removal. The active `rotom-restic-backup.timer` and `rotom-restic-backup-status-api.service` remain active; current fstab, worker, units, and status API files remain present; no failed systemd unit was reported.
+- **Scope:** No Restic repository/snapshot, NAS data, current backup staging, credential, policy, timer schedule, or active recovery control was changed.
+- **Documentation updated:** `08-Rotom-Directory-Tree.txt` removes the now-retired rollback-copy paths from the current filesystem topology.
+
 ## 2026-09-29 — JAR-51 legacy migration-artifact retirement
 
 - **Implemented / Verified:** After read-only dependency and recovery review, retired the inactive `286 MiB` Smart Home rollback tree `/home/smarthome/docker` and four inactive root-owned rollback copies: `/etc/fstab.pre-jar55-20260928`, `/etc/systemd/system/rotom-downloads-game-ro.service.pre-jar35-20260928`, `/usr/local/sbin/rotom-restic-backup.pre-jar47-20260929-1725`, and `/usr/local/sbin/rotom-nas-docker-recovery.pre-jar35-20260928`.
