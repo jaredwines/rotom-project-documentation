@@ -8,7 +8,7 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-09-29; JAR-57 portable VM restore test recorded.
+# Documentation revised: 2026-09-29; JAR-74 safe weekly maintenance recorded.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the RPD.
 #
@@ -34,6 +34,9 @@
 # /etc/systemd/system/pve-restic-backup.timer  enabled/active; daily 04:00; Persistent=true; AccuracySec=1min
 # /usr/local/sbin/pve-backup-status-api         read-only schedule-status API; /health and PVE Restic/Rotom VM status endpoints
 # /etc/systemd/system/pve-backup-status-api.service  enabled/active; LAN-only 192.168.1.68:8789
+# /usr/local/sbin/weekly-host-maintenance       root:root 0750; JAR-74 locked safe weekly maintenance worker
+# /etc/systemd/system/pve-weekly-maintenance.service
+# /etc/systemd/system/pve-weekly-maintenance.timer enabled/active; Sunday 00:30; Persistent=true; AccuracySec=1min; RandomizedDelaySec=0
 # /var/backups/pve-restic-recovery/          canonical reconstruction staging tree
 # /mnt/nas-pve-restic-backup/                NFS PVE_Restic_Backup/.data
 #   pve-restic-backup/                       Restic repo ID 8ca0218c645dc2968c2b21d67dbda3840794d8bc9c157c0515a85af30eb3d0e3
@@ -130,10 +133,13 @@
 #     rotom-restic-backup.service              current oneshot; RequiresMountsFor=/mnt/nas-rotom-restic-backup; ExecStart=/usr/local/sbin/rotom-restic-backup
 #     rotom-restic-backup.timer                ENABLED/ACTIVE; daily 03:00; Persistent=true; RandomizedDelaySec=10m
 #     rotom-restic-backup-status-api.service   enabled/active; TCP 8787; Homepage /backup-status
+#     rotom-weekly-maintenance.service          JAR-74 root oneshot; ExecStart=/usr/local/sbin/weekly-host-maintenance
+#     rotom-weekly-maintenance.timer            ENABLED/ACTIVE; Sunday 01:15; Persistent=true; AccuracySec=1min; RandomizedDelaySec=0
 # /usr/local/
 #   sbin/rotom-nas-docker-recovery       current helper; uses /mnt/nas-downloaders and compatibility views
 #   sbin/rotom-restic-backup             current root-protected backup implementation; repository /mnt/nas-rotom-restic-backup/rotom-restic-backup
 #   sbin/rotom-restic-backup-status-api  current root-protected status API
+#   sbin/weekly-host-maintenance          root:root 0750; locked safe weekly maintenance worker
 #   sbin/weekly-linux-update             restored script; cron not installed
 #   bin/backup-restic-to-nas             current shared manual launcher
 # /var/lib/docker/

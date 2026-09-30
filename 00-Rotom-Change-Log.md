@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — JAR-74 safe weekly PVE and Rotom maintenance
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Installed the root-owned `0750` `/usr/local/sbin/weekly-host-maintenance` worker and host-specific oneshot services/timers: PVE runs Sundays at `00:30`; Rotom runs Sundays at `01:15`. Both timers are enabled with `Persistent=true`, one-minute accuracy, and no randomized delay, preserving the existing 03:00 guest Restic, 04:00 PVE Restic, and 05:00 VM VZDump sequence. The worker takes a nonblocking lock, writes its lifecycle to the system journal, blocks on failed units, less than 10 GiB free space, active relevant backup work, inactive PVE storage, or unhealthy running Rotom Docker containers, and waits up to ten minutes for APT locks. It performs normal `apt-get upgrade` only—never autoremove or automatic reboot—and limits cleanup to APT downloads, existing tmpfiles rules, archived journals over 500 MiB, plus dangling images only on Rotom. It never prunes containers, volumes, networks, NAS data, snapshots, Restic state, or application data. A `REBOOT REQUIRED` result is journaled for a planned window rather than acted upon.
+- **Evidence:** The enabled PVE timer reports its next run as Sunday 2026-10-04 00:30 PDT; its manual run passed preflight, upgraded eight normal packages, applied only the stated cleanup, retained 57 GiB free, reported no reboot required, and exited `Result=success` / `ExecMainStatus=0`. The enabled Rotom timer reports Sunday 2026-10-04 01:15 PDT; its final manual run passed preflight, upgraded three normal packages, reclaimed no dangling-image or journal space, retained 32 GiB free, found all intended running containers healthy, reported no reboot required, and exited successfully with no failed units. The PVE service's `pvesm` storage check passed internally; Jared's later interactive `pvesm` invocation failed only because `/usr/sbin` is absent from that interactive shell's PATH.
+- **Outstanding:** None for JAR-74. The pre-existing `pve-cpu-temp-api.service` special-`nobody` verification warning and tmpfiles duplicate `/run/lock` warning are unrelated to this maintenance service.
+
 ## 2026-09-29 — Retire final verified Rotom staging and Compose rollback copies
 
 - **Implemented / Verified:** With Jared's explicit authorization, retired Phase C staging copies under `/home/jared/.phasec-jar34` and `.phasec-jar35`, their Network/Runtime/fstab copies, the superseded Codex instruction copy, and four inactive Media Compose rollback copies for Radarr, Sonarr, and Gamarr.
