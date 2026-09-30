@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-09-29 — JAR-75 Filesync Syncthing deployment
+**Documentation updated:** 2026-09-29 — JAR-75 rollback artifacts retired
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -56,6 +56,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-09-29 — Retire JAR-75 Syncthing rollback artifacts
+
+- **Files changed:** `00-Rotom-Change-Log.md`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** At Jared's direction, removed only the six JAR-75 rollback/temporary files: the two local Syncthing configuration snapshots, the Syncthing Compose rollback copy, NPM database snapshot, Homepage configuration snapshot, and temporary known-hosts file. Current Syncthing configuration/database and all production data were preserved.
+- **Evidence:** No active configuration reference remained before removal. Afterwards Syncthing and Homepage were healthy, `https://syncthing.rotom.casa` returned HTTP `200` through NPM, and no failed systemd units were reported.
+- **Outstanding:** None.
 
 ## 2026-09-29 — JAR-75 Filesync Syncthing deployment
 
