@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — Adopt Codex SSH and PVE execution lanes
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`.
+- **Status:** **Documentation only / Adopted operational policy.**
+- **Changes:** Adopted the operational division of responsibility: Codex performs routine Rotom inspection and authorized changes through the `rotom` SSH alias as `jared`, using `sudo` only when needed; Jared manually executes every PVE check and change through `pve` from paste-ready, ticket-specific command blocks supplied by Codex. Each PVE block must distinguish preflight, targeted action, and verification, and Jared's output is the PVE evidence source.
+- **Evidence:** Jared explicitly selected this execution model. Existing Mac key-only aliases for both `rotom` and `pve` are recorded as verified; this documentation update does not change SSH keys, account privileges, PVE, or Rotom.
+- **Outstanding:** A future Rotom task must establish that Codex can use the `rotom` alias non-interactively before relying on the agent-operated lane; failure is a reported access blocker, not permission to fall back to PVE or change SSH configuration.
+
 ## 2026-09-29 — Retire empty Downloads NAS boundary
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `08-Rotom-Directory-Tree.txt`.
