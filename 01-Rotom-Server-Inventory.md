@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-29 — JAR-45 Web v2 convergence verified
+**Documentation updated:** 2026-09-29 — JAR-47 final recovery policy verified
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -45,7 +45,8 @@ The accepted Phase B architecture now uses **PVE** as the product abbreviation a
 | Palworld | `palworld-server-jared` and `palworld-server-fran` intentionally stopped, not dead/restarting/OOM; `unless-stopped`; active worlds/saves reverified and preserved |
 | qBittorrentVPN | Running; fail-closed design retained; `wg0` verified `10.2.0.2/32`; Downloader sentinel and NAS mounts verified |
 | Guest NAS | Twelve fstab-backed systemd automounts plus read-only Media/Game bindfs compatibility views; post-reboot verification passed |
-| Guest Restic | Canonical guest layer unchanged: `/mnt/nas-rotom-restic-backup/rotom-restic-backup`, `rotom-restic-backup*`, manual `backup-restic-to-nas` |
+| JAR-47 recovery policy | Final four-layer model: application-aware artifacts, guest Restic, separate PVE VM VZDump, and UNAS local snapshots for authoritative NAS Media. All layers remain on the same UNAS appliance where applicable; snapshots are rollback protection, not off-site protection. |
+| Guest Restic | Canonical repository `/mnt/nas-rotom-restic-backup/rotom-restic-backup`; `rotom-restic-backup*`; snapshot `aedd8e57` (2026-09-29 17:28 PDT) is the verified v2 recovery point after the Smart Home staging correction; retention is 7 daily / 4 weekly / 12 monthly. |
 | PVE host-config Restic | NAS `PVE_Restic_Backup/.data`; mount `/mnt/nas-pve-restic-backup`; repo `/mnt/nas-pve-restic-backup/pve-restic-backup`; repo ID `8ca0218c645dc2968c2b21d67dbda3840794d8bc9c157c0515a85af30eb3d0e3`; worker/unit/timer `pve-restic-backup*`; staging `/var/backups/pve-restic-recovery`; timer enabled/active daily `04:00`; retention `7 daily / 4 weekly / 12 monthly` |
 | PVE Restic current recovery point | Snapshot `35d4b0c2`, host `pve`, path `/var/backups/pve-restic-recovery`; pre-rename `0cf1c62a` and `3db28d41` deliberately forgotten; subsequent `restic check` found no errors |
 | Whole-VM backup | NAS `Rotom_VM_Backup/.data`; PVE storage `nas-rotom-vm-backup`; mount `/mnt/pve/nas-rotom-vm-backup`; launcher `backup-rotom-vm-to-nas`; service/worker `rotom-vm-vzdump-manual*`; job `rotom-vm-daily` enabled at `05:00`, `repeat-missed=0`, retention `7 daily / 4 weekly / 6 monthly` |
