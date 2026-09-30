@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — Retire empty Downloads NAS boundary
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Retired the distinct empty UNAS `Downloads` drive and its unused Rotom `/mnt/nas-downloads` fstab/systemd-automount contract. The local mountpoint was removed after the mount was stopped. This does not affect active `Downloader/.data` at `/mnt/nas-downloaders`, or the retained `Game` rollback library.
+- **Evidence:** A final mounted inspection found `Downloads/.data` contained 0 bytes and no entries; the supplied configuration-reference scan found no active workload reference. The exact fstab entry was removed, its generated automount was absent after daemon reload, the local directory was removed, `Downloader/.data` remained mounted, and `systemctl --failed` reported zero failed units. Jared then confirmed deletion of the empty NAS drive.
+- **Outstanding:** `Game` remains retained rollback material and was not changed.
+
 ## 2026-09-29 — JAR-49 Intel Quick Sync passthrough commissioning
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `08-Rotom-Directory-Tree.txt`.

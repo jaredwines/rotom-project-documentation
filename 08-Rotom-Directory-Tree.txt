@@ -8,7 +8,7 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-09-29; JAR-49 Intel QSV passthrough commissioned.
+# Documentation revised: 2026-09-29; empty Downloads NAS boundary retired.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the RPD.
 #
@@ -22,6 +22,7 @@
 # - JAR-48/JAR-72: Homepage baseline dashboard includes UNAS ICMP reachability (192.168.1.70) and authoritative Media NFS capacity through Glances (`fs:/mnt/host-root/mnt/nas-media`). Documents, immediately below Hosted Websites, contains Paperless and private Rotom Docs; Docs has no HTTP monitor, preserving its trusted-LAN boundary. Media cards are Jellyfin/Radarr/Sonarr/Gamarr/Prowlarr/RomM; Downloader, immediately above NAS Storage, contains qBittorrent. No notification delivery or Uptime Kuma component is configured; rollback copies are `services.yaml.pre-jar48-20260928-201236`, `services.yaml.pre-jar72-20260929-2224`, `services.yaml.pre-jar72-followup-20260929-2235`, `services.yaml.pre-jar72-romm-20260929-2238`, and `services.yaml.pre-jar72-section-order-20260929-2240`.
 # - JAR-10: RomM/MariaDB/Valkey are deployed at `/srv/rotom/stacks/media/romm`; all mutable state and verified logical export are local below `/srv/rotom/appdata/media/romm`, protected inputs are under `secrets/media/romm`, and `/mnt/nas-media/library/games` is read-only in RomM. NPM uses loopback `8081` for `romm.rotom.casa`.
 # - JAR-49: active Jellyfin Compose labels resolve to `/home/media/docker/jellyfin/compose.yaml`, not the existing `/srv/rotom/stacks/media/jellyfin` directory. Jellyfin maps `/dev/dri` and guest groups `44`/`992`, uses QSV on `/dev/dri/renderD128`, and has a verified live `h264_qsv` transcode. Other Media module locations were not re-audited by JAR-49.
+# - 2026-09-29: the distinct empty NAS `Downloads` drive and unused `/mnt/nas-downloads` guest contract were retired after a mounted zero-byte/no-reference inspection. Active `Downloader` storage and retained `Game` rollback data are unchanged.
 # - JAR-5: private `rotom-docs` static portal is deployed at `/srv/rotom/stacks/infra/rotom-docs`, with controlled derived source and generated site under `/srv/rotom/appdata/infra/rotom-docs`. Its root-owned publisher permits only RPD members `00`–`08`; NPM routes `docs.rotom.casa` through loopback `8082` and allows only loopback plus the trusted LAN.
 # - JAR-42: Palworld Jared and Fran Compose roots are `/srv/rotom/stacks/gameserver/palworld-{jared,fran}` (local commit `50bb937`); current local state is `/srv/rotom/appdata/gameserver/palworld-{jared,fran}` and protected environment files are under `/srv/rotom/secrets/gameserver`. Both containers are intentionally stopped after controlled health/readiness validation. Their private networks retain Jared `172.27.0.0/16` and Fran `172.25.0.0/16`; `/mnt/nas-gameserver` is not a live-world mount. `/home/game/docker/palworld-server-*` remains rollback material.
 # - JAR-56: qBittorrentVPN production Compose is `/srv/rotom/stacks/downloader/qbittorrentvpn/compose.yaml`, appdata is `/srv/rotom/appdata/downloader/qbittorrentvpn`, and active payload is `/mnt/nas-media/torrents`; former `/home/downloaders/docker/qbittorrentvpn` and `/mnt/nas-downloaders/torrents` remain rollback material. `/usr/local/sbin/rotom-qbittorrent-media-guard` with matching service/timer checks Media NFS/sentinel every 15 seconds and stops qBittorrentVPN on a missing mount. Authenticated application-import/seeding validation is Jared's deferred manual follow-up.
@@ -175,9 +176,11 @@
 # /home/game, /home/downloaders, /home/apps
 #   JAR-35 retained compatibility homes after identities became gameserver,
 #   downloader, and customapps respectively; numeric ownership is unchanged.
-# /mnt/nas-gameserver, /mnt/nas-downloads, /mnt/nas-customapps
-#   JAR-55 empty reserved NFSv3/service-GID boundaries; active compatibility
-#   /mnt/nas-game, /mnt/nas-downloaders, and /mnt/nas-apps remain unchanged.
+# /mnt/nas-gameserver, /mnt/nas-customapps
+#   JAR-55 empty reserved NFSv3/service-GID boundaries. The separate empty
+#   `/mnt/nas-downloads` / NAS `Downloads` drive was retired 2026-09-29;
+#   active compatibility `/mnt/nas-game`, `/mnt/nas-downloaders`, and
+#   `/mnt/nas-apps` remain unchanged.
 # /srv/rotom/stacks/NETWORKING.md
 #   JAR-36 tracked Compose contract for external rotom-proxy, rotom-arr, and
 #   rotom-monitoring bridges; the networks initially have no containers.
@@ -235,7 +238,7 @@
 #     rotom-linux-home-server-backup-restore-kit/  copied legacy restore documentation from old share; not a self-contained recovery bundle
 #   nas-rotom-backup/         RETIRED NFS path; unmounted/no active backup config reference; inert local directory may remain; old NAS share retained rollback-only
 #   nas-shared-drive/  NFSv3 Shared_Drive/.data; root 988:988 mode 0770
-# - Current downloader correction: live fstab/generated unit/findmnt/showmount all use Downloader/.data. Historical Downloads/.data records below remain dated evidence.
+# - Current downloader correction: live fstab/generated unit/findmnt/showmount all use Downloader/.data. The distinct empty `Downloads` NAS drive and `/mnt/nas-downloads` guest contract were retired 2026-09-29; historical `Downloads/.data` records below remain dated evidence.
 # - All twelve current canonical NFS paths remain fstab/systemd automounts using _netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s; the Restic member is now nas-rotom-restic-backup rather than nas-rotom-backup.
 # - JAR-31 reboot: first NAS recovery invocation failed at Media readiness; systemd retry about 30s later succeeded and recovered qBittorrentVPN, Radarr, Sonarr, Gamarr, Jellyfin.
 #

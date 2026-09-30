@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-29 — JAR-49 Intel QSV passthrough commissioned
+**Documentation updated:** 2026-09-29 — empty Downloads NAS boundary retired
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -42,7 +42,7 @@ The accepted Phase B architecture now uses **PVE** as the product abbreviation a
 | JAR-8 Paperless | Paperless-ngx v3.2.1, PostgreSQL 18, and Valkey 9 run from `/srv/rotom/stacks/documents/paperless`; all mutable state is VM-local under Documents appdata and the web service uses `rotom-proxy` plus loopback NPM compatibility routing. `paperless.rotom.casa` is externally verified through the retained NPM route. |
 | JAR-71 Remote Desktop Commander | Native outbound-only `desktop-commander.service` runs as locked, dedicated `desktopcmd` (`1001:1001`). Its `0700` home holds pinned agent `0.2.52`, the sole writable workspace, and sensitive pairing state; it has no sudo, Docker, service-group, NAS, proxy, DNS, or inbound-listener access. |
 | Rotom v2 filesystem foundation | JAR-34 created `/srv/rotom` as an empty, root-administered v2 namespace. `stacks/` and `scripts/` are locally Git-versioned declarative content; `appdata/` contains service-owned empty domain roots; `secrets/` and `backup-staging/` are root-only. Existing `/home/<service>/docker` workloads remain authoritative compatibility paths until their owning Phase D migrations. |
-| Reserved v2 NAS boundaries | JAR-55 added empty `Gameserver`, `Downloads`, and `Customapps` exports as `/mnt/nas-gameserver`, `/mnt/nas-downloads`, and `/mnt/nas-customapps`. They use the established nofail automount/NFSv3 contract and do not replace active `Game`, `Downloader`, or `Apps` compatibility storage. |
+| Reserved v2 NAS boundaries | `Gameserver` and `Customapps` remain empty reserved exports as `/mnt/nas-gameserver` and `/mnt/nas-customapps`. On 2026-09-29, the separate empty `Downloads` drive plus its unused `/mnt/nas-downloads` fstab/automount and local mountpoint were retired after live empty/reference checks. This did not affect active `Game`, `Downloader`, or `Apps` compatibility storage. |
 | Palworld | `palworld-server-jared` and `palworld-server-fran` intentionally stopped, not dead/restarting/OOM; `unless-stopped`; active worlds/saves reverified and preserved |
 | qBittorrentVPN | Running; fail-closed design retained; `wg0` verified `10.2.0.2/32`; Downloader sentinel and NAS mounts verified |
 | Guest NAS | Twelve fstab-backed systemd automounts plus read-only Media/Game bindfs compatibility views; post-reboot verification passed |
@@ -168,7 +168,7 @@ The adopted access policy keeps `jared` outside the media group. Administer medi
 
 All twelve canonical **guest** NFS mountpoints remain guest fstab/systemd automounts. The PVE-only `/mnt/nas-pve-restic-backup` automount is an additional host backup path and does not change the guest twelve-mount count. The 2026-09-27 post-boot audit freshly verified all twelve generated `.automount` units active and the current NFS sources, including `Downloader/.data` and `Rotom_Restic_Backup/.data`. JAR-31 additionally restored the two bindfs compatibility views and the targeted NAS/Docker recovery helper; fresh Media/Game traversal checks again passed. The former `/mnt/nas-rotom-backup` export is no longer part of current Rotom configuration: it is unmounted and the old NAS `Rotom_Home_Server_Backup` share is retained only as rollback data. The mounted `/mnt/nas-rotom-restic-backup` NFS root freshly verified as numeric `988:988` mode `0700`. The audit did not isolate the underlying local directory while fully unmounted, so its local-directory mode remains non-authoritative unless separately checked.
 
-Historical JAR-21/JAR-29 records name `/mnt/nas-downloads` and/or `Downloads/.data`; those remain historical recovery evidence. Current live fstab, generated mount unit, active NFS source, and `showmount` identify `/mnt/nas-downloaders -> Downloader/.data`.
+Historical JAR-21/JAR-29 records name `/mnt/nas-downloads` and/or `Downloads/.data`; those remain historical recovery evidence. Current live fstab, generated mount unit, active NFS source, and `showmount` identify `/mnt/nas-downloaders -> Downloader/.data`. The distinct empty `Downloads` drive and `/mnt/nas-downloads` guest contract were retired on 2026-09-29 after a mounted zero-byte inspection and no-reference scan; they must not be confused with the active singular `Downloader/.data` share.
 
 ### JAR-22 pre-migration audit baseline — 2026-09-22
 
