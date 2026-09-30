@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-29 — stale Apps mount retired; Customapps retained
+**Documentation updated:** 2026-09-29 — unused Auth account and guest boundary retired
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -38,7 +38,7 @@ The accepted Phase B architecture now uses **PVE** as the product abbreviation a
 | JAR-43 Smart Home v2 | Home Assistant and Homebridge run from independent modules under `/srv/rotom/stacks/smarthome`, with authoritative mutable state under `/srv/rotom/appdata/smarthome`. They retain host networking for discovery and the established NPM compatibility routes. JAR-51 retired the inactive prior `/home/smarthome/docker/{home-assistant,homebridge}` rollback trees after reference and service validation; `/mnt/nas-smarthome` remains an unused reserved boundary. |
 | JAR-45 Web v2 | Aloha Millworks runs from `/srv/rotom/stacks/web` with site content under `/srv/rotom/appdata/web` and joins `rotom-proxy`; its `7778` listener remains the required compatibility upstream for retained host-networked NPM. Jared Wines is migrated to v2 state/Compose but remains intentionally unstarted and unpublished. The former legacy Web trees were explicitly retired on 2026-09-29. |
 | JAR-44 Documents foundation | `/srv/rotom/stacks/documents/DOMAIN-CONTRACT.md` defines the future Paperless contract: Documents `900:5004`, VM-local appdata and secrets, `rotom-proxy` web expectations, and a reserved non-authoritative NAS boundary. No document app or data is deployed. |
-| JAR-46 Future domains | Tracked `filesync`, `customapps`, and `auth` contracts define identities, local appdata/secrets, reserved NAS authority, proxy expectations, and recovery-review triggers; no workloads are deployed. |
+| JAR-46 Future domains | Tracked `filesync`, `customapps`, and `auth` contracts define v2 local appdata/secrets, proxy expectations, and recovery-review triggers; no workloads are deployed. The former Auth Linux account and NAS boundary were retired on 2026-09-29. |
 | JAR-8 Paperless | Paperless-ngx v3.2.1, PostgreSQL 18, and Valkey 9 run from `/srv/rotom/stacks/documents/paperless`; all mutable state is VM-local under Documents appdata and the web service uses `rotom-proxy` plus loopback NPM compatibility routing. `paperless.rotom.casa` is externally verified through the retained NPM route. |
 | JAR-71 Remote Desktop Commander | Native outbound-only `desktop-commander.service` runs as locked, dedicated `desktopcmd` (`1001:1001`). Its `0700` home holds pinned agent `0.2.52`, the sole writable workspace, and sensitive pairing state; it has no sudo, Docker, service-group, NAS, proxy, DNS, or inbound-listener access. |
 | Rotom v2 filesystem foundation | JAR-34 created `/srv/rotom` as an empty, root-administered v2 namespace. `stacks/` and `scripts/` are locally Git-versioned declarative content; `appdata/` contains service-owned empty domain roots; `secrets/` and `backup-staging/` are root-only. Existing `/home/<service>/docker` workloads remain authoritative compatibility paths until their owning Phase D migrations. |
@@ -73,7 +73,6 @@ ChatGPT-controlled browser work is not part of the Rotom administration or docum
 | web | Aloha Millworks active; Jared Wines project retained but intentionally undeployed |
 | filesync | Service-account skeleton reserved for future synchronization workloads; built-in Linux `sync` remains untouched |
 | customapps | Service-account skeleton reserved for future application workloads; compatibility home `/home/apps` retained |
-| auth | Service-account skeleton reserved for future authentication workloads |
 | desktopcmd | Dedicated non-human Remote Desktop Commander identity; only `/home/desktopcmd/workspace` is its intended writable work area; no service-storage role or NAS mount |
 | jared | Interactive administrator with full sudo; Fran's pre-migration administrator identity is preserved but not yet recreated in the VM |
 
@@ -94,7 +93,6 @@ The ten storage-facing service accounts retain their JAR-29 numeric identity con
 | web | 902 : 5006 | `/mnt/nas-web` | Aloha active; Jared Wines intentionally undeployed |
 | filesync | 903 : 5007 | `/mnt/nas-filesync` | Restored storage boundary; no application deployed |
 | customapps | 904 : 5008 | `/mnt/nas-customapps` | Reserved storage boundary; no application deployed; compatibility home `/home/apps` retained |
-| auth | 905 : 5009 | `/mnt/nas-auth` | Restored storage boundary; no application deployed |
 
 All ten service-home shortcuts remain `/home/<service>/nas-<service> -> /mnt/nas-<service>`, including `/home/downloaders/nas-downloaders` and the deliberate compatibility exception `/home/apps/nas-customapps -> /mnt/nas-customapps` for `customapps`. Backup and Shared Drive remain separate root-controlled mounts. Fran is not yet recreated in the new VM.
 
@@ -152,7 +150,6 @@ The adopted access policy keeps `jared` outside the media group. Administer medi
 | `/mnt/nas-web` | Web service share; root `988:5006` mode `2770`; website content remains local under `/home/web` |
 | `/mnt/nas-filesync` | Filesync service share; root `988:5007` mode `2770`; no application deployed |
 | `/mnt/nas-customapps` | NFSv3 `Customapps/.data`; root `988:5008` mode `2770`; reserved `customapps` boundary; compatibility home `/home/apps` retained |
-| `/mnt/nas-auth` | Auth service share; root `988:5009` mode `2770`; no application deployed |
 | `/mnt/nas-rotom-restic-backup` | NFSv3 `Rotom_Restic_Backup/.data`; mounted share root `988:988` mode `0700`; canonical repository `/mnt/nas-rotom-restic-backup/rotom-restic-backup`; current verified snapshot `f666d63c`; `rotom-restic-backup.timer` enabled/active |
 | `/mnt/nas-pve-restic-backup` *(PVE host only)* | NFSv3 `PVE_Restic_Backup/.data`; systemd automount from PVE `/etc/fstab`; canonical repository `/mnt/nas-pve-restic-backup/pve-restic-backup` (repo ID `8ca0218c645dc2968c2b21d67dbda3840794d8bc9c157c0515a85af30eb3d0e3`); staging `/var/backups/pve-restic-recovery`; current snapshot `35d4b0c2`; `pve-restic-backup.timer` enabled/active for `04:00` |
 | `/mnt/nas-shared-drive` | NFSv3 Shared Drive; contains JAR-25 raw NVMe rollback image; outside host Restic because `/mnt` is excluded |

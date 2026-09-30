@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; final JAR-68 post-reboot state is 16 container objects / 14 intended running with both Palworld servers intentionally stopped
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-29 — stale Apps mount retired; Customapps retained
+**Documentation updated:** 2026-09-29 — unused Auth account and guest boundary retired
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -318,7 +318,7 @@ JAR-6 added **no Docker integration** for the eight new service NAS shares. No r
 
 ## 7. Shared Docker Architecture and Storage Notes
 
-- The current Compose inventory follows `/home/<account>/docker/<service>/compose.yaml` across six active workload-owner directories: `infra`, `media`, `game`, `smarthome`, `downloaders`, and `web`. The additional service-account homes (`documents`, `filesync`, `customapps` at compatibility path `/home/apps`, and `auth`) currently have no deployed application workload.
+- The current Compose inventory follows `/home/<account>/docker/<service>/compose.yaml` across six active workload-owner directories: `infra`, `media`, `game`, `smarthome`, `downloaders`, and `web`. The additional service-account homes (`documents`, `filesync`, and `customapps` at compatibility path `/home/apps`) currently have no deployed application workload. The former `auth` account/home and NAS boundary were retired on 2026-09-29.
 - JAR-22 records 16 running containers and 16 total container objects. `jaredwines.com` has a retained Compose project at `/home/web/docker/jaredwines.com/compose.yaml` but no current container object. `glances` shares the Homepage Compose stack at `/home/infra/docker/homepage/compose.yaml`.
 - Published mappings include both IPv4 and IPv6 bindings for most mapped services. Glances shows an IPv4 loopback binding only. These listings do not establish firewall rules, router forwarding, or external reachability.
 - The original container/path inventories alone do not establish volumes, networks, environment variables, dependencies, VPN behavior, or reverse-proxy routing. Later evidence adds the media identity settings and mounts above; use 03 and 04 for separately audited network and storage details. Full current Compose contents still need inspection before editing any service.
@@ -338,7 +338,6 @@ Production workloads are restored under the current service-account layout. The 
 | web | `902:5006` | `/mnt/nas-web` | Aloha active; Jared Wines retained but intentionally undeployed |
 | filesync | `903:5007` | `/mnt/nas-filesync` | Storage boundary only |
 | customapps | `904:5008` | `/mnt/nas-customapps` | Reserved storage boundary only; compatibility home `/home/apps` |
-| auth | `905:5009` | `/mnt/nas-auth` | Storage boundary only |
 
 Current application restores use `/home/<service>/docker/<project>` with the exception that the historical consumer-facing bindfs names `/mnt/nas-downloads-media-ro` and `/mnt/nas-downloads-game-ro` are deliberately retained for compatibility while sourcing current `/mnt/nas-downloaders`. The active qBittorrent sentinel is under `/mnt/nas-downloaders/.rotom-qbt-nas-ready`.
 
