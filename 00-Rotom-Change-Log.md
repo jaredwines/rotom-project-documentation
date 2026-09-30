@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-09-29 — Jared PVE backup-launcher access and journal visibility recorded
+**Documentation updated:** 2026-09-29 — NAS Auth drive retirement confirmed
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -57,13 +57,21 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — Confirm NAS Auth drive retirement
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `04-NAS-and-Storage.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Verified.**
+- **Changes:** Recorded Jared's confirmation that the NAS `Auth` drive was deleted, completing the Auth account and guest-boundary retirement recorded below.
+- **Evidence:** Jared explicitly confirmed the deletion. Rotom had already verified that no `auth` account, `/home/auth`, `/mnt/nas-auth`, Auth fstab/automount contract, or `Auth/.data` NFS export remained.
+- **Outstanding:** None. Retained `Customapps` remains unchanged and must not be deleted.
+
 ## 2026-09-29 — Retire unused Auth account and guest boundary
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
-- **Status:** **Implemented / Verified** for Rotom and the NFS export; NAS UI deletion remains unverified.
+- **Status:** **Implemented / Verified** for Rotom and the NFS export; NAS UI deletion was then unverified.
 - **Changes:** Retired the unused `auth` Linux account/group (`905:5009`), its default-only `/home/auth` tree and `nas-auth` shortcut, plus the `Auth/.data -> /mnt/nas-auth` fstab/automount contract and local mountpoint. The separate `Customapps` identity and reserved mount remain unchanged.
 - **Evidence:** No auth-owned process, deployed workload, Docker mount, or operational configuration reference was found. The Auth export was unavailable; `showmount` lists `Customapps/.data` but no `Auth/.data`. After targeted removal, the account/group/home/mountpoint and fstab entry were absent, Jellyfin remained up, and `systemctl --failed` reported zero failed units.
-- **Outstanding:** Confirm NAS-side deletion of the `Auth` drive if it still appears in UniFi Drive; do not remove `Customapps`.
+- **Outstanding:** NAS-side deletion confirmation was pending at the time; it is recorded in the newer entry above. `Customapps` remains retained and must not be deleted.
 
 ## 2026-09-29 — Retire stale Apps mount; retain Customapps boundary
 
