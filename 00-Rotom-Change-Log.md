@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — Retire unused Auth account and guest boundary
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified** for Rotom and the NFS export; NAS UI deletion remains unverified.
+- **Changes:** Retired the unused `auth` Linux account/group (`905:5009`), its default-only `/home/auth` tree and `nas-auth` shortcut, plus the `Auth/.data -> /mnt/nas-auth` fstab/automount contract and local mountpoint. The separate `Customapps` identity and reserved mount remain unchanged.
+- **Evidence:** No auth-owned process, deployed workload, Docker mount, or operational configuration reference was found. The Auth export was unavailable; `showmount` lists `Customapps/.data` but no `Auth/.data`. After targeted removal, the account/group/home/mountpoint and fstab entry were absent, Jellyfin remained up, and `systemctl --failed` reported zero failed units.
+- **Outstanding:** Confirm NAS-side deletion of the `Auth` drive if it still appears in UniFi Drive; do not remove `Customapps`.
+
 ## 2026-09-29 — Retire stale Apps mount; retain Customapps boundary
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.

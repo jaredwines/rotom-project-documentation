@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-09-29 — Codex SSH and PVE execution lanes adopted
+**Documentation updated:** 2026-09-29 — unused Auth account and guest boundary retired
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -204,7 +204,7 @@ No active Home Assistant YAML configuration for email, Telegram, Discord, Slack,
 
 ### JAR-48 baseline dashboard monitoring — 2026-09-28
 
-Homepage's `Rotom Monitoring` section uses Glances v4 through Docker DNS on `rotom-monitoring` for Rotom system information, CPU, memory, container activity, local disk I/O and capacity, and host network traffic. It now includes **Media NAS Storage**, the authoritative Glances filesystem metric `fs:/mnt/host-root/mnt/nas-media`, and **UNAS Reachability**, an IPv4 ICMP check to `192.168.1.70`. The active Media and Downloader mounts are NFSv3 runtime dependencies; empty reserved `nas-auth`, `nas-customapps`, and `nas-gameserver` shares intentionally have no checks.
+Homepage's `Rotom Monitoring` section uses Glances v4 through Docker DNS on `rotom-monitoring` for Rotom system information, CPU, memory, container activity, local disk I/O and capacity, and host network traffic. It now includes **Media NAS Storage**, the authoritative Glances filesystem metric `fs:/mnt/host-root/mnt/nas-media`, and **UNAS Reachability**, an IPv4 ICMP check to `192.168.1.70`. The active Media and Downloader mounts are NFSv3 runtime dependencies; empty reserved `nas-customapps` and `nas-gameserver` shares intentionally have no checks. The former Auth account/mount was retired on 2026-09-29.
 
 Homepage retains active HTTPS/internal site monitors for Nginx Proxy Manager, Arcane, Home Assistant, and Homebridge; backup-status and PVE temperature/backup-status cards remain read-only. The scope is visibility only: no Uptime Kuma component, alert destination, notification delivery, external credential, or unattended alert policy is configured. The retained rollback artifact is `/srv/rotom/appdata/infra/homepage/config/services.yaml.pre-jar48-20260928-201236`; it can restore the prior dashboard configuration without affecting workloads.
 

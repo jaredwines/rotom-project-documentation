@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-29 — stale Apps mount retired; Customapps retained
+**Documentation updated:** 2026-09-29 — unused Auth account and guest boundary retired
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -31,7 +31,7 @@ The Rotom guest storage contract remains unchanged: twelve NFS systemd automount
 
 ### NAS protection classification — JAR-47
 
-UniFi Drive snapshots are enabled for every NAS drive. The supplied Media settings evidence records a **daily 12:00 AM UNAS-local** snapshot schedule with a **16-snapshot** limit. `Media/library` (including `library/games`) is authoritative NAS data and uses this snapshot policy for local rollback. `Media/torrents` is transient/reproducible payload and is deliberately outside the authoritative-library claim. The current Documents, Gameserver, Customapps, Filesync, Auth, Web, Smarthome, and Infra reserved shares may remain empty; empty boundaries are not represented as backup-protected data. Paperless remains VM-local, so `nas-documents` has no current authoritative Paperless content. Snapshot retention protects against ordinary deletion/corruption but remains on the same UNAS appliance and is not off-site protection.
+UniFi Drive snapshots are enabled for every NAS drive. The supplied Media settings evidence records a **daily 12:00 AM UNAS-local** snapshot schedule with a **16-snapshot** limit. `Media/library` (including `library/games`) is authoritative NAS data and uses this snapshot policy for local rollback. `Media/torrents` is transient/reproducible payload and is deliberately outside the authoritative-library claim. The current Documents, Gameserver, Customapps, Filesync, Web, Smarthome, and Infra reserved shares may remain empty; empty boundaries are not represented as backup-protected data. Paperless remains VM-local, so `nas-documents` has no current authoritative Paperless content. Snapshot retention protects against ordinary deletion/corruption but remains on the same UNAS appliance and is not off-site protection.
 
 ### PVE host-config Restic storage
 
@@ -59,6 +59,10 @@ The separate `Downloads/.data` drive was mounted for final inspection and contai
 ### Retired stale `Apps` guest boundary; retained `Customapps` — 2026-09-29
 
 Live account evidence identifies the service identity as `customapps` (`904:5008`) with compatibility home `/home/apps`. The separate obsolete `Apps/.data -> /mnt/nas-apps` target was unavailable, had no workload configuration reference beyond fstab, and was the sole failed mount unit. Its fstab/automount contract, empty local mountpoint, and stale `/home/apps/nas-apps` shortcut were removed. `/home/apps/nas-customapps` now points to the retained empty `Customapps/.data` export at `/mnt/nas-customapps`, which mounted successfully. Jared confirmed the NAS `Apps` drive was deleted; do not remove `Customapps`.
+
+### Retired unused `Auth` account and guest boundary — 2026-09-29
+
+The unused `auth` account/group (`905:5009`) had only a default-profile home and `nas-auth` shortcut, no process, workload, Docker mount, or operational configuration consumer. Its unavailable `Auth/.data -> /mnt/nas-auth` fstab/automount contract, local mountpoint, account/group, and home were removed. `showmount` no longer lists `Auth/.data` while the retained `Customapps/.data` export remains present. NAS UI deletion of the Auth drive remains unverified; do not remove `Customapps`.
 
 The old PVE backup share names are no longer part of active PVE configuration. Historical sections below may preserve their dated names as evidence.
 
