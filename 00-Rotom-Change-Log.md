@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — JAR-49 Intel Quick Sync passthrough commissioning
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Enabled PVE `intel_iommu=on` while retaining `i915.enable_dc=0`, then attached the NUC Iris Plus Graphics 655 (`0000:00:02.0`) to VMID 100 as optional `hostpci0: 0000:00:02.0,pcie=1`. Rotom exposes the GPU at `01:00.0` as `/dev/dri/card1` and `renderD128`; active Jellyfin Compose is `/home/media/docker/jellyfin/compose.yaml`, maps `/dev/dri`, and adds guest video/render GIDs `44`/`992`. Jellyfin is configured for QSV at `/dev/dri/renderD128`. The portable VM baseline remains valid without this host attachment: remove `hostpci0` and Jellyfin's device/group mappings to use software transcoding on replacement hardware. A live Compose-label inspection found that the existing `/srv/rotom/stacks/media/jellyfin` directory is not the active Jellyfin project; this corrects the earlier JAR-40 Jellyfin-path claim only and does not infer the active paths of other Media services.
+- **Evidence:** IOMMU group 0 isolates `0000:00:02.0`; after attachment PVE reports `vfio-pci`, while Rotom reports the Intel `i915` device and `/dev/dri/renderD128`. Jellyfin's bundled FFmpeg exposes QSV; its LinuxServer startup added device access to the existing `127:5000` service identity. A forced real Jellyfin H.264 transcode initialized Intel `iHD`/VA-API at `renderD128`, used `h264_qsv`, and exited `0`. A complete PVE reboot retained the IOMMU command line, `hostpci0`, VFIO binding, VM autostart, Rotom GPU devices, mounts, Jellyfin mapping, and zero failed guest units; the existing NAS recovery helper completed successfully after the transient boot-time mount race.
+- **Outstanding:** Coffee Lake QSV supports H.264 and HEVC 8/10-bit but not AV1; H.264 High 10 and HEVC RExt remain software paths. Low-Power encoding and VPP tone mapping remain intentionally disabled because HuC firmware was not commissioned. The active paths of Radarr, Sonarr, Prowlarr, and Gamarr were not re-audited by this ticket.
+
 ## 2026-09-29 — JAR-74 safe weekly PVE and Rotom maintenance
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
