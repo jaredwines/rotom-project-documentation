@@ -57,6 +57,13 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — JAR-51 legacy migration-artifact retirement
+
+- **Implemented / Verified:** After read-only dependency and recovery review, retired the inactive `286 MiB` Smart Home rollback tree `/home/smarthome/docker` and four inactive root-owned rollback copies: `/etc/fstab.pre-jar55-20260928`, `/etc/systemd/system/rotom-downloads-game-ro.service.pre-jar35-20260928`, `/usr/local/sbin/rotom-restic-backup.pre-jar47-20260929-1725`, and `/usr/local/sbin/rotom-nas-docker-recovery.pre-jar35-20260928`.
+- **Verified:** No current stack, systemd unit, or fstab reference used the Smart Home tree or four files. Current replacements existed; both v2 Smart Home Compose files parsed; Home Assistant and Homebridge remained running; the active Downloader compatibility services and Restic timer remained active; and no failed systemd unit was reported.
+- **Retained intentionally:** `/srv/rotom/backup-staging` remains current JAR-47 recovery material. `/mnt/nas-game`, `/mnt/nas-apps`, and `/mnt/nas-downloaders` remain active compatibility/mount dependencies; authoritative NAS Game/Downloader data and the unrelated Codex rollout-migrations directory were not touched.
+- **Documentation updated:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, and `08-Rotom-Directory-Tree.txt` now distinguish the retired Smart Home/worker rollback artifacts from retained current recovery material.
+
 ## 2026-09-29 — JAR-50 disaster-recovery rehearsal closeout
 
 - **Verified:** The accepted evidence set combines JAR-57's isolated VZDump restore/console boot and cleanup with JAR-47's restricted Restic restore, Home Assistant SQLite `PRAGMA quick_check`, Paperless export-manifest recovery, and stopped-state Palworld SaveGames checksum validation. No production workload, production IP, or production data was overwritten during those exercises.

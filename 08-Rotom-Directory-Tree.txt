@@ -193,8 +193,7 @@
 #       Homepage monitoring: extra_hosts pins rotom/nginx/arcane/home-assistant/homebridge names to 192.168.1.69; guest backup widget -> http://192.168.1.69:8787/backup-status; PVE Restic/Rotom VM schedule widgets -> http://192.168.1.68:8789/pve-restic-backup-status and /rotom-vm-backup-status; Disk Usage -> disk:sda; CPU Temperature -> Glances URL http://192.168.1.68:8788 metric sensor:Package id 0 with charting; JAR-48 Media NAS Storage -> Glances fs:/mnt/host-root/mnt/nas-media and UNAS Reachability -> IPv4 ICMP 192.168.1.70. No alert destination is configured.
 #     docker/nginx-proxy-manager/   ACTIVE
 #   smarthome/   126:5003  mode 0750  -> nas-smarthome -> /mnt/nas-smarthome
-#     docker/home-assistant/        JAR-43 retained local rollback tree
-#     docker/homebridge/            JAR-43 retained local rollback tree
+#     docker/{home-assistant,homebridge}/ JAR-51 legacy rollback trees retired after current-v2 validation
 #   documents/   900:5004  mode 0750  -> nas-documents -> /mnt/nas-documents
 #   downloaders/ 901:5005  mode 0750  -> nas-downloaders -> /mnt/nas-downloaders
 #     docker/prowlarr/              ACTIVE
