@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-09-30 — PVE web UI NPM route and Homepage management card verified
+**Documentation updated:** 2026-09-30 — Jared Wines Homepage card restored
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -56,6 +56,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-09-30 — Restore Jared Wines Homepage card
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Restored the existing **Jared Wines** card in Homepage's **Hosted Websites** section with its established `https://jaredwines.com` link and `siteMonitor`. The card is presentation/monitoring configuration only; the retained Jared Wines Compose module was not started and no NPM, DNS, TLS, container, or content change was made.
+- **Evidence:** Homepage became healthy and returned local HTTP `200` after the targeted card restore. The public Jared Wines request returned HTTP `502`, matching the intended unstarted/no-container state.
+- **Outstanding:** The card will report the target unavailable until Jared Wines is deliberately deployed; this task did not change that deployment decision.
 
 ## 2026-09-30 — PVE web UI NPM route and Homepage card
 
