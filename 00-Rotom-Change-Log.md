@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-30 — JAR-73 high-signal alerting
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Deployed Uptime Kuma 2 at `/srv/rotom/stacks/infra/uptime-kuma`, with VM-local SQLite state and only `127.0.0.1:3002 -> 3001`; NPM serves authenticated `https://uptime.rotom.casa` with WebSockets and Homepage links to it. Root-only Rotom and PVE alert workers send Pushover alerts for backup result/staleness, Media NFS, qBittorrent safety-stop, and local disk thresholds. Healthchecks external heartbeats cover Rotom, PVE, and the monitoring stack. `rotom-alerting maintenance {rotom|pve|monitoring|all} MINUTES` pauses selected external checks with automatic resume.
+- **Evidence:** Kuma health, loopback-only listener, NPM TLS route, Homepage, zero failed Rotom units, and all Healthchecks endpoints were verified. Rotom and PVE Pushover tests, Healthchecks Pushover down/recovery, and a one-minute PVE maintenance pause/resume were confirmed on the iPhone.
+- **Outstanding:** Uptime Kuma is an authenticated administrative dashboard; no public status page is enabled.
+
 ## 2026-09-29 — Retire JAR-75 Syncthing rollback artifacts
 
 - **Files changed:** `00-Rotom-Change-Log.md`.
