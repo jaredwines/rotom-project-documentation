@@ -57,6 +57,12 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — Retire superseded PVE rollback copies
+
+- **Implemented / Verified:** With Jared's explicit authorization, retired inactive PVE rollback copies `/etc/fstab.pre-proxmox-restic-backup.20260927-152218`, `/etc/network/interfaces.pre-wol`, and `/etc/network/interfaces.pre-e1000e-offload-20260927` after confirming the active fstab/network replacements exist, differ as historical copies should, and have no active reference.
+- **Verified:** PVE remained `running` with zero failed units; `pve-restic-backup.timer` remained active; `local`, `local-lvm`, and `nas-rotom-vm-backup` storage were active. No active PVE network configuration, backup worker, Restic repository/snapshot, VZDump archive, or recovery staging data was changed.
+- **Documentation updated:** `06-Maintenance-and-Automation.md` retains the historical WOL/offload implementation evidence but records that its temporary pre-change copies are no longer retained.
+
 ## 2026-09-29 — Retire superseded Rotom backup rollback copies
 
 - **Implemented / Verified:** With Jared's explicit authorization, retired two superseded `rpd` helper copies and ten inactive legacy Restic/backup rollback copies: historical `update-to-nas` sudoers, `unas-backup` units/status API, legacy backup helpers, and the pre-Restic-share-cutover fstab copy. Each had a current replacement and no active reference.
