@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-09-29 — NAS Auth drive retirement confirmed
+**Documentation updated:** 2026-09-29 — JAR-75 Filesync Syncthing deployment
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -56,6 +56,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-09-29 — JAR-75 Filesync Syncthing deployment
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Deployed Syncthing `2.0.0` from `/srv/rotom/stacks/filesync/syncthing/compose.yaml` as `903:5007`. Its persistent local configuration/database is `/srv/rotom/appdata/filesync/syncthing`; its only payload bind is `/mnt/nas-filesync -> /filesync`, with `create_host_path: false`. The GUI requires configured authentication, listens only on `127.0.0.1:8384`, and is served by NPM at `https://syncthing.rotom.casa` with forced TLS. The container uses `restart: unless-stopped`, an image healthcheck, a private default network, and `rotom-proxy`; it has no privileged mode, added capabilities, Docker socket, or other NAS bind. Syncthing folder policy is trash-can versioning: recovery versions reside in each synchronized folder's `.stversions`; NAS payload recovery depends on the UNAS snapshot policy and remains outside guest Restic. The disposable acceptance peer and test files were removed.
+- **Evidence:** Live NFS was `rw`, `988:5007`, mode `2770`, and writable by `filesync`; Compose rendered the non-creating bind; container health and restart persistence passed; GUI authentication persisted; listener inspection showed loopback-only `8384`; the NPM TLS route returned HTTP `200`; Restic includes `/srv` and excludes `/mnt`; zero failed systemd units and unaffected production containers were observed. A disposable peer test confirmed receipt on the actual Filesync NFS filesystem; further bidirectional testing was explicitly skipped by Jared.
+- **Outstanding:** Syncthing has no production folder or peer yet. Before authoritative payload is added, confirm the applicable UNAS snapshot retention/recovery policy remains appropriate; guest Restic protects local configuration, not `/mnt/nas-filesync` payloads.
 
 ## 2026-09-29 — Confirm NAS Auth drive retirement
 

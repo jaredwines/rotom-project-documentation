@@ -161,8 +161,10 @@
 #     site/                          generated static portal output; served read-only
 #   stacks/documents/DOMAIN-CONTRACT.md JAR-44 Paperless deployment/recovery contract; no Compose placeholder
 #   stacks/documents/paperless/compose.yaml JAR-8 Paperless/PostgreSQL/Valkey stack
-#   stacks/{filesync,customapps,auth}/DOMAIN-CONTRACT.md JAR-46 future-domain contracts; no Compose placeholders
+#   stacks/filesync/syncthing/compose.yaml JAR-75 Syncthing 2.0.0; numeric 903:5007; loopback-only 8384 for NPM; sole NAS bind /mnt/nas-filesync -> /filesync with create_host_path:false
+#   stacks/{customapps,auth}/DOMAIN-CONTRACT.md JAR-46 future-domain contracts; no Compose placeholders
 #   appdata/<domain>/                service-owned mutable state; migrated domains have owning state trees
+#     filesync/syncthing/             JAR-75 persistent Syncthing configuration/database; included in guest Restic /srv source
 #     smarthome/home-assistant/       JAR-43 authoritative Home Assistant state
 #     smarthome/homebridge/           JAR-43 authoritative Homebridge state
 #     web/alohamillworks.com/          JAR-45 authoritative Aloha content

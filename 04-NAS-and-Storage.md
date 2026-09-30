@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-29 — unused Auth account and guest boundary retired
+**Documentation updated:** 2026-09-29 — JAR-75 Filesync Syncthing storage boundary deployed
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -31,7 +31,7 @@ The Rotom guest storage contract remains unchanged: twelve NFS systemd automount
 
 ### NAS protection classification — JAR-47
 
-UniFi Drive snapshots are enabled for every NAS drive. The supplied Media settings evidence records a **daily 12:00 AM UNAS-local** snapshot schedule with a **16-snapshot** limit. `Media/library` (including `library/games`) is authoritative NAS data and uses this snapshot policy for local rollback. `Media/torrents` is transient/reproducible payload and is deliberately outside the authoritative-library claim. The current Documents, Gameserver, Customapps, Filesync, Web, Smarthome, and Infra reserved shares may remain empty; empty boundaries are not represented as backup-protected data. Paperless remains VM-local, so `nas-documents` has no current authoritative Paperless content. Snapshot retention protects against ordinary deletion/corruption but remains on the same UNAS appliance and is not off-site protection.
+UniFi Drive snapshots are enabled for every NAS drive. The supplied Media settings evidence records a **daily 12:00 AM UNAS-local** snapshot schedule with a **16-snapshot** limit. `Media/library` (including `library/games`) is authoritative NAS data and uses this snapshot policy for local rollback. `Media/torrents` is transient/reproducible payload and is deliberately outside the authoritative-library claim. Documents, Gameserver, Customapps, Web, Smarthome, and Infra reserved shares may remain empty; empty boundaries are not represented as backup-protected data. JAR-75 deploys Syncthing against the Filesync boundary, but it has no production folder or payload yet. Before Filesync content becomes authoritative, confirm its applicable UNAS snapshot retention/recovery policy; Syncthing uses trash-can versions in each folder's `.stversions` as an additional local recovery layer. Paperless remains VM-local, so `nas-documents` has no current authoritative Paperless content. Snapshot retention protects against ordinary deletion/corruption but remains on the same UNAS appliance and is not off-site protection.
 
 ### PVE host-config Restic storage
 
@@ -79,7 +79,7 @@ At the final pre-migration baseline, Rotom used one local NVMe system disk and N
 | `/mnt/nas-documents` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Documents/.data` | NFSv3 `sec=sys` | `988:5004` mode `2770` | Documents storage boundary; currently empty |
 | `/mnt/nas-downloads` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Downloads/.data` | NFSv3 `sec=sys` | `988:5005` mode `2770` | Active centralized torrent storage; canonical tree `/mnt/nas-downloads/torrents` |
 | `/mnt/nas-web` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Web/.data` | NFSv3 `sec=sys` | `988:5006` mode `2770` | Web storage boundary; websites remain local |
-| `/mnt/nas-filesync` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Filesync/.data` | NFSv3 `sec=sys` | `988:5007` mode `2770` | Filesync storage boundary; currently empty |
+| `/mnt/nas-filesync` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Filesync/.data` | NFSv3 `sec=sys` | `988:5007` mode `2770` | JAR-75 Syncthing's sole payload boundary; no production payload currently configured |
 | `/mnt/nas-apps` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Apps/.data` | NFSv3 `sec=sys` | `988:5008` mode `2770` | Apps storage boundary; currently empty |
 | `/mnt/nas-auth` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Auth/.data` | NFSv3 `sec=sys` | `988:5009` mode `2770` | Auth storage boundary; currently empty |
 | `/mnt/nas-rotom-backup` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Rotom_Home_Server_Backup/.data` | NFSv3 | `988:988` mode `0700` | Restic repository and recovery material |

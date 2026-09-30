@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Restic backup architecture, scope, retention, verification, restore evidence, and recovery boundaries  
 **Recovery scope:** pre-migration Rotom plus current Proxmox/VM foundation  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-29 — unused Auth account and guest boundary retired
+**Documentation updated:** 2026-09-29 — JAR-75 Filesync Syncthing recovery boundary recorded
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -68,7 +68,7 @@ JAR-45 places current Aloha Millworks and retained Jared Wines website content u
 
 JAR-44 defines the Documents domain before Paperless deployment. Future database, broker, index, configuration, exports, and originals remain VM-local under `/srv/rotom/appdata/documents` until an authoritative-media decision and recovery test exists; `/mnt/nas-documents` is reserved only. Generic `/srv` inclusion does not substitute for future Paperless application-aware backup/restore validation. A read-only inspection also found the guest backup worker's Home Assistant SQLite staging still points to the pre-JAR-43 path; JAR-47 owns its safe reconciliation and verification.
 
-JAR-46 defines Filesync, Customapps, and Auth as future v2 local domains. Their future local appdata is within `/srv`, but generic inclusion does not establish application consistency or a NAS recovery claim. The unused Auth Linux account and NAS boundary were retired on 2026-09-29; future authoritative NAS data requires a protection/recovery review before use.
+JAR-75 implements the Filesync domain with Syncthing. Its configuration/database is VM-local at `/srv/rotom/appdata/filesync/syncthing`, within the established `/srv` guest Restic source; the current worker includes `/srv` and excludes `/mnt`. Thus guest Restic protects the local Syncthing identity/configuration but does **not** protect synchronized Filesync payloads at `/mnt/nas-filesync`. Syncthing's per-folder trash-can versioning preserves deleted/overwritten content under `.stversions`; before any Filesync payload is treated as authoritative, confirm the applicable UNAS snapshot retention and recovery policy. The unused Auth Linux account and NAS boundary were retired on 2026-09-29.
 
 JAR-8 Paperless state, PostgreSQL, Valkey, media, exports, and consume paths are VM-local under `/srv/rotom/appdata/documents/paperless`; NAS Documents is unused. A supported local export was produced into protected `/srv/rotom/backup-staging/documents/paperless`, but it is not yet in a verified guest Restic snapshot. JAR-47 must first repair the shared Smart Home SQLite staging discrepancy before a guest backup run.
 
