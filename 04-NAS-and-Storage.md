@@ -62,7 +62,7 @@ Live account evidence identifies the service identity as `customapps` (`904:5008
 
 ### Retired unused `Auth` account and guest boundary — 2026-09-29
 
-The unused `auth` account/group (`905:5009`) had only a default-profile home and `nas-auth` shortcut, no process, workload, Docker mount, or operational configuration consumer. Its unavailable `Auth/.data -> /mnt/nas-auth` fstab/automount contract, local mountpoint, account/group, and home were removed. `showmount` no longer lists `Auth/.data` while the retained `Customapps/.data` export remains present. NAS UI deletion of the Auth drive remains unverified; do not remove `Customapps`.
+The unused `auth` account/group (`905:5009`) had only a default-profile home and `nas-auth` shortcut, no process, workload, Docker mount, or operational configuration consumer. Its unavailable `Auth/.data -> /mnt/nas-auth` fstab/automount contract, local mountpoint, account/group, and home were removed. `showmount` no longer lists `Auth/.data` while the retained `Customapps/.data` export remains present. Jared confirmed the NAS `Auth` drive was deleted; do not remove `Customapps`.
 
 The old PVE backup share names are no longer part of active PVE configuration. Historical sections below may preserve their dated names as evidence.
 
