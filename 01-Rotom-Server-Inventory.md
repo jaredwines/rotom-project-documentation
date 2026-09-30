@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-29 — Codex SSH and PVE execution lanes adopted
+**Documentation updated:** 2026-09-29 — stale Apps mount retired; Customapps retained
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -42,7 +42,7 @@ The accepted Phase B architecture now uses **PVE** as the product abbreviation a
 | JAR-8 Paperless | Paperless-ngx v3.2.1, PostgreSQL 18, and Valkey 9 run from `/srv/rotom/stacks/documents/paperless`; all mutable state is VM-local under Documents appdata and the web service uses `rotom-proxy` plus loopback NPM compatibility routing. `paperless.rotom.casa` is externally verified through the retained NPM route. |
 | JAR-71 Remote Desktop Commander | Native outbound-only `desktop-commander.service` runs as locked, dedicated `desktopcmd` (`1001:1001`). Its `0700` home holds pinned agent `0.2.52`, the sole writable workspace, and sensitive pairing state; it has no sudo, Docker, service-group, NAS, proxy, DNS, or inbound-listener access. |
 | Rotom v2 filesystem foundation | JAR-34 created `/srv/rotom` as an empty, root-administered v2 namespace. `stacks/` and `scripts/` are locally Git-versioned declarative content; `appdata/` contains service-owned empty domain roots; `secrets/` and `backup-staging/` are root-only. Existing `/home/<service>/docker` workloads remain authoritative compatibility paths until their owning Phase D migrations. |
-| Reserved v2 NAS boundaries | `Gameserver` and `Customapps` remain empty reserved exports as `/mnt/nas-gameserver` and `/mnt/nas-customapps`. On 2026-09-29, the separate empty `Downloads` drive plus its unused `/mnt/nas-downloads` fstab/automount and local mountpoint were retired after live empty/reference checks. This did not affect active `Game`, `Downloader`, or `Apps` compatibility storage. |
+| Reserved v2 NAS boundaries | `Gameserver` and `Customapps` remain empty reserved exports as `/mnt/nas-gameserver` and `/mnt/nas-customapps`; `customapps` (`904:5008`) deliberately retains compatibility home `/home/apps`. On 2026-09-29, the separate empty `Downloads` drive and the stale unavailable `Apps` guest contract were retired after live checks. This did not affect active `Game`, `Downloader`, or Customapps storage. |
 | Palworld | `palworld-server-jared` and `palworld-server-fran` intentionally stopped, not dead/restarting/OOM; `unless-stopped`; active worlds/saves reverified and preserved |
 | qBittorrentVPN | Running; fail-closed design retained; `wg0` verified `10.2.0.2/32`; Downloader sentinel and NAS mounts verified |
 | Guest NAS | Twelve fstab-backed systemd automounts plus read-only Media/Game bindfs compatibility views; post-reboot verification passed |
@@ -93,10 +93,10 @@ The ten storage-facing service accounts retain their JAR-29 numeric identity con
 | downloaders | 901 : 5005 | `/mnt/nas-downloaders` | Active Prowlarr/qBittorrentVPN owner; current backing export `Downloader/.data`; qBittorrent `wg0` verified after reboot |
 | web | 902 : 5006 | `/mnt/nas-web` | Aloha active; Jared Wines intentionally undeployed |
 | filesync | 903 : 5007 | `/mnt/nas-filesync` | Restored storage boundary; no application deployed |
-| apps | 904 : 5008 | `/mnt/nas-apps` | Restored storage boundary; no application deployed |
+| customapps | 904 : 5008 | `/mnt/nas-customapps` | Reserved storage boundary; no application deployed; compatibility home `/home/apps` retained |
 | auth | 905 : 5009 | `/mnt/nas-auth` | Restored storage boundary; no application deployed |
 
-All ten service-home shortcuts remain `/home/<service>/nas-<service> -> /mnt/nas-<service>`, including `/home/downloaders/nas-downloaders`. Backup and Shared Drive remain separate root-controlled mounts. Fran is not yet recreated in the new VM.
+All ten service-home shortcuts remain `/home/<service>/nas-<service> -> /mnt/nas-<service>`, including `/home/downloaders/nas-downloaders` and the deliberate compatibility exception `/home/apps/nas-customapps -> /mnt/nas-customapps` for `customapps`. Backup and Shared Drive remain separate root-controlled mounts. Fran is not yet recreated in the new VM.
 
 ### Preserved pre-migration identities and NAS separation
 
@@ -151,7 +151,7 @@ The adopted access policy keeps `jared` outside the media group. Administer medi
 | `/mnt/nas-downloads-game-ro` | Active read-only bindfs compatibility view sourced from `/mnt/nas-downloaders` for Game applications |
 | `/mnt/nas-web` | Web service share; root `988:5006` mode `2770`; website content remains local under `/home/web` |
 | `/mnt/nas-filesync` | Filesync service share; root `988:5007` mode `2770`; no application deployed |
-| `/mnt/nas-apps` | Apps service share; root `988:5008` mode `2770`; no application deployed |
+| `/mnt/nas-customapps` | NFSv3 `Customapps/.data`; root `988:5008` mode `2770`; reserved `customapps` boundary; compatibility home `/home/apps` retained |
 | `/mnt/nas-auth` | Auth service share; root `988:5009` mode `2770`; no application deployed |
 | `/mnt/nas-rotom-restic-backup` | NFSv3 `Rotom_Restic_Backup/.data`; mounted share root `988:988` mode `0700`; canonical repository `/mnt/nas-rotom-restic-backup/rotom-restic-backup`; current verified snapshot `f666d63c`; `rotom-restic-backup.timer` enabled/active |
 | `/mnt/nas-pve-restic-backup` *(PVE host only)* | NFSv3 `PVE_Restic_Backup/.data`; systemd automount from PVE `/etc/fstab`; canonical repository `/mnt/nas-pve-restic-backup/pve-restic-backup` (repo ID `8ca0218c645dc2968c2b21d67dbda3840794d8bc9c157c0515a85af30eb3d0e3`); staging `/var/backups/pve-restic-recovery`; current snapshot `35d4b0c2`; `pve-restic-backup.timer` enabled/active for `04:00` |

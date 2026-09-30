@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-29 — empty Downloads NAS boundary retired
+**Documentation updated:** 2026-09-29 — stale Apps mount retired; Customapps retained
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -55,6 +55,10 @@ All twelve guest NFS automounts and both read-only bindfs views passed final pos
 ### Retired empty `Downloads` boundary — 2026-09-29
 
 The separate `Downloads/.data` drive was mounted for final inspection and contained 0 bytes with no entries. No active workload configuration referenced `/mnt/nas-downloads` or `Downloads/.data`. Its precise Rotom fstab entry, generated mount/automount, and empty local mountpoint were removed; Jared then deleted the empty NAS drive. This retirement does not affect active `Downloader/.data` at `/mnt/nas-downloaders`, or retained Game rollback data.
+
+### Retired stale `Apps` guest boundary; retained `Customapps` — 2026-09-29
+
+Live account evidence identifies the service identity as `customapps` (`904:5008`) with compatibility home `/home/apps`. The separate obsolete `Apps/.data -> /mnt/nas-apps` target was unavailable, had no workload configuration reference beyond fstab, and was the sole failed mount unit. Its fstab/automount contract, empty local mountpoint, and stale `/home/apps/nas-apps` shortcut were removed. `/home/apps/nas-customapps` now points to the retained empty `Customapps/.data` export at `/mnt/nas-customapps`, which mounted successfully. The unavailable Apps export is consistent with NAS removal, but NAS-side drive deletion remains unverified; do not remove `Customapps`.
 
 The old PVE backup share names are no longer part of active PVE configuration. Historical sections below may preserve their dated names as evidence.
 

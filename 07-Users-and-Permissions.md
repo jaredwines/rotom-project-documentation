@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-09-28 — current RPD/Codex/GitHub access model added; canonical PVE identity retained
+**Documentation updated:** 2026-09-29 — stale Apps mount retired; Customapps retained
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -26,6 +26,8 @@ This is the canonical detailed owner of Rotom account identity and permission fa
 
 **Current JAR-35 correction:** The final v2 service account names are `gameserver` (`995:5001`), `downloader` (`901:5005`), and `customapps` (`904:5008`). Their prior names `game`, `downloaders`, and `apps` are absent from NSS; no UID/GID, Docker-group membership, or ownership rewrite was performed. Their compatibility homes deliberately remain `/home/game`, `/home/downloaders`, and `/home/apps` until workload-specific migration. Current service processes resolve to the new account names because the underlying numeric identities were preserved.
 
+**Current Customapps storage correction — 2026-09-29:** `/home/apps` remains the deliberately retained compatibility home for `customapps`, but its obsolete `nas-apps` shortcut and the separate Apps mount were retired. The current reserved NAS boundary is `Customapps/.data -> /mnt/nas-customapps`, reached through `/home/apps/nas-customapps`; it remains empty and no application workload is deployed.
+
 Guest service-account identities and Docker-group policy remain unchanged. Docker group is package-created GID `989` with no members; administrative Docker use remains `sudo docker`. No permission broadening was introduced.
 
 | Layer/account | Verified current state |
@@ -39,7 +41,7 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 | documents | `900:5004`, `/home/documents` |
 | downloaders | `901:5005`, `/home/downloaders`; Prowlarr/qBittorrentVPN |
 | web | `902:5006`, `/home/web`; Aloha active; Jared Wines undeployed |
-| filesync/apps/auth | `903:5007`, `904:5008`, `905:5009` respectively |
+| filesync/customapps/auth | `903:5007`, `904:5008`, `905:5009` respectively; `customapps` retains compatibility home `/home/apps` |
 | desktopcmd | `1001:1001`, locked non-human account with `/home/desktopcmd` mode `0700`; Remote Desktop Commander only; no sudo, SSH authorized keys, Docker/socket, service-group, or NAS-specific access |
 | Docker group | GID `989`, no members |
 

@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — Retire stale Apps mount; retain Customapps boundary
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified** for Rotom; NAS-side Apps-drive deletion remains unverified.
+- **Changes:** Corrected current terminology to `customapps` (`904:5008`) while preserving its compatibility home `/home/apps`. Retired only the stale `Apps/.data -> /mnt/nas-apps` Rotom fstab/automount contract, local mountpoint, and `/home/apps/nas-apps` shortcut; replaced the shortcut with `/home/apps/nas-customapps -> /mnt/nas-customapps`. The separate empty `Customapps/.data` boundary remains mounted and reserved.
+- **Evidence:** Live `getent` identifies `customapps` with home `/home/apps`; `Customapps/.data` mounted successfully and was empty. The Apps export was unavailable, no workload configuration referenced either Apps or Customapps boundary beyond fstab, and the Apps mount was the sole failed unit. After targeted removal, `Customapps` remained mounted, the new compatibility shortcut was readable as `customapps`, Jellyfin remained up, and `systemctl --failed` reported zero failed units.
+- **Outstanding:** The unavailable Apps export is consistent with its NAS drive having already been removed, but no direct NAS-side deletion evidence was supplied. Confirm that the NAS `Apps` drive is deleted if it still appears in UniFi Drive; do not delete `Customapps`.
+
 ## 2026-09-29 — Adopt Codex SSH and PVE execution lanes
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`.

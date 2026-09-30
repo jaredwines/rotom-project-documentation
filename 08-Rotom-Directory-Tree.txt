@@ -8,7 +8,7 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-09-29; empty Downloads NAS boundary retired.
+# Documentation revised: 2026-09-29; stale Apps mount retired and Customapps retained.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the RPD.
 #
@@ -23,6 +23,7 @@
 # - JAR-10: RomM/MariaDB/Valkey are deployed at `/srv/rotom/stacks/media/romm`; all mutable state and verified logical export are local below `/srv/rotom/appdata/media/romm`, protected inputs are under `secrets/media/romm`, and `/mnt/nas-media/library/games` is read-only in RomM. NPM uses loopback `8081` for `romm.rotom.casa`.
 # - JAR-49: active Jellyfin Compose labels resolve to `/home/media/docker/jellyfin/compose.yaml`, not the existing `/srv/rotom/stacks/media/jellyfin` directory. Jellyfin maps `/dev/dri` and guest groups `44`/`992`, uses QSV on `/dev/dri/renderD128`, and has a verified live `h264_qsv` transcode. Other Media module locations were not re-audited by JAR-49.
 # - 2026-09-29: the distinct empty NAS `Downloads` drive and unused `/mnt/nas-downloads` guest contract were retired after a mounted zero-byte/no-reference inspection. Active `Downloader` storage and retained `Game` rollback data are unchanged.
+# - 2026-09-29: current identity `customapps` retains compatibility home `/home/apps`; stale unavailable `Apps/.data -> /mnt/nas-apps` fstab/automount, local mountpoint, and `nas-apps` shortcut were retired. Empty `Customapps/.data -> /mnt/nas-customapps` remains the reserved boundary through `/home/apps/nas-customapps`.
 # - JAR-5: private `rotom-docs` static portal is deployed at `/srv/rotom/stacks/infra/rotom-docs`, with controlled derived source and generated site under `/srv/rotom/appdata/infra/rotom-docs`. Its root-owned publisher permits only RPD members `00`–`08`; NPM routes `docs.rotom.casa` through loopback `8082` and allows only loopback plus the trusted LAN.
 # - JAR-42: Palworld Jared and Fran Compose roots are `/srv/rotom/stacks/gameserver/palworld-{jared,fran}` (local commit `50bb937`); current local state is `/srv/rotom/appdata/gameserver/palworld-{jared,fran}` and protected environment files are under `/srv/rotom/secrets/gameserver`. Both containers are intentionally stopped after controlled health/readiness validation. Their private networks retain Jared `172.27.0.0/16` and Fran `172.25.0.0/16`; `/mnt/nas-gameserver` is not a live-world mount. `/home/game/docker/palworld-server-*` remains rollback material.
 # - JAR-56: qBittorrentVPN production Compose is `/srv/rotom/stacks/downloader/qbittorrentvpn/compose.yaml`, appdata is `/srv/rotom/appdata/downloader/qbittorrentvpn`, and active payload is `/mnt/nas-media/torrents`; former `/home/downloaders/docker/qbittorrentvpn` and `/mnt/nas-downloaders/torrents` remain rollback material. `/usr/local/sbin/rotom-qbittorrent-media-guard` with matching service/timer checks Media NFS/sentinel every 15 seconds and stops qBittorrentVPN on a missing mount. Authenticated application-import/seeding validation is Jared's deferred manual follow-up.
@@ -179,8 +180,9 @@
 # /mnt/nas-gameserver, /mnt/nas-customapps
 #   JAR-55 empty reserved NFSv3/service-GID boundaries. The separate empty
 #   `/mnt/nas-downloads` / NAS `Downloads` drive was retired 2026-09-29;
-#   active compatibility `/mnt/nas-game`, `/mnt/nas-downloaders`, and
-#   `/mnt/nas-apps` remain unchanged.
+#   active compatibility `/mnt/nas-game` and `/mnt/nas-downloaders` remain
+#   unchanged. The stale unavailable `/mnt/nas-apps` boundary was retired
+#   2026-09-29; `customapps` uses `/mnt/nas-customapps`.
 # /srv/rotom/stacks/NETWORKING.md
 #   JAR-36 tracked Compose contract for external rotom-proxy, rotom-arr, and
 #   rotom-monitoring bridges; the networks initially have no containers.
@@ -208,7 +210,8 @@
 #   web/         902:5006  mode 0750  -> nas-web -> /mnt/nas-web
 #     docker/{alohamillworks.com,jaredwines.com}/ JAR-45 legacy rollback trees retired 2026-09-29
 #   filesync/    903:5007  mode 0750  -> nas-filesync -> /mnt/nas-filesync
-#   apps/        904:5008  mode 0750  -> nas-apps -> /mnt/nas-apps
+#   apps/        904:5008  mode 0750  customapps compatibility home
+#     nas-customapps -> /mnt/nas-customapps
 #   auth/        905:5009  mode 0750  -> nas-auth -> /mnt/nas-auth
 #   desktopcmd/  1001:1001 mode 0700  JAR-71 Remote Desktop Commander native identity
 #     app/                        pinned @wonderwhy-er/desktop-commander 0.2.52 installation
@@ -231,7 +234,7 @@
 #   nas-downloads-game-ro/   bindfs RO source /mnt/nas-downloaders; game compatibility view
 #   nas-web/           NFSv3 Web/.data; root 988:5006 mode 2770
 #   nas-filesync/      NFSv3 Filesync/.data; root 988:5007 mode 2770
-#   nas-apps/          NFSv3 Apps/.data; root 988:5008 mode 2770
+#   nas-customapps/    NFSv3 Customapps/.data; root 988:5008 mode 2770
 #   nas-auth/          NFSv3 Auth/.data; root 988:5009 mode 2770
 #   nas-rotom-restic-backup/  NFSv3 Rotom_Restic_Backup/.data; mounted root freshly verified 988:988 mode 0700; underlying local directory mode not isolated while fully unmounted in the live audit
 #     rotom-restic-backup/     repository 799babb2; current verified snapshot f666d63c; post-run restic check passed 21/21 snapshots
