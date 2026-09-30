@@ -29,6 +29,12 @@ The manual path is `/usr/local/bin/backup-rotom-vm-to-nas` -> `rotom-vm-vzdump-m
 
 All six prior VMID 100 backups on the canonical storage were deliberately deleted after exact safety checks. A single fresh backup was then created: `vzdump-qemu-100-2026_09_28-00_09_19.vma.zst`, size `47,415,540,796` bytes. The service completed `Result=success` / `ExecMainStatus=0`; `zstd -t` passed; full `zstd -dc | vma verify -` passed; VM100 stayed running. This archive is currently **unprotected**, so normal `7/4/6` retention can eventually prune it.
 
+### JAR-57 isolated portability restore — 2026-09-29
+
+JAR-57 selected the available archive `vzdump-qemu-100-2026_09_28-19_28_32.vma.zst` (47,498,796,321 bytes) and restored it to disposable VMID `101` on temporary directory storage `jar57-test` below the existing PVE-managed VZDump NFS mount. This was a non-production test location, not NAS application data. The restored configuration used q35/OVMF and `x86-64-v2-AES`; its configuration had no `hostpci`, `usb`, or `args` lines. Before start it was set `onboot: 0`, received a new VirtIO MAC, and used `link_down=1`, preventing it from claiming production address `192.168.1.69`.
+
+The restored guest booted to the Debian 13 console and accepted a normal login. `qm agent 101 ping` did not report an available agent, so guest-agent, `/srv/rotom`, Docker, and deeper filesystem checks are deliberately deferred to the JAR-50 DR rehearsal; this result is console-boot portability evidence, not a replacement for that full rehearsal. After inspection, VMID `101`, `jar57-test`, and its empty `images/` directory were removed. Do not reuse the removed storage name; create fresh isolated temporary storage only when a later rehearsal requires it.
+
 ## 2A. Current VM-Era Guest Restic Repository and Control Files
 
 Guest Restic remains intentionally unchanged by JAR-68:

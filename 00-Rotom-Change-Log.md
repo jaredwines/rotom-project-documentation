@@ -57,6 +57,13 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-29 — JAR-57 portable VM restore test
+
+- **Verified / Implemented:** Recorded JAR-57's isolated restore of `vzdump-qemu-100-2026_09_28-19_28_32.vma.zst` into disposable VMID `101`. The test retained the portable `q35`/OVMF/`x86-64-v2-AES` baseline, had no `hostpci`, `usb`, or `args` attachment, used `onboot: 0`, and was given a distinct VirtIO MAC with `link_down=1` before boot. The Proxmox console showed a successful Debian 13 login; production IP `192.168.1.69` was never exposed.
+- **Verified:** The temporary VM configuration, its temporary `jar57-test` storage definition, and the inspected empty `/mnt/pve/nas-rotom-vm-backup/jar57-test/{images,}` directories were removed. VMID 100, production NAS application data, and the VZDump archives were not altered.
+- **Decision / limitation:** Jared accepted the console boot proof as the portability gate evidence for this rehearsal. `qm agent 101 ping` did not report an available guest agent, and the deeper in-guest `/srv/rotom`, Docker, and filesystem checks were intentionally deferred to JAR-50; do not represent those checks as completed by JAR-57.
+- **Documentation updated:** `01-Rotom-Server-Inventory.md`, `05-Backup-and-Restore.md`, and `08-Rotom-Directory-Tree.txt` now record the tested archive, safe isolation controls, cleanup, and the limitation above.
+
 ## 2026-09-29 — JAR-47 final Rotom v2 recovery policy
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.

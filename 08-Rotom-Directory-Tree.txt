@@ -8,7 +8,7 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-09-29; JAR-72 Homepage application-card organization verified.
+# Documentation revised: 2026-09-29; JAR-57 portable VM restore test recorded.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the RPD.
 #
@@ -50,6 +50,7 @@
 #   dump/vzdump-qemu-100-2026_09_28-00_09_19.vma.zst  47,415,540,796 bytes; zstd PASS; full VMA verify PASS; currently unprotected
 # - Six older VMID 100 backups were deliberately removed before this fresh baseline. Historical local backup-proxmox-to-nas.pre-systemd.* launcher was also deliberately deleted.
 # - Old active storage/job/manual names are absent.
+# - JAR-57 used temporary `jar57-test` directory storage below this mount only to restore archive `vzdump-qemu-100-2026_09_28-19_28_32.vma.zst` as disposable VMID 101. It booted q35/OVMF/x86-64-v2-AES with no host attachment and network link down; the VM, storage definition, and now-empty `jar57-test/images` tree were subsequently removed. This is historical test evidence, not a persistent storage path.
 #
 # FINAL JAR-68 ACCEPTANCE
 # - Controlled physical PVE reboot changed boot ID; pve-cluster/pvedaemon/pveproxy active; VM100 auto-started.
