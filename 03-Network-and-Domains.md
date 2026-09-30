@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-29 — JAR-5 private documentation portal verified
+**Documentation updated:** 2026-09-29 — JAR-75 Syncthing proxy route verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -16,6 +16,8 @@ Record substantive changes to this document in the change log as part of the sam
 ### JAR-5 private documentation route — 2026-09-29
 
 `rotom-docs` joins `rotom-proxy` but retained host-networked NPM cannot use Docker DNS on that bridge. NPM proxy host 22 therefore routes `docs.rotom.casa` to the loopback-only `127.0.0.1:8082` compatibility listener using existing wildcard certificate ID 24 and forced TLS. The dedicated `Rotom Docs trusted LAN` access list allows only `127.0.0.1` and `192.168.1.0/24`; an untrusted bridge request was denied with HTTP `403`. Local-SNI HTTPS returned `200`, including the rendered directory-tree page. This is an intentionally private administrative route: public Internet access is not expected or required, and no DNS, WAN-forwarding, VLAN, firewall, certificate, or other proxy route was changed.
+
+JAR-75 adds Syncthing as a proxied Filesync management service. Syncthing joins `rotom-proxy`, but the retained host-networked NPM route uses the loopback-only compatibility listener `127.0.0.1:8384`; `8384` is not broadly host-published. NPM routes `syncthing.rotom.casa` to that listener using existing certificate ID `24` and forced TLS; local HTTPS returned `200`. Syncthing's GUI authentication is enabled. The service exposes no separate WAN-published Syncthing transport port through Docker; peer transport remains container networking/explicit future client configuration rather than an inferred router-forwarding rule.
 
 ### JAR-8 Paperless route — 2026-09-29
 
