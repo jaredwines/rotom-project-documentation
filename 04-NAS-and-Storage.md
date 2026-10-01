@@ -64,6 +64,10 @@ JAR-81 retained `/mnt/nas-downloaders`, its fstab automount, and `.rotom-qbt-nas
 
 The existing `Game/.data` export remains authorized only to Rotom and is the fstab-backed `/mnt/nas-game` automount with its original NFSv3/service-GID root (`988:5001`, mode `2770`). JAR-76 created setgid Game-owned `downloads/romm-inbox`, `downloads/romm-review`, and `library/games/roms` paths. The separate `.rotom-qbt-media-ready/` marker remains owned by the Downloader/Media contract and qBittorrentVPN binds it read-only with `create_host_path: false`; its payload remains Media-only at `/mnt/nas-media/torrents`. The active 15-second guard still requires both the Media and Game NFS/marker pairs. JDownloader may write only the ROM inbox; the organizer copies DAT-matched content to the Game library and moves unmatched input to review without deletion. Palworld worlds remain VM-local.
 
+### JAR-87 Media ROM and Games-torrent layout — 2026-10-01
+
+The active ROM paths are Media-owned setgid directories: `downloads/romm-inbox`, `downloads/romm-inbox/.processed`, `downloads/romm-review`, and `library/games/{,roms}` are used by `995:5000`; `torrents/games` and `torrents/incomplete/games` are used by qBittorrent's `901:5000` Media contract. The two-file, 128 KiB Game ROM source was copied to Media with matching SHA-256 manifests and is retained unchanged for rollback. The former Game qBittorrent marker was removed only after qBittorrentVPN ran against the Media-only bind/guard; no Game source data was deleted.
+
 ### Boot-time Game/Filesync automount recovery finding — 2026-10-01
 
 At the 12:57 PDT guest boot, the initial NFS mount attempts for `/mnt/nas-game` and `/mnt/nas-filesync` failed with `Network is unreachable` before the NAS route was available. The failed Game mount left its local empty mountpoint visible, so Docker could not satisfy the JDownloader/RomM Game binds; Media/Game-dependent containers also retained their startup errors after the NAS returned. A targeted `systemctl reset-failed` plus mount start restored both exports as their expected NFSv3 mounts. The Game root and its ROM inbox/library/marker paths, the Media payload/marker paths, and the Filesync mount were then verified.
@@ -91,7 +95,7 @@ At the final pre-migration baseline, Rotom used one local NVMe system disk and N
 | Mount | Source | Filesystem | Root metadata | Primary purpose |
 |---|---|---|---|---|
 | `/mnt/nas-media` | `192.168.1.70:/var/nfs/shared/Media` | NFSv3 `sec=sys` | `988:5000` mode `2770` | Final movie/show/game library data; JAR-52 game content is under `library/games`; old torrent tree removed by JAR-21 |
-| `/mnt/nas-game` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Game/.data` | NFSv3 `sec=sys` | `988:5001` mode `2770` | JAR-76 Game ROM inbox/review/library plus retained historical material; Palworld remains local VM state |
+| `/mnt/nas-game` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Game/.data` | NFSv3 `sec=sys` | `988:5001` mode `2770` | Retained JAR-87 ROM rollback library and historical material; Palworld remains local VM state |
 | `/mnt/nas-infra` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Infra/.data` | NFSv3 `sec=sys` | `988:5002` mode `2770` | Infra storage boundary; currently no workload data |
 | `/mnt/nas-smarthome` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Smarthome/.data` | NFSv3 `sec=sys` | `988:5003` mode `2770` | Smarthome storage boundary; HA/Homebridge remain local |
 | `/mnt/nas-documents` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Documents/.data` | NFSv3 `sec=sys` | `988:5004` mode `2770` | Documents storage boundary; currently empty |

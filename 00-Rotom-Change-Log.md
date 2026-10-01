@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-01 — JAR-87 move ROM pipeline and Game torrents to Media NAS
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Created only the required setgid Media ROM-pipeline and Games-torrent directories; copied the active Game ROM library to Media while retaining the source unchanged; moved RomM, JDownloader, and Igir to Media paths with JDownloader/Igir at `995:5000`; restored qBittorrent's Media Games category; and retired its Game marker/bind so the enabled guard is Media-only. Root-protected rollback copies are retained under `/srv/rotom/backup-staging/media/jar87-20261001`.
+- **Evidence:** Both NFS targets were writable; source/target manifests matched (`6adb48c86503a15fa3a3642629d562c46aa00c7042b356437d6fed825ebe30b1`); a harmless JDownloader-to-Igir fixture reached the Media pipeline; RomM read the Media library; the persisted qBittorrent categories show Games completed/incomplete Media paths while Movies/Shows are unchanged; the Media-only guard passed; all affected containers were running and no systemd units failed.
+- **Outstanding:** None.
+
 ## 2026-10-01 — Adopt autonomous JAR ticket execution command
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `06-Maintenance-and-Automation.md`.

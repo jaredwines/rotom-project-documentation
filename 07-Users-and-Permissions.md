@@ -37,7 +37,7 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 | PVE host | hostname `pve`; routine administration as Linux user `jared` (UID/GID `1000:1000`, groups `sudo` and `users`); canonical Mac aliases `pve` / `pve.rotom.casa`; key `~/.ssh/id_ed25519_pve`; PVE identity `jared@pam` has propagated `Administrator` access at `/`; matching root-authorized key removed; root retained for emergency recovery |
 | Debian VM `jared` | UID/GID `1000:1000`; supplementary `sudo`; key-only Mac login via `~/.ssh/id_ed25519_rotom` |
 | media | `127:5000`, `/home/media`; Jellyfin/Radarr/Sonarr |
-| game | `995:5001`, `/home/game`; both Palworld containers plus JAR-76 JDownloader/Igir runtime; Gamarr retired |
+| game | `995:5001`, `/home/game`; both Palworld containers; JAR-87 JDownloader/Igir use UID `995` with Media primary GID `5000`; Gamarr retired |
 | infra | `997:5002`, `/home/infra`; Arcane/DDNS/Homepage/Glances/NPM |
 | smarthome | `126:5003`, `/home/smarthome`; Home Assistant/Homebridge |
 | documents | `900:5004`, `/home/documents` |
@@ -49,9 +49,9 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 
 ### Current PVE backup privilege boundary
 
-### JAR-76 Game ROM service boundary
+### JAR-87 Media ROM service boundary
 
-JDownloader and the Igir container execution run as the locked `game` identity (`995:5001`). The Game NFS ROM inbox, review, and library directories are Game-owned setgid paths; qBittorrent's separate Game readiness marker remains outside this write contract. MyJDownloader input files are administered by root below `/srv/rotom/secrets/game/jdownloader`, group-readable only by `game` so the non-root container can read the read-only mounts. Their values, the persisted service configuration contents, and any account credentials are never recorded in the RPD.
+JDownloader and the Igir container execution use UID `995` with primary GID `5000` for Media writes. The Media ROM inbox, review, and library directories are narrowly scoped setgid paths; qBittorrent's Media-only sentinel remains outside this write contract. Existing protected MyJDownloader inputs remain under `/srv/rotom/secrets/game/jdownloader`; their values and all credentials are never recorded in the RPD.
 
 PVE host-config Restic is root-operated. `/usr/local/sbin/pve-restic-backup` is the privileged worker; root-owned `/usr/local/bin/backup-restic-to-nas` re-executes through `sudo` when a non-root user invokes it, so Jared can start the existing root workflow through normal sudo authentication without direct access to the worker or its protected credential. `/etc/restic/nas-password` remains protected and its contents are never documented. The repository is `/mnt/nas-pve-restic-backup/pve-restic-backup` and staging is `/var/backups/pve-restic-recovery`. Whole-VM manual backup likewise uses root-owned `/usr/local/bin/backup-rotom-vm-to-nas`, which re-executes through `sudo` for non-root invocation, plus `rotom-vm-vzdump-manual.service` and `/usr/local/sbin/rotom-vm-vzdump-manual`. Jared is a PVE member of `systemd-journal`, allowing direct read-only service-log access such as `journalctl -fu rotom-vm-vzdump-manual.service`; this does not grant permission to alter services.
 
@@ -321,7 +321,7 @@ Runtime mounts create these notable access paths:
 - Glances has a read-only bind of the host root and a read-only Docker socket. Its former read-only `/mnt/nas-rotom-backup` bind was removed on 2026-09-18.
 - Media storage: Sonarr and Radarr read/write `/mnt/nas-media` at `/media` and additionally bind `/mnt/nas-media/torrents` read-only at `/media/torrents`; Jellyfin mounts the library subtree read-only. qBittorrentVPN binds that torrent directory read/write. The enabled Downloader compatibility view has no current container consumer and is proposed for retirement. Prowlarr has no NAS bind.
 - Home Assistant has read-only access to /run/dbus.
-- Game storage: Palworld uses local `/srv/rotom/appdata/game` data and no Game NAS bind. JAR-76 JDownloader writes only the Game ROM inbox; Igir writes the Game ROM library/review paths. qBittorrent retains only its separate read-only Game readiness-marker bind; the unused Game Downloads read-only view is retired.
+- Game storage: Palworld uses local `/srv/rotom/appdata/game` data and no Game NAS bind. JAR-87 moves JDownloader/Igir ROM writes to narrowly scoped Media paths as `995:5000`; the Game library remains rollback material and qBittorrent has no Game bind.
 - Cloudflare DDNS receives a read-only secret-file mount. Its contents were not inspected.
 
 
