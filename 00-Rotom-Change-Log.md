@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-01 — JAR-82 documentation cross-reference correction recorded
+**Documentation updated:** 2026-10-01 — Post-JAR-77 Docker-runtime claims corrected
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -56,6 +56,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-01 — Correct post-JAR-77 Docker runtime claims
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Documentation only.**
+- **Changes:** Reclassified the JAR-68 Docker count and state as dated historical evidence rather than current state. Removed the unsupported current Gamarr-running claim: JAR-77 remains the authoritative record that Gamarr was retired. Recorded that JAR-75 added Syncthing and JAR-84 found it exited, so a fresh full Docker inventory is required before documenting a present container count or intended-running set.
+- **Evidence:** Cross-check of the JAR-68 acceptance, JAR-75 Syncthing, JAR-77 Gamarr retirement, and JAR-84 Syncthing preflight records. A requested live read-only Docker inspection could not run because `sudo` requires an interactive password.
+- **Outstanding:** Run a read-only `docker ps -a` inventory under authorized root access, then reconcile the current container-object count, intended-running set, Palworld state, and Syncthing state.
 
 ## 2026-10-01 — Correct JAR-82 NPM documentation cross-references
 

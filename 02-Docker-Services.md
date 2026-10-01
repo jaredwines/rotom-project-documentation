@@ -2,9 +2,9 @@
 
 **Documentation set:** Rotom Project Documentation  
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
-**Scope:** Rotom workload layer; current JAR-78 state is 17 container objects / 17 intended running, including both healthy Palworld servers
+**Scope:** Rotom workload layer; the latest comprehensive Docker count is dated JAR-68 evidence and requires a fresh post-JAR-84 inventory before being treated as current
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — JAR-82 documentation cross-reference correction recorded
+**Documentation updated:** 2026-10-01 — Post-JAR-77 Docker-runtime claims corrected
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -74,11 +74,11 @@ JAR-78 establishes the current Game domain at local stack roots `/srv/rotom/stac
 
 Docker socket access is exceptional: Arcane has the raw read-write socket for deliberate Docker administration only, with automatic updates and auto-heal disabled; Homepage has the read-only socket for dashboard metadata; Glances has the read-only socket plus its read-only host-root monitoring bind. A read-only socket mount does not prove a read-only Docker API. All other current application containers have no socket. Current deliberate runtime exceptions are Home Assistant (host networking, privileged, read-only D-Bus), Homebridge/Nginx Proxy Manager/Cloudflare DDNS (host networking), qBittorrentVPN (`CAP_NET_ADMIN` for WireGuard), and the stated Arcane/Glances mounts. Phase D workload tickets must rejustify rather than inherit any exception.
 
-### Verified current intended state
+### JAR-68 runtime snapshot — 2026-09-28
 
-There are **16 total container objects and 14 intended running containers**. Both Palworld containers were intentionally stopped by the administrator to save resources; they remain preserved with `unless-stopped`, are not dead/restarting/OOM, and their current world save trees were reverified during final JAR-68 acceptance. All other expected production containers are running.
+At JAR-68 acceptance there were **16 total container objects and 14 intended running containers**. Both Palworld containers were intentionally stopped by the administrator to save resources; they remained preserved with `unless-stopped`, were not dead/restarting/OOM, and their world save trees were reverified. The table below is that dated runtime snapshot, not a current inventory.
 
-| Container | Current state / role |
+| Container | JAR-68 state / role |
 |---|---|
 | `arcane` | Running |
 | `cloudflare-ddns` | Running |
@@ -97,7 +97,9 @@ There are **16 total container objects and 14 intended running containers**. Bot
 | `homebridge` | Running |
 | `alohamillworks.com` | Running |
 
-`jaredwines.com` remains intentionally undeployed and has no container object. Final post-reboot acceptance verified all twelve NAS automounts, qBittorrentVPN, Homepage PVE CPU monitoring, guest Restic timer state, and zero failed guest systemd units. Both former Downloads read-only bindfs compatibility views are now retired. The earlier 16-running observations below remain valid historical checkpoints but are superseded for the current intended runtime by this 14-running state.
+At JAR-68, `jaredwines.com` was intentionally undeployed and had no container object. Final post-reboot acceptance verified all twelve NAS automounts, qBittorrentVPN, Homepage PVE CPU monitoring, guest Restic timer state, and zero failed guest systemd units. Both former Downloads read-only bindfs compatibility views were retired later. The earlier 16-running observations below remain valid historical checkpoints; JAR-68 superseded them at that time with its 14-intended-running result.
+
+**Post-JAR-68 changes:** JAR-75 subsequently deployed Syncthing; JAR-77 retired Gamarr and removed its container; JAR-84 found Syncthing exited before its preflight. No later complete `docker ps -a` inventory is recorded. Do not infer a current container count, intended-running set, or Palworld/Syncthing state from the JAR-68 snapshot; refresh it with a read-only live inspection.
 
 ### JAR-38 Infra v2 convergence — 2026-09-28
 

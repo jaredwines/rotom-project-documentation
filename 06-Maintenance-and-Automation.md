@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-01 — JAR-86 unused Media bindfs view retired and verified
+**Documentation updated:** 2026-10-01 — Post-JAR-77 Docker-runtime claims corrected
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -52,7 +52,7 @@ JAR-72 reorganized Homepage cards without changing monitoring behavior or any ap
 
 ### Rotom VM
 
-- Docker/containerd remain enabled. Current intended runtime is 16 container objects / 14 running because both Palworld containers are intentionally stopped; their worlds remain preserved.
+- Docker/containerd remain enabled. The 16-container / 14-intended-running JAR-68 result is historical evidence, not a current count: JAR-75 later deployed Syncthing, JAR-77 retired Gamarr, and JAR-84 found Syncthing exited. A fresh full Docker inventory is required before claiming the current intended runtime or Palworld/Syncthing state.
 - `rotom-nas-docker-recovery.service` remains the NAS-backed container recovery helper. JAR-86 healthy-state validation passed with all twelve NFS automounts, the retained Downloader sentinel and Media paths, and qBittorrentVPN `wg0` `10.2.0.2/32`; the unused Media bindfs view and its branch are absent.
 - Guest Restic remains `rotom-restic-backup.service` / `.timer` around `03:00`, with manual `backup-restic-to-nas`; guest naming was intentionally not changed by JAR-68.
 - JAR-47 repaired the v2 Home Assistant SQLite staging path and verified snapshot `aedd8e57`; its restricted restore passed Palworld archive checksums and Home Assistant SQLite integrity. Media uses daily 12:00 AM UNAS-local snapshots with a 16-snapshot limit for authoritative library rollback.
