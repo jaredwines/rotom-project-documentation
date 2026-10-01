@@ -31,7 +31,7 @@ Available Sources defines the RPD membership boundary. Repository-support files,
 - Treat dated evidence and explicit state labels as more authoritative than unstated assumptions.
 - Use the current RPD documents for operational reference; do not use older change-log entries as instructions to recreate prior state.
 - Use the guarded `rpd` helper for normal repository operations. `rpd path` resolves the active checkout.
-- Read [CONTRIBUTING.md](CONTRIBUTING.md) before preparing a change.
+- Read the [contribution guide](support/CONTRIBUTING.md) before preparing a change.
 
 ## Safety
 
@@ -39,4 +39,4 @@ Never commit passwords, tokens, private keys, VPN credentials, cookies, Home Ass
 
 ## Keeping the RPD current
 
-The canonical RPD maintenance contract is [00 - Rotom Change Log](00-Rotom-Change-Log.md). It defines the required evidence standard, consistency review, state labels, dated change-history entries, and the supported publication workflow. This README and [CONTRIBUTING.md](CONTRIBUTING.md) are repository guides and do not replace that contract.
+The canonical RPD maintenance contract is [00 - Rotom Change Log](00-Rotom-Change-Log.md). It defines the required evidence standard, consistency review, state labels, dated change-history entries, and the supported publication workflow. This README and the [contribution guide](support/CONTRIBUTING.md) are repository guides and do not replace that contract.

@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-01 — Organize repository-support files
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`, `AGENTS.md`, `README.md`, `CONTRIBUTING.md` → `support/CONTRIBUTING.md`, `tooling/rpd` → `support/tooling/rpd`.
+- **Status:** **Documentation only.**
+- **Changes:** Kept the nine-file Core Numbered Reference Set, root `AGENTS.md`, root `README.md`, and `.gitignore` at the repository root. Moved repository-only contribution guidance and the canonical helper source into `support/`; root documentation and current-state references now use the new paths. `support/` is repository support material, not an RPD membership boundary or an Available Sources destination.
+- **Evidence:** Explicit user decision on 2026-10-01; repository path/reference review before the move.
+- **Outstanding:** None. The identical `/usr/local/bin/rpd` installations on Mac and Rotom were unchanged; this task only moved their tracked canonical source path inside the repository.
+
 ## 2026-10-01 — Record JDownloader and current Docker inventory
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
