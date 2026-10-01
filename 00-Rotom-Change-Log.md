@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-01 — JAR-82 Nginx Proxy Manager Infra v2 migration verified
+**Documentation updated:** 2026-10-01 — Repository README and contribution guide recorded
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -56,6 +56,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-01 — Add RPD repository README and contribution guide
+
+- **Files changed:** `README.md`, `CONTRIBUTING.md`, `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`.
+- **Status:** **Documentation only / Verified.**
+- **Changes:** Added repository-support `README.md` as the GitHub landing page and navigation index, plus `CONTRIBUTING.md` as the concise repository-facing change guide. Both direct readers to this document as the sole canonical RPD maintenance contract. They document the current nine-file Core Numbered Reference Set and safety expectations, but neither file is an RPD member or changes Available Sources membership.
+- **Evidence:** Explicit user decision on 2026-10-01; the new files were created in the verified current RPD Git checkout after reconciling its then-current GitHub `main` history.
+- **Outstanding:** None.
 
 ## 2026-10-01 — JAR-82 migrate Nginx Proxy Manager Compose to Infra v2
 
