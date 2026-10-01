@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-29 — JAR-75 Filesync Syncthing storage boundary deployed
+**Documentation updated:** 2026-09-30 — JAR-78 Game mount contract verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -31,7 +31,7 @@ The Rotom guest storage contract remains unchanged: twelve NFS systemd automount
 
 ### NAS protection classification — JAR-47
 
-UniFi Drive snapshots are enabled for every NAS drive. The supplied Media settings evidence records a **daily 12:00 AM UNAS-local** snapshot schedule with a **16-snapshot** limit. `Media/library` (including `library/games`) is authoritative NAS data and uses this snapshot policy for local rollback. `Media/torrents` is transient/reproducible payload and is deliberately outside the authoritative-library claim. Documents, Gameserver, Customapps, Web, Smarthome, and Infra reserved shares may remain empty; empty boundaries are not represented as backup-protected data. JAR-75 deploys Syncthing against the Filesync boundary, but it has no production folder or payload yet. Before Filesync content becomes authoritative, confirm its applicable UNAS snapshot retention/recovery policy; Syncthing uses trash-can versions in each folder's `.stversions` as an additional local recovery layer. Paperless remains VM-local, so `nas-documents` has no current authoritative Paperless content. Snapshot retention protects against ordinary deletion/corruption but remains on the same UNAS appliance and is not off-site protection.
+UniFi Drive snapshots are enabled for every NAS drive. The supplied Media settings evidence records a **daily 12:00 AM UNAS-local** snapshot schedule with a **16-snapshot** limit. `Media/library` (including `library/games`) is authoritative NAS data and uses this snapshot policy for local rollback. `Media/torrents` is transient/reproducible payload and is deliberately outside the authoritative-library claim. Customapps, Web, Smarthome, Infra, and unused service boundaries may remain empty; empty boundaries are not represented as backup-protected data. JAR-78 confirmed the existing `Game` share is the sole current Game mount at `/mnt/nas-game` and retired the unavailable duplicate Gameserver guest contract without deleting NAS data. JAR-75 deploys Syncthing against the Filesync boundary, but it has no production folder or payload yet. Before Filesync content becomes authoritative, confirm its applicable UNAS snapshot retention/recovery policy; Syncthing uses trash-can versions in each folder's `.stversions` as an additional local recovery layer. Paperless remains VM-local, so `nas-documents` has no current authoritative Paperless content. Snapshot retention protects against ordinary deletion/corruption but remains on the same UNAS appliance and is not off-site protection.
 
 ### PVE host-config Restic storage
 
