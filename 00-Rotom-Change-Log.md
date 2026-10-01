@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-30 — Retire unused Game Downloads bindfs view
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Retired the unused read-only `/mnt/nas-downloads-game-ro` bindfs view, its enabled `rotom-downloads-game-ro.service`, and the view-specific branch of `rotom-nas-docker-recovery`. The helper retains its separate `/mnt/nas-game` NFS readiness check. No NAS data, Game NFS mount, Palworld path, or container bind was changed.
+- **Evidence:** Live Docker inspection found no container mounted the view. The retired service was stopped/disabled and removed, its empty local mountpoint was removed after unmount confirmation, and the revised recovery helper passed syntax and healthy-state validation with success status. No active unit, helper reference, or local path remains.
+- **Outstanding:** None.
+
 ## 2026-09-30 — JAR-78 rename Gameserver domain to Game
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
