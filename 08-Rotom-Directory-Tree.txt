@@ -8,7 +8,7 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-09-30; obsolete Media/Game qBittorrent readiness markers removed after live-reference verification.
+# Documentation revised: 2026-10-01; JAR-83 restored the minimal Game qBittorrent readiness marker and automount.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the RPD.
 #
@@ -28,8 +28,9 @@
 # - 2026-09-29: current identity `customapps` retains compatibility home `/home/apps`; the obsolete NAS `Apps` drive plus its `Apps/.data -> /mnt/nas-apps` fstab/automount, local mountpoint, and `nas-apps` shortcut were retired. Empty `Customapps/.data -> /mnt/nas-customapps` remains the reserved boundary through `/home/apps/nas-customapps`.
 # - 2026-09-29: unused `auth` (`905:5009`) and `/home/auth`, its `nas-auth` shortcut, and the unavailable `Auth/.data -> /mnt/nas-auth` guest contract were retired. `showmount` no longer lists Auth, and Jared confirmed the NAS Auth drive was deleted; retained Customapps remains exported.
 # - JAR-5: private `rotom-docs` static portal is deployed at `/srv/rotom/stacks/infra/rotom-docs`, with controlled derived source and generated site under `/srv/rotom/appdata/infra/rotom-docs`. Its root-owned publisher permits only RPD members `00`–`08`; NPM routes `docs.rotom.casa` through loopback `8082` and allows only loopback plus the trusted LAN.
-# - JAR-78: Palworld Jared and Fran Compose roots are `/srv/rotom/stacks/game/palworld-{jared,fran}`; current local state is `/srv/rotom/appdata/game/palworld-{jared,fran}` and protected environment files are under `/srv/rotom/secrets/game`. Locked `game` remains `995:5001`; both containers are healthy after controlled one-at-a-time recreation. Their private networks retain Jared `172.27.0.0/16` and Fran `172.25.0.0/16`; `/mnt/nas-game` is the sole current Game mount and not a live-world bind. `/home/game/docker/palworld-server-*` is historical rollback evidence only.
-# - JAR-56: qBittorrentVPN production Compose is `/srv/rotom/stacks/downloader/qbittorrentvpn/compose.yaml`, appdata is `/srv/rotom/appdata/downloader/qbittorrentvpn`, and active payload is `/mnt/nas-media/torrents`; former `/home/downloaders/docker/qbittorrentvpn` and `/mnt/nas-downloaders/torrents` remain rollback material. `/usr/local/sbin/rotom-qbittorrent-media-guard` with matching service/timer checks Media NFS and `/mnt/nas-media/.rotom-qbt-media-ready` every 15 seconds and stops qBittorrentVPN on a missing mount. The obsolete empty `/mnt/nas-media/.rotom-qbt-nas-ready` and `/mnt/nas-game/.rotom-qbt-nas-ready` directories were removed after live-reference verification. Authenticated application-import/seeding validation is Jared's deferred manual follow-up.
+# - JAR-78/JAR-83: Palworld Jared and Fran Compose roots are `/srv/rotom/stacks/game/palworld-{jared,fran}`; current local state is `/srv/rotom/appdata/game/palworld-{jared,fran}` and protected environment files are under `/srv/rotom/secrets/game`. Locked `game` remains `995:5001`; both containers are healthy after controlled one-at-a-time recreation. Their private networks retain Jared `172.27.0.0/16` and Fran `172.25.0.0/16`; `/mnt/nas-game` is an automounted minimal marker contract, not a live-world bind. `/home/game/docker/palworld-server-*` is historical rollback evidence only.
+# - JAR-56/JAR-83: qBittorrentVPN production Compose is `/srv/rotom/stacks/downloader/qbittorrentvpn/compose.yaml`, appdata is `/srv/rotom/appdata/downloader/qbittorrentvpn`, and active payload is `/mnt/nas-media/torrents`; former `/home/downloaders/docker/qbittorrentvpn` and `/mnt/nas-downloaders/torrents` remain rollback material. `/usr/local/sbin/rotom-qbittorrent-media-guard` with matching service/timer checks the Media payload NFS/marker and the Game NFS `/mnt/nas-game/.rotom-qbt-media-ready` marker every 15 seconds, stopping qBittorrentVPN when either safety pair is unavailable. Compose binds both markers read-only with `create_host_path: false`. The obsolete empty `/mnt/nas-media/.rotom-qbt-nas-ready` and `/mnt/nas-game/.rotom-qbt-nas-ready` directories remain removed. Authenticated application-import/seeding validation is Jared's deferred manual follow-up.
+# - JAR-84: removed legacy `/home/downloaders/docker/{prowlarr,qbittorrentvpn}` and `/home/media/docker/{radarr,sonarr}` only after root-protected archive creation, successful Restic snapshot `3c85d5be`, and byte-readback verification. The empty `/home/game/docker` directory was retired. `/home/downloaders/docker` remains for Arcane's parent bind; Jellyfin and the held Web Docker directory remain untouched.
 #
 # PVE HOST-CONFIG RESTIC — CURRENT
 # /etc/fstab                                  canonical automount -> PVE_Restic_Backup/.data at /mnt/nas-pve-restic-backup
@@ -227,14 +228,14 @@
 # /mnt/
 #   nas-media/         NFSv3 Media/.data; root 988:5000 mode 2770
 #   nas-game/          NFSv3 Game/.data; root 988:5001 mode 2770
+#     .rotom-qbt-media-ready/  901:5000 mode 2750; required qBittorrentVPN RO safety marker; sole current Game-share entry
 #   nas-infra/         NFSv3 Infra/.data; root 988:5002 mode 2770
 #   nas-smarthome/     NFSv3 Smarthome/.data; root 988:5003 mode 2770
 #   nas-documents/     NFSv3 Documents/.data; root 988:5004 mode 2770
 #   nas-downloaders/   NFSv3 Downloader/.data; root 988:5005 mode 2770; writable Downloader boundary
 #     .rotom-qbt-nas-ready/
-#     torrents/{incomplete,movies,shows}/
-#       incomplete/{movies,shows}/
-#   nas-downloads-media-ro/  enabled bindfs RO source /mnt/nas-downloaders; no current consumer; proposed retirement
+#     JAR-81 retired the obsolete torrents/ tree; the sentinel remains.
+#   nas-downloads-media-ro/  enabled retained bindfs RO source /mnt/nas-downloaders; no current container consumer
 #   Game compatibility view retired; JAR-79 removed empty torrents/{,incomplete/}games
 #   nas-web/           NFSv3 Web/.data; root 988:5006 mode 2770
 #   nas-filesync/      NFSv3 Filesync/.data; root 988:5007 mode 2770

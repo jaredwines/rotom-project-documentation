@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-01 — JAR-84 legacy service-home Docker-tree retirement
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Retired the verified-inactive `/home/downloaders/docker/{prowlarr,qbittorrentvpn}` and `/home/media/docker/{radarr,sonarr}` trees, plus the verified-empty `/home/game/docker` directory. Preserved every service home and NAS shortcut, `/home/downloaders/docker` because Arcane read-only mounts that parent, and the held `/home/media/docker/jellyfin` and `/home/web/docker` directories. Fresh Compose-label evidence establishes all active Media services, including Jellyfin, under `/srv/rotom/stacks/media`; the retained Jellyfin legacy tree was deliberately not removed.
+- **Evidence:** Root preflight found no active Compose label, bind source, or configuration reference to the four removed children; all active labels resolved to v2 stacks. Root-only archives are `/srv/rotom/backup-staging/downloader/jar84-20261001/downloader-legacy-docker.tar.gz` (`66dd1cf1b10b75b16082f381c7f713f0c688ab9c86667456d4288b3133e0d4ba`) and `/srv/rotom/backup-staging/media/jar84-20261001/media-legacy-arr-docker.tar.gz` (`91d711aaba034bbc5aceb0732daeb9241003a98977b6358fcf3881fda6489a52`). Fresh guest Restic snapshot `3c85d5be` at 2026-10-01 02:30 PDT completed successfully; byte-for-byte Restic readback matched both checksums. The source had one transient qBittorrent IPC socket, which `tar` correctly omitted. Post-change probes passed for Homepage local/HTTPS, Uptime Kuma HTTPS redirect, and Aloha HTTPS; all intended running containers and no failed units were verified after restoring the existing qBittorrent guard-controlled service.
+- **Outstanding:** `/home/web/docker` remains held and untouched. Syncthing was already exited before JAR-84 preflight and was not changed by this ticket; investigate separately if it is intended to run.
+
 ## 2026-10-01 — JAR-85 retain active Infra state and retire three inactive artifacts
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
@@ -65,12 +73,20 @@ Keep future entries brief: the change log should point to the detailed documents
 - **Evidence:** Root metadata showed `/home/infra` `infra:infra` mode `0750`, `.ssh` `0700`, Docker `0770`, and the expected mounted Infra NFS boundary. Docker labels showed the v2 Infra working directories and no current consumer of the retired paths; Arcane's current database had no old discovery-path reference. All three retired entries were unreferenced, non-sensitive, and single-link objects. After removal, all v2 Infra Compose files validated; Arcane and Homepage were healthy, DDNS and NPM were running, both local Homepage and `https://rotom.casa` returned HTTP `200`, and `systemctl --failed` was empty.
 - **Outstanding:** The retained NPM legacy path and its historical Compose copy were explicitly left untouched. Historical pre-v2 Arcane records remain historical evidence, not current configuration.
 
-## 2026-10-01 — JAR-81 Media compatibility-view drift assessment
+## 2026-10-01 — JAR-83 minimal Game qBittorrent marker restoration
 
-- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
-- **Status:** **Documentation only / Verified / Proposed.**
-- **Changes:** Corrected current-state documentation for the retained `/mnt/nas-downloads-media-ro` bindfs view. It remains enabled and mounted from `/mnt/nas-downloaders`, but it is not used by the current Media or Downloader containers. Radarr, Sonarr, and qBittorrentVPN instead bind `/mnt/nas-media/torrents` directly. Retiring the unused view and its recovery-helper branch is proposed as a separate, targeted live change; this documentation task did not modify Rotom.
-- **Evidence:** Live `findmnt` showed the read-only bindfs mount and `rotom-downloads-media-ro.service` enabled/active. `docker inspect` showed Radarr and Sonarr bind `/mnt/nas-media/torrents` read-only at `/media/torrents`, while qBittorrentVPN binds the same source read/write. Reference scans found no live Compose, systemd, or recovery-script consumer of `/mnt/nas-downloads-media-ro`; the service itself remains started by the recovery helper.
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Restored the existing `Game/.data` export as the fstab-backed `/mnt/nas-game` automount and `/home/game/nas-game` shortcut. Its prior empty state was retained: the sole current entry is `.rotom-qbt-media-ready/` (`901:5000`, mode `2750`) beneath the preserved `988:5001` mode-`2770` root. qBittorrentVPN now mounts that marker read-only with `create_host_path: false`, alongside its unchanged Media payload and Media marker. The active 15-second guard now requires both NFS/marker pairs. JAR-80 was narrowed to preserve this minimal contract while retaining its separate legacy-content scope.
+- **Evidence:** Live `showmount` confirmed the established Game export remains authorized only to Rotom; a mounted inventory found 0 usage before marker creation. Compose validation passed, qBittorrentVPN recreated with both markers read-only, and the normal guard check plus WireGuard `10.2.0.2/32` passed. During the controlled negative test, temporarily renaming only the empty Game marker made the guard exit nonzero and stop qBittorrentVPN; restoring it allowed clean container, guard, and WireGuard recovery. No Game library/torrent tree, Palworld world, or unrelated NAS content was changed; zero failed systemd units were reported at final live verification.
+- **Outstanding:** None for JAR-83.
+
+## 2026-10-01 — JAR-81 Downloader torrent-payload retirement and Media compatibility-view assessment
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Documentation only / Verified / Proposed.**
+- **Changes:** Retained the Downloader NFS root, sentinel, fstab automount, and enabled read-only Media bindfs view. Removed only the obsolete Downloader `torrents/` tree: its one duplicate Backrooms file and five verified-empty descendants. The bindfs unit and recovery helper now validate the retained root/sentinel/NFS contract without requiring `torrents/`. Corrected current-state documentation for the retained `/mnt/nas-downloads-media-ro` bindfs view: it is enabled and sourced from `/mnt/nas-downloaders`, but has no current Media or Downloader container consumer; Radarr, Sonarr, and qBittorrentVPN bind `/mnt/nas-media/torrents` directly. Retiring the unused view and its recovery-helper branch remains a separate proposed live change.
+- **Evidence:** Both 10,482,662,507-byte Backrooms copies matched SHA-256 `0cad312d8f5997c3a641a1d5cf112c02492a56fb7da803bb0db02e99535fd58d` before deletion. Afterwards the root/sentinel remained, the torrent tree was absent, bindfs/recovery were active, qBittorrentVPN `wg0` was `10.2.0.2/32`, Media-backed workloads were running, and no unit had failed.
 - **Outstanding:** Before retiring the view, disable/remove its unit and mountpoint and remove its recovery-helper branch, then validate the affected media/downloader services and update the RPD again.
 
 ## 2026-09-30 — Remove obsolete qBittorrent NAS readiness markers

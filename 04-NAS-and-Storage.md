@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — JAR-79 Game torrent-directory retirement verified
+**Documentation updated:** 2026-10-01 — JAR-83 minimal Game qBittorrent marker restored and verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -55,6 +55,14 @@ All twelve guest NFS automounts and both read-only bindfs views passed the histo
 ### JAR-79 empty Game torrent-directory retirement — 2026-10-01
 
 `/mnt/nas-downloaders/torrents/games` and `/mnt/nas-downloaders/torrents/incomplete/games` were empty, including hidden entries, and each used 0 disk space. After qBittorrent's zero-torrent live state and unused `Games` category were confirmed, the category was removed and both directories were removed with `rmdir`; no recursive deletion occurred. The resulting Downloader tree has only `movies`, `shows`, `incomplete/movies`, and `incomplete/shows`. The Game bindfs view/unit was already retired. JAR-81 later verified that `/mnt/nas-downloads-media-ro` remains mounted read-only but unused by current containers and proposed its separate retirement. Live qBittorrentVPN Compose inspection found its current payload binds instead source `/mnt/nas-media/torrents`; no payload mount, NAS snapshot policy, or Media/Game library data was changed by JAR-79.
+
+### JAR-81 Downloader torrent-payload retirement — 2026-10-01
+
+JAR-81 retained `/mnt/nas-downloaders`, its fstab automount, and `.rotom-qbt-nas-ready/`, while removing only its obsolete `torrents/` tree. The sole 10,482,662,507-byte Backrooms file was byte-identical to the retained Media copy (SHA-256 `0cad312d8f5997c3a641a1d5cf112c02492a56fb7da803bb0db02e99535fd58d`); after its deletion, five verified-empty descendant directories and then `torrents/` were removed with targeted `rmdir`. The enabled `/mnt/nas-downloads-media-ro` bindfs view remains sourced from the retained root; its unit and recovery helper now validate the NFS root and sentinel rather than the retired tree. Media libraries, Media torrents, NAS snapshot policy, Game data, and backup artifacts were not changed.
+
+### JAR-83 minimal Game marker restoration — 2026-10-01
+
+The existing `Game/.data` export remains authorized only to Rotom and was restored as the fstab-backed `/mnt/nas-game` automount with its original NFSv3/service-GID root (`988:5001`, mode `2770`). A read-only inventory found it empty; its sole current entry is `.rotom-qbt-media-ready/`, numeric `901:5000`, mode `2750`. The restored `/home/game/nas-game` shortcut targets that mount. qBittorrentVPN binds this marker read-only with `create_host_path: false`, while its payload remains Media-only at `/mnt/nas-media/torrents`. The active 15-second guard requires both the Media and Game NFS/marker pairs. Temporarily renaming only the empty Game marker caused the guard to stop qBittorrentVPN; restoring it returned the guard and WireGuard to healthy state. No Game library, torrent tree, Palworld world, or unrelated NAS content was created, deleted, or moved.
 
 ### Retired empty `Downloads` boundary — 2026-09-29
 
@@ -640,6 +648,7 @@ Radarr:         /mnt/nas-media                          -> /media               
                 /mnt/nas-media/torrents                 -> /media/torrents         RO
 qBittorrentVPN: /mnt/nas-media/torrents                 -> /media/torrents          RW
                 /mnt/nas-media/.rotom-qbt-media-ready   -> /run/rotom-nas-media     RO
+                /mnt/nas-game/.rotom-qbt-media-ready    -> /run/rotom-nas-game      RO
 Prowlarr:       /home/downloaders/docker/prowlarr/config -> /config RW; no NAS bind
 Glances:        no `/mnt/nas-rotom-restic-backup` bind
 ```
