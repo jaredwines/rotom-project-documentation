@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-01 — JAR-79 Game torrent-directory retirement verified
+**Documentation updated:** 2026-10-01 — JAR-86 unused Media bindfs view retired and verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -56,6 +56,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-01 — JAR-86 retire unused Media Downloader bindfs view
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Retired only the unused `/mnt/nas-downloads-media-ro` read-only bindfs view, its enabled `rotom-downloads-media-ro.service`, and the view-specific branch of `rotom-nas-docker-recovery`. Root-protected rollback copies of the prior unit and helper are retained. The Downloader NFS root/sentinel and its fstab automount, Media NFS tree, qBittorrentVPN safety controls, and all Media-backed workload definitions remain unchanged.
+- **Evidence:** Fresh root Docker/Compose and configuration inspection found no container, active Compose definition, application configuration, or remaining recovery dependency for the view. The revised helper passed syntax and a healthy-state systemd run, confirming its retained Downloader and Media NFS checks while leaving all covered containers running. Downloader and Media were active NFS mounts, their required sentinel/library/torrent paths were present, qBittorrentVPN `wg0` was `10.2.0.2/32`, qBittorrentVPN/Radarr/Sonarr/RomM/Jellyfin were running, and no systemd unit was failed. The removed unit, local mountpoint, and active configuration references were absent after the change.
+- **Outstanding:** None.
 
 ## 2026-10-01 — JAR-84 legacy service-home Docker-tree retirement
 

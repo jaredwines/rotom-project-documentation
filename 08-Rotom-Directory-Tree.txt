@@ -8,7 +8,7 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-10-01; JAR-83 restored the minimal Game qBittorrent readiness marker and automount.
+# Documentation revised: 2026-10-01; JAR-86 retired the unused Media bindfs view while preserving the Downloader and Media NFS contracts.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the RPD.
 #
@@ -119,7 +119,7 @@
 # - qBittorrent wg0 up at 10.2.0.2/32. Core service HTTP probes returned expected 200/302 results.
 # - All ten current service identities/homes verified; each home mode 0750; every /home/<service>/nas-<service> symlink resolves to the current /mnt/nas-<service> target.
 # - docker group remains GID 989 with no members; Fran remains absent.
-# - All twelve fstab-backed systemd automounts active. The Media bindfs compatibility view is mounted RO but has no current container consumer and is proposed for retirement; the Game Downloads view is retired.
+# - All twelve fstab-backed systemd automounts active. Both former Downloads bindfs compatibility views are retired; JAR-86 removed the unused Media view after dependency preflight.
 # - Restic mounted NFS root verified 988:988 mode 0700; this 02:29 audit observed the then-held backup timer disabled/inactive, later superseded the same day by deliberate `rotom-restic-backup.timer` recommissioning; weekly updater cron absent; JAR-32 temporary helper absent.
 # - Arcane current settings freshly verified: auto-update midnight/no exclusions; auto-heal every 30s/no exclusions, max 5 per 30m; followProjectSymlinks=true; scheduled prune disabled.
 # - Arcane discovery symlink /home/infra/docker/downloads -> /home/downloaders/docker verified. Arcane qBittorrentVPN project status is stale/unknown from 2026-09-22 while Docker runtime/wg0 are current.
@@ -143,7 +143,7 @@
 #     rotom-weekly-maintenance.service          JAR-74 root oneshot; ExecStart=/usr/local/sbin/weekly-host-maintenance
 #     rotom-weekly-maintenance.timer            ENABLED/ACTIVE; Sunday 01:15; Persistent=true; AccuracySec=1min; RandomizedDelaySec=0
 # /usr/local/
-#   sbin/rotom-nas-docker-recovery       current helper; uses /mnt/nas-downloaders and compatibility views
+#   sbin/rotom-nas-docker-recovery       current helper; uses retained /mnt/nas-downloaders and /mnt/nas-media NFS checks
 #   sbin/rotom-restic-backup             current root-protected backup implementation; repository /mnt/nas-rotom-restic-backup/rotom-restic-backup
 #   sbin/rotom-restic-backup-status-api  current root-protected status API
 #   sbin/weekly-host-maintenance          root:root 0750; locked safe weekly maintenance worker
@@ -235,7 +235,7 @@
 #   nas-downloaders/   NFSv3 Downloader/.data; root 988:5005 mode 2770; writable Downloader boundary
 #     .rotom-qbt-nas-ready/
 #     JAR-81 retired the obsolete torrents/ tree; the sentinel remains.
-#   nas-downloads-media-ro/  enabled retained bindfs RO source /mnt/nas-downloaders; no current container consumer
+#   JAR-86 retired the unused nas-downloads-media-ro bindfs view; Downloader root/sentinel remain.
 #   Game compatibility view retired; JAR-79 removed empty torrents/{,incomplete/}games
 #   nas-web/           NFSv3 Web/.data; root 988:5006 mode 2770
 #   nas-filesync/      NFSv3 Filesync/.data; root 988:5007 mode 2770
@@ -580,7 +580,6 @@
 │       │   └── shows
 │       ├── movies
 │       └── shows
-├── nas-downloads-media-ro  # enabled, unused bindfs RO view of /mnt/nas-downloaders; proposed retirement
 ├── nas-filesync
 ├── nas-infra
 ├── nas-smarthome
