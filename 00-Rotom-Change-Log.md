@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-01 — JAR-76 ROM download and organization pipeline verified
+**Documentation updated:** 2026-10-01 — autonomous JAR ticket execution command adopted
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -23,6 +23,12 @@ Update this log as part of the same task whenever a substantive change is made t
 Do not add an entry for an unchanged re-upload, download, repackaging, or a formatting-only edit. Record typo corrections only when they change the meaning of a command, path, ID, or other operational detail. Discussion alone does not require an entry until a decision or finding is incorporated into the documentation.
 
 The sole canonical documentation-update command is **`Update the RPD`**. It means apply this maintenance procedure to **the final supported state established in the current chat**. It authorizes documentation preparation and packaging only; it does **not** authorize changes to Rotom, Proxmox, Docker, NAS, networking, applications, external services, or other live state unless those changes are separately authorized.
+
+The canonical active-ticket command is **`Work on ticket JAR-*`**, replacing `JAR-*` with the exact Linear ticket identifier. It authorizes Codex to work autonomously within that ticket's verified scope and acceptance criteria until it is complete, verified, documented, and ready to close. Before changing live state, Codex must read the ticket and relevant current RPD, inspect the live state, and compare observed and documented state. It must make reasonable routine implementation decisions within the ticket scope, use the smallest safe change, and keep Linear current with meaningful verified milestones, material scope/design decisions, blockers, rollbacks, and intentional deferrals. Linear updates must not be a raw command transcript or duplicate routine diagnostics.
+
+An intermediate failure, partial progress, unresolved acceptance criterion, or failed verification is not a completion or handoff condition. Codex must investigate the evidence and continue with the next safe, scoped approach. Codex must not declare the ticket complete merely because an intermediate step failed or more work remains. It must request Jared's input before a destructive action; obtaining, creating, changing, or exposing a secret or credential; modifying protected backup/recovery behavior or data; or acting on a genuine ambiguity that cannot be safely resolved from available evidence. An unavoidable access or evidence blocker must also be reported rather than bypassed. PVE remains Jared-executed: when a PVE check or change is required, Codex supplies the established ticket-specific preflight/action/verification blocks and waits for Jared's output before proceeding where that evidence is required.
+
+Before reporting a ticket ready to close, Codex must satisfy its acceptance criteria (or record Jared's explicit waiver), complete final appropriate live-state verification, record the meaningful final outcome in Linear, and update the RPD from the final supported state under this maintenance contract. “Ready to close” does not itself authorize closing the Linear ticket.
 
 For each `Update the RPD` task:
 
@@ -56,6 +62,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-01 — Adopt autonomous JAR ticket execution command
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `06-Maintenance-and-Automation.md`.
+- **Status:** **Documentation only / Adopted operational policy.**
+- **Changes:** Added the canonical `Work on ticket JAR-*` command. It authorizes autonomous, ticket-scoped Rotom work through final verification, meaningful Linear updates, and RPD closeout; it requires investigation and continued safe work after intermediate failures rather than premature completion or handoff. The command preserves explicit approval boundaries, reports unavoidable access/evidence blockers, and retains Jared-executed PVE operations.
+- **Evidence:** Jared's explicit 2026-10-01 operating-policy decision.
+- **Outstanding:** None.
 
 ## 2026-10-01 — Restore Homepage Uptime Kuma monitor resolution
 
