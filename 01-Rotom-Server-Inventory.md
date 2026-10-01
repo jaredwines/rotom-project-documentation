@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — JAR-85 Infra legacy-material retirement verified
+**Documentation updated:** 2026-10-01 — JAR-86 unused Media bindfs view retired and verified
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -51,7 +51,7 @@ The accepted Phase B architecture now uses **PVE** as the product abbreviation a
 | Reserved v2 NAS boundaries | `Customapps` remains the empty reserved export at `/mnt/nas-customapps`; `customapps` (`904:5008`) deliberately retains compatibility home `/home/apps`. JAR-78 retired the stale `Gameserver` guest contract after confirming the established `Game` export at `/mnt/nas-game`; no NAS data was deleted. The separate empty `Downloads` and obsolete `Apps` guest contracts remain retired. |
 | Palworld | `palworld-server-jared` and `palworld-server-fran` are running and healthy with `unless-stopped`; their active worlds/saves were reverified and preserved through JAR-78 |
 | qBittorrentVPN | Running; fail-closed design retained; `wg0` verified `10.2.0.2/32`; active Media payload plus Media and Game read-only safety markers verified |
-| Guest NAS | Twelve fstab-backed systemd automounts plus the retained enabled Media bindfs compatibility view; JAR-81 removed only the obsolete Downloader torrent tree while preserving its root and sentinel; the Game Downloads view was retired |
+| Guest NAS | Twelve fstab-backed systemd automounts; JAR-86 retired the unused Media bindfs compatibility view while preserving the Downloader root/sentinel and all Media paths; the Game Downloads view was already retired |
 | JAR-47 recovery policy | Final four-layer model: application-aware artifacts, guest Restic, separate PVE VM VZDump, and UNAS local snapshots for authoritative NAS Media. All layers remain on the same UNAS appliance where applicable; snapshots are rollback protection, not off-site protection. |
 | Guest Restic | Canonical repository `/mnt/nas-rotom-restic-backup/rotom-restic-backup`; `rotom-restic-backup*`; snapshot `3c85d5be` (2026-10-01 02:30 PDT) is the verified JAR-84 recovery point, including byte-verified legacy-tree archives; retention is 7 daily / 4 weekly / 12 monthly. |
 | PVE host-config Restic | NAS `PVE_Restic_Backup/.data`; mount `/mnt/nas-pve-restic-backup`; repo `/mnt/nas-pve-restic-backup/pve-restic-backup`; repo ID `8ca0218c645dc2968c2b21d67dbda3840794d8bc9c157c0515a85af30eb3d0e3`; worker/unit/timer `pve-restic-backup*`; staging `/var/backups/pve-restic-recovery`; timer enabled/active daily `04:00`; retention `7 daily / 4 weekly / 12 monthly` |
@@ -151,7 +151,6 @@ The adopted access policy keeps `jared` outside the media group. Administer medi
 | `/mnt/nas-smarthome` | Smarthome service share; root `988:5003` mode `2770`; HA/Homebridge state remains local under `/home/smarthome` |
 | `/mnt/nas-documents` | Documents service share; root `988:5004` mode `2770`; no application deployed |
 | `/mnt/nas-downloaders` | NFSv3 **`Downloader/.data`**; root `988:5005` mode `2770`; active writable Downloader boundary with Movies/Shows directory layout and sentinel. JAR-79 found qBittorrentVPN currently sources its payload binds from Media, not this mount. |
-| `/mnt/nas-downloads-media-ro` | Enabled read-only bindfs view sourced from `/mnt/nas-downloaders`; no current container consumer; proposed for separate retirement |
 | `/mnt/nas-web` | Web service share; root `988:5006` mode `2770`; website content remains local under `/home/web` |
 | `/mnt/nas-filesync` | Filesync service share; root `988:5007` mode `2770`; no application deployed |
 | `/mnt/nas-customapps` | NFSv3 `Customapps/.data`; root `988:5008` mode `2770`; reserved `customapps` boundary; compatibility home `/home/apps` retained |
@@ -214,8 +213,8 @@ The current recovery design has three independent logical layers on the same Uni
 
 1. The Debian VM still boots independently of NAS availability through the fstab/systemd automount design.
 2. Docker and containerd are enabled and returned active after the JAR-31 acceptance reboot. Docker runtime state remains local at `/var/lib/docker`.
-3. The adapted `rotom-nas-docker-recovery.service` is enabled with retry-on-failure behavior. On the JAR-31 reboot its first invocation reached `/mnt/nas-downloaders` but failed when `/mnt/nas-media` was not ready; systemd retried about 30 seconds later, then the helper mounted/verified Downloader, Media, and Game storage plus both read-only bindfs views and automatically recovered qBittorrentVPN, Radarr, Sonarr, and Jellyfin. JAR-77 removed its retired Gamarr branch; its manual healthy-state run passed. Final unit state was `active (exited)`, `Result=success`, `ExecMainStatus=0`.
-4. The sole compatibility-view service remains active: `/mnt/nas-downloads-media-ro` is a read-only bindfs view sourced from current `/mnt/nas-downloaders`, but JAR-81 found no current container consumer. Its separate retirement is proposed; the Game view remains retired.
+3. The adapted `rotom-nas-docker-recovery.service` is enabled with retry-on-failure behavior. On the JAR-31 reboot its first invocation reached `/mnt/nas-downloaders` but failed when `/mnt/nas-media` was not ready; systemd retried about 30 seconds later, then the helper mounted/verified the required storage and automatically recovered qBittorrentVPN, Radarr, Sonarr, and Jellyfin. JAR-77 removed its retired Gamarr branch; JAR-86 removed the unused Media bindfs branch. Its final healthy-state run passed with the retained Downloader/Media NFS checks and all covered containers already running.
+4. Both former Downloads compatibility views are retired. `/mnt/nas-downloads-media-ro` and its unit were removed after preflight found no container or Compose consumer; the Game view was already retired.
 5. The earlier reboot restored the then-intended 16-running set. Final JAR-68 acceptance later recorded 16 total container objects / 14 intended running because both Palworld containers were deliberately stopped; qBittorrent `wg0` and core checks passed and zero systemd units were failed.
 6. The Proxmox host remains independent of Rotom application NFS and application Docker; no application share is mounted there.
 

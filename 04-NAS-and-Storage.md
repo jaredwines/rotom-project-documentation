@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — JAR-83 minimal Game qBittorrent marker restored and verified
+**Documentation updated:** 2026-10-01 — JAR-86 unused Media bindfs view retired and verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -27,7 +27,7 @@ The original audit was read-only. It did not recursively enumerate the NAS, modi
 
 ## 2. Current Storage State — 2026-09-29 JAR-47 final recovery policy
 
-The Rotom guest storage contract remains twelve NFS systemd automounts plus an enabled read-only Media bindfs view that has no current container consumer and is proposed for separate retirement. PVE has only backup-specific NAS mounts; it does not host the guest application shares.
+The Rotom guest storage contract remains twelve NFS systemd automounts. JAR-86 retired the unused read-only Media bindfs view after confirming it had no active container or Compose consumer; PVE has only backup-specific NAS mounts and does not host the guest application shares.
 
 ### NAS protection classification — JAR-47
 
@@ -50,7 +50,7 @@ UniFi Drive snapshots are enabled for every NAS drive. The supplied Media settin
 
 ### Guest storage and post-reboot acceptance
 
-All twelve guest NFS automounts and both read-only bindfs views passed the historical final post-reboot verification. The Game view is now retired; JAR-81 found the retained Media view enabled but unused by current containers and proposes its separate retirement. `/mnt/nas-downloaders/.rotom-qbt-nas-ready` remained valid in that verification; qBittorrentVPN saw the expected mounts and WireGuard `10.2.0.2/32`. Current finished media/library and torrent/download separation remains unchanged.
+All twelve guest NFS automounts and both read-only bindfs views passed the historical final post-reboot verification. Both views are now retired: JAR-86 removed the unused Media view and its recovery-helper branch after fresh dependency preflight. `/mnt/nas-downloaders/.rotom-qbt-nas-ready` remained valid in that verification; qBittorrentVPN saw the expected mounts and WireGuard `10.2.0.2/32`. Current finished media/library and torrent/download separation remains unchanged.
 
 ### JAR-79 empty Game torrent-directory retirement — 2026-10-01
 
@@ -58,7 +58,7 @@ All twelve guest NFS automounts and both read-only bindfs views passed the histo
 
 ### JAR-81 Downloader torrent-payload retirement — 2026-10-01
 
-JAR-81 retained `/mnt/nas-downloaders`, its fstab automount, and `.rotom-qbt-nas-ready/`, while removing only its obsolete `torrents/` tree. The sole 10,482,662,507-byte Backrooms file was byte-identical to the retained Media copy (SHA-256 `0cad312d8f5997c3a641a1d5cf112c02492a56fb7da803bb0db02e99535fd58d`); after its deletion, five verified-empty descendant directories and then `torrents/` were removed with targeted `rmdir`. The enabled `/mnt/nas-downloads-media-ro` bindfs view remains sourced from the retained root; its unit and recovery helper now validate the NFS root and sentinel rather than the retired tree. Media libraries, Media torrents, NAS snapshot policy, Game data, and backup artifacts were not changed.
+JAR-81 retained `/mnt/nas-downloaders`, its fstab automount, and `.rotom-qbt-nas-ready/`, while removing only its obsolete `torrents/` tree. The sole 10,482,662,507-byte Backrooms file was byte-identical to the retained Media copy (SHA-256 `0cad312d8f5997c3a641a1d5cf112c02492a56fb7da803bb0db02e99535fd58d`); after its deletion, five verified-empty descendant directories and then `torrents/` were removed with targeted `rmdir`. JAR-86 subsequently retired the unused `/mnt/nas-downloads-media-ro` bindfs view and removed only its branch from the recovery helper; the helper retains NFS readiness validation for the Downloader root/sentinel and Media paths. Media libraries, Media torrents, NAS snapshot policy, Game data, and backup artifacts were not changed.
 
 ### JAR-83 minimal Game marker restoration — 2026-10-01
 

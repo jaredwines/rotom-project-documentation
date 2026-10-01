@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; current JAR-78 state is 17 container objects / 17 intended running, including both healthy Palworld servers
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — JAR-83 minimal Game qBittorrent marker restored and verified
+**Documentation updated:** 2026-10-01 — JAR-86 unused Media bindfs view retired and verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -93,7 +93,7 @@ There are **16 total container objects and 14 intended running containers**. Bot
 | `homebridge` | Running |
 | `alohamillworks.com` | Running |
 
-`jaredwines.com` remains intentionally undeployed and has no container object. Final post-reboot acceptance verified all twelve NAS automounts, both read-only bindfs compatibility views, qBittorrentVPN, Homepage PVE CPU monitoring, guest Restic timer state, and zero failed guest systemd units. The earlier 16-running observations below remain valid historical checkpoints but are superseded for the current intended runtime by this 14-running state.
+`jaredwines.com` remains intentionally undeployed and has no container object. Final post-reboot acceptance verified all twelve NAS automounts, qBittorrentVPN, Homepage PVE CPU monitoring, guest Restic timer state, and zero failed guest systemd units. Both former Downloads read-only bindfs compatibility views are now retired. The earlier 16-running observations below remain valid historical checkpoints but are superseded for the current intended runtime by this 14-running state.
 
 ### JAR-38 Infra v2 convergence — 2026-09-28
 
@@ -237,7 +237,7 @@ Prowlarr and qBittorrentVPN are Downloads-owned services at `901:5005` after JAR
 
 `/mnt/nas-media` has root ownership `988:5000`, mode `2770`. Existing mixed owner UIDs in the library are preserved. The former Media torrent tree was removed after JAR-21; active torrent objects are now created in Downloads storage under the Downloads identity/GID contract.
 
-Sonarr and Radarr mount the complete Media NAS at `/media` and bind `/mnt/nas-media/torrents` read-only at `/media/torrents`; Jellyfin's library mount remains read-only. qBittorrentVPN binds `/mnt/nas-media/torrents` read/write. The enabled `/mnt/nas-downloads-media-ro` bindfs view has no current container consumer and is proposed for separate retirement. Only qBittorrent uses the VPN and its kill switch was directly verified. **JAR-49 current state:** PVE attaches the NUC's Iris Plus Graphics 655 as optional `hostpci0`; Rotom maps its Intel `01:00.0` GPU to `/dev/dri/card1` and `/dev/dri/renderD128`. Active Jellyfin maps `/dev/dri`, adds guest GIDs `44` (video) and `992` (render), and runs under its existing `127:5000` service identity. Jellyfin is deliberately configured for QSV at `/dev/dri/renderD128`, with H.264/HEVC hardware processing enabled. A forced live H.264 transcode initialized Intel `iHD`/VA-API and used `h264_qsv`, then exited `0`; this attachment, device mapping, and Jellyfin runtime survived a complete PVE reboot. QSV is optional: remove `hostpci0` and the Compose device/group mappings to return Jellyfin to software transcoding on portable hardware. Coffee Lake Gen9.5 supports H.264 plus HEVC 8/10-bit acceleration but not AV1; H.264 High 10 and HEVC RExt remain software-only limitations. Low-Power encoder and VPP tone-mapping remain disabled because HuC firmware was not commissioned.
+Sonarr and Radarr mount the complete Media NAS at `/media` and bind `/mnt/nas-media/torrents` read-only at `/media/torrents`; Jellyfin's library mount remains read-only. qBittorrentVPN binds `/mnt/nas-media/torrents` read/write. JAR-86 retired the unused `/mnt/nas-downloads-media-ro` bindfs view after confirming it had no container or Compose consumer. Only qBittorrent uses the VPN and its kill switch was directly verified. **JAR-49 current state:** PVE attaches the NUC's Iris Plus Graphics 655 as optional `hostpci0`; Rotom maps its Intel `01:00.0` GPU to `/dev/dri/card1` and `/dev/dri/renderD128`. Active Jellyfin maps `/dev/dri`, adds guest GIDs `44` (video) and `992` (render), and runs under its existing `127:5000` service identity. Jellyfin is deliberately configured for QSV at `/dev/dri/renderD128`, with H.264/HEVC hardware processing enabled. A forced live H.264 transcode initialized Intel `iHD`/VA-API and used `h264_qsv`, then exited `0`; this attachment, device mapping, and Jellyfin runtime survived a complete PVE reboot. QSV is optional: remove `hostpci0` and the Compose device/group mappings to return Jellyfin to software transcoding on portable hardware. Coffee Lake Gen9.5 supports H.264 plus HEVC 8/10-bit acceleration but not AV1; H.264 High 10 and HEVC RExt remain software-only limitations. Low-Power encoder and VPP tone-mapping remain disabled because HuC firmware was not commissioned.
 
 Ordinary `jared` access to the media NAS is intentionally excluded. Administration uses `sudo -iu media` on Rotom after connecting as Jared. Jared's final account listing confirms he is not a member of media GID `5000`. UNAS's observed `--manage-gids` behavior means adding a client-side supplementary group alone does not grant the tested NFS access; using primary GID 5000 succeeded. See 04 and 07 for identity details and verification commands.
 
@@ -357,7 +357,7 @@ Production workloads are restored under the current service-account layout. The 
 
 | Service account | Current guest UID:GID | Current guest NAS mount | Current Docker/application use |
 |---|---:|---|---|
-| media | `127:5000` | `/mnt/nas-media` | Jellyfin/Radarr/Sonarr; Media compatibility view of Downloader torrents is read-only |
+| media | `127:5000` | `/mnt/nas-media` | Jellyfin/Radarr/Sonarr; active torrent path is `/mnt/nas-media/torrents` |
 | game | `995:5001` | `/mnt/nas-game` | Both Palworld servers; retained Game library is JAR-52 rollback material |
 | infra | `997:5002` | `/mnt/nas-infra` | Arcane/DDNS/Homepage/Glances/NPM configs remain local under `/home/infra/docker` |
 | smarthome | `126:5003` | `/mnt/nas-smarthome` | Home Assistant/Homebridge configs remain local under `/home/smarthome/docker` |
@@ -367,7 +367,7 @@ Production workloads are restored under the current service-account layout. The 
 | filesync | `903:5007` | `/mnt/nas-filesync` | Storage boundary only |
 | customapps | `904:5008` | `/mnt/nas-customapps` | Reserved storage boundary only; compatibility home `/home/apps` |
 
-Current application restores use `/home/<service>/docker/<project>`. The enabled `/mnt/nas-downloads-media-ro` Media read-only compatibility view sources `/mnt/nas-downloaders` and is retained despite having no current container consumer. JAR-81 removed only the obsolete Downloader `torrents/` tree; the root and active qBittorrent sentinel `/mnt/nas-downloaders/.rotom-qbt-nas-ready` remain. The unused Game view was retired.
+Current application restores use `/home/<service>/docker/<project>`. JAR-86 retired the unused `/mnt/nas-downloads-media-ro` Media read-only compatibility view and its recovery-helper branch; its source `/mnt/nas-downloaders`, root, and active qBittorrent sentinel `/mnt/nas-downloaders/.rotom-qbt-nas-ready` remain. JAR-81 removed only the obsolete Downloader `torrents/` tree. The unused Game view was already retired.
 
 The current `docker` group should be re-read before future privilege changes. JAR-30 GID `989` with no members is the last explicit verification; JAR-31 application restoration does not by itself demonstrate group membership changes.
 
