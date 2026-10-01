@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-30 — JAR-77 retire Gamarr and its integrations
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Retired the live Gamarr Compose project, container, private `gamarr_default` network, TCP `6767` listener, NPM proxy-host ID `19`, Homepage Media card, current/legacy Gamarr configuration trees, and the Gamarr branch of `rotom-nas-docker-recovery`. The retained shared `rotom-arr` and `rotom-proxy` networks, NPM wildcard certificate ID `24`, `/mnt/nas-media/library/games`, `/mnt/nas-media/torrents`, RomM, Prowlarr, qBittorrentVPN, Jellyfin, Radarr, and Sonarr were not changed. qBittorrent's `Games` category was retained because its active/seeding state was not authenticated for a safe deletion decision.
+- **Recovery:** Before deletion, a root-protected VM-local archive of current and legacy Gamarr Compose/configuration state was created at `/srv/rotom/backup-staging/media/jar77-20260930/gamarr-config-and-compose.tar.gz` (SHA-256 `382da2c3a289630271b1802ed8316f7c4b5d1e86d257f9168c4389d8303c6c3b`). The prior recovery worker is retained as root-owned `/usr/local/sbin/rotom-nas-docker-recovery.pre-jar77-20260930-0503`; it is a targeted rollback artifact, not active configuration.
+- **Evidence:** Docker labels established `/srv/rotom/stacks/media/gamarr/compose.yaml` as the live project before mutation. Its only writable non-local bind was the preserved Media game library; torrents were read-only. Prowlarr had only Radarr/Sonarr applications. NPM host 19 was marked deleted and its generated config absent while certificate 24 remained active; `gamarr.rotom.casa` no longer completed TLS routing, whereas `https://rotom.casa` returned `200`. Homepage was healthy after its targeted recreation. The recovery worker passed after the one-line retirement. Final checks found no Gamarr container, listener, private network, active configuration reference, or Gamarr-named live path; RomM retained its read-only game-library bind, qBittorrentVPN retained `wg0` `10.2.0.2/32`, Media game-library/torrent paths remained present, and zero systemd units were failed after a stale Filesync boot-race mount was safely retried.
+
 ## 2026-09-30 — Restore Jared Wines Homepage card
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`.

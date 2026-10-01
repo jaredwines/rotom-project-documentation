@@ -40,6 +40,10 @@ JAR-37 is the accepted Phase C runtime gate. Docker's daemon-wide `json-file` ca
 
 ### JAR-75 Filesync Syncthing — 2026-09-29
 
+### JAR-77 Gamarr retirement — 2026-09-30
+
+Gamarr is retired. JAR-77 verified its live v2 Compose labels before removing `/srv/rotom/stacks/media/gamarr`, `/srv/rotom/appdata/media/gamarr`, and the legacy `/home/game/docker/gamarr`/standalone Gamarr config. Its container, private default network, port `6767`, Homepage card, NPM route, and recovery-worker branch are absent. RomM retains its read-only `/mnt/nas-media/library/games` bind; Prowlarr retains only Radarr/Sonarr applications, and qBittorrentVPN retains its existing `Games` category and verified VPN design. The targeted root-protected restore archive is `/srv/rotom/backup-staging/media/jar77-20260930/gamarr-config-and-compose.tar.gz`.
+
 ### JAR-73 Uptime Kuma — 2026-09-30
 
 ### PVE web UI Homepage entry — 2026-09-30
