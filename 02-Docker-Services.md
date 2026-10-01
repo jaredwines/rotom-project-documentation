@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; current supplied 2026-10-01 Docker inventory is 25 container objects / 24 running, with deployment details separately evidenced per service
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — JDownloader and current Docker inventory recorded
+**Documentation updated:** 2026-10-01 — JAR-76 ROM download and organization pipeline verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -42,7 +42,7 @@ JAR-37 is the accepted Phase C runtime gate. Docker's daemon-wide `json-file` ca
 
 ### JAR-77 Gamarr retirement — 2026-09-30
 
-Gamarr is retired. JAR-77 verified its live v2 Compose labels before removing `/srv/rotom/stacks/media/gamarr`, `/srv/rotom/appdata/media/gamarr`, and the legacy `/home/game/docker/gamarr`/standalone Gamarr config. Its container, private default network, port `6767`, Homepage card, NPM route, and recovery-worker branch are absent. RomM retains its read-only `/mnt/nas-media/library/games` bind; Prowlarr retains only Radarr/Sonarr applications. At JAR-77 closeout, qBittorrentVPN's `Games` category was retained because its active/seeding state was not authenticated; JAR-79 later removed it after live zero-torrent verification. The targeted root-protected restore archive is `/srv/rotom/backup-staging/media/jar77-20260930/gamarr-config-and-compose.tar.gz`.
+Gamarr is retired. JAR-77 verified its live v2 Compose labels before removing `/srv/rotom/stacks/media/gamarr`, `/srv/rotom/appdata/media/gamarr`, and the legacy `/home/game/docker/gamarr`/standalone Gamarr config. Its container, private default network, port `6767`, Homepage card, NPM route, and recovery-worker branch are absent. At JAR-77 closeout, RomM retained its read-only `/mnt/nas-media/library/games` bind; JAR-76 later superseded that bind with the current read-only Game library path. Prowlarr retains only Radarr/Sonarr applications. At JAR-77 closeout, qBittorrentVPN's `Games` category was retained because its active/seeding state was not authenticated; JAR-79 later removed it after live zero-torrent verification. The targeted root-protected restore archive is `/srv/rotom/backup-staging/media/jar77-20260930/gamarr-config-and-compose.tar.gz`.
 
 ### JAR-79 Game torrent-directory retirement — 2026-10-01
 
@@ -105,7 +105,7 @@ At JAR-68, `jaredwines.com` was intentionally undeployed and had no container ob
 
 The supplied root `docker ps -a` output records **25 container objects: 24 running and one exited**. `syncthing` is the sole exited object (`Exited (0)`); both Palworld containers are running and healthy; Gamarr is absent, consistent with JAR-77 retirement. The running set is `jdownloader`, `romm`, `nginx-proxy-manager`, `qbittorrentvpn`, both Palworld servers, `jellyfin`, `homepage`, `prowlarr`, `uptime-kuma`, `rotom-docs`, `romm-valkey`, `romm-db`, `paperless`, `paperless-db`, `paperless-broker`, `alohamillworks.com`, `homebridge`, `home-assistant`, `sonarr`, `radarr`, `arcane`, `cloudflare-ddns`, and `glances`.
 
-`jdownloader` is newly observed running. The supplied output shows only its bare container TCP `3129` port, not a host-published mapping. Its image tag, authoritative Compose definition, persistent binds, service identity, network attachments, restart policy, credentials, and backup/recovery contract were not inspected and remain **Needs Verification**. Do not document or expose its protected inputs.
+`jdownloader` is the JAR-76 Game-domain direct-download service. Its authoritative Compose file is `/srv/rotom/stacks/game/jdownloader/compose.yaml`; it runs as `995:5001` with `unless-stopped`, no host-published ports, no added capabilities, and `no-new-privileges`. Its only writable NAS bind is `/mnt/nas-game/downloads/romm-inbox -> /opt/JDownloader/Downloads`; its VM-local configuration is `/srv/rotom/appdata/game/jdownloader/config`. MyJDownloader inputs are root-administered files below `/srv/rotom/secrets/game/jdownloader`, mounted read-only to the service and never recorded by value. Live verification completed a MyJDownloader-submitted direct download to the inbox.
 
 ### JAR-38 Infra v2 convergence — 2026-09-28
 
@@ -129,7 +129,7 @@ The root-owned `scripts/publish-source` is the controlled publication mechanism.
 
 ### JAR-10 RomM deployment — 2026-09-29
 
-RomM 5.3.1 with MariaDB 11 and Valkey 9 runs from `/srv/rotom/stacks/media/romm/compose.yaml`. Its state, database, config, assets, resources, cache, and verified logical export are VM-local under `/srv/rotom/appdata/media/romm`; protected database/application inputs are root-only under `/srv/rotom/secrets/media/romm`. It mounts `/mnt/nas-media/library/games` read-only, has no Docker socket or privileged mode, and exposes only loopback `127.0.0.1:8081` for retained host-networked NPM.
+RomM 5.3.1 with MariaDB 11 and Valkey 9 runs from `/srv/rotom/stacks/media/romm/compose.yaml`. Its state, database, config, assets, resources, cache, and verified logical export are VM-local under `/srv/rotom/appdata/media/romm`; protected database/application inputs are root-only under `/srv/rotom/secrets/media/romm`. JAR-76 changes only its library bind to `/mnt/nas-game/library/games:/romm/library:ro` and enables scheduled quick scans at minutes 7, 22, 37, and 52. It has no Docker socket or privileged mode and exposes only loopback `127.0.0.1:8081` for retained host-networked NPM.
 
 Jellyfin, Radarr, Sonarr, and Prowlarr are active v2 modules under `/srv/rotom/stacks/media/<app>/compose.yaml`; JAR-84 directly verified all four Compose labels and active bind sources. Jellyfin retains its read-only `/mnt/nas-media/library` bind, while Radarr/Sonarr mount `/mnt/nas-media/torrents` at `/media/torrents`. qBittorrentVPN retains its v2 downloader stack/appdata paths and Media payload binds. The former service-home Radarr/Sonarr/Prowlarr/qBittorrentVPN trees are retired recovery artifacts; the Jellyfin tree is deliberately retained. All proxyable services attach `rotom-proxy`; Radarr/Sonarr/Prowlarr attach `rotom-arr`; qBittorrentVPN also attaches `rotom-arr`. Existing ports remain NPM compatibility upstreams.
 
@@ -370,7 +370,7 @@ Production workloads are restored under the current service-account layout. The 
 | Service account | Current guest UID:GID | Current guest NAS mount | Current Docker/application use |
 |---|---:|---|---|
 | media | `127:5000` | `/mnt/nas-media` | Jellyfin/Radarr/Sonarr; active torrent path is `/mnt/nas-media/torrents` |
-| game | `995:5001` | `/mnt/nas-game` | Both Palworld servers; retained Game library is JAR-52 rollback material |
+| game | `995:5001` | `/mnt/nas-game` | Both Palworld servers plus private JDownloader; Game ROM inbox/review/library are current JAR-76 paths |
 | infra | `997:5002` | `/mnt/nas-infra` | Arcane/DDNS/Homepage/Glances/NPM configs remain local under `/home/infra/docker` |
 | smarthome | `126:5003` | `/mnt/nas-smarthome` | Home Assistant/Homebridge configs remain local under `/home/smarthome/docker` |
 | documents | `900:5004` | `/mnt/nas-documents` | Storage boundary only |

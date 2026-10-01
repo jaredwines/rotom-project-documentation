@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — JAR-86 unused Media bindfs view retired and verified
+**Documentation updated:** 2026-10-01 — JAR-76 Game ROM storage pipeline verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -62,7 +62,7 @@ JAR-81 retained `/mnt/nas-downloaders`, its fstab automount, and `.rotom-qbt-nas
 
 ### JAR-83 minimal Game marker restoration — 2026-10-01
 
-The existing `Game/.data` export remains authorized only to Rotom and was restored as the fstab-backed `/mnt/nas-game` automount with its original NFSv3/service-GID root (`988:5001`, mode `2770`). A read-only inventory found it empty; its sole current entry is `.rotom-qbt-media-ready/`, numeric `901:5000`, mode `2750`. The restored `/home/game/nas-game` shortcut targets that mount. qBittorrentVPN binds this marker read-only with `create_host_path: false`, while its payload remains Media-only at `/mnt/nas-media/torrents`. The active 15-second guard requires both the Media and Game NFS/marker pairs. Temporarily renaming only the empty Game marker caused the guard to stop qBittorrentVPN; restoring it returned the guard and WireGuard to healthy state. No Game library, torrent tree, Palworld world, or unrelated NAS content was created, deleted, or moved.
+The existing `Game/.data` export remains authorized only to Rotom and is the fstab-backed `/mnt/nas-game` automount with its original NFSv3/service-GID root (`988:5001`, mode `2770`). JAR-76 created setgid Game-owned `downloads/romm-inbox`, `downloads/romm-review`, and `library/games/roms` paths. The separate `.rotom-qbt-media-ready/` marker remains owned by the Downloader/Media contract and qBittorrentVPN binds it read-only with `create_host_path: false`; its payload remains Media-only at `/mnt/nas-media/torrents`. The active 15-second guard still requires both the Media and Game NFS/marker pairs. JDownloader may write only the ROM inbox; the organizer copies DAT-matched content to the Game library and moves unmatched input to review without deletion. Palworld worlds remain VM-local.
 
 ### Retired empty `Downloads` boundary — 2026-09-29
 
@@ -85,7 +85,7 @@ At the final pre-migration baseline, Rotom used one local NVMe system disk and N
 | Mount | Source | Filesystem | Root metadata | Primary purpose |
 |---|---|---|---|---|
 | `/mnt/nas-media` | `192.168.1.70:/var/nfs/shared/Media` | NFSv3 `sec=sys` | `988:5000` mode `2770` | Final movie/show/game library data; JAR-52 game content is under `library/games`; old torrent tree removed by JAR-21 |
-| `/mnt/nas-game` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Game/.data` | NFSv3 `sec=sys` | `988:5001` mode `2770` | Compatibility Game-library source retained intact for JAR-52 rollback; Palworld remains local VM state |
+| `/mnt/nas-game` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Game/.data` | NFSv3 `sec=sys` | `988:5001` mode `2770` | JAR-76 Game ROM inbox/review/library plus retained historical material; Palworld remains local VM state |
 | `/mnt/nas-infra` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Infra/.data` | NFSv3 `sec=sys` | `988:5002` mode `2770` | Infra storage boundary; currently no workload data |
 | `/mnt/nas-smarthome` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Smarthome/.data` | NFSv3 `sec=sys` | `988:5003` mode `2770` | Smarthome storage boundary; HA/Homebridge remain local |
 | `/mnt/nas-documents` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Documents/.data` | NFSv3 `sec=sys` | `988:5004` mode `2770` | Documents storage boundary; currently empty |

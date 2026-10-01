@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Restic backup architecture, scope, retention, verification, restore evidence, and recovery boundaries  
 **Recovery scope:** pre-migration Rotom plus current Proxmox/VM foundation  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — JAR-82 documentation cross-reference correction recorded
+**Documentation updated:** 2026-10-01 — JAR-76 ROM pipeline recovery boundaries recorded
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -77,6 +77,8 @@ JAR-75 implements the Filesync domain with Syncthing. Its configuration/database
 JAR-8 Paperless state, PostgreSQL, Valkey, media, exports, and consume paths are VM-local under `/srv/rotom/appdata/documents/paperless`; NAS Documents is unused. A supported local export was produced into protected `/srv/rotom/backup-staging/documents/paperless`, but it is not yet in a verified guest Restic snapshot. JAR-47 must first repair the shared Smart Home SQLite staging discrepancy before a guest backup run.
 
 JAR-10 RomM database and application state are VM-local under `/srv/rotom/appdata/media/romm`; a single-transaction MariaDB export is retained under its `backup` directory and gzip integrity was verified. The Media NAS game library is read-only in RomM and remains outside guest Restic because `/mnt` is excluded.
+
+JAR-76 moves RomM's current read-only library bind to `/mnt/nas-game/library/games` and adds JDownloader configuration, Igir DAT/report/cache state, Compose definitions, protected MyJDownloader input files, and targeted rollback copies under `/srv/rotom`. Those VM-local paths are within the established guest Restic source scope; no backup run, retention change, or recovery-policy change was made by JAR-76. The Game NAS inbox, review queue, and library remain outside guest Restic because `/mnt` is excluded. Recover NAS-resident ROM data through the applicable UNAS snapshot/recovery process; treat JAR-76 test artifacts as non-production content.
 
 JAR-5 keeps its documentation portal Compose definition and controlled-publish script under `/srv/rotom/stacks/infra/rotom-docs` and its generated source/site output under `/srv/rotom/appdata/infra/rotom-docs`; these VM-local paths are within the established guest Restic `/srv` source scope. The portal source is a deliberately derived, reproducible copy of canonical RPD material, not a new authority or a NAS dataset. JAR-5 did not run, modify, or validate Restic, retention, pruning, repositories, credentials, schedules, or restores.
 

@@ -8,7 +8,7 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-10-01; JDownloader and current Docker inventory recorded.
+# Documentation revised: 2026-10-01; JAR-76 ROM download and organization pipeline verified.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the RPD.
 #
@@ -18,11 +18,11 @@
 # - Canonical Mac PVE SSH: aliases `pve` / `pve.rotom.casa` -> 192.168.1.68 Jared using ~/.ssh/id_ed25519_pve. PVE Jared has sudo plus `jared@pam` Administrator access; the matching root-authorized key was removed, while root remains emergency recovery. Old `proxmox*` aliases/key filenames are absent. PVE /etc/hosts contains canonical `192.168.1.68 pve.rotom.casa pve`.
 # - PVE monitoring: /usr/local/sbin/pve-cpu-temp-api + /etc/systemd/system/pve-cpu-temp-api.service; 192.168.1.68:8788; Homepage label `PVE CPU Temperature`. Backup status: /usr/local/sbin/pve-backup-status-api + /etc/systemd/system/pve-backup-status-api.service; LAN-only 192.168.1.68:8789; Homepage PVE Restic and Rotom VM schedule cards.
 # - VMID 100 `rotom`: q35/OVMF, x86-64-v2-AES, 8 vCPU, 12 GiB RAM, 100 GiB; onboot=1; optional JAR-49 host attachment `hostpci0: 0000:00:02.0,pcie=1` exposes the NUC Iris Plus 655 as guest `01:00.0` / `/dev/dri/renderD128`; guest rotom.casa at reserved 192.168.1.69, MAC BC:24:11:97:10:47. Removing hostpci0 preserves the portable baseline.
-# - Docker: supplied root 2026-10-01 inventory records 25 container objects / 24 running. JDownloader is running with container-only TCP 3129; both Palworld containers are healthy; Syncthing is exited (0); Gamarr remains retired/absent. JDownloader Compose, persistence, identity, network, automation, and recovery details are Needs Verification.
+# - Docker: supplied root 2026-10-01 inventory records 25 container objects / 24 running. JAR-76 JDownloader is private (no host-published port), runs as `995:5001` from `/srv/rotom/stacks/game/jdownloader`, and writes only the Game ROM inbox. Both Palworld containers are healthy; Syncthing is exited (0); Gamarr remains retired/absent.
 # - JAR-82: Infra v2 Compose includes `/srv/rotom/stacks/infra/nginx-proxy-manager/compose.yaml`; NPM retains host networking and binds authoritative root-owned data/certificate state from `/srv/rotom/appdata/infra/nginx-proxy-manager/{data,letsencrypt}`. The former `/home/infra/docker/nginx-proxy-manager` Compose/data tree is retained rollback material, not active configuration.
 # - JAR-85: root inspection confirmed `/home/infra` ownership/ACLs and the mounted Infra NFS boundary. Active Arcane mounts `/home/downloaders/docker` directly, and its current database has no old discovery-path reference. The inactive `/home/infra/docker/downloads` symlink and two superseded non-sensitive Homepage files were retired after reference and recovery review. NPM, its historical Compose copy, credentials, certificate/database state, RPD, `.ssh`, and NAS paths remain untouched.
 # - JAR-73: Uptime Kuma Compose is `/srv/rotom/stacks/infra/uptime-kuma/compose.yaml`; its local SQLite data is `/srv/rotom/appdata/infra/uptime-kuma`, and its sole listener is `127.0.0.1:3002`. Root-only Rotom alert worker/unit/timer are `/usr/local/sbin/rotom-alerting`, `/etc/systemd/system/rotom-alerting.service`, and `.timer`, with state under `/var/lib/rotom-alerting`; PVE has the parallel `/usr/local/sbin/pve-alerting` and `pve-alerting.{service,timer}`. Protected alert inputs remain below `/srv/rotom/secrets/infra` and are never documented by value.
-# - JAR-10: RomM/MariaDB/Valkey are deployed at `/srv/rotom/stacks/media/romm`; all mutable state and verified logical export are local below `/srv/rotom/appdata/media/romm`, protected inputs are under `secrets/media/romm`, and `/mnt/nas-media/library/games` is read-only in RomM. NPM uses loopback `8081` for `romm.rotom.casa`.
+# - JAR-10/JAR-76: RomM/MariaDB/Valkey are deployed at `/srv/rotom/stacks/media/romm`; all mutable state and verified logical export are local below `/srv/rotom/appdata/media/romm`, protected inputs are under `secrets/media/romm`, and `/mnt/nas-game/library/games` is read-only in RomM. JDownloader's sole writable NAS bind is `/mnt/nas-game/downloads/romm-inbox`; `romm-igir.timer` runs every 15 minutes and copies DAT-matched content to the Game library or routes unmatched files to review without deletion. RomM scans at minutes 7, 22, 37, and 52. NPM uses loopback `8081` for `romm.rotom.casa`.
 # - JAR-49: active Jellyfin Compose labels resolve to `/home/media/docker/jellyfin/compose.yaml`, not the existing `/srv/rotom/stacks/media/jellyfin` directory. Jellyfin maps `/dev/dri` and guest groups `44`/`992`, uses QSV on `/dev/dri/renderD128`, and has a verified live `h264_qsv` transcode. Other Media module locations were not re-audited by JAR-49.
 # - 2026-09-29: the distinct empty NAS `Downloads` drive and unused `/mnt/nas-downloads` guest contract were retired after a mounted zero-byte/no-reference inspection. Active `Downloader` storage and retained `Game` rollback data are unchanged.
 # - 2026-09-29: current identity `customapps` retains compatibility home `/home/apps`; the obsolete NAS `Apps` drive plus its `Apps/.data -> /mnt/nas-apps` fstab/automount, local mountpoint, and `nas-apps` shortcut were retired. Empty `Customapps/.data -> /mnt/nas-customapps` remains the reserved boundary through `/home/apps/nas-customapps`.
@@ -172,6 +172,8 @@
 #   stacks/documents/DOMAIN-CONTRACT.md JAR-44 Paperless deployment/recovery contract; no Compose placeholder
 #   stacks/documents/paperless/compose.yaml JAR-8 Paperless/PostgreSQL/Valkey stack
 #   stacks/filesync/syncthing/compose.yaml JAR-75 Syncthing 2.0.0; numeric 903:5007; loopback-only 8384 for NPM; sole NAS bind /mnt/nas-filesync -> /filesync with create_host_path:false
+#   stacks/game/jdownloader/compose.yaml JAR-76 private MyJDownloader service; no host port; sole NAS write bind is the ROM inbox
+#   stacks/media/romm/compose.yaml       JAR-76 read-only Game library bind; scheduled quick scan enabled
 #   stacks/{customapps,auth}/DOMAIN-CONTRACT.md JAR-46 future-domain contracts; no Compose placeholders
 #   appdata/<domain>/                service-owned mutable state; migrated domains have owning state trees
 #     filesync/syncthing/             JAR-75 persistent Syncthing configuration/database; included in guest Restic /srv source
@@ -179,11 +181,15 @@
 #     smarthome/homebridge/           JAR-43 authoritative Homebridge state
 #     web/alohamillworks.com/          JAR-45 authoritative Aloha content
 #     web/jaredwines.com/              JAR-45 retained unstarted site content
+#     game/jdownloader/config/          JAR-76 persistent JDownloader configuration; included in guest Restic /srv source
+#     game/romm-igir/{dats,reports,npm-cache}/ JAR-76 worker state; included in guest Restic /srv source
 #   secrets/                         root:root 0700; credentials/private material only, Git-ignored
 #     documents/                     JAR-44 root-only Documents secret boundary
 #       paperless/                   JAR-8 protected Paperless credentials
+#     game/jdownloader/              JAR-76 protected MyJDownloader input files; values never documented
 #     {filesync,customapps,auth}/    JAR-46 root-only future-domain secret boundaries
 #   scripts/                         root-owned declarative helper namespace
+#   backup-staging/game/jar76-20261001/ JAR-76 retained targeted Compose/config rollback material
 #   backup-staging/                  root:root 0700; app-consistent export staging, Git-ignored; JAR-47 holds verified Paperless and Palworld recovery artifacts
 #   .git/                            local history only; no remote configured by JAR-34
 #   .gitignore                       excludes mutable/sensitive/generated state
@@ -195,6 +201,10 @@
 #   empty local mountpoint. The separate empty `/mnt/nas-downloads` / NAS
 #   `Downloads` drive and stale `/mnt/nas-apps` boundary are retired;
 #   `customapps` uses `/mnt/nas-customapps`.
+#   JAR-76 current ROM paths: downloads/romm-inbox (JDownloader-only write),
+#   downloads/romm-review (unmatched input), and library/games/roms (Igir copy
+#   target, mounted read-only by RomM). `.rotom-qbt-media-ready` remains the
+#   separate qBittorrent read-only safety marker.
 # /srv/rotom/stacks/NETWORKING.md
 #   JAR-36 tracked Compose contract for external rotom-proxy, rotom-arr, and
 #   rotom-monitoring bridges; the networks initially have no containers.

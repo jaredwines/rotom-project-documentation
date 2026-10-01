@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-01 — JDownloader and current Docker inventory recorded
+**Documentation updated:** 2026-10-01 — JAR-76 ROM download and organization pipeline verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -56,6 +56,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-01 — JAR-76 automate ROM downloads and organization
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Added the Game-domain JDownloader module and secret-input boundary, the non-destructive Igir inbox worker, and RomM's read-only Game-library bind with scheduled quick scans. The Game NFS share now has explicit `downloads/romm-inbox`, `downloads/romm-review`, and `library/games/roms` paths. JDownloader has no host-published port and can write only its inbox; Igir copies DAT-matched ROMs to the library, retains source artifacts, and routes unmatched input to review.
+- **Evidence:** Live Compose/systemd validation; JDownloader completed a 5,847-byte MyJDownloader-submitted public direct download to the Game inbox; host/container bind views matched; Igir routed that unmatched file to review. Separate raw-ROM and ZIP fixture checks copied valid DAT-matched content to the RomM library, and RomM's scheduled scan found both files and completed. All checked containers remained running, qBittorrentVPN retained `wg0` `10.2.0.2/32`, and no systemd unit was failed.
+- **Outstanding:** The intentionally retained JAR-76 test artifacts are not production library content. NAS-resident library and inbox/review data remain outside guest Restic and use the existing NAS recovery model; no backup policy was changed.
 
 ## 2026-10-01 — Organize repository-support files
 
