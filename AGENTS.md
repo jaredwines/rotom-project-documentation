@@ -9,7 +9,7 @@ This repository is the Git working copy for the legacy documentation set (legacy
 - Follow the current legacy documentation rather than duplicating its detailed procedures in this file.
 - Preserve historical entries as historical evidence. Do not silently rewrite old records to match current state.
 
-Repository support files such as `AGENTS.md`, `.gitignore`, and files under `tooling/` are not legacy documentation members merely because they are stored in this Git repository. Available Sources remains the legacy documentation membership boundary.
+Repository support files such as root `AGENTS.md`, `.gitignore`, `README.md`, and files under `support/` are not legacy documentation members merely because they are stored in this Git repository. Available Sources remains the legacy documentation membership boundary.
 
 ## legacy documentation Git workflow
 

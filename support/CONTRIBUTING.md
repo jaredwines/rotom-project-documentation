@@ -1,6 +1,6 @@
 # Contributing to the legacy documentation set
 
-This repository records verified Rotom state. Before preparing a change, read the canonical maintenance contract in [00 - Rotom Change Log](00-Rotom-Change-Log.md). That document governs legacy documentation updates; this guide only summarizes the repository-facing expectations.
+This repository records verified Rotom state. Before preparing a change, read the canonical maintenance contract in [00 - Rotom Change Log](../00-Rotom-Change-Log.md). That document governs legacy documentation updates; this guide only summarizes the repository-facing expectations.
 
 ## Before changing documentation
 
@@ -19,7 +19,7 @@ This repository records verified Rotom state. Before preparing a change, read th
 
 ## Change history
 
-For every substantive legacy documentation update, add one dated entry to the **Change History** in [00 - Rotom Change Log](00-Rotom-Change-Log.md), following its required format. The entry should name the affected files, state what changed and why, identify evidence, and record outstanding work.
+For every substantive legacy documentation update, add one dated entry to the **Change History** in [00 - Rotom Change Log](../00-Rotom-Change-Log.md), following its required format. The entry should name the affected files, state what changed and why, identify evidence, and record outstanding work.
 
 Do not add a change-history entry solely for an unchanged re-upload, download, packaging action, or formatting-only edit unless it alters an operational meaning. The full decision rule and update procedure are defined only in document 00.
 
@@ -30,4 +30,4 @@ Do not add a change-history entry solely for an unchanged re-upload, download, p
 - Confirm no secrets, temporary files, generated packages, or unrelated changes are included.
 - Use the guarded `retired-helper` workflow: review with `retired-helper diff`, validate with `retired-helper check`, then use `retired-helper commit` and `retired-helper push` only when the canonical maintenance contract authorizes publication.
 
-Repository-support files such as `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.gitignore`, and `tooling/` are not legacy documentation members merely because they are stored here. Available Sources remains the legacy documentation membership boundary.
+Repository-support files such as root `README.md`, root `AGENTS.md`, `.gitignore`, and files under `support/` are not legacy documentation members merely because they are stored here. Available Sources remains the legacy documentation membership boundary.
