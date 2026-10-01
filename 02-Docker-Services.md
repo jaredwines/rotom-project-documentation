@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; current JAR-78 state is 17 container objects / 17 intended running, including both healthy Palworld servers
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — JAR-79 Game torrent-directory retirement verified
+**Documentation updated:** 2026-10-01 — JAR-83 minimal Game qBittorrent marker restored and verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -47,6 +47,14 @@ Gamarr is retired. JAR-77 verified its live v2 Compose labels before removing `/
 ### JAR-79 Game torrent-directory retirement — 2026-10-01
 
 qBittorrentVPN's local API reported zero torrents; its unused `Games` category was removed after the two associated `Downloader/.data` directories were confirmed empty, then removed with non-recursive `rmdir`. The active category set is Movies/Shows only. Live Compose inspection also established that qBittorrentVPN currently binds `/mnt/nas-media/torrents` at both `/media/torrents` and `/game/torrents`; JAR-79 made no change to that payload topology. This is a current-state correction to the conflicting older Downloader-path claims, which remain historical unless separately reconciled.
+
+### JAR-83 minimal Game qBittorrent marker — 2026-10-01
+
+The existing `Game/.data` export is again automounted at `/mnt/nas-game`, but it contains only `.rotom-qbt-media-ready/` (`901:5000`, mode `2750`) below its `988:5001` mode-`2770` root. qBittorrentVPN now requires that marker as a read-only `/run/rotom-nas-game` long bind with `create_host_path: false`, alongside the existing Media marker. Its active payload remains `/mnt/nas-media/torrents`; no Game torrent or library bind was restored. The 15-second guard requires both NFS mounts and marker directories. A controlled Game-marker absence test stopped qBittorrentVPN, and restoring the marker allowed clean container, guard, and WireGuard (`10.2.0.2/32`) recovery.
+
+### JAR-84 legacy service-home Docker-tree retirement — 2026-10-01
+
+Fresh root Docker inspection found every active application Compose label under `/srv/rotom/stacks`, except the retained active NPM project under `/home/infra/docker/nginx-proxy-manager`. The inactive legacy `/home/downloaders/docker/{prowlarr,qbittorrentvpn}` and `/home/media/docker/{radarr,sonarr}` trees were archived, checksum-verified, covered by, and byte-read back from Restic snapshot `3c85d5be` before removal. `/home/game/docker` was verified empty and removed. `/home/downloaders/docker` remains because Arcane read-only mounts its parent; `/home/media/docker/jellyfin` and held `/home/web/docker` were not changed. In particular, JAR-84 supersedes the prior JAR-49 current-location conclusion: active Jellyfin is `/srv/rotom/stacks/media/jellyfin/compose.yaml`, while its former service-home tree remains retained legacy material.
 
 ### JAR-73 Uptime Kuma — 2026-09-30
 
@@ -111,7 +119,7 @@ The root-owned `scripts/publish-source` is the controlled publication mechanism.
 
 RomM 5.3.1 with MariaDB 11 and Valkey 9 runs from `/srv/rotom/stacks/media/romm/compose.yaml`. Its state, database, config, assets, resources, cache, and verified logical export are VM-local under `/srv/rotom/appdata/media/romm`; protected database/application inputs are root-only under `/srv/rotom/secrets/media/romm`. It mounts `/mnt/nas-media/library/games` read-only, has no Docker socket or privileged mode, and exposes only loopback `127.0.0.1:8081` for retained host-networked NPM.
 
-Jellyfin, Radarr, Sonarr, Prowlarr, and Gamarr were recorded as v2 modules under `/srv/rotom/stacks/media/<app>/compose.yaml` (JAR-40 `f5f2da4`; JAR-52 `5ec39bd`; JAR-56 `3a29838`). **JAR-49 correction:** live Docker Compose labels identify active Jellyfin as `/home/media/docker/jellyfin/compose.yaml`, not `/srv/rotom/stacks/media/jellyfin`; the latter directory exists but was not its active project. JAR-49 did not re-audit the active locations of Radarr, Sonarr, Prowlarr, or Gamarr, so do not extend this correction to them without new evidence. Jellyfin retains its read-only `/mnt/nas-media/library` bind. Radarr/Sonarr now mount `/mnt/nas-media/torrents` read-only at `/media/torrents`; Gamarr uses Media GID 5000 with `/mnt/nas-media/library/games -> /game/library/games` and `/mnt/nas-media/torrents -> /game/torrents:ro`. qBittorrentVPN retains its v2 downloader stack/appdata paths and Media payload binds at its unchanged `/media/torrents` and `/game/torrents` paths. The old Game library and Downloader payload remain intact rollback material. Jared deferred authenticated application-import and post-import seeding validation for later manual completion; the direct paths and filesystem-level hardlink capability are verified. All proxyable services attach `rotom-proxy`; Radarr/Sonarr/Prowlarr/Gamarr also attach `rotom-arr`; qBittorrentVPN also attaches `rotom-arr`. Existing ports remain NPM compatibility upstreams.
+Jellyfin, Radarr, Sonarr, and Prowlarr are active v2 modules under `/srv/rotom/stacks/media/<app>/compose.yaml`; JAR-84 directly verified all four Compose labels and active bind sources. Jellyfin retains its read-only `/mnt/nas-media/library` bind, while Radarr/Sonarr mount `/mnt/nas-media/torrents` at `/media/torrents`. qBittorrentVPN retains its v2 downloader stack/appdata paths and Media payload binds. The former service-home Radarr/Sonarr/Prowlarr/qBittorrentVPN trees are retired recovery artifacts; the Jellyfin tree is deliberately retained. All proxyable services attach `rotom-proxy`; Radarr/Sonarr/Prowlarr attach `rotom-arr`; qBittorrentVPN also attaches `rotom-arr`. Existing ports remain NPM compatibility upstreams.
 
 Core infrastructure; Compose files under `/home/infra/docker/`.
 
@@ -211,9 +219,9 @@ Media services; Compose files under `/home/media/docker/`.
 
 | Current container name | Observed image | Observed status | Published ports | Container-only ports shown | Compose file |
 | --- | --- | --- | --- | --- | --- |
-| `jellyfin` | `lscr.io/linuxserver/jellyfin:latest` | Up 19 hours | `0.0.0.0:8096->8096/tcp`, `[::]:8096->8096/tcp` | `8920/tcp` | `/home/media/docker/jellyfin/compose.yaml` |
-| `radarr` | `lscr.io/linuxserver/radarr:latest` | Up 23 hours | `0.0.0.0:7878->7878/tcp`, `[::]:7878->7878/tcp` | None shown | `/home/media/docker/radarr/compose.yaml` |
-| `sonarr` | `lscr.io/linuxserver/sonarr:latest` | Up 23 hours | `0.0.0.0:8989->8989/tcp`, `[::]:8989->8989/tcp` | None shown | `/home/media/docker/sonarr/compose.yaml` |
+| `jellyfin` | `lscr.io/linuxserver/jellyfin:latest` | Running at JAR-84 verification | `0.0.0.0:8096->8096/tcp`, `[::]:8096->8096/tcp` | `8920/tcp` | `/srv/rotom/stacks/media/jellyfin/compose.yaml` |
+| `radarr` | `lscr.io/linuxserver/radarr:latest` | Running at JAR-84 verification | `0.0.0.0:7878->7878/tcp`, `[::]:7878->7878/tcp` | None shown | `/srv/rotom/stacks/media/radarr/compose.yaml` |
+| `sonarr` | `lscr.io/linuxserver/sonarr:latest` | Running at JAR-84 verification | `0.0.0.0:8989->8989/tcp`, `[::]:8989->8989/tcp` | None shown | `/srv/rotom/stacks/media/sonarr/compose.yaml` |
 
 ### Current media identity and NAS access
 
@@ -359,7 +367,7 @@ Production workloads are restored under the current service-account layout. The 
 | filesync | `903:5007` | `/mnt/nas-filesync` | Storage boundary only |
 | customapps | `904:5008` | `/mnt/nas-customapps` | Reserved storage boundary only; compatibility home `/home/apps` |
 
-Current application restores use `/home/<service>/docker/<project>`. The enabled `/mnt/nas-downloads-media-ro` Media read-only compatibility view sources current `/mnt/nas-downloaders`, but has no current container consumer and is proposed for retirement. The unused Game view was retired. The active qBittorrent sentinel is under `/mnt/nas-downloaders/.rotom-qbt-nas-ready`.
+Current application restores use `/home/<service>/docker/<project>`. The enabled `/mnt/nas-downloads-media-ro` Media read-only compatibility view sources `/mnt/nas-downloaders` and is retained despite having no current container consumer. JAR-81 removed only the obsolete Downloader `torrents/` tree; the root and active qBittorrent sentinel `/mnt/nas-downloaders/.rotom-qbt-nas-ready` remain. The unused Game view was retired.
 
 The current `docker` group should be re-read before future privilege changes. JAR-30 GID `989` with no members is the last explicit verification; JAR-31 application restoration does not by itself demonstrate group membership changes.
 

@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-01 — JAR-79 Game torrent-directory retirement verified
+**Documentation updated:** 2026-10-01 — JAR-83 minimal Game qBittorrent marker restored and verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -24,7 +24,7 @@ Documentation updated: **2026-09-28** through JAR-34's verified non-migrating `/
 
 ## 2. Current Maintenance and Automation — 2026-09-28 JAR-68 final
 
-JAR-78 retains the Game NFS readiness check in `rotom-nas-docker-recovery`, but retires the unused `rotom-downloads-game-ro.service` and `/mnt/nas-downloads-game-ro` view after confirming no container consumer. JAR-79 then removed qBittorrent's unused Games category and its two empty Downloader directories. JAR-81 verified that the remaining Media bindfs view is also unused; its retirement is proposed but not implemented, so the recovery helper still starts it. The stale Gameserver automount is retired; the established `/mnt/nas-game` contract remains current.
+JAR-78 retains the Game NFS readiness check in `rotom-nas-docker-recovery`, but retires the unused `rotom-downloads-game-ro.service` and `/mnt/nas-downloads-game-ro` view after confirming no container consumer. JAR-79 then removed qBittorrent's unused Games category and its two empty Downloader directories. JAR-81 retains the unused Media bindfs view and recovery-helper branch while removing only the obsolete Downloader `torrents/` tree; their checks now require the Downloader NFS root and sentinel, not that retired directory. JAR-83 restores the established `/mnt/nas-game` automount as a minimal marker contract and makes its marker an explicit qBittorrent safety dependency.
 
 JAR-36 maintains three empty Docker network contracts; they are not scheduled automation and have no container attachments. The tracked `/srv/rotom/stacks/NETWORKING.md` contract directs later workload tickets to attach only required services and use Docker DNS.
 
@@ -34,7 +34,7 @@ JAR-38 converted Homepage, Glances, Arcane, and Cloudflare DDNS to independent v
 
 JAR-40 added independent Media v2 modules at local commit `f5f2da4`. The five migrated services retain `unless-stopped`; Gamarr retains its image healthcheck. NPM remains the established host-networked reverse proxy, so the applications retain host compatibility ports while joining their v2 Docker networks. No update automation, backup schedule, download payload, or VPN behavior changed.
 
-JAR-56 adds `rotom-qbittorrent-media-guard.timer`, enabled and active every 15 seconds, with `/usr/local/sbin/rotom-qbittorrent-media-guard` and its matching systemd service. It validates the underlying Media NFS filesystem and `/mnt/nas-media/.rotom-qbt-media-ready`; if either is absent while qBittorrentVPN is running, it stops that container rather than allowing an accidental local write. The normal check was live-verified after accounting for the autofs/NFS mount layers. The former Downloader payload and configuration remain rollback material.
+`rotom-qbittorrent-media-guard.timer` is enabled and active every 15 seconds, with `/usr/local/sbin/rotom-qbittorrent-media-guard` and its matching systemd service. JAR-83 verifies it requires the underlying Media payload NFS mount and marker plus the Game NFS mount and `.rotom-qbt-media-ready` marker. qBittorrentVPN has matching read-only Compose binds with `create_host_path: false`; the Media payload remains unchanged. If either marker/mount pair is absent while qBittorrentVPN is running, the guard stops it rather than allowing an accidental local write. A controlled Game-marker absence test stopped the container; restoring the marker allowed clean container and WireGuard recovery.
 
 JAR-72 reorganized Homepage cards without changing monitoring behavior or any application boundary. **Documents**, immediately below **Hosted Websites**, contains Paperless and the private Rotom Docs portal; Docs is intentionally a link/container-status card without an HTTP monitor, so Homepage does not receive a trusted-LAN access-policy exemption. **Media** contains Jellyfin, Radarr, Sonarr, Prowlarr, and RomM; JAR-77 retired the former Gamarr card and force-recreated only Homepage, which returned healthy and `https://rotom.casa` `200`. **Downloader**, immediately above **NAS Storage**, contains qBittorrent. Historical rollback artifacts remain historical evidence.
 
