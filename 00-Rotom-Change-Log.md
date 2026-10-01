@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-01 — Restore Homepage Uptime Kuma monitor resolution
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `02-Docker-Services.md`, `06-Maintenance-and-Automation.md`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Homepage's Uptime Kuma `siteMonitor` was red because the Homepage container intermittently failed to resolve `uptime.rotom.casa` (`EAI_AGAIN`). Added the targeted `uptime.rotom.casa:192.168.1.69` `extra_hosts` mapping to `/srv/rotom/stacks/infra/homepage/compose.yaml` and recreated only Homepage. Uptime Kuma, Nginx Proxy Manager, public DNS, certificates, and the Uptime Kuma monitor configuration were unchanged.
+- **Evidence:** The active Compose definition validated. The rebuilt Homepage was healthy, carried the exact mapping, resolved the hostname internally, and reached the Uptime Kuma TLS route, which returned its expected redirect followed by the dashboard response. Homepage's canonical local request returned HTTP `200`, and no new matching DNS error appeared in post-rebuild logs.
+- **Outstanding:** The separate Jared Wines card remains intentionally unavailable because its website is intentionally undeployed.
+
 ## 2026-10-01 — Record boot-time Game NAS recovery limitation
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
