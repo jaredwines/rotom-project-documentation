@@ -41,7 +41,7 @@ Home Assistant and Homebridge moved only their Compose/application-state paths t
 
 ### JAR-38 Infra v2 network convergence — 2026-09-28
 
-JAR-40 attaches Jellyfin, Radarr, Sonarr, Prowlarr, and Gamarr to `rotom-proxy`; Radarr/Sonarr/Prowlarr/Gamarr also attach `rotom-arr` and resolve peer service names through Docker DNS. NPM is retained in host networking, so existing application ports remain its verified compatibility upstreams; no proxy listener change was made.
+JAR-40 attached Jellyfin, Radarr, Sonarr, Prowlarr, and Gamarr to `rotom-proxy`; Radarr/Sonarr/Prowlarr/Gamarr also attached `rotom-arr`. JAR-77 retired Gamarr and its private network/port while retaining both shared networks for the remaining services. NPM is retained in host networking.
 
 Homepage and Glances now use the external `rotom-monitoring` bridge (`172.31.0.0/16`) and resolve each other through Docker service DNS; Glances has no host-published listener. Homepage and Arcane also attach to `rotom-proxy` (`172.29.0.0/16`) for the Caddy-era proxy handoff, while their current host ports `3001` and `3552` remain only because the existing NPM host-network proxy still consumes them. Cloudflare DDNS moved from host networking to its ordinary private `cloudflare-ddns_default` bridge; it needs no inbound listener and its immediate update confirmed outbound/DNS operation. NPM remains the only Infra reverse proxy listener on 80/81/443 until JAR-39. No DNS, WAN forwarding, VLAN, certificate, or NPM route configuration changed.
 
@@ -319,9 +319,9 @@ JAR-22 verified `/home/web/docker/jaredwines.com/compose.yaml` remains present, 
 
 The default Docker bridge has IP masquerading enabled and binds published ports to `0.0.0.0` by default. Docker adds NAT/forwarding rules for published bridge-container ports.
 
-### Gamarr application connectivity
+### Gamarr application connectivity — retired by JAR-77
 
-Gamarr is a host-published bridge service on TCP `6767` and now has an active Nginx Proxy Manager route: `gamarr.rotom.casa -> 192.168.1.69:6767`. The verified NPM record uses certificate ID `24`, forces SSL, has no assigned access list, and returned HTTP `302` through the HTTPS route. Its qBittorrent download client connects to `192.168.1.69:8080` and uses category `Games`. Its working Prowlarr Torznab base is `http://192.168.1.69:9696/2`; Gamarr appends `/api`, so configuring a base that already ends in `/api` produces an invalid `/api/api` request. API keys are intentionally omitted.
+This is historical deployment evidence. JAR-77 removed the container, private network, TCP `6767` listener, and NPM proxy-host ID `19`; the host is marked deleted and its generated configuration is absent. The shared wildcard certificate ID `24` remains active, and wildcard DNS resolution may continue without a route.
 
 
 Runtime container IPv4 addresses are observations, not guaranteed static assignments. The audits did not inspect Compose IPAM/static-address declarations.

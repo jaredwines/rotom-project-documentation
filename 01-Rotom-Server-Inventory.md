@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-30 — Jared Wines Homepage card restored
+**Documentation updated:** 2026-09-30 — JAR-77 Gamarr retirement verified
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -36,6 +36,7 @@ The accepted Phase B architecture now uses **PVE** as the product abbreviation a
 | JAR-73 alerting | Uptime Kuma 2 runs from `/srv/rotom/stacks/infra/uptime-kuma` with VM-local SQLite data and a loopback-only `127.0.0.1:3002` listener. NPM provides authenticated, WebSocket-enabled `https://uptime.rotom.casa`; Homepage links to it. Root-only Rotom/PVE workers and Healthchecks heartbeats provide high-signal Pushover delivery, with time-bounded external maintenance pauses. |
 | JAR-5 documentation portal | `/srv/rotom/stacks/infra/rotom-docs` defines the static portal and its controlled-publish script. Its generated source and site output are local under `/srv/rotom/appdata/infra/rotom-docs`; it publishes only a deliberate derived copy of the approved current nine-file RPD set and never mounts the canonical RPD checkout. NPM serves `docs.rotom.casa` through loopback-only port `8082` and a trusted-LAN allowlist. |
 | JAR-10 Media v2 | RomM runs from its verified v2 module under `/srv/rotom/stacks/media/romm`. A JAR-49 live Compose-label inspection supersedes the earlier Jellyfin path claim: active Jellyfin is `/home/media/docker/jellyfin/compose.yaml`; the existing `/srv/rotom/stacks/media/jellyfin` directory is not its active Compose project. The active locations of the other Media services were not re-audited by JAR-49. NPM serves `romm.rotom.casa`. |
+| JAR-77 Gamarr retirement | Gamarr is retired. Its active/legacy Compose and appdata trees, container, private network, port `6767`, Homepage card, NPM host `gamarr.rotom.casa`/ID `19`, and recovery-worker branch are removed. Certificate ID `24`, shared `rotom-arr`/`rotom-proxy`, Media game library/torrents, RomM, Prowlarr, qBittorrentVPN, Jellyfin, Radarr, and Sonarr remain intact. Targeted restore state is root-protected at `/srv/rotom/backup-staging/media/jar77-20260930/gamarr-config-and-compose.tar.gz`. |
 | JAR-42 Gameserver v2 | Independent Palworld Jared and Fran Compose modules are current under `/srv/rotom/stacks/gameserver`, with local live state under `/srv/rotom/appdata/gameserver`; protected environment files remain under the root-only Gameserver secrets boundary. Both containers are intentionally stopped after controlled validation. The former `/home/game/docker/palworld-server-*` rollback trees were explicitly retired on 2026-09-29. Reserved `/mnt/nas-gameserver` is not a live-world dependency. |
 | JAR-43 Smart Home v2 | Home Assistant and Homebridge run from independent modules under `/srv/rotom/stacks/smarthome`, with authoritative mutable state under `/srv/rotom/appdata/smarthome`. They retain host networking for discovery and the established NPM compatibility routes. JAR-51 retired the inactive prior `/home/smarthome/docker/{home-assistant,homebridge}` rollback trees after reference and service validation; `/mnt/nas-smarthome` remains an unused reserved boundary. |
 | JAR-45 Web v2 | Aloha Millworks runs from `/srv/rotom/stacks/web` with site content under `/srv/rotom/appdata/web` and joins `rotom-proxy`; its `7778` listener remains the required compatibility upstream for retained host-networked NPM. Jared Wines is migrated to v2 state/Compose but remains intentionally unstarted and unpublished; its Homepage **Hosted Websites** card was restored on 2026-09-30 and currently reflects the unavailable target. The former legacy Web trees were explicitly retired on 2026-09-29. |
@@ -69,7 +70,7 @@ ChatGPT-controlled browser work is not part of the Rotom administration or docum
 |---|---|
 | infra | Arcane, Cloudflare DDNS, Homepage, Glances, Nginx Proxy Manager |
 | media | Jellyfin, Radarr, Sonarr |
-| gameserver | Palworld servers for Fran and Jared at UID:GID `995:5001`; Gamarr retains UID 995 but uses Media storage GID 5000 for its Media-library bind; compatibility home `/home/game` retained |
+| gameserver | Palworld servers for Fran and Jared at UID:GID `995:5001`; compatibility home `/home/game` retained |
 | smarthome | Home Assistant and Homebridge |
 | documents | Service-account skeleton reserved for future document workloads; no application deployed |
 | downloader | Active Prowlarr/qBittorrentVPN domain; UID:GID `901:5005`; compatibility home and mount remain `/home/downloaders` / `/mnt/nas-downloaders` |
@@ -88,7 +89,7 @@ The ten storage-facing service accounts retain their JAR-29 numeric identity con
 | Account | UID : primary GID | Current NAS mount | Current state |
 |---|---:|---|---|
 | media | 127 : 5000 | `/mnt/nas-media` | Active Jellyfin/Radarr/Sonarr owner; NFSv3 on demand; ordinary storage boundary retained |
-| gameserver | 995 : 5001 | `/mnt/nas-game` | Active Jared/Fran Palworld identity; the retained Game library is JAR-52 rollback material, while Gamarr uses UID 995 with Media GID 5000 against `/mnt/nas-media/library/games` |
+| gameserver | 995 : 5001 | `/mnt/nas-game` | Active Jared/Fran Palworld identity; the retained Game library is JAR-52 rollback material |
 | infra | 997 : 5002 | `/mnt/nas-infra` | Active core infrastructure owner; Arcane restored with preserved named volume |
 | smarthome | 126 : 5003 | `/mnt/nas-smarthome` | Active Home Assistant/Homebridge owner; authoritative application state is local under `/srv/rotom/appdata/smarthome` |
 | documents | 900 : 5004 | `/mnt/nas-documents` | Restored storage boundary; no application deployed |
@@ -160,7 +161,7 @@ The adopted access policy keeps `jared` outside the media group. Administer medi
 | `/home/media/docker` | Active Jellyfin/Radarr/Sonarr Compose/config trees |
 | `/home/downloaders/docker` | Active Prowlarr/qBittorrentVPN Compose/config trees; Arcane mounts this root read-only for discovery |
 | `/home/smarthome/docker` | Active Home Assistant/Homebridge Compose/config trees |
-| `/home/game/docker` | Both Palworld projects present with saves preserved; both Palworld containers intentionally stopped; Gamarr active |
+| `/home/game/docker` | Both Palworld projects present with saves preserved; both Palworld containers intentionally stopped; Gamarr legacy trees retired by JAR-77 |
 | `/home/web/docker` | Aloha active; Jared Wines project retained but intentionally undeployed |
 | `/var/lib/docker` | Current Docker runtime root on VM-local ext4; not NFS-backed |
 | `/var/lib/docker/volumes` | Current Docker named-volume store; includes restored `arcane_arcane-data` |
@@ -212,7 +213,7 @@ The current recovery design has three independent logical layers on the same Uni
 
 1. The Debian VM still boots independently of NAS availability through the fstab/systemd automount design.
 2. Docker and containerd are enabled and returned active after the JAR-31 acceptance reboot. Docker runtime state remains local at `/var/lib/docker`.
-3. The adapted `rotom-nas-docker-recovery.service` is enabled with retry-on-failure behavior. On the JAR-31 reboot its first invocation reached `/mnt/nas-downloaders` but failed when `/mnt/nas-media` was not ready; systemd retried about 30 seconds later, then the helper mounted/verified Downloader, Media, and Game storage plus both read-only bindfs views and automatically recovered qBittorrentVPN, Radarr, Sonarr, Gamarr, and Jellyfin. Final unit state was `active (exited)`, `Result=success`, `ExecMainStatus=0`.
+3. The adapted `rotom-nas-docker-recovery.service` is enabled with retry-on-failure behavior. On the JAR-31 reboot its first invocation reached `/mnt/nas-downloaders` but failed when `/mnt/nas-media` was not ready; systemd retried about 30 seconds later, then the helper mounted/verified Downloader, Media, and Game storage plus both read-only bindfs views and automatically recovered qBittorrentVPN, Radarr, Sonarr, and Jellyfin. JAR-77 removed its retired Gamarr branch; its manual healthy-state run passed. Final unit state was `active (exited)`, `Result=success`, `ExecMainStatus=0`.
 4. The two compatibility-view services are active: `/mnt/nas-downloads-media-ro` and `/mnt/nas-downloads-game-ro` are read-only bindfs views sourced from current `/mnt/nas-downloaders`.
 5. The earlier reboot restored the then-intended 16-running set. Final JAR-68 acceptance later recorded 16 total container objects / 14 intended running because both Palworld containers were deliberately stopped; qBittorrent `wg0` and core checks passed and zero systemd units were failed.
 6. The Proxmox host remains independent of Rotom application NFS and application Docker; no application share is mounted there.

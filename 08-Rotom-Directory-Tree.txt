@@ -198,7 +198,7 @@
 #     docker/sonarr/                ACTIVE
 #   game/        995:5001  mode 0750  -> nas-game -> /mnt/nas-game
 #     docker/palworld-server-{jared,fran}/ JAR-42 legacy rollback trees retired 2026-09-29
-#     docker/gamarr/                ACTIVE; network 172.23.0.0/16
+#     docker/gamarr/                RETIRED by JAR-77; targeted restore state is under /srv/rotom/backup-staging/media/jar77-20260930/
 #   infra/       997:5002  mode 0750  -> nas-infra -> /mnt/nas-infra
 #     docker/arcane/                ACTIVE; network 172.28.0.0/16
 #     docker/cloudflare-ddns/       ACTIVE
@@ -245,7 +245,7 @@
 #   nas-shared-drive/  NFSv3 Shared_Drive/.data; root 988:988 mode 0770
 # - Current downloader correction: live fstab/generated unit/findmnt/showmount all use Downloader/.data. The distinct empty `Downloads` NAS drive and `/mnt/nas-downloads` guest contract were retired 2026-09-29; historical `Downloads/.data` records below remain dated evidence.
 # - All twelve current canonical NFS paths remain fstab/systemd automounts using _netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s; the Restic member is now nas-rotom-restic-backup rather than nas-rotom-backup.
-# - JAR-31 reboot: first NAS recovery invocation failed at Media readiness; systemd retry about 30s later succeeded and recovered qBittorrentVPN, Radarr, Sonarr, Gamarr, Jellyfin.
+# - JAR-31 reboot: first NAS recovery invocation failed at Media readiness; systemd retry about 30s later succeeded and recovered qBittorrentVPN, Radarr, Sonarr, Gamarr, Jellyfin. JAR-77 later retired Gamarr and removed its recovery-worker branch.
 #
 # CURRENT DOCKER BRIDGE MAP — JAR-31 FINAL REBOOT
 #   bridge                     172.17.0.0/16
@@ -254,7 +254,7 @@
 #   sonarr_default             172.20.0.0/16
 #   prowlarr_default           172.21.0.0/16
 #   qbittorrentvpn_default     172.22.0.0/16
-#   gamarr_default             172.23.0.0/16
+#   gamarr_default             172.23.0.0/16 (historical; removed by JAR-77)
 #   homepage                   172.24.0.0/16
 #   palworld-fran_default      172.25.0.0/16
 #   alohamillworkscom_default  172.26.0.0/16
