@@ -8,7 +8,7 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-10-01; JAR-86 retired the unused Media bindfs view while preserving the Downloader and Media NFS contracts.
+# Documentation revised: 2026-10-01; JAR-82 migrated Nginx Proxy Manager Compose and authoritative state into Infra v2 while retaining its former tree for rollback.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the RPD.
 #
@@ -19,7 +19,7 @@
 # - PVE monitoring: /usr/local/sbin/pve-cpu-temp-api + /etc/systemd/system/pve-cpu-temp-api.service; 192.168.1.68:8788; Homepage label `PVE CPU Temperature`. Backup status: /usr/local/sbin/pve-backup-status-api + /etc/systemd/system/pve-backup-status-api.service; LAN-only 192.168.1.68:8789; Homepage PVE Restic and Rotom VM schedule cards.
 # - VMID 100 `rotom`: q35/OVMF, x86-64-v2-AES, 8 vCPU, 12 GiB RAM, 100 GiB; onboot=1; optional JAR-49 host attachment `hostpci0: 0000:00:02.0,pcie=1` exposes the NUC Iris Plus 655 as guest `01:00.0` / `/dev/dri/renderD128`; guest rotom.casa at reserved 192.168.1.69, MAC BC:24:11:97:10:47. Removing hostpci0 preserves the portable baseline.
 # - Docker: 17 total container objects / 17 intended running; both Palworld containers are healthy with worlds preserved; qBittorrentVPN wg0 10.2.0.2/32; JAR-5 local acceptance found 0 failed units.
-# - JAR-38: Infra v2 module Compose roots are `/srv/rotom/stacks/infra/{homepage,glances,arcane,cloudflare-ddns}` (local Git commit `a17a217`); Homepage/Glances/Arcane state is under appdata and protected inputs under `secrets/infra`. Legacy Infra paths and `arcane_arcane-data` remain rollback artifacts. NPM remains active pending JAR-39.
+# - JAR-82: Infra v2 Compose includes `/srv/rotom/stacks/infra/nginx-proxy-manager/compose.yaml`; NPM retains host networking and binds authoritative root-owned data/certificate state from `/srv/rotom/appdata/infra/nginx-proxy-manager/{data,letsencrypt}`. The former `/home/infra/docker/nginx-proxy-manager` Compose/data tree is retained rollback material, not active configuration.
 # - JAR-85: root inspection confirmed `/home/infra` ownership/ACLs and the mounted Infra NFS boundary. Active Arcane mounts `/home/downloaders/docker` directly, and its current database has no old discovery-path reference. The inactive `/home/infra/docker/downloads` symlink and two superseded non-sensitive Homepage files were retired after reference and recovery review. NPM, its historical Compose copy, credentials, certificate/database state, RPD, `.ssh`, and NAS paths remain untouched.
 # - JAR-73: Uptime Kuma Compose is `/srv/rotom/stacks/infra/uptime-kuma/compose.yaml`; its local SQLite data is `/srv/rotom/appdata/infra/uptime-kuma`, and its sole listener is `127.0.0.1:3002`. Root-only Rotom alert worker/unit/timer are `/usr/local/sbin/rotom-alerting`, `/etc/systemd/system/rotom-alerting.service`, and `.timer`, with state under `/var/lib/rotom-alerting`; PVE has the parallel `/usr/local/sbin/pve-alerting` and `pve-alerting.{service,timer}`. Protected alert inputs remain below `/srv/rotom/secrets/infra` and are never documented by value.
 # - JAR-10: RomM/MariaDB/Valkey are deployed at `/srv/rotom/stacks/media/romm`; all mutable state and verified logical export are local below `/srv/rotom/appdata/media/romm`, protected inputs are under `secrets/media/romm`, and `/mnt/nas-media/library/games` is read-only in RomM. NPM uses loopback `8081` for `romm.rotom.casa`.
@@ -158,6 +158,10 @@
 #                                     root-owned declarative namespace; migrated domains have owning modules
 #   stacks/NETWORKING.md             JAR-36 shared external-network/Docker-DNS contract
 #   stacks/RUNTIME-POLICY.md         JAR-37 controlled-update, Compose, and exception policy
+#   stacks/infra/nginx-proxy-manager/compose.yaml
+#                                     JAR-82 active host-networked NPM Compose
+#   appdata/infra/nginx-proxy-manager/{data,letsencrypt}/
+#                                     JAR-82 authoritative NPM database/configuration and certificates
 #   stacks/infra/rotom-docs/         JAR-5 root-owned Compose definition and controlled-publish script
 #   appdata/infra/rotom-docs/
 #     source/                        generated controlled RPD source copy; not canonical authority
@@ -205,7 +209,7 @@
 #     docker/cloudflare-ddns/       ACTIVE
 #     docker/homepage/              ACTIVE Homepage+Glances; network 172.24.0.0/16
 #       Homepage monitoring: extra_hosts pins rotom/nginx/arcane/home-assistant/homebridge names to 192.168.1.69; guest backup widget -> http://192.168.1.69:8787/backup-status; PVE Restic/Rotom VM schedule widgets -> http://192.168.1.68:8789/pve-restic-backup-status and /rotom-vm-backup-status; Disk Usage -> disk:sda; CPU Temperature -> Glances URL http://192.168.1.68:8788 metric sensor:Package id 0 with charting; JAR-48 Media NAS Storage -> Glances fs:/mnt/host-root/mnt/nas-media and UNAS Reachability -> IPv4 ICMP 192.168.1.70. JAR-73 adds the Uptime Kuma management link and the separate high-signal Pushover/Healthchecks delivery layer.
-#     docker/nginx-proxy-manager/   ACTIVE
+#     docker/nginx-proxy-manager/   RETAINED JAR-82 rollback source; not active configuration
 #   smarthome/   126:5003  mode 0750  -> nas-smarthome -> /mnt/nas-smarthome
 #     docker/{home-assistant,homebridge}/ JAR-51 legacy rollback trees retired after current-v2 validation
 #   documents/   900:5004  mode 0750  -> nas-documents -> /mnt/nas-documents

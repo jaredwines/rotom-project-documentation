@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-01 — JAR-86 unused Media bindfs view retired and verified
+**Documentation updated:** 2026-10-01 — JAR-82 Nginx Proxy Manager Infra v2 migration verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -56,6 +56,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-01 — JAR-82 migrate Nginx Proxy Manager Compose to Infra v2
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Recreated only the production host-networked Nginx Proxy Manager container from `/srv/rotom/stacks/infra/nginx-proxy-manager/compose.yaml`. Its authoritative persistent binds are now `/srv/rotom/appdata/infra/nginx-proxy-manager/{data,letsencrypt}`. The image, container name, host network, DNS, restart policy, listeners, proxy-host database, access-list configuration, TLS material, and compatibility upstream model were retained. The former `/home/infra/docker/nginx-proxy-manager` Compose/data tree remains intact as an explicitly retained rollback source; it was not retired or modified after the final state copy.
+- **Evidence:** Before cutover, the original Compose and SQLite database validated, Nginx passed `nginx -t`, and representative routes established the HTTP baseline. A metadata-preserving persistent-data copy passed SQLite `quick_check` and target Compose validation. The controlled cutover stopped and removed only NPM's prior container, performed a final source-to-target synchronization, and started the v2 Compose without an image build. Post-cutover Docker labels identify the v2 Compose/working directory and only the two expected v2 binds; NPM is running with zero restarts, `nginx -t` and SQLite `quick_check` pass, and the database retains 25 proxy hosts, one access list, and six certificates. TCP 80/81/443 listen on IPv4 and IPv6. Local-SNI and public HTTPS probes preserved the expected results for `rotom.casa`, `alohamillworks.com`, `docs.rotom.casa`, `pve.rotom.casa`, `uptime.rotom.casa`, `paperless.rotom.casa`, `romm.rotom.casa`, and the intentionally unavailable Syncthing upstream; wildcard Rotom and Aloha certificates were presented with their existing validity dates. No systemd unit was failed.
+- **Outstanding:** The retained former Compose/data tree is the rollback source and must not be retired without a separate recovery/cleanup decision. Syncthing's existing HTTP 502 was preserved by this ticket and is outside JAR-82 scope.
 
 ## 2026-10-01 — JAR-86 retire unused Media Downloader bindfs view
 

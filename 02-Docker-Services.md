@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; current JAR-78 state is 17 container objects / 17 intended running, including both healthy Palworld servers
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — JAR-86 unused Media bindfs view retired and verified
+**Documentation updated:** 2026-10-01 — JAR-82 Nginx Proxy Manager Infra v2 migration verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -54,7 +54,7 @@ The existing `Game/.data` export is again automounted at `/mnt/nas-game`, but it
 
 ### JAR-84 legacy service-home Docker-tree retirement — 2026-10-01
 
-Fresh root Docker inspection found every active application Compose label under `/srv/rotom/stacks`, except the retained active NPM project under `/home/infra/docker/nginx-proxy-manager`. The inactive legacy `/home/downloaders/docker/{prowlarr,qbittorrentvpn}` and `/home/media/docker/{radarr,sonarr}` trees were archived, checksum-verified, covered by, and byte-read back from Restic snapshot `3c85d5be` before removal. `/home/game/docker` was verified empty and removed. `/home/downloaders/docker` remains because Arcane read-only mounts its parent; `/home/media/docker/jellyfin` and held `/home/web/docker` were not changed. In particular, JAR-84 supersedes the prior JAR-49 current-location conclusion: active Jellyfin is `/srv/rotom/stacks/media/jellyfin/compose.yaml`, while its former service-home tree remains retained legacy material.
+JAR-84 root Docker inspection found every active application Compose label under `/srv/rotom/stacks` except NPM; JAR-82 subsequently migrated NPM to `/srv/rotom/stacks/infra/nginx-proxy-manager/compose.yaml` and its authoritative state to `/srv/rotom/appdata/infra/nginx-proxy-manager`. The former NPM tree under `/home/infra/docker/nginx-proxy-manager` remains a retained rollback source. The inactive legacy `/home/downloaders/docker/{prowlarr,qbittorrentvpn}` and `/home/media/docker/{radarr,sonarr}` trees were archived, checksum-verified, covered by, and byte-read back from Restic snapshot `3c85d5be` before removal. `/home/game/docker` was verified empty and removed. `/home/downloaders/docker` remains because Arcane read-only mounts its parent; `/home/media/docker/jellyfin` and held `/home/web/docker` were not changed. In particular, JAR-84 supersedes the prior JAR-49 current-location conclusion: active Jellyfin is `/srv/rotom/stacks/media/jellyfin/compose.yaml`, while its former service-home tree remains retained legacy material.
 
 ### JAR-73 Uptime Kuma — 2026-09-30
 
@@ -97,7 +97,7 @@ There are **16 total container objects and 14 intended running containers**. Bot
 
 ### JAR-38 Infra v2 convergence — 2026-09-28
 
-The four migrated Infra modules each have an independent root-owned Compose definition: `/srv/rotom/stacks/infra/homepage/compose.yaml`, `glances/compose.yaml`, `arcane/compose.yaml`, and `cloudflare-ddns/compose.yaml`. These definitions were validated and recreated without an image pull; the verified cached images are Homepage, Glances, Arcane, and Cloudflare DDNS.
+The Infra modules each have independent root-owned Compose definitions under `/srv/rotom/stacks/infra`. JAR-82 added `/srv/rotom/stacks/infra/nginx-proxy-manager/compose.yaml`, preserving NPM's host-network identity and making `/srv/rotom/appdata/infra/nginx-proxy-manager/{data,letsencrypt}` authoritative. The retained former NPM Compose/data tree is rollback-only. The existing Homepage, Glances, Arcane, and Cloudflare DDNS definitions were validated and recreated without an image pull; the verified cached images are Homepage, Glances, Arcane, and Cloudflare DDNS.
 
 Homepage configuration is now `/srv/rotom/appdata/infra/homepage/config`; Glances configuration is `/srv/rotom/appdata/infra/glances/glances.conf`; Arcane data is `/srv/rotom/appdata/infra/arcane`, owned `997:5002`. Protected inputs are in `/srv/rotom/secrets/infra` and are Git-ignored. Homepage uses the supported `HOMEPAGE_VAR_*` substitution for its protected provider credential; its configuration contains no credential value. Homepage and Glances attach to `rotom-monitoring` and resolve `glances` through Docker DNS. Homepage additionally attaches `rotom-proxy`; Arcane attaches `rotom-proxy`. Glances exposes no host port. Homepage retains host `3001` and Arcane `3552` only as compatibility upstreams for the still-host-networked NPM; those paths returned local/proxied HTTP 200. NPM remains intact on 80/81/443 for JAR-39.
 
@@ -129,7 +129,7 @@ Core infrastructure; Compose files under `/home/infra/docker/`.
 | `cloudflare-ddns` | `favonia/cloudflare-ddns:1` | Up 3 days | None shown | None shown | `/home/infra/docker/cloudflare-ddns/compose.yaml` |
 | `homepage` | `ghcr.io/gethomepage/homepage:latest` | Up (healthy), re-created 2026-09-18 | `0.0.0.0:3001->3000/tcp`, `[::]:3001->3000/tcp` | None shown | `/home/infra/docker/homepage/compose.yaml` |
 | `glances` | `nicolargo/glances:latest-full` | Up, re-created 2026-09-18 | `127.0.0.1:61208->61208/tcp` | `61209/tcp` | `/home/infra/docker/homepage/compose.yaml` |
-| `nginx-proxy-manager` | `jc21/nginx-proxy-manager:latest` | Up 3 days | None shown | None shown | `/home/infra/docker/nginx-proxy-manager/compose.yaml` |
+| `nginx-proxy-manager` | `jc21/nginx-proxy-manager:latest` | Running; JAR-82 recreated | None shown | None shown | `/srv/rotom/stacks/infra/nginx-proxy-manager/compose.yaml` |
 
 ### Homepage identity — September 16 update
 
