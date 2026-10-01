@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — JAR-82 Nginx Proxy Manager Infra v2 migration verified
+**Documentation updated:** 2026-10-01 — JAR-82 documentation cross-reference correction recorded
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -410,9 +410,9 @@ No redirect hosts, stream hosts, or dead hosts were present in the earlier audit
 | `sonarr.rotom.casa` | HTTP | `192.168.1.69:8989` | enabled | Sonarr |
 | `jellyfin.rotom.casa` | HTTP | `192.168.1.69:8096` | enabled | Jellyfin |
 | `prowlarr.rotom.casa` | HTTP | `192.168.1.69:9696` | enabled | Prowlarr; local and proxied HTTP both remained `302` after the 2026-09-19 migration |
-| `gamarr.rotom.casa` | HTTP | `127.0.0.1:6767` | DB enabled; generated config absent | Gamarr is retired; this retained database row is not an active route |
+| `gamarr.rotom.casa` | HTTP | `192.168.1.69:6767` | enabled at the historical audit | Historical Gamarr route; JAR-77 later marked proxy-host ID `19` deleted and removed its generated configuration |
 
-The legacy Smart Hub/Portainer/OliveTin/PalTools rows above remain `enabled=1` in the NPM database, but their IDs are absent from the current generated `/srv/rotom/appdata/infra/nginx-proxy-manager/data/nginx/proxy_host/*.conf` set. The retained Gamarr row is likewise absent following its retirement. Treat all of those rows as stale/unresolved database records rather than active generated routes until administrator intent is reviewed. JAR-82 verified that the remaining active Rotom/application routes regenerated from the preserved database after cutover.
+The legacy Smart Hub/Portainer/OliveTin/PalTools rows above remain `enabled=1` in the NPM database, but their IDs are absent from the current generated `/srv/rotom/appdata/infra/nginx-proxy-manager/data/nginx/proxy_host/*.conf` set. Treat those rows as stale/unresolved database records rather than active generated routes until administrator intent is reviewed. Gamarr's route is retired: JAR-77 marked proxy-host ID `19` deleted and its generated configuration is absent; JAR-82 did not re-establish it. JAR-82 verified that the remaining active Rotom/application routes regenerated from the preserved database after cutover.
 
 The database output did not expose a current WebSocket-support field in the selected schema output, so WebSocket behavior is not documented here.
 
