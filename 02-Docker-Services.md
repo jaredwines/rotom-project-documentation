@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; current JAR-78 state is 17 container objects / 17 intended running, including both healthy Palworld servers
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-30 — JAR-78 Game domain migration verified
+**Documentation updated:** 2026-10-01 — JAR-79 Game torrent-directory retirement verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -42,7 +42,11 @@ JAR-37 is the accepted Phase C runtime gate. Docker's daemon-wide `json-file` ca
 
 ### JAR-77 Gamarr retirement — 2026-09-30
 
-Gamarr is retired. JAR-77 verified its live v2 Compose labels before removing `/srv/rotom/stacks/media/gamarr`, `/srv/rotom/appdata/media/gamarr`, and the legacy `/home/game/docker/gamarr`/standalone Gamarr config. Its container, private default network, port `6767`, Homepage card, NPM route, and recovery-worker branch are absent. RomM retains its read-only `/mnt/nas-media/library/games` bind; Prowlarr retains only Radarr/Sonarr applications, and qBittorrentVPN retains its existing `Games` category and verified VPN design. The targeted root-protected restore archive is `/srv/rotom/backup-staging/media/jar77-20260930/gamarr-config-and-compose.tar.gz`.
+Gamarr is retired. JAR-77 verified its live v2 Compose labels before removing `/srv/rotom/stacks/media/gamarr`, `/srv/rotom/appdata/media/gamarr`, and the legacy `/home/game/docker/gamarr`/standalone Gamarr config. Its container, private default network, port `6767`, Homepage card, NPM route, and recovery-worker branch are absent. RomM retains its read-only `/mnt/nas-media/library/games` bind; Prowlarr retains only Radarr/Sonarr applications. At JAR-77 closeout, qBittorrentVPN's `Games` category was retained because its active/seeding state was not authenticated; JAR-79 later removed it after live zero-torrent verification. The targeted root-protected restore archive is `/srv/rotom/backup-staging/media/jar77-20260930/gamarr-config-and-compose.tar.gz`.
+
+### JAR-79 Game torrent-directory retirement — 2026-10-01
+
+qBittorrentVPN's local API reported zero torrents; its unused `Games` category was removed after the two associated `Downloader/.data` directories were confirmed empty, then removed with non-recursive `rmdir`. The active category set is Movies/Shows only. Live Compose inspection also established that qBittorrentVPN currently binds `/mnt/nas-media/torrents` at both `/media/torrents` and `/game/torrents`; JAR-79 made no change to that payload topology. This is a current-state correction to the conflicting older Downloader-path claims, which remain historical unless separately reconciled.
 
 ### JAR-73 Uptime Kuma — 2026-09-30
 

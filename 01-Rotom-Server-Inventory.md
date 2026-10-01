@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-30 — JAR-78 Game domain migration verified
+**Documentation updated:** 2026-10-01 — JAR-79 Game torrent-directory retirement verified
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -148,9 +148,8 @@ The adopted access policy keeps `jared` outside the media group. Administer medi
 | `/mnt/nas-infra` | Infra service share; root `988:5002` mode `2770`; application configs remain local under `/home/infra` |
 | `/mnt/nas-smarthome` | Smarthome service share; root `988:5003` mode `2770`; HA/Homebridge state remains local under `/home/smarthome` |
 | `/mnt/nas-documents` | Documents service share; root `988:5004` mode `2770`; no application deployed |
-| `/mnt/nas-downloaders` | NFSv3 **`Downloader/.data`**; root `988:5005` mode `2770`; active qBittorrent torrent domain with sentinel and torrent categories verified |
+| `/mnt/nas-downloaders` | NFSv3 **`Downloader/.data`**; root `988:5005` mode `2770`; active writable Downloader boundary with Movies/Shows directory layout and sentinel. JAR-79 found qBittorrentVPN currently sources its payload binds from Media, not this mount. |
 | `/mnt/nas-downloads-media-ro` | Active read-only bindfs compatibility view sourced from `/mnt/nas-downloaders` for Media applications |
-| `/mnt/nas-downloads-game-ro` | Active read-only bindfs compatibility view sourced from `/mnt/nas-downloaders` for Game applications |
 | `/mnt/nas-web` | Web service share; root `988:5006` mode `2770`; website content remains local under `/home/web` |
 | `/mnt/nas-filesync` | Filesync service share; root `988:5007` mode `2770`; no application deployed |
 | `/mnt/nas-customapps` | NFSv3 `Customapps/.data`; root `988:5008` mode `2770`; reserved `customapps` boundary; compatibility home `/home/apps` retained |
@@ -214,7 +213,7 @@ The current recovery design has three independent logical layers on the same Uni
 1. The Debian VM still boots independently of NAS availability through the fstab/systemd automount design.
 2. Docker and containerd are enabled and returned active after the JAR-31 acceptance reboot. Docker runtime state remains local at `/var/lib/docker`.
 3. The adapted `rotom-nas-docker-recovery.service` is enabled with retry-on-failure behavior. On the JAR-31 reboot its first invocation reached `/mnt/nas-downloaders` but failed when `/mnt/nas-media` was not ready; systemd retried about 30 seconds later, then the helper mounted/verified Downloader, Media, and Game storage plus both read-only bindfs views and automatically recovered qBittorrentVPN, Radarr, Sonarr, and Jellyfin. JAR-77 removed its retired Gamarr branch; its manual healthy-state run passed. Final unit state was `active (exited)`, `Result=success`, `ExecMainStatus=0`.
-4. The two compatibility-view services are active: `/mnt/nas-downloads-media-ro` and `/mnt/nas-downloads-game-ro` are read-only bindfs views sourced from current `/mnt/nas-downloaders`.
+4. The sole compatibility-view service is active: `/mnt/nas-downloads-media-ro` is a read-only bindfs view sourced from current `/mnt/nas-downloaders`. JAR-79 removed the empty Game torrent directories and qBittorrent `Games` category; the Game view remains retired.
 5. The earlier reboot restored the then-intended 16-running set. Final JAR-68 acceptance later recorded 16 total container objects / 14 intended running because both Palworld containers were deliberately stopped; qBittorrent `wg0` and core checks passed and zero systemd units were failed.
 6. The Proxmox host remains independent of Rotom application NFS and application Docker; no application share is mounted there.
 

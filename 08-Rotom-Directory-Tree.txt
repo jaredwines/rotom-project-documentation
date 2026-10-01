@@ -229,11 +229,12 @@
 #   nas-infra/         NFSv3 Infra/.data; root 988:5002 mode 2770
 #   nas-smarthome/     NFSv3 Smarthome/.data; root 988:5003 mode 2770
 #   nas-documents/     NFSv3 Documents/.data; root 988:5004 mode 2770
-#   nas-downloaders/   NFSv3 Downloader/.data; root 988:5005 mode 2770; CURRENT active torrent domain
+#   nas-downloaders/   NFSv3 Downloader/.data; root 988:5005 mode 2770; writable Downloader boundary
 #     .rotom-qbt-nas-ready/
-#     torrents/{games,incomplete,movies,shows}/
+#     torrents/{incomplete,movies,shows}/
+#       incomplete/{movies,shows}/
 #   nas-downloads-media-ro/  bindfs RO source /mnt/nas-downloaders; media compatibility view
-#   nas-downloads-game-ro/   bindfs RO source /mnt/nas-downloaders; game compatibility view
+#   Game compatibility view retired; JAR-79 removed empty torrents/{,incomplete/}games
 #   nas-web/           NFSv3 Web/.data; root 988:5006 mode 2770
 #   nas-filesync/      NFSv3 Filesync/.data; root 988:5007 mode 2770
 #   nas-customapps/    NFSv3 Customapps/.data; root 988:5008 mode 2770
