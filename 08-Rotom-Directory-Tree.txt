@@ -117,7 +117,7 @@
 # - qBittorrent wg0 up at 10.2.0.2/32. Core service HTTP probes returned expected 200/302 results.
 # - All ten current service identities/homes verified; each home mode 0750; every /home/<service>/nas-<service> symlink resolves to the current /mnt/nas-<service> target.
 # - docker group remains GID 989 with no members; Fran remains absent.
-# - All twelve fstab-backed systemd automounts active. Media/Game bindfs compatibility views mounted RO and traversal PASS.
+# - All twelve fstab-backed systemd automounts active. The Media bindfs compatibility view is mounted RO; the unused Game Downloads view is retired.
 # - Restic mounted NFS root verified 988:988 mode 0700; this 02:29 audit observed the then-held backup timer disabled/inactive, later superseded the same day by deliberate `rotom-restic-backup.timer` recommissioning; weekly updater cron absent; JAR-32 temporary helper absent.
 # - Arcane current settings freshly verified: auto-update midnight/no exclusions; auto-heal every 30s/no exclusions, max 5 per 30m; followProjectSymlinks=true; scheduled prune disabled.
 # - Arcane discovery symlink /home/infra/docker/downloads -> /home/downloaders/docker verified. Arcane qBittorrentVPN project status is stale/unknown from 2026-09-22 while Docker runtime/wg0 are current.

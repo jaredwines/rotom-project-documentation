@@ -32,7 +32,7 @@ The Proxmox VE host `pve` remains hypervisor-only; the application Docker runtim
 
 JAR-34 created the non-migrating v2 declarative namespace at `/srv/rotom`. It contains empty domain reservations under `stacks/` and service-owned empty domain roots under `appdata/`; it contains no placeholder Compose files, containers, databases, or production bind mounts. Existing production projects under `/home/<service>/docker` remain current until their individual Phase D workload tickets migrate and verify them. `/srv/rotom` is a local Git repository for only `stacks/`, `scripts/`, and support files; `.gitignore` excludes `appdata/`, `secrets/`, `backup-staging/`, databases, logs, caches, generated state, and environment files.
 
-JAR-78 supersedes the Gameserver naming for the active Palworld domain: locked `game` is `995:5001` with home `/home/game`; `downloader` remains `901:5005` and `customapps` remains `904:5008`. The active Game bindfs unit and NAS-recovery helper use `game`; the Palworld modules were recreated one at a time after their paths moved to the Game domain. Existing numeric PUID/PGID values remain unchanged.
+JAR-78 supersedes the Gameserver naming for the active Palworld domain: locked `game` is `995:5001` with home `/home/game`; `downloader` remains `901:5005` and `customapps` remains `904:5008`. The NAS-recovery helper retains the Game NFS readiness check; the unused Game Downloads bindfs view is retired. The Palworld modules were recreated one at a time after their paths moved to the Game domain. Existing numeric PUID/PGID values remain unchanged.
 
 JAR-36 created unused external bridge networks `rotom-proxy` (`172.29.0.0/16`), `rotom-arr` (`172.30.0.0/16`), and `rotom-monitoring` (`172.31.0.0/16`). Future migrated stacks attach only services needing cross-stack connectivity, use Docker DNS/service names, and may retain private default networks. No current container is attached; current ports and bridge networks remain authoritative until owning workload migration tickets.
 
@@ -355,7 +355,7 @@ Production workloads are restored under the current service-account layout. The 
 | filesync | `903:5007` | `/mnt/nas-filesync` | Storage boundary only |
 | customapps | `904:5008` | `/mnt/nas-customapps` | Reserved storage boundary only; compatibility home `/home/apps` |
 
-Current application restores use `/home/<service>/docker/<project>` with the exception that the historical consumer-facing bindfs names `/mnt/nas-downloads-media-ro` and `/mnt/nas-downloads-game-ro` are deliberately retained for compatibility while sourcing current `/mnt/nas-downloaders`. The active qBittorrent sentinel is under `/mnt/nas-downloaders/.rotom-qbt-nas-ready`.
+Current application restores use `/home/<service>/docker/<project>` with the exception that `/mnt/nas-downloads-media-ro` remains as the Media read-only compatibility view while sourcing current `/mnt/nas-downloaders`. The unused Game view was retired. The active qBittorrent sentinel is under `/mnt/nas-downloaders/.rotom-qbt-nas-ready`.
 
 The current `docker` group should be re-read before future privilege changes. JAR-30 GID `989` with no members is the last explicit verification; JAR-31 application restoration does not by itself demonstrate group membership changes.
 

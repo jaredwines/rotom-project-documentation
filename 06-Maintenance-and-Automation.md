@@ -24,7 +24,7 @@ Documentation updated: **2026-09-28** through JAR-34's verified non-migrating `/
 
 ## 2. Current Maintenance and Automation — 2026-09-28 JAR-68 final
 
-JAR-78 updates the current Game-name-dependent automation references: `rotom-downloads-game-ro.service` forces the `game` identity and `rotom-nas-docker-recovery` validates its read-only view with `runuser -u game`. The bindfs service was restarted after the rename and is enabled/active. The stale Gameserver automount was retired; the established `/mnt/nas-game` contract remains current.
+JAR-78 retains the Game NFS readiness check in `rotom-nas-docker-recovery`, but retires the unused `rotom-downloads-game-ro.service` and `/mnt/nas-downloads-game-ro` view after confirming no container consumer. The stale Gameserver automount is retired; the established `/mnt/nas-game` contract remains current.
 
 JAR-36 maintains three empty Docker network contracts; they are not scheduled automation and have no container attachments. The tracked `/srv/rotom/stacks/NETWORKING.md` contract directs later workload tickets to attach only required services and use Docker DNS.
 
@@ -72,7 +72,7 @@ The intended staggered cadence remains guest Restic around `03:00`, PVE host-con
 | Time or trigger | Automation | Verified behavior |
 |---|---|---|
 | Boot | Docker | Docker and containerd are enabled. Docker starts after networking and containerd. |
-| Post-Docker boot / retry on failure | `rotom-nas-docker-recovery.service` | Verifies real Downloads/Media/Game NFS readiness, restores the two Downloads bindfs views, and recovers only stopped NAS-backed containers with recorded NAS/mount startup errors. Enabled; manual healthy-state validation passed; reboot validation deferred. |
+| Post-Docker boot / retry on failure | `rotom-nas-docker-recovery.service` | Verifies real Downloads/Media/Game NFS readiness, restores the Media Downloads bindfs view, and recovers only stopped NAS-backed containers with recorded NAS/mount startup errors. Enabled; manual healthy-state validation passed; reboot validation deferred. |
 | Every minute and container start | Cloudflare DDNS | Checks its configured DNS record and updates it if needed. |
 | Every 30 seconds | Arcane auto-heal | Enabled; may restart unhealthy managed containers. |
 | Midnight | Arcane automatic updates | Enabled with no exclusions. |
@@ -92,7 +92,7 @@ The NAS backup service is a root oneshot service. It requires /mnt/nas-rotom-bac
 
 The backup status API service is enabled and active. It restarts on failure and starts after networking, but has no explicit NAS mount dependency.
 
-The current fstab-backed NAS paths keep their existing automount model. JAR-78 retired the stale unavailable `/mnt/nas-gameserver` entry and local mountpoint; `/mnt/nas-game` is the sole active Game contract. The retired `/mnt/nas-downloads` boundary and reserved `/mnt/nas-customapps` boundary do not create a global Docker NAS dependency. JAR-21 additionally created two persistent bindfs units: `rotom-downloads-media-ro.service` and `rotom-downloads-game-ro.service`.
+The current fstab-backed NAS paths keep their existing automount model. JAR-78 retired the stale unavailable `/mnt/nas-gameserver` entry and local mountpoint; `/mnt/nas-game` is the sole active Game contract. The retired `/mnt/nas-downloads` boundary and reserved `/mnt/nas-customapps` boundary do not create a global Docker NAS dependency. `rotom-downloads-media-ro.service` remains the sole persistent Downloads bindfs unit.
 
 qBittorrent uses a service-specific Docker/Compose startup guard rather than a global Docker→NAS systemd dependency. The active `/mnt/nas-downloads/torrents` bind and Downloads sentinel bind use `create_host_path: false`; deliberate removal of the Downloads sentinel caused recreation to fail as required. This prevents local-directory fallback on recreation. A live runtime NFS-loss watchdog was not implemented.
 
@@ -103,7 +103,7 @@ No rc.local hook exists. The at scheduler is not installed. No per-user crontabs
 
 After the September 23 boot race left the Downloads bindfs views and several NAS-backed containers stopped, JAR-23 added root-owned executable `/usr/local/sbin/rotom-nas-docker-recovery` and systemd unit `/etc/systemd/system/rotom-nas-docker-recovery.service`. The unit is enabled under `multi-user.target`, `Requires=docker.service`, runs after `docker.service` and `network-online.target`, and uses `Restart=on-failure` with a 30-second delay so a transiently unavailable NAS can be retried without making all Docker services depend on the NAS.
 
-The helper explicitly starts/verifies `/mnt/nas-downloads`, `/mnt/nas-media`, and `/mnt/nas-game` as NFS, verifies the Downloads torrent tree and `.rotom-qbt-nas-ready` sentinel, starts/verifies `rotom-downloads-media-ro.service` and `rotom-downloads-game-ro.service`, tests traversal as `media` and `game`, then inspects qBittorrentVPN, Radarr, Sonarr, and Jellyfin. JAR-77 removed its retired Gamarr branch after a targeted worker rollback copy was made; the revised worker passed healthy-state validation. Already-running containers are left untouched. A stopped container is started only when its restart policy is `unless-stopped`/`always` and its recorded Docker error matches a NAS/mount startup-failure signature; other stopped containers are left stopped. This protects intentionally stopped workloads from being indiscriminately started.
+The helper explicitly starts/verifies `/mnt/nas-downloads`, `/mnt/nas-media`, and `/mnt/nas-game` as NFS, verifies the Downloads torrent tree and `.rotom-qbt-nas-ready` sentinel, starts/verifies `rotom-downloads-media-ro.service`, tests Media traversal, then inspects qBittorrentVPN, Radarr, Sonarr, and Jellyfin. JAR-77 removed its retired Gamarr branch and JAR-78 retired the unused Game bindfs branch; the revised worker passed healthy-state validation. Already-running containers are left untouched. A stopped container is started only when its restart policy is `unless-stopped`/`always` and its recorded Docker error matches a NAS/mount startup-failure signature; other stopped containers are left stopped. This protects intentionally stopped workloads from being indiscriminately started.
 
 Manual validation on the healthy server completed `Result=success`, `ExecMainStatus=0`, and `active (exited)` while reporting all five covered containers already running. Zero failed systemd units remained. The helper SHA-256 was `ea1ac1b6db7da89317b50b0de95a07a4be2cab5a7d530e5c3c1c1ed30bdb9d85`; the unit SHA-256 was `92b3b8d4bce02f574abb49b63031bcdca066a999459a6cebc79a7ac178486ac0`. Duplicate journal messages during the test were cosmetic because the helper logs both to stdout and `logger`. Full reboot-path validation is intentionally deferred until preservation work is complete.
 

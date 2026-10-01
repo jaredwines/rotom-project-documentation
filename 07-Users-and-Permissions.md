@@ -317,7 +317,7 @@ Runtime mounts create these notable access paths:
 - Glances has a read-only bind of the host root and a read-only Docker socket. Its former read-only `/mnt/nas-rotom-backup` bind was removed on 2026-09-18.
 - Media storage: Sonarr and Radarr read/write `/mnt/nas-media` at `/media`; Jellyfin mounts the library subtree read-only. Sonarr/Radarr additionally receive `/mnt/nas-downloads-media-ro/torrents` read-only at `/media/torrents`. Prowlarr has no NAS bind.
 - Home Assistant has read-only access to /run/dbus.
-- Game storage: the Palworld containers use local `/home/game/docker` data; Gamarr has `/mnt/nas-game -> /game` read/write and `/mnt/nas-downloads-game-ro/torrents -> /game/torrents` read-only. qBittorrent has no Media/Game NAS bind.
+- Game storage: Palworld uses local `/srv/rotom/appdata/game` data and no Game NAS bind; the unused Game Downloads read-only view is retired. qBittorrent has no Game NAS bind.
 - Cloudflare DDNS receives a read-only secret-file mount. Its contents were not inspected.
 
 
