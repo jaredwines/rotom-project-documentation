@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-01 — JAR-81 Media compatibility-view drift assessment
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Documentation only / Verified / Proposed.**
+- **Changes:** Corrected current-state documentation for the retained `/mnt/nas-downloads-media-ro` bindfs view. It remains enabled and mounted from `/mnt/nas-downloaders`, but it is not used by the current Media or Downloader containers. Radarr, Sonarr, and qBittorrentVPN instead bind `/mnt/nas-media/torrents` directly. Retiring the unused view and its recovery-helper branch is proposed as a separate, targeted live change; this documentation task did not modify Rotom.
+- **Evidence:** Live `findmnt` showed the read-only bindfs mount and `rotom-downloads-media-ro.service` enabled/active. `docker inspect` showed Radarr and Sonarr bind `/mnt/nas-media/torrents` read-only at `/media/torrents`, while qBittorrentVPN binds the same source read/write. Reference scans found no live Compose, systemd, or recovery-script consumer of `/mnt/nas-downloads-media-ro`; the service itself remains started by the recovery helper.
+- **Outstanding:** Before retiring the view, disable/remove its unit and mountpoint and remove its recovery-helper branch, then validate the affected media/downloader services and update the RPD again.
+
 ## 2026-09-30 — Remove obsolete qBittorrent NAS readiness markers
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `08-Rotom-Directory-Tree.txt`.
