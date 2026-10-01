@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-01 — JAR-76 ROM pipeline automation verified
+**Documentation updated:** 2026-10-01 — boot-time Game NAS recovery limitation verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -24,9 +24,15 @@ Documentation updated: **2026-09-28** through JAR-34's verified non-migrating `/
 
 ## 2. Current Maintenance and Automation — 2026-09-28 JAR-68 final
 
-JAR-78 retains the Game NFS readiness check in `rotom-nas-docker-recovery`, but retires the unused `rotom-downloads-game-ro.service` and `/mnt/nas-downloads-game-ro` view after confirming no container consumer. JAR-79 then removed qBittorrent's unused Games category and its two empty Downloader directories. JAR-81 retains the Downloader NFS root and sentinel while removing only its obsolete `torrents/` tree. JAR-86 then retired the unused Media bindfs view and removed only its recovery-helper branch, retaining the separate Downloader and Media NFS readiness checks. JAR-83 restores the established `/mnt/nas-game` automount as a minimal marker contract and makes its marker an explicit qBittorrent safety dependency.
+JAR-78 retired the unused `rotom-downloads-game-ro.service` and `/mnt/nas-downloads-game-ro` view after confirming no container consumer. JAR-79 then removed qBittorrent's unused Games category and its two empty Downloader directories. JAR-81 retains the Downloader NFS root and sentinel while removing only its obsolete `torrents/` tree. JAR-86 then retired the unused Media bindfs view and removed only its recovery-helper branch, retaining the separate Downloader and Media NFS readiness checks. JAR-83 restores the established `/mnt/nas-game` automount as a minimal marker contract and makes its marker an explicit qBittorrent safety dependency.
 
 JAR-76 adds `romm-igir.timer`, enabled and active every 15 minutes, with root-owned `/usr/local/sbin/romm-igir-run` and `romm-igir.service`. It locks before work, validates required mounts and DAT availability, runs pinned Igir as the Game identity, and never deletes input: DAT-matched files are copied to `/mnt/nas-game/library/games/roms` and retained in the inbox `.processed` area, while unmatched input goes to `downloads/romm-review`. RomM's own scheduled quick scan is enabled at minutes 7, 22, 37, and 52; filesystem watching is not used on NFS. JDownloader is deliberately not exposed on a host port.
+
+### Boot-time Game NAS recovery finding — 2026-10-01
+
+The 12:57 PDT guest boot demonstrated that automounts can be attempted before the NAS route is usable: Game and Filesync failed with `Network is unreachable`, and Docker retained NAS-bind startup failures after network storage returned. The targeted recovery remounted Game and Filesync, verified the documented Game/Media paths and markers, and started JDownloader, RomM, qBittorrentVPN, Radarr, Sonarr, and Jellyfin; zero systemd units remained failed.
+
+The current automatic scopes remain deliberate: `rotom-nas-docker-recovery.service` checks/retries Downloader and Media consumers only, while `rotom-qbittorrent-media-guard.timer` checks the Media payload/marker and Game marker every 15 seconds and stops qBittorrentVPN if either pair is unsafe. Neither mechanism restarts qBittorrentVPN after recovery, nor covers JDownloader or RomM. Those two services fail closed when their Game bind paths are absent and require targeted operator recovery after the mount returns.
 
 JAR-36 maintains three empty Docker network contracts; they are not scheduled automation and have no container attachments. The tracked `/srv/rotom/stacks/NETWORKING.md` contract directs later workload tickets to attach only required services and use Docker DNS.
 
