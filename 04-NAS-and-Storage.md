@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — JAR-76 Game ROM storage pipeline verified
+**Documentation updated:** 2026-10-01 — boot-time Game/Filesync automount recovery verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -20,7 +20,7 @@ This document records the current Phase B storage architecture and preserves the
 **Project:** Rotom-Home-Server  
 **Document:** `04-NAS-and-Storage.md`  
 **Baseline evidence:** 2026-09-14 22:46 PDT; read-only update 2026-09-15  
-**Documentation updated:** 2026-09-27 — current Proxmox VZDump archive set and disconnect-safe manual path recorded; storage boundaries unchanged  
+**Documentation updated:** 2026-10-01 — boot-time Game/Filesync automount recovery recorded; storage boundaries unchanged  
 **Status:** All twelve required application/storage NFS mounts remain guest-only systemd automounts. Guest `Rotom_Restic_Backup` remains unchanged. JAR-68 normalized the two PVE-only backup exports to `PVE_Restic_Backup` for host-config Restic and `Rotom_VM_Backup` for whole-VM VZDump; canonical mounts are `/mnt/nas-pve-restic-backup` and `/mnt/pve/nas-rotom-vm-backup`. The PVE host still has no Rotom application NFS mounts.
 
 The original audit was read-only. It did not recursively enumerate the NAS, modify mounts or permissions, restart containers, inspect secrets, traverse Restic repository internals, or create a hardlink test file. Later user-supplied checks, completed media GID changes, and the 2026-09-18 backup-share access-protection deployment are recorded below; they are separate from that audit. Unchanged capacity, mount, and systemd observations retain their original evidence dates.
@@ -63,6 +63,12 @@ JAR-81 retained `/mnt/nas-downloaders`, its fstab automount, and `.rotom-qbt-nas
 ### JAR-83 minimal Game marker restoration — 2026-10-01
 
 The existing `Game/.data` export remains authorized only to Rotom and is the fstab-backed `/mnt/nas-game` automount with its original NFSv3/service-GID root (`988:5001`, mode `2770`). JAR-76 created setgid Game-owned `downloads/romm-inbox`, `downloads/romm-review`, and `library/games/roms` paths. The separate `.rotom-qbt-media-ready/` marker remains owned by the Downloader/Media contract and qBittorrentVPN binds it read-only with `create_host_path: false`; its payload remains Media-only at `/mnt/nas-media/torrents`. The active 15-second guard still requires both the Media and Game NFS/marker pairs. JDownloader may write only the ROM inbox; the organizer copies DAT-matched content to the Game library and moves unmatched input to review without deletion. Palworld worlds remain VM-local.
+
+### Boot-time Game/Filesync automount recovery finding — 2026-10-01
+
+At the 12:57 PDT guest boot, the initial NFS mount attempts for `/mnt/nas-game` and `/mnt/nas-filesync` failed with `Network is unreachable` before the NAS route was available. The failed Game mount left its local empty mountpoint visible, so Docker could not satisfy the JDownloader/RomM Game binds; Media/Game-dependent containers also retained their startup errors after the NAS returned. A targeted `systemctl reset-failed` plus mount start restored both exports as their expected NFSv3 mounts. The Game root and its ROM inbox/library/marker paths, the Media payload/marker paths, and the Filesync mount were then verified.
+
+`x-systemd.automount` provides on-demand mounting; it is not a readiness assertion for a consumer. The Game `.rotom-qbt-media-ready` sentinel plus qBittorrent guard provides that assertion for qBittorrentVPN only. It does not automatically recover JDownloader or RomM after a Game mount failure.
 
 ### Retired empty `Downloads` boundary — 2026-09-29
 

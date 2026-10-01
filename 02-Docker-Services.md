@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; current supplied 2026-10-01 Docker inventory is 25 container objects / 24 running, with deployment details separately evidenced per service
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — JAR-76 ROM download and organization pipeline verified
+**Documentation updated:** 2026-10-01 — boot-time Game NAS recovery limitation verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -51,6 +51,12 @@ qBittorrentVPN's local API reported zero torrents; its unused `Games` category w
 ### JAR-83 minimal Game qBittorrent marker — 2026-10-01
 
 The existing `Game/.data` export is again automounted at `/mnt/nas-game`, but it contains only `.rotom-qbt-media-ready/` (`901:5000`, mode `2750`) below its `988:5001` mode-`2770` root. qBittorrentVPN now requires that marker as a read-only `/run/rotom-nas-game` long bind with `create_host_path: false`, alongside the existing Media marker. Its active payload remains `/mnt/nas-media/torrents`; no Game torrent or library bind was restored. The 15-second guard requires both NFS mounts and marker directories. A controlled Game-marker absence test stopped qBittorrentVPN, and restoring the marker allowed clean container, guard, and WireGuard (`10.2.0.2/32`) recovery.
+
+### Boot-time Game NAS recovery finding — 2026-10-01
+
+During the 12:57 PDT guest boot, the initial `/mnt/nas-game` NFS mount failed while the NAS network route was unavailable. Docker consequently left JDownloader and RomM stopped with Game-bind startup errors; qBittorrentVPN, Radarr, Sonarr, and Jellyfin also remained stopped after their NAS bind startup failures. After the NAS returned, targeted remounts restored Game and Filesync, the expected Game inbox/library and Game/Media marker paths were verified, and the six affected containers were started successfully.
+
+This does not change the payload topology or legacy-tree decision: current torrents remain exclusively at `/mnt/nas-media/torrents`, and the removed documented legacy `/home/*/docker` trees were not consumers. The Game `.rotom-qbt-media-ready` directory is a qBittorrentVPN sentinel only; `rotom-qbittorrent-media-guard` checks it with the Media mount/marker every 15 seconds and stops qBittorrentVPN when either safety pair is invalid, but does not restart it. JDownloader and RomM require their Game bind paths to start, but have no Game-specific sentinel, guard, or automatic recovery path.
 
 ### JAR-84 legacy service-home Docker-tree retirement — 2026-10-01
 

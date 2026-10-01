@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-01 — Record boot-time Game NAS recovery limitation
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Verified / Documentation only.**
+- **Changes:** Recorded the 2026-10-01 boot incident in which the initial Game and Filesync NFS mount attempts failed while the NAS network route was unavailable. Clarified that `/mnt/nas-game/.rotom-qbt-media-ready` is a qBittorrentVPN sentinel, not a torrent-payload location; the qBittorrent guard checks both Media and Game every 15 seconds, but does not restart containers. Corrected the recovery-helper scope: it covers Downloader and Media only. RomM and JDownloader have required Game bind mounts but no Game-specific sentinel, guard, or automatic restart/recovery path.
+- **Evidence:** Root live inspection recorded `mount.nfs: Network is unreachable` for Game and Filesync during the 12:57 PDT boot; Docker then recorded mount-start errors for JDownloader, RomM, qBittorrentVPN, Radarr, Sonarr, and Jellyfin. After the NAS returned, the Game and Filesync NFS mounts, required Game/Media paths and markers, all six affected containers, the qBittorrent guard, and zero failed systemd units were verified. Active torrent payload remained `/mnt/nas-media/torrents`; no legacy service-home Docker-tree deletion caused the incident.
+- **Outstanding:** The existing helper/guard design was documented, not changed. A future implementation decision is required before adding automatic Game recovery for RomM or JDownloader.
+
 ## 2026-10-01 — JAR-76 automate ROM downloads and organization
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
