@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-01 — Repository README and contribution guide recorded
+**Documentation updated:** 2026-10-01 — JAR-82 documentation cross-reference correction recorded
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -56,6 +56,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-01 — Correct JAR-82 NPM documentation cross-references
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `05-Backup-and-Restore.md`.
+- **Status:** **Documentation only.**
+- **Changes:** Preserved the dated JAR-38 and JAR-84 records as historical evidence and added a separate JAR-82 current-state entry. Corrected recovery guidance to identify the current NPM Compose, data, certificate, and database paths under `/srv/rotom`; the former `/home/infra/docker/nginx-proxy-manager` tree remains rollback-only. Reconciled the NPM proxy-host table with JAR-77: Gamarr is historical/retired and was not re-established by JAR-82.
+- **Evidence:** Cross-check of the recorded JAR-77 retirement and JAR-82 migration evidence in this RPD. No live Rotom configuration was changed or newly inspected for this documentation correction.
+- **Outstanding:** The current scheduled NPM SQLite-staging source-path mapping has not been freshly inspected; inspect it read-only before relying on or changing it.
 
 ## 2026-10-01 — Add RPD repository README and contribution guide
 
