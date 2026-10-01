@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-09-30 — PVE web UI NPM route and Homepage link verified
+**Documentation updated:** 2026-09-30 — JAR-78 Game automation references verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -24,7 +24,7 @@ Documentation updated: **2026-09-28** through JAR-34's verified non-migrating `/
 
 ## 2. Current Maintenance and Automation — 2026-09-28 JAR-68 final
 
-JAR-35 updated the only current Game-name-dependent automation references: `rotom-downloads-game-ro.service` now forces the `gameserver` identity and `rotom-nas-docker-recovery` validates its read-only view with `runuser -u gameserver`. The helper was restarted after the rename and completed successfully while all affected containers were already running. Compatibility storage/mount names remain unchanged pending their owning migration tickets.
+JAR-78 updates the current Game-name-dependent automation references: `rotom-downloads-game-ro.service` forces the `game` identity and `rotom-nas-docker-recovery` validates its read-only view with `runuser -u game`. The bindfs service was restarted after the rename and is enabled/active. The stale Gameserver automount was retired; the established `/mnt/nas-game` contract remains current.
 
 JAR-36 maintains three empty Docker network contracts; they are not scheduled automation and have no container attachments. The tracked `/srv/rotom/stacks/NETWORKING.md` contract directs later workload tickets to attach only required services and use Docker DNS.
 
@@ -92,7 +92,7 @@ The NAS backup service is a root oneshot service. It requires /mnt/nas-rotom-bac
 
 The backup status API service is enabled and active. It restarts on failure and starts after networking, but has no explicit NAS mount dependency.
 
-All fifteen fstab-backed NAS paths keep their existing automount model. JAR-55 added unused v2 boundary mounts `/mnt/nas-gameserver`, `/mnt/nas-downloads`, and `/mnt/nas-customapps`; they do not create a global Docker NAS dependency. JAR-21 additionally created two persistent bindfs units: `rotom-downloads-media-ro.service` and `rotom-downloads-game-ro.service`.
+The current fstab-backed NAS paths keep their existing automount model. JAR-78 retired the stale unavailable `/mnt/nas-gameserver` entry and local mountpoint; `/mnt/nas-game` is the sole active Game contract. The retired `/mnt/nas-downloads` boundary and reserved `/mnt/nas-customapps` boundary do not create a global Docker NAS dependency. JAR-21 additionally created two persistent bindfs units: `rotom-downloads-media-ro.service` and `rotom-downloads-game-ro.service`.
 
 qBittorrent uses a service-specific Docker/Compose startup guard rather than a global Docker→NAS systemd dependency. The active `/mnt/nas-downloads/torrents` bind and Downloads sentinel bind use `create_host_path: false`; deliberate removal of the Downloads sentinel caused recreation to fail as required. This prevents local-directory fallback on recreation. A live runtime NFS-loss watchdog was not implemented.
 
@@ -205,7 +205,7 @@ No active Home Assistant YAML configuration for email, Telegram, Discord, Slack,
 
 ### JAR-48 baseline dashboard monitoring — 2026-09-28
 
-Homepage's `Rotom Monitoring` section uses Glances v4 through Docker DNS on `rotom-monitoring` for Rotom system information, CPU, memory, container activity, local disk I/O and capacity, and host network traffic. It now includes **Media NAS Storage**, the authoritative Glances filesystem metric `fs:/mnt/host-root/mnt/nas-media`, and **UNAS Reachability**, an IPv4 ICMP check to `192.168.1.70`. The active Media and Downloader mounts are NFSv3 runtime dependencies; empty reserved `nas-customapps` and `nas-gameserver` shares intentionally have no checks. The former Auth account/mount was retired on 2026-09-29.
+Homepage's `Rotom Monitoring` section uses Glances v4 through Docker DNS on `rotom-monitoring` for Rotom system information, CPU, memory, container activity, local disk I/O and capacity, and host network traffic. It now includes **Media NAS Storage**, the authoritative Glances filesystem metric `fs:/mnt/host-root/mnt/nas-media`, and **UNAS Reachability**, an IPv4 ICMP check to `192.168.1.70`. The active Media and Downloader mounts are NFSv3 runtime dependencies; the reserved `nas-customapps` share intentionally has no check. The former Auth account/mount and stale Gameserver guest mount were retired.
 
 Homepage retains active HTTPS/internal site monitors for Nginx Proxy Manager, Arcane, Home Assistant, and Homebridge; backup-status and PVE temperature/backup-status cards remain read-only. JAR-73 adds an Uptime Kuma link under Rotom Management and a deliberately small alerting layer: `/usr/local/sbin/rotom-alerting` runs each minute via `rotom-alerting.timer`, sources protected Infra secrets, sends Rotom/Pushover alerts only on state transitions, checks Restic/PVE backup-status APIs, Media NFS with a three-minute grace, root-disk thresholds, and the qBittorrent guard. The PVE counterpart runs each minute as `pve-alerting.timer` for an independent heartbeat and PVE root-disk thresholds. Healthchecks monitors external Rotom, PVE, and monitoring heartbeats at 3-minute period plus 2-minute grace, with Pushover integration. For planned work, run `sudo rotom-alerting maintenance {rotom|pve|monitoring|all} MINUTES`; it pauses selected Healthchecks checks with manual-resume protection, suppresses local notifications, and automatically resumes at expiry.
 

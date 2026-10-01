@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-09-29 — unused Auth account and guest boundary retired
+**Documentation updated:** 2026-09-30 — JAR-78 Game identity verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -24,7 +24,7 @@ This is the canonical detailed owner of Rotom account identity and permission fa
 
 ## 2. Current Phase B Identity and Access Model — 2026-09-28 JAR-68 final
 
-**Current JAR-35 correction:** The final v2 service account names are `gameserver` (`995:5001`), `downloader` (`901:5005`), and `customapps` (`904:5008`). Their prior names `game`, `downloaders`, and `apps` are absent from NSS; no UID/GID, Docker-group membership, or ownership rewrite was performed. Their compatibility homes deliberately remain `/home/game`, `/home/downloaders`, and `/home/apps` until workload-specific migration. Current service processes resolve to the new account names because the underlying numeric identities were preserved.
+**Current JAR-78 correction:** The active Palworld service account is `game` (`995:5001`); `downloader` remains `901:5005` and `customapps` remains `904:5008`. `gameserver` is absent from NSS. No UID/GID, Docker-group membership, or broad ownership rewrite was performed; the service home remains `/home/game`, and active Game-domain service paths are now under `/srv/rotom`.
 
 **Current Customapps storage correction — 2026-09-29:** `/home/apps` remains the deliberately retained compatibility home for `customapps`, but its obsolete `nas-apps` shortcut and the separate Apps mount were retired. The current reserved NAS boundary is `Customapps/.data -> /mnt/nas-customapps`, reached through `/home/apps/nas-customapps`; it remains empty and no application workload is deployed.
 
@@ -37,7 +37,7 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 | PVE host | hostname `pve`; routine administration as Linux user `jared` (UID/GID `1000:1000`, groups `sudo` and `users`); canonical Mac aliases `pve` / `pve.rotom.casa`; key `~/.ssh/id_ed25519_pve`; PVE identity `jared@pam` has propagated `Administrator` access at `/`; matching root-authorized key removed; root retained for emergency recovery |
 | Debian VM `jared` | UID/GID `1000:1000`; supplementary `sudo`; key-only Mac login via `~/.ssh/id_ed25519_rotom` |
 | media | `127:5000`, `/home/media`; Jellyfin/Radarr/Sonarr |
-| game | `995:5001`, `/home/game`; Gamarr running; both Palworld containers intentionally stopped with worlds preserved |
+| game | `995:5001`, `/home/game`; both Palworld containers running and healthy; Gamarr retired |
 | infra | `997:5002`, `/home/infra`; Arcane/DDNS/Homepage/Glances/NPM |
 | smarthome | `126:5003`, `/home/smarthome`; Home Assistant/Homebridge |
 | documents | `900:5004`, `/home/documents` |

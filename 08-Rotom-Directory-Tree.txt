@@ -18,7 +18,7 @@
 # - Canonical Mac PVE SSH: aliases `pve` / `pve.rotom.casa` -> 192.168.1.68 Jared using ~/.ssh/id_ed25519_pve. PVE Jared has sudo plus `jared@pam` Administrator access; the matching root-authorized key was removed, while root remains emergency recovery. Old `proxmox*` aliases/key filenames are absent. PVE /etc/hosts contains canonical `192.168.1.68 pve.rotom.casa pve`.
 # - PVE monitoring: /usr/local/sbin/pve-cpu-temp-api + /etc/systemd/system/pve-cpu-temp-api.service; 192.168.1.68:8788; Homepage label `PVE CPU Temperature`. Backup status: /usr/local/sbin/pve-backup-status-api + /etc/systemd/system/pve-backup-status-api.service; LAN-only 192.168.1.68:8789; Homepage PVE Restic and Rotom VM schedule cards.
 # - VMID 100 `rotom`: q35/OVMF, x86-64-v2-AES, 8 vCPU, 12 GiB RAM, 100 GiB; onboot=1; optional JAR-49 host attachment `hostpci0: 0000:00:02.0,pcie=1` exposes the NUC Iris Plus 655 as guest `01:00.0` / `/dev/dri/renderD128`; guest rotom.casa at reserved 192.168.1.69, MAC BC:24:11:97:10:47. Removing hostpci0 preserves the portable baseline.
-# - Docker: 17 total container objects / 15 intended running; both Palworld containers intentionally stopped with worlds preserved; qBittorrentVPN wg0 10.2.0.2/32; JAR-5 local acceptance found 0 failed units.
+# - Docker: 17 total container objects / 17 intended running; both Palworld containers are healthy with worlds preserved; qBittorrentVPN wg0 10.2.0.2/32; JAR-5 local acceptance found 0 failed units.
 # - JAR-38: Infra v2 module Compose roots are `/srv/rotom/stacks/infra/{homepage,glances,arcane,cloudflare-ddns}` (local Git commit `a17a217`); Homepage/Glances/Arcane state is under appdata and protected inputs under `secrets/infra`. Legacy Infra paths and `arcane_arcane-data` remain rollback artifacts. NPM remains active pending JAR-39.
 # - JAR-73: Uptime Kuma Compose is `/srv/rotom/stacks/infra/uptime-kuma/compose.yaml`; its local SQLite data is `/srv/rotom/appdata/infra/uptime-kuma`, and its sole listener is `127.0.0.1:3002`. Root-only Rotom alert worker/unit/timer are `/usr/local/sbin/rotom-alerting`, `/etc/systemd/system/rotom-alerting.service`, and `.timer`, with state under `/var/lib/rotom-alerting`; PVE has the parallel `/usr/local/sbin/pve-alerting` and `pve-alerting.{service,timer}`. Protected alert inputs remain below `/srv/rotom/secrets/infra` and are never documented by value.
 # - JAR-10: RomM/MariaDB/Valkey are deployed at `/srv/rotom/stacks/media/romm`; all mutable state and verified logical export are local below `/srv/rotom/appdata/media/romm`, protected inputs are under `secrets/media/romm`, and `/mnt/nas-media/library/games` is read-only in RomM. NPM uses loopback `8081` for `romm.rotom.casa`.
@@ -27,7 +27,7 @@
 # - 2026-09-29: current identity `customapps` retains compatibility home `/home/apps`; the obsolete NAS `Apps` drive plus its `Apps/.data -> /mnt/nas-apps` fstab/automount, local mountpoint, and `nas-apps` shortcut were retired. Empty `Customapps/.data -> /mnt/nas-customapps` remains the reserved boundary through `/home/apps/nas-customapps`.
 # - 2026-09-29: unused `auth` (`905:5009`) and `/home/auth`, its `nas-auth` shortcut, and the unavailable `Auth/.data -> /mnt/nas-auth` guest contract were retired. `showmount` no longer lists Auth, and Jared confirmed the NAS Auth drive was deleted; retained Customapps remains exported.
 # - JAR-5: private `rotom-docs` static portal is deployed at `/srv/rotom/stacks/infra/rotom-docs`, with controlled derived source and generated site under `/srv/rotom/appdata/infra/rotom-docs`. Its root-owned publisher permits only RPD members `00`–`08`; NPM routes `docs.rotom.casa` through loopback `8082` and allows only loopback plus the trusted LAN.
-# - JAR-42: Palworld Jared and Fran Compose roots are `/srv/rotom/stacks/gameserver/palworld-{jared,fran}` (local commit `50bb937`); current local state is `/srv/rotom/appdata/gameserver/palworld-{jared,fran}` and protected environment files are under `/srv/rotom/secrets/gameserver`. Both containers are intentionally stopped after controlled health/readiness validation. Their private networks retain Jared `172.27.0.0/16` and Fran `172.25.0.0/16`; `/mnt/nas-gameserver` is not a live-world mount. `/home/game/docker/palworld-server-*` remains rollback material.
+# - JAR-78: Palworld Jared and Fran Compose roots are `/srv/rotom/stacks/game/palworld-{jared,fran}`; current local state is `/srv/rotom/appdata/game/palworld-{jared,fran}` and protected environment files are under `/srv/rotom/secrets/game`. Locked `game` remains `995:5001`; both containers are healthy after controlled one-at-a-time recreation. Their private networks retain Jared `172.27.0.0/16` and Fran `172.25.0.0/16`; `/mnt/nas-game` is the sole current Game mount and not a live-world bind. `/home/game/docker/palworld-server-*` is historical rollback evidence only.
 # - JAR-56: qBittorrentVPN production Compose is `/srv/rotom/stacks/downloader/qbittorrentvpn/compose.yaml`, appdata is `/srv/rotom/appdata/downloader/qbittorrentvpn`, and active payload is `/mnt/nas-media/torrents`; former `/home/downloaders/docker/qbittorrentvpn` and `/mnt/nas-downloaders/torrents` remain rollback material. `/usr/local/sbin/rotom-qbittorrent-media-guard` with matching service/timer checks Media NFS/sentinel every 15 seconds and stops qBittorrentVPN on a missing mount. Authenticated application-import/seeding validation is Jared's deferred manual follow-up.
 #
 # PVE HOST-CONFIG RESTIC — CURRENT
@@ -152,7 +152,7 @@
 #   volumes/arcane_arcane-data/     restored Arcane persistent named-volume data
 #
 # /srv/rotom/                       JAR-34 v2 foundation; root:root 0755
-#   stacks/{infra,media,downloader,gameserver,smarthome,documents,web,filesync,customapps,auth}/
+#   stacks/{infra,media,downloader,game,smarthome,documents,web,filesync,customapps,auth}/
 #                                     root-owned declarative namespace; migrated domains have owning modules
 #   stacks/NETWORKING.md             JAR-36 shared external-network/Docker-DNS contract
 #   stacks/RUNTIME-POLICY.md         JAR-37 controlled-update, Compose, and exception policy
@@ -179,14 +179,13 @@
 #   .git/                            local history only; no remote configured by JAR-34
 #   .gitignore                       excludes mutable/sensitive/generated state
 # /home/game, /home/downloaders, /home/apps
-#   JAR-35 retained compatibility homes after identities became gameserver,
-#   downloader, and customapps respectively; numeric ownership is unchanged.
-# /mnt/nas-gameserver, /mnt/nas-customapps
-#   JAR-55 empty reserved NFSv3/service-GID boundaries. The separate empty
-#   `/mnt/nas-downloads` / NAS `Downloads` drive was retired 2026-09-29;
-#   active compatibility `/mnt/nas-game` and `/mnt/nas-downloaders` remain
-#   unchanged. The stale unavailable `/mnt/nas-apps` boundary was retired
-#   2026-09-29; `customapps` uses `/mnt/nas-customapps`.
+#   `game`, `downloader`, and `customapps` retain their numeric ownership.
+# /mnt/nas-game, /mnt/nas-customapps
+#   `/mnt/nas-game` is the sole current NFSv3/service-GID Game mount after
+#   JAR-78 retired the stale unavailable `/mnt/nas-gameserver` contract and
+#   empty local mountpoint. The separate empty `/mnt/nas-downloads` / NAS
+#   `Downloads` drive and stale `/mnt/nas-apps` boundary are retired;
+#   `customapps` uses `/mnt/nas-customapps`.
 # /srv/rotom/stacks/NETWORKING.md
 #   JAR-36 tracked Compose contract for external rotom-proxy, rotom-arr, and
 #   rotom-monitoring bridges; the networks initially have no containers.

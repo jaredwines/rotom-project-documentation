@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-09-30 — Jared Wines Homepage card restored
+**Documentation updated:** 2026-09-30 — JAR-78 Game domain migration verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -56,6 +56,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-09-30 — JAR-78 rename Gameserver domain to Game
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Renamed the locked Rotom service account/group from `gameserver` to `game`, preserving UID:GID `995:5001`, `/home/game`, and its supplementary-membership model. Moved the active Palworld stacks, appdata, protected inputs, and backup staging from the `gameserver` domain to `game`; updated the live bindfs/recovery references; and removed the stale `Gameserver/.data -> /mnt/nas-gameserver` fstab/automount contract and its empty local mountpoint. UniFi Drive already exposed the authoritative `Game` share, so it and the verified `/mnt/nas-game` mount were retained without NAS data changes.
+- **Evidence:** Both Palworld containers were stopped before migration. Fresh pre-move SHA-256 manifests (Jared 105 files; Fran 92 files) and world IDs `DB40338954B844C28CEA21471A392F98` and `396F5898378F4E9CAE89461F403653D9` matched byte-for-byte after the moves. `game` resolves locked at `995:5001`; the old NSS names, stale fstab entry, automount, mountpoint, and active configuration references are absent. Intended `game` access to the `988:5001` Game NFS root succeeded while `web` traversal was denied. Both Compose definitions validated, were recreated one at a time, and are healthy with their expected UDP ports and only `/srv/rotom/appdata/game/...` binds. Restic snapshot `b7b7288b` (2026-09-30 22:23 PDT) covers `/srv` under the final paths; the established retention/prune completed and `restic check` reported no errors.
+- **Outstanding:** None.
 
 ## 2026-09-30 — JAR-77 retire Gamarr and its integrations
 

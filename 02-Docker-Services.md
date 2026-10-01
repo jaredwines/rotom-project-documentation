@@ -2,9 +2,9 @@
 
 **Documentation set:** Rotom Project Documentation  
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
-**Scope:** Rotom workload layer; final JAR-68 post-reboot state is 16 container objects / 14 intended running with both Palworld servers intentionally stopped
+**Scope:** Rotom workload layer; current JAR-78 state is 17 container objects / 17 intended running, including both healthy Palworld servers
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-30 — Jared Wines Homepage card restored
+**Documentation updated:** 2026-09-30 — JAR-78 Game domain migration verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -32,7 +32,7 @@ The Proxmox VE host `pve` remains hypervisor-only; the application Docker runtim
 
 JAR-34 created the non-migrating v2 declarative namespace at `/srv/rotom`. It contains empty domain reservations under `stacks/` and service-owned empty domain roots under `appdata/`; it contains no placeholder Compose files, containers, databases, or production bind mounts. Existing production projects under `/home/<service>/docker` remain current until their individual Phase D workload tickets migrate and verify them. `/srv/rotom` is a local Git repository for only `stacks/`, `scripts/`, and support files; `.gitignore` excludes `appdata/`, `secrets/`, `backup-staging/`, databases, logs, caches, generated state, and environment files.
 
-JAR-35 renamed the three service identities without changing their numeric runtime identities: `gameserver` is `995:5001`, `downloader` is `901:5005`, and `customapps` is `904:5008`. Compatibility homes remain `/home/game`, `/home/downloaders`, and `/home/apps`, respectively. The Gameserver bindfs unit and NAS-recovery helper use `gameserver`; their successful post-change run confirmed no container recreation was needed. Existing Compose PUID/PGID and bind paths remain unchanged.
+JAR-78 supersedes the Gameserver naming for the active Palworld domain: locked `game` is `995:5001` with home `/home/game`; `downloader` remains `901:5005` and `customapps` remains `904:5008`. The active Game bindfs unit and NAS-recovery helper use `game`; the Palworld modules were recreated one at a time after their paths moved to the Game domain. Existing numeric PUID/PGID values remain unchanged.
 
 JAR-36 created unused external bridge networks `rotom-proxy` (`172.29.0.0/16`), `rotom-arr` (`172.30.0.0/16`), and `rotom-monitoring` (`172.31.0.0/16`). Future migrated stacks attach only services needing cross-stack connectivity, use Docker DNS/service names, and may retain private default networks. No current container is attached; current ports and bridge networks remain authoritative until owning workload migration tickets.
 
@@ -54,7 +54,7 @@ NPM serves the PVE HTTPS UI at `https://pve.rotom.casa`, forwarding over HTTPS t
 
 Syncthing `2.0.0` runs from `/srv/rotom/stacks/filesync/syncthing/compose.yaml` as numeric `903:5007`, with persistent configuration/database below `/srv/rotom/appdata/filesync/syncthing`. It uses `restart: unless-stopped` and its image-provided healthcheck. Its only payload bind is `/mnt/nas-filesync -> /filesync`; the long bind has `create_host_path: false`, preventing Docker from substituting an unmounted local directory. An isolated nonexistent-source Compose probe verified this fails before fallback-directory creation. It has no Docker socket, privilege, added capability, device mapping, or unrelated NAS bind. It retains a private default network and attaches to `rotom-proxy`; its GUI is published only as `127.0.0.1:8384` for host-networked NPM compatibility. GUI authentication is configured and NPM forces TLS for `syncthing.rotom.casa`. The disposable test peer and acceptance payload were removed after verification, so no production folder or peer is preconfigured.
 
-JAR-42 completed the Gameserver convergence at local stack roots `/srv/rotom/stacks/gameserver/palworld-jared` and `/srv/rotom/stacks/gameserver/palworld-fran` (local Git commit `50bb937`). Their authoritative world/runtime binds are `/srv/rotom/appdata/gameserver/palworld-jared -> /palworld` and `/srv/rotom/appdata/gameserver/palworld-fran -> /palworld`; root-only environment files remain under `/srv/rotom/secrets/gameserver` and are not documented here. Each container uses its own private default network, `restart: unless-stopped`, image-provided healthcheck, and retained UDP mapping: Jared `8211/udp` plus `27015/udp`; Fran `8212/udp` plus `27016/udp`. Controlled 2026-09-29 starts reached healthy REST/dedicated-server readiness against expected existing worlds, then both were returned to the administrator's intended stopped state. Native Palworld backup directories are under their local appdata roots. Neither stack mounts `/mnt/nas-gameserver`; the retained `/home/game/docker/palworld-server-*` trees are rollback material and not current runtime paths.
+JAR-78 establishes the current Game domain at local stack roots `/srv/rotom/stacks/game/palworld-jared` and `/srv/rotom/stacks/game/palworld-fran`. Their authoritative world/runtime binds are `/srv/rotom/appdata/game/palworld-jared -> /palworld` and `/srv/rotom/appdata/game/palworld-fran -> /palworld`; root-only environment files remain under `/srv/rotom/secrets/game` and are not documented here. Each container uses its own private default network, `restart: unless-stopped`, image-provided healthcheck, and retained UDP mapping: Jared `8211/udp` plus `27015/udp`; Fran `8212/udp` plus `27016/udp`. Both are currently healthy after controlled one-at-a-time recreation. Native Palworld backup directories are under their local appdata roots. Neither stack mounts `/mnt/nas-game`; the retired `/home/game/docker/palworld-server-*` trees are historical rollback evidence only.
 
 Docker socket access is exceptional: Arcane has the raw read-write socket for deliberate Docker administration only, with automatic updates and auto-heal disabled; Homepage has the read-only socket for dashboard metadata; Glances has the read-only socket plus its read-only host-root monitoring bind. A read-only socket mount does not prove a read-only Docker API. All other current application containers have no socket. Current deliberate runtime exceptions are Home Assistant (host networking, privileged, read-only D-Bus), Homebridge/Nginx Proxy Manager/Cloudflare DDNS (host networking), qBittorrentVPN (`CAP_NET_ADMIN` for WireGuard), and the stated Arcane/Glances mounts. Phase D workload tickets must rejustify rather than inherit any exception.
 
@@ -231,7 +231,7 @@ Ordinary `jared` access to the media NAS is intentionally excluded. Administrati
 
 ## 4. Game — `game`
 
-Palworld services retain the `gameserver` identity at UID/GID `995:5001` and local state under `/home/game/docker/`. Palworld stays on local storage. Gamarr retains UID 995 but its active v2 stack uses Media GID 5000 and the Media NAS game-library bind; the old Game library is retained only for JAR-52 rollback.
+Palworld services use the locked `game` identity at UID/GID `995:5001` and local state under `/srv/rotom/appdata/game/`. Palworld stays on local storage. Gamarr is retired; the old Game library is retained only for JAR-52 rollback.
 
 | Current container name | Observed image | Observed status | Published ports | Container-only ports shown | Compose file |
 | --- | --- | --- | --- | --- | --- |
@@ -346,7 +346,7 @@ Production workloads are restored under the current service-account layout. The 
 | Service account | Current guest UID:GID | Current guest NAS mount | Current Docker/application use |
 |---|---:|---|---|
 | media | `127:5000` | `/mnt/nas-media` | Jellyfin/Radarr/Sonarr; Media compatibility view of Downloader torrents is read-only |
-| gameserver | `995:5001` | `/mnt/nas-game` | Both Palworld servers; retained Game library is JAR-52 rollback material |
+| game | `995:5001` | `/mnt/nas-game` | Both Palworld servers; retained Game library is JAR-52 rollback material |
 | infra | `997:5002` | `/mnt/nas-infra` | Arcane/DDNS/Homepage/Glances/NPM configs remain local under `/home/infra/docker` |
 | smarthome | `126:5003` | `/mnt/nas-smarthome` | Home Assistant/Homebridge configs remain local under `/home/smarthome/docker` |
 | documents | `900:5004` | `/mnt/nas-documents` | Storage boundary only |
