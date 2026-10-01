@@ -2,9 +2,9 @@
 
 **Documentation set:** Rotom Project Documentation  
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
-**Scope:** Rotom workload layer; the latest comprehensive Docker count is dated JAR-68 evidence and requires a fresh post-JAR-84 inventory before being treated as current
+**Scope:** Rotom workload layer; current supplied 2026-10-01 Docker inventory is 25 container objects / 24 running, with deployment details separately evidenced per service
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — Post-JAR-77 Docker-runtime claims corrected
+**Documentation updated:** 2026-10-01 — JDownloader and current Docker inventory recorded
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -99,7 +99,13 @@ At JAR-68 acceptance there were **16 total container objects and 14 intended run
 
 At JAR-68, `jaredwines.com` was intentionally undeployed and had no container object. Final post-reboot acceptance verified all twelve NAS automounts, qBittorrentVPN, Homepage PVE CPU monitoring, guest Restic timer state, and zero failed guest systemd units. Both former Downloads read-only bindfs compatibility views were retired later. The earlier 16-running observations below remain valid historical checkpoints; JAR-68 superseded them at that time with its 14-intended-running result.
 
-**Post-JAR-68 changes:** JAR-75 subsequently deployed Syncthing; JAR-77 retired Gamarr and removed its container; JAR-84 found Syncthing exited before its preflight. No later complete `docker ps -a` inventory is recorded. Do not infer a current container count, intended-running set, or Palworld/Syncthing state from the JAR-68 snapshot; refresh it with a read-only live inspection.
+**Post-JAR-68 changes:** JAR-75 subsequently deployed Syncthing; JAR-77 retired Gamarr and removed its container; JAR-84 found Syncthing exited before its preflight. The following supplied 2026-10-01 `docker ps -a` inventory supersedes the JAR-68 count and runtime-state claims.
+
+### Current Docker inventory — supplied 2026-10-01 output
+
+The supplied root `docker ps -a` output records **25 container objects: 24 running and one exited**. `syncthing` is the sole exited object (`Exited (0)`); both Palworld containers are running and healthy; Gamarr is absent, consistent with JAR-77 retirement. The running set is `jdownloader`, `romm`, `nginx-proxy-manager`, `qbittorrentvpn`, both Palworld servers, `jellyfin`, `homepage`, `prowlarr`, `uptime-kuma`, `rotom-docs`, `romm-valkey`, `romm-db`, `paperless`, `paperless-db`, `paperless-broker`, `alohamillworks.com`, `homebridge`, `home-assistant`, `sonarr`, `radarr`, `arcane`, `cloudflare-ddns`, and `glances`.
+
+`jdownloader` is newly observed running. The supplied output shows only its bare container TCP `3129` port, not a host-published mapping. Its image tag, authoritative Compose definition, persistent binds, service identity, network attachments, restart policy, credentials, and backup/recovery contract were not inspected and remain **Needs Verification**. Do not document or expose its protected inputs.
 
 ### JAR-38 Infra v2 convergence — 2026-09-28
 

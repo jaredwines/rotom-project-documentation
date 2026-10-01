@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-01 — Post-JAR-77 Docker-runtime claims corrected
+**Documentation updated:** 2026-10-01 — JDownloader and current Docker inventory recorded
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -56,6 +56,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-01 — Record JDownloader and current Docker inventory
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Verified / Documentation only.**
+- **Changes:** Recorded the supplied root `docker ps -a` inventory: 25 container objects, 24 running, and Syncthing exited normally. Added the newly observed running `jdownloader` container; its bare TCP `3129` port is container-only in the supplied output. The two Palworld containers were running and healthy. Gamarr remains retired and absent.
+- **Evidence:** User-supplied `sudo docker ps -a` output from 2026-10-01. It enumerated each current container/status and did not expose secret values.
+- **Outstanding:** JDownloader's authoritative Compose path, persistent binds, service identity, network attachments, restart policy, and recovery/backup contract were not inspected; do not infer them from `docker ps -a` alone.
 
 ## 2026-10-01 — Correct post-JAR-77 Docker runtime claims
 
