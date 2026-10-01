@@ -166,7 +166,7 @@ The pre-migration audit reverified `eno1` at `192.168.1.69/24` and captured MAC 
 
 JAR-23 did not change Rotom's LAN address, DHCP reservation, gateway, DNS configuration, Cloudflare DDNS settings, Nginx Proxy Manager routes, firewall policy, or published ports. The September 23 reboot sequence did show transient DNS/NFS readiness failures while Docker was restoring containers. `NetworkManager-wait-online.service` was enabled and completed successfully, and `network-online.target` became active, but that did not guarantee the UNAS NFS exports were ready for immediate Docker bind-mount use. The resulting failure was therefore treated as an application-storage startup-order problem rather than a persistent IP/DNS configuration defect.
 
-The `rotom-nas-docker-recovery.service` waits until after `docker.service` and `network-online.target`, then actively verifies the Downloads/Media/Game NFS mounts and the remaining Media bindfs prerequisite before recovering only containers whose stopped state carries a NAS/mount startup-failure signature. It changes no DNS or routing behavior. Manual validation passed; reboot validation is deferred.
+The `rotom-nas-docker-recovery.service` waits until after `docker.service` and `network-online.target`, then actively verifies the Downloads/Media/Game NFS mounts and currently starts the unused Media bindfs unit before recovering only containers whose stopped state carries a NAS/mount startup-failure signature. JAR-81 proposes retiring that view and branch separately. It changes no DNS or routing behavior. Manual validation passed; reboot validation is deferred.
 
 ### JAR-24 backup-network scope verification — 2026-09-25
 
@@ -886,7 +886,7 @@ Boot/recreation fail-closed behavior and the JAR-31 recovery retry path are veri
 
 ### Resolved or intentional states — not gaps
 
-- Current `/mnt/nas-downloaders`, `/mnt/nas-media`, `/mnt/nas-game`, the Media bindfs view, and boot-time recovery behavior were verified by JAR-31 and reverified during the later physical Proxmox power-cycle; the unused Game Downloads view was retired by JAR-78.
+- Current `/mnt/nas-downloaders`, `/mnt/nas-media`, `/mnt/nas-game`, and boot-time recovery behavior were verified by JAR-31 and reverified during the later physical Proxmox power-cycle. JAR-81 verified that the enabled Media bindfs view has no container consumer and proposes its separate retirement; the unused Game Downloads view was retired by JAR-78.
 - `jaredwines.com` is intentionally undeployed; its Compose project is retained. Starting it later is an administrative decision, not missing evidence.
 - Historical `jaredwinescom_default`, `olivetin_default`, `portainer_default`, and `palworld_default` network observations are not part of the current JAR-31 bridge map.
 - Homepage backup-status access no longer depends on a guest UFW rule because UFW is not installed in the current VM.
