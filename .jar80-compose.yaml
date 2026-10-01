@@ -1,0 +1,60 @@
+services:
+  qbittorrentvpn:
+    image: binhex/arch-qbittorrentvpn:latest
+    container_name: qbittorrentvpn
+    restart: unless-stopped
+    env_file:
+      - /srv/rotom/secrets/downloader/qbittorrentvpn.env
+
+    cap_add:
+      - NET_ADMIN
+
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+
+    environment:
+      - PUID=901
+      - PGID=5000
+      - UMASK=002
+      - TZ=America/Los_Angeles
+
+      - VPN_ENABLED=yes
+      - VPN_PROV=protonvpn
+      - VPN_CLIENT=wireguard
+
+      - LAN_NETWORK=192.168.1.0/24
+      - ENABLE_PRIVOXY=no
+      - ENABLE_SOCKS=no
+      - STRICT_PORT_FORWARD=yes
+      - USERSPACE_WIREGUARD=no
+
+      - NAME_SERVERS=1.1.1.1,1.0.0.1
+      - WEBUI_PORT=8080
+
+    volumes:
+      - /srv/rotom/appdata/downloader/qbittorrentvpn/config:/config
+
+      - type: bind
+        source: /mnt/nas-media/torrents
+        target: /media/torrents
+        bind:
+          create_host_path: false
+
+      - type: bind
+        source: /mnt/nas-media/.rotom-qbt-media-ready
+        target: /run/rotom-nas-media
+        read_only: true
+        bind:
+          create_host_path: false
+
+      - /etc/localtime:/etc/localtime:ro
+
+    ports:
+      - "8080:8080"
+    networks:
+      default: {}
+      rotom-arr: {}
+
+networks:
+  rotom-arr:
+    external: true

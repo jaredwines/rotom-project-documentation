@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-09-30 — Remove obsolete qBittorrent NAS readiness markers
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Removed the empty, unreferenced legacy directories `/mnt/nas-media/.rotom-qbt-nas-ready` and `/mnt/nas-game/.rotom-qbt-nas-ready` using non-recursive directory removal. The active Media qBittorrent safety marker `/mnt/nas-media/.rotom-qbt-media-ready` remains unchanged.
+- **Evidence:** Live reference scans found neither removed path in `/etc`, `/usr/local`, or `/srv/rotom`; qBittorrentVPN mounts only the active Media marker at `/run/rotom-nas-media`. Both removed directories were verified empty, then absent after removal. The enabled active media-guard timer checks the retained Media marker and underlying NFS filesystem.
+- **Outstanding:** None.
+
 ## 2026-10-01 — JAR-79 retire empty Game torrent directories
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
