@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-30 — PVE web UI NPM route verified
+**Documentation updated:** 2026-10-01 — JAR-82 Nginx Proxy Manager Infra v2 migration verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -365,7 +365,7 @@ Additional Home Assistant/Homebridge dynamic/discovery listeners were present, i
 
 ---
 
-## 10. Pre-Migration Nginx Proxy Manager
+## 10. Current Nginx Proxy Manager
 
 ### Runtime model
 
@@ -381,8 +381,8 @@ Persistent bind mounts:
 
 | Host path | Container path | Mode |
 | --- | --- | --- |
-| `/home/infra/docker/nginx-proxy-manager/data` | `/data` | read/write |
-| `/home/infra/docker/nginx-proxy-manager/letsencrypt` | `/etc/letsencrypt` | read/write |
+| `/srv/rotom/appdata/infra/nginx-proxy-manager/data` | `/data` | read/write |
+| `/srv/rotom/appdata/infra/nginx-proxy-manager/letsencrypt` | `/etc/letsencrypt` | read/write |
 
 No NPM secrets or certificate/private-key contents are recorded here.
 
@@ -410,9 +410,9 @@ No redirect hosts, stream hosts, or dead hosts were present in the earlier audit
 | `sonarr.rotom.casa` | HTTP | `192.168.1.69:8989` | enabled | Sonarr |
 | `jellyfin.rotom.casa` | HTTP | `192.168.1.69:8096` | enabled | Jellyfin |
 | `prowlarr.rotom.casa` | HTTP | `192.168.1.69:9696` | enabled | Prowlarr; local and proxied HTTP both remained `302` after the 2026-09-19 migration |
-| `gamarr.rotom.casa` | HTTP | `192.168.1.69:6767` | enabled | Gamarr; NPM proxy-host ID 19, certificate ID 24, forced SSL, no access list; HTTPS probe returned `302` |
+| `gamarr.rotom.casa` | HTTP | `127.0.0.1:6767` | DB enabled; generated config absent | Gamarr is retired; this retained database row is not an active route |
 
-The legacy Smart Hub/Portainer/OliveTin/PalTools rows above remain `enabled=1` in the NPM database, but their IDs are absent from the currently generated `/home/infra/docker/nginx-proxy-manager/data/nginx/proxy_host/*.conf` set inspected in the later comprehensive audit. Treat them as stale/unresolved database records rather than active generated routes until administrator intent is reviewed. The current generated configuration includes the active Rotom/application routes, including Gamarr.
+The legacy Smart Hub/Portainer/OliveTin/PalTools rows above remain `enabled=1` in the NPM database, but their IDs are absent from the current generated `/srv/rotom/appdata/infra/nginx-proxy-manager/data/nginx/proxy_host/*.conf` set. The retained Gamarr row is likewise absent following its retirement. Treat all of those rows as stale/unresolved database records rather than active generated routes until administrator intent is reviewed. JAR-82 verified that the remaining active Rotom/application routes regenerated from the preserved database after cutover.
 
 The database output did not expose a current WebSocket-support field in the selected schema output, so WebSocket behavior is not documented here.
 
@@ -505,7 +505,7 @@ Rotom's current externally observed IPv4 was also `68.8.40.225`. Therefore the C
 
 ### Homepage cutover — September 16, 2026
 
-“Change Homepage URL” supersedes the earlier Homepage hostname in the audit. The canonical URL is `https://rotom.casa`. Supplied output from `/home/infra/docker/nginx-proxy-manager/data/nginx/proxy_host/9.conf` shows `server_name rotom.casa;`, so the Homepage proxy no longer includes `homepage.rotom.casa`.
+“Change Homepage URL” supersedes the earlier Homepage hostname in the audit. The canonical URL is `https://rotom.casa`. The retained historical source output, and the current JAR-82 generated configuration at `/srv/rotom/appdata/infra/nginx-proxy-manager/data/nginx/proxy_host/9.conf`, show `server_name rotom.casa;`, so the Homepage proxy no longer includes `homepage.rotom.casa`.
 
 The supplied command `curl -Ik --resolve rotom.casa:443:127.0.0.1 https://rotom.casa/` returned `HTTP/1.1 200 OK` and `X-Served-By: rotom.casa`. This verifies local TLS routing with the correct SNI and a successful application response; because `-k` skips certificate verification, it does not independently prove certificate trust or external reachability. Testing `https://127.0.0.1` with only an HTTP Host header does not provide the same TLS SNI and previously produced an unrecognized-name error.
 
