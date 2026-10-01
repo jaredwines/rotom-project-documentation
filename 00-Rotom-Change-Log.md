@@ -57,6 +57,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-01 — JAR-85 retain active Infra state and retire three inactive artifacts
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Root inspection confirmed the documented `/home/infra` ownership and access contract; no correction was required. Retired only an inactive `downloads` discovery symlink and two superseded non-sensitive Homepage rollback files. Active v2 Arcane, Cloudflare DDNS, and Homepage paths remain under `/srv/rotom`; the active NPM project and every NPM file, credential, certificate, database, NAS boundary, RPD checkout, SSH material, and recovery artifact were retained.
+- **Evidence:** Root metadata showed `/home/infra` `infra:infra` mode `0750`, `.ssh` `0700`, Docker `0770`, and the expected mounted Infra NFS boundary. Docker labels showed the v2 Infra working directories and no current consumer of the retired paths; Arcane's current database had no old discovery-path reference. All three retired entries were unreferenced, non-sensitive, and single-link objects. After removal, all v2 Infra Compose files validated; Arcane and Homepage were healthy, DDNS and NPM were running, both local Homepage and `https://rotom.casa` returned HTTP `200`, and `systemctl --failed` was empty.
+- **Outstanding:** The retained NPM legacy path and its historical Compose copy were explicitly left untouched. Historical pre-v2 Arcane records remain historical evidence, not current configuration.
+
 ## 2026-10-01 — JAR-81 Media compatibility-view drift assessment
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.

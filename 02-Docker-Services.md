@@ -438,7 +438,7 @@ The VM-era backup baseline is no longer a Docker gap. The current verified guest
 
 - **Intentional:** Fran is not recreated, and her historical backup sudoers rule is not installed.
 - **Needs Verification — live Downloader-NFS loss:** startup/recreation fail-closed behavior and boot-time recovery are verified, but behavior after sudden NFS loss while qBittorrent is already running is not. Read-only inspection of the current Compose/systemd definitions can confirm that no runtime watchdog is documented; actual failure behavior would require a separately planned non-destructive maintenance test and must not be inferred.
-- **Known Arcane metadata drift:** current auto-update/auto-heal settings were freshly verified on 2026-09-27 (document 06). Arcane discovers Prowlarr and qBittorrentVPN through `/home/infra/docker/downloads -> /home/downloaders/docker`; its persisted qBittorrentVPN project status remains stale/`unknown` even though Docker runtime and WireGuard are current and healthy enough to be running.
+- **Known Arcane metadata drift:** current auto-update/auto-heal settings were freshly verified on 2026-09-27 (document 06). JAR-85 verified the active Arcane container mounts `/home/downloaders/docker` directly; the former `/home/infra/docker/downloads` discovery symlink was unreferenced by the current Arcane database and retired. Historical Arcane records that name the old symlink remain historical evidence. Its persisted qBittorrentVPN project status remains stale/`unknown` even though Docker runtime and WireGuard are current and healthy enough to be running.
 
 ## 14. Related Documentation
 
