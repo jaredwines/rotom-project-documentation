@@ -270,7 +270,7 @@ The Docker service directories and their Compose files have matching service own
 
 | Owner | Service directory and Compose mode |
 |---|---|
-| infra | arcane, cloudflare-ddns, homepage, nginx-proxy-manager retain their recorded modes; `/home/infra/docker/downloads` is the Arcane discovery symlink to the Downloads Docker root |
+| infra | arcane, cloudflare-ddns, homepage, nginx-proxy-manager retain their recorded modes; JAR-85 retired the inactive `/home/infra/docker/downloads` symlink after verifying Arcane directly mounts the Downloads Docker root and its current database has no reference to the symlink |
 | media | jellyfin, radarr, sonarr remain active; no retained Prowlarr/qBittorrent rollback project remains |
 | downloads | active `prowlarr` and `qbittorrentvpn` are under `/home/downloads/docker`, owned by Downloads `901:5005`; qBittorrent `.env` remains mode `0600` with a narrow Infra read ACL for Arcane discovery |
 | game | palworld-server-jared and palworld-server-fran retain their recorded directory/Compose modes; active `gamarr` is under `/home/game/docker/gamarr` with local config owned for `game` (`995:5001`) |
