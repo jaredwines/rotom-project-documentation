@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-09-30 — JAR-78 Game domain migration verified
+**Documentation updated:** 2026-10-01 — JAR-79 Game torrent-directory retirement verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -56,6 +56,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-01 — JAR-79 retire empty Game torrent directories
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Removed qBittorrentVPN's unused `Games` category and the verified-empty `torrents/games` and `torrents/incomplete/games` directories from the active `Downloader/.data` NFS share using non-recursive empty-directory removal. The retired Game bindfs view/unit remained absent. The retained Media read-only view, Game NFS mount, Media game library, and active Movies/Shows categories were not changed.
+- **Evidence:** qBittorrent's local API reported zero torrents before the change; the category used `/game/torrents/{,incomplete/}games`. Hidden-entry inspection and `du` each showed both NAS directories empty. The API removal returned HTTP 200 and the final category set is Movies/Shows only; both `rmdir` operations succeeded. Downloads NFS remained mounted/read-write and writable by `downloader`; the Media bindfs view remained read-only and the recovery helper completed successfully. qBittorrentVPN `wg0` remained `10.2.0.2/32`; Radarr, Sonarr, RomM, and both Palworld containers were running/healthy where healthchecks exist; no failed systemd unit was reported.
+- **Outstanding:** Live Compose inspection found qBittorrentVPN currently binds `/mnt/nas-media/torrents` at both `/media/torrents` and `/game/torrents`, contrary to the ticket/RPD claim that it uses `/mnt/nas-downloaders`. JAR-79 did not change that separate payload topology; resolve it in a scoped follow-up before asserting qBittorrent uses Downloader.
 
 ## 2026-09-30 — Retire unused Game Downloads bindfs view
 

@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-09-30 — JAR-78 Game mount contract verified
+**Documentation updated:** 2026-10-01 — JAR-79 Game torrent-directory retirement verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -27,7 +27,7 @@ The original audit was read-only. It did not recursively enumerate the NAS, modi
 
 ## 2. Current Storage State — 2026-09-29 JAR-47 final recovery policy
 
-The Rotom guest storage contract remains unchanged: twelve NFS systemd automounts plus read-only Media/Game bindfs compatibility views. PVE has only backup-specific NAS mounts; it does not host the guest application shares.
+The Rotom guest storage contract remains twelve NFS systemd automounts plus the read-only Media bindfs compatibility view. PVE has only backup-specific NAS mounts; it does not host the guest application shares.
 
 ### NAS protection classification — JAR-47
 
@@ -51,6 +51,10 @@ UniFi Drive snapshots are enabled for every NAS drive. The supplied Media settin
 ### Guest storage and post-reboot acceptance
 
 All twelve guest NFS automounts and both read-only bindfs views passed final post-reboot verification. `/mnt/nas-downloaders/.rotom-qbt-nas-ready` remained valid; qBittorrentVPN saw the expected mounts and WireGuard `10.2.0.2/32`. Current finished media/library and torrent/download separation remains unchanged.
+
+### JAR-79 empty Game torrent-directory retirement — 2026-10-01
+
+`/mnt/nas-downloaders/torrents/games` and `/mnt/nas-downloaders/torrents/incomplete/games` were empty, including hidden entries, and each used 0 disk space. After qBittorrent's zero-torrent live state and unused `Games` category were confirmed, the category was removed and both directories were removed with `rmdir`; no recursive deletion occurred. The resulting Downloader tree has only `movies`, `shows`, `incomplete/movies`, and `incomplete/shows`. The Game bindfs view/unit was already retired; `/mnt/nas-downloads-media-ro` remains mounted read-only. Live qBittorrentVPN Compose inspection found its current payload binds instead source `/mnt/nas-media/torrents`; no payload mount, NAS snapshot policy, or Media/Game library data was changed by JAR-79.
 
 ### Retired empty `Downloads` boundary — 2026-09-29
 
