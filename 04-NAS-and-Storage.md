@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — boot-time Game/Filesync automount recovery verified
+**Documentation updated:** 2026-10-01 — JAR-88 Gameserver export and guest mount verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -31,7 +31,7 @@ The Rotom guest storage contract remains twelve NFS systemd automounts. JAR-86 r
 
 ### NAS protection classification — JAR-47
 
-UniFi Drive snapshots are enabled for every NAS drive. The supplied Media settings evidence records a **daily 12:00 AM UNAS-local** snapshot schedule with a **16-snapshot** limit. `Media/library` (including `library/games`) is authoritative NAS data and uses this snapshot policy for local rollback. `Media/torrents` is transient/reproducible payload and is deliberately outside the authoritative-library claim. Customapps, Web, Smarthome, Infra, and unused service boundaries may remain empty; empty boundaries are not represented as backup-protected data. JAR-78 confirmed the existing `Game` share is the sole current Game mount at `/mnt/nas-game` and retired the unavailable duplicate Gameserver guest contract without deleting NAS data. JAR-75 deploys Syncthing against the Filesync boundary, but it has no production folder or payload yet. Before Filesync content becomes authoritative, confirm its applicable UNAS snapshot retention/recovery policy; Syncthing uses trash-can versions in each folder's `.stversions` as an additional local recovery layer. Paperless remains VM-local, so `nas-documents` has no current authoritative Paperless content. Snapshot retention protects against ordinary deletion/corruption but remains on the same UNAS appliance and is not off-site protection.
+UniFi Drive snapshots are enabled for every NAS drive. The supplied Media settings evidence records a **daily 12:00 AM UNAS-local** snapshot schedule with a **16-snapshot** limit. `Media/library` (including `library/games`) is authoritative NAS data and uses this snapshot policy for local rollback. `Media/torrents` is transient/reproducible payload and is deliberately outside the authoritative-library claim. Customapps, Web, Smarthome, Infra, and unused service boundaries may remain empty; empty boundaries are not represented as backup-protected data. JAR-88 made `Gameserver` the current guest contract at `/mnt/nas-gameserver`; original `Game` remains retained NAS rollback data without a guest mount. JAR-75 deploys Syncthing against the Filesync boundary, but it has no production folder or payload yet. Before Filesync content becomes authoritative, confirm its applicable UNAS snapshot retention/recovery policy; Syncthing uses trash-can versions in each folder's `.stversions` as an additional local recovery layer. Paperless remains VM-local, so `nas-documents` has no current authoritative Paperless content. Snapshot retention protects against ordinary deletion/corruption but remains on the same UNAS appliance and is not off-site protection.
 
 ### PVE host-config Restic storage
 
@@ -67,6 +67,10 @@ The existing `Game/.data` export remains authorized only to Rotom and is the fst
 ### JAR-87 Media ROM and Games-torrent layout — 2026-10-01
 
 The active ROM paths are Media-owned setgid directories: `downloads/romm-inbox`, `downloads/romm-inbox/.processed`, `downloads/romm-review`, and `library/games/{,roms}` are used by `995:5000`; `torrents/games` and `torrents/incomplete/games` are used by qBittorrent's `901:5000` Media contract. The two-file, 128 KiB Game ROM source was copied to Media with matching SHA-256 manifests and is retained unchanged for rollback. The former Game qBittorrent marker was removed only after qBittorrentVPN ran against the Media-only bind/guard; no Game source data was deleted.
+
+### JAR-88 Gameserver drive and mount — 2026-10-01
+
+`Gameserver/.data` is the current NFSv3 export authorized to Rotom and mounted at canonical `/mnt/nas-gameserver` through the fstab/systemd-automount pattern. Its root is numeric `988:5001`, mode `2770`; `gameserver` (`995:5001`) passed write/traverse and unrelated service identities were denied traversal. Six retained Game files copied to Gameserver with matching SHA-256 manifests. Original `Game/.data` remains unchanged on UNAS but is no longer mounted on Rotom; it is rollback data, not an active service contract. Palworld worlds remain VM-local.
 
 ### Boot-time Game/Filesync automount recovery finding — 2026-10-01
 

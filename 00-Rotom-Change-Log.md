@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-01 — JAR-88 rename Game domain and migrate Gameserver NAS drive
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Selected `/mnt/nas-gameserver` as canonical; commissioned and mounted `Gameserver/.data`; retained original `Game` unchanged but removed its active guest mount. Renamed `game` to `gameserver` preserving `995:5001`, moved its home, v2 paths, and local Igir state, and recreated Palworld modules individually. JDownloader, RomM, Igir, and qBittorrentVPN retain Media-only contracts.
+- **Evidence:** The new NFSv3 export is Rotom-only, root `988:5001` mode `2770`, and passed intended service write plus unrelated-account denial tests. Source/target Game manifests matched six files. Root-only rollback artifacts remain under `/srv/rotom/backup-staging/game/jar88-20261001`; both worlds retained their IDs and both containers returned healthy with unchanged UDP mappings. Post-stop manifests record normal Palworld save/backup rotation.
+- **Outstanding:** Original Game export and JAR-88 rollback artifacts remain intentionally retained pending acceptance/recovery review; no source data was deleted.
+
 ## 2026-10-01 — JAR-87 move ROM pipeline and Game torrents to Media NAS
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
