@@ -30,6 +30,8 @@ JAR-87 retains `romm-igir.timer`, enabled and active every 15 minutes, with root
 
 JAR-88 moved only Igir’s VM-local state root to `/srv/rotom/appdata/gameserver/romm-igir`; its timer, worker, UID:GID, and all Media NAS inputs/outputs are unchanged. The old Game mount is no longer part of automation or a qBittorrent guard.
 
+JAR-89 adds enabled `romm-qbt-importer.timer` every five minutes. Its root-only API snapshot uses the already-running qBittorrent container's localhost API, while the importer has the narrow `995:5000` Media read/inbox-write contract, no Docker socket, and durable local state at `/srv/rotom/appdata/gameserver/romm-qbt-importer`. It requires a completed idle/seeding `Games` torrent, unchanged 60-second manifest, allowlisted format, capacity reserve, and unique content hash before atomic staging. Disable future staging with `sudo systemctl disable --now romm-qbt-importer.timer`; this does not affect qBittorrent, Igir, RomM, or existing files. JAR-89 also corrected the existing DAT directory and its single DAT file from group `gameserver` to `media`, restoring the documented Igir `995:5000` read path without changing UIDs, modes, or DAT content.
+
 ### Boot-time Game NAS recovery finding — 2026-10-01
 
 The 12:57 PDT guest boot demonstrated that automounts can be attempted before the NAS route is usable: Game and Filesync failed with `Network is unreachable`, and Docker retained NAS-bind startup failures after network storage returned. The targeted recovery remounted Game and Filesync, verified the documented Game/Media paths and markers, and started JDownloader, RomM, qBittorrentVPN, Radarr, Sonarr, and Jellyfin; zero systemd units remained failed.
