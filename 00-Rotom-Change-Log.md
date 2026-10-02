@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-01 — autonomous JAR ticket execution command adopted
+**Documentation updated:** 2026-10-01 — complete RPD consistency audit
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-01 — Complete RPD consistency audit and current-state cleanup
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Documentation only / Verified source-set consistency.**
+- **Changes:** Audited the complete nine-file Available Sources set and reconciled current sections with the newest recorded JAR-75/JAR-87/JAR-88 evidence. Corrected Paperless and Syncthing deployment status; current Gameserver account, mount, and `/srv/rotom` paths; the eleven-mount/no-bindfs guest topology; Media-only ROM/qBittorrent contracts; current Restic recovery-point references; and retained `/home` trees versus active v2 modules. Marked pre-JAR-88 Game boot/marker material and older Docker tables as historical instead of current, removed a duplicate permissions finding, and clarified canonical subject ownership without deleting recovery evidence.
+- **Evidence:** Cross-document comparison of every current Available Sources member plus the dated implementation/verification evidence already recorded in the RPD. A second pass checked current-state terminology, local cross-references, duplicate headings/findings, and the complete packaged member list. No live Rotom, PVE, Docker, NAS, UniFi, Cloudflare, or application inspection/change was performed.
+- **Outstanding:** Needs Verification remains for UNAS metadata persistence after a future NAS-side event, live qBittorrent behavior during sudden Media-NFS loss, first/future unattended backup executions where still called out, end-to-end Wake-on-LAN triggering, prior PVE reset attribution, current UniFi WAN/firewall/NAT policy, legacy NPM database rows, credential-rotation records, and any explicitly deferred recovery rehearsal. Available Sources replacement remains manual by Jared.
 
 ## 2026-10-01 — JAR-88 rename Game domain and migrate Gameserver NAS drive
 

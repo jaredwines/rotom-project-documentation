@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — JAR-82 documentation cross-reference correction recorded
+**Documentation updated:** 2026-10-01 — complete RPD consistency audit
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -100,7 +100,7 @@ JAR-69 adds the separate read-only `/usr/local/sbin/pve-backup-status-api` with 
 
 ### Current NAS / NFS connectivity
 
-The Rotom guest retains its twelve fstab-backed NFS systemd automounts and two read-only bindfs compatibility views. Two PVE-only backup exports are canonical:
+The Rotom guest currently has eleven fstab-backed NFS systemd automounts and no bindfs compatibility views. JAR-88 replaced the active Game guest mount with Gameserver; the separate Downloads, Apps, and Auth guest contracts are retired. Two PVE-only backup exports are canonical:
 
 - `PVE_Restic_Backup/.data` -> `/mnt/nas-pve-restic-backup` on `192.168.1.68`; repository subdirectory `pve-restic-backup`.
 - `Rotom_VM_Backup/.data` -> PVE storage `nas-rotom-vm-backup` at `/mnt/pve/nas-rotom-vm-backup`.
@@ -367,7 +367,7 @@ Additional Home Assistant/Homebridge dynamic/discovery listeners were present, i
 
 ## 10. Current Nginx Proxy Manager
 
-### Runtime model
+### Nginx Proxy Manager runtime model
 
 | Item | Value |
 | --- | --- |
@@ -452,7 +452,7 @@ For the audited proxy hosts, `http2_support=0`, `hsts_enabled=0`, and `hsts_subd
 
 ## 11. Pre-Migration Cloudflare DDNS
 
-### Runtime model
+### Cloudflare DDNS runtime model
 
 | Item | Value |
 | --- | --- |
@@ -801,7 +801,7 @@ Backup remains `988:988` mode `0700` and Shared Drive remains `988:988` mode `07
 
 ### JAR-9 rollback / unused path — 2026-09-21
 
-`/mnt/nas-game-servers` remains absent from fstab and unmounted. During the later JAR-6 UNAS audit the former `Game_Servers/.data` path was observed absent rather than merely unused. JAR-6 did not delete or recreate it. The active Game dependency remains `/mnt/nas-game` → `Game/.data`.
+`/mnt/nas-game-servers` remained absent from fstab and unmounted at this checkpoint. During the later JAR-6 UNAS audit the former `Game_Servers/.data` path was observed absent rather than merely unused. JAR-6 did not delete or recreate it. The then-active Game dependency was `/mnt/nas-game` → `Game/.data`; JAR-88 later replaced it with `/mnt/nas-gameserver` → `Gameserver/.data`.
 
 ### Network-side implications of the JAR-6 service shares
 
@@ -880,13 +880,13 @@ The Debian VM currently has **no UFW installation** per JAR-31; the broad UFW ru
 
 The 2026-09-27 read-only audit refreshed Rotom listeners and Docker-published ports, so the host-side portion is verified current. UniFi WAN forwarding/firewall/NAT policy remains unverified and must still be inspected separately before drawing conclusions about Internet exposure.
 
-### qBittorrent live NFS-loss behavior — Needs Verification
+### qBittorrent live Media-NFS-loss behavior — Needs Verification
 
-Boot/recreation fail-closed behavior and the JAR-31 recovery retry path are verified. The RPD does not establish what an already-running qBittorrent container does if the mounted Downloader NFS filesystem disappears after startup; no runtime watchdog is claimed. A purely read-only check cannot reproduce that failure mode. Resolve only through a separately planned non-destructive maintenance test, not by inferring from the startup guard.
+Fail-closed recreation and the current Media guard are documented. The RPD does not establish what an already-running qBittorrent container does if the active Media NFS payload disappears after startup. A purely read-only check cannot reproduce that failure mode. Resolve only through a separately planned non-destructive maintenance test, not by inference.
 
 ### Resolved or intentional states — not gaps
 
-- Current `/mnt/nas-downloaders`, `/mnt/nas-media`, `/mnt/nas-game`, and boot-time recovery behavior were verified by JAR-31 and reverified during the later physical Proxmox power-cycle. JAR-81 verified that the enabled Media bindfs view has no container consumer and proposes its separate retirement; the unused Game Downloads view was retired by JAR-78.
+- Current `/mnt/nas-downloaders` and `/mnt/nas-media` remain verified service boundaries. JAR-86 retired the final bindfs view, JAR-87 made qBittorrent/ROM payloads Media-only, and JAR-88 replaced the active Game guest mount with `/mnt/nas-gameserver`. Historical boot-recovery observations remain diagnostic evidence only.
 - `jaredwines.com` is intentionally undeployed; its Compose project is retained. Starting it later is an administrative decision, not missing evidence.
 - Historical `jaredwinescom_default`, `olivetin_default`, `portainer_default`, and `palworld_default` network observations are not part of the current JAR-31 bridge map.
 - Homepage backup-status access no longer depends on a guest UFW rule because UFW is not installed in the current VM.

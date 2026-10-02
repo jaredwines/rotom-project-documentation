@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-10-01 — JAR-88 Gameserver identity migration verified
+**Documentation updated:** 2026-10-01 — complete RPD consistency audit
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -40,10 +40,10 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 | gameserver | `995:5001`, `/home/gameserver`; both Palworld containers; JAR-87 JDownloader/Igir use UID `995` with Media primary GID `5000`; Gamarr retired |
 | infra | `997:5002`, `/home/infra`; Arcane/DDNS/Homepage/Glances/NPM |
 | smarthome | `126:5003`, `/home/smarthome`; Home Assistant/Homebridge |
-| documents | `900:5004`, `/home/documents` |
-| downloaders | `901:5005`, `/home/downloaders`; Prowlarr/qBittorrentVPN |
+| documents | `900:5004`, `/home/documents`; Paperless workload with VM-local state |
+| downloader | `901:5005`, compatibility home `/home/downloaders`; Prowlarr/qBittorrentVPN |
 | web | `902:5006`, `/home/web`; Aloha active; Jared Wines undeployed |
-| filesync/customapps | `903:5007`, `904:5008` respectively; `customapps` retains compatibility home `/home/apps` |
+| filesync/customapps | `903:5007`, `904:5008` respectively; Syncthing runs as Filesync, while `customapps` remains reserved and retains compatibility home `/home/apps` |
 | desktopcmd | `1001:1001`, locked non-human account with `/home/desktopcmd` mode `0700`; Remote Desktop Commander only; no sudo, SSH authorized keys, Docker/socket, service-group, or NAS-specific access |
 | Docker group | GID `989`, no members |
 
@@ -69,7 +69,7 @@ The Rotom VM continues to use `rotom` / `rotom.casa`, user `jared`, and `~/.ssh/
 
 The Debian `acl` package is now installed so `getfacl`/`setfacl` are available. Supplied final `getfacl -p /home/infra` output shows owner/group `infra:infra`, base owner/group access consistent with mode `0750`, named ACL `user:jared:--x`, mask `r-x`, and `other::---`. This gives Jared traversal through the private Infra home without granting directory listing or write access and without adding Jared to the `infra` group. Fran is not currently recreated and no current Fran ACL was established by this task.
 
-The current documentation/Git paths observed during this task are `/home/infra/documentation` as `root:root` mode `0755` and `/home/infra/documentation/rpd` as `jared:infra` mode `0750`. Jared can traverse `/home/infra`, read the documentation path, and write the `rpd` checkout. The private `/home/infra` parent remains the controlling boundary for unrelated local accounts. This current state supersedes the older 2026-09-16 documentation ownership/ACL description for these paths; that older state is retained below as historical evidence.
+The current RPD Git checkout is `/home/infra/documentation/rotom-project-documentation`; the former `/home/infra/documentation/rpd` path is historical. Jared can traverse `/home/infra` and use the guarded `rpd` workflow for the checkout. Exact current checkout ownership/mode was not re-established by this documentation-only audit; use read-only `stat`/`getfacl` if that permission detail becomes operationally relevant. The private `/home/infra` parent remains the controlling boundary for unrelated local accounts.
 
 Jared's general GitHub SSH identity is `~/.ssh/d_ed25519_github`. The private key is kept under Jared's account and must not be copied to `infra` or another service account; key contents and passphrases are never documented. Supplied output verified `ssh -T git@github.com` authenticated as GitHub account `jaredwines`, and the RPD checkout uses the SSH remote `git@github.com:jaredwines/rotom-project-documentation.git`. The user also set `~/.ssh` mode `0700`, the GitHub private-key file mode `0600`, public-key mode `0644`, and SSH config mode `0600`.
 
@@ -98,7 +98,7 @@ The named operational identities at the final pre-migration JAR-6/JAR-21 baselin
 
 JAR-6 reconciled ownership beneath the eight changed service homes so no object in those home trees retained the old primary GID. Arcane live named-volume data was also reconciled from old Infra GID `986` to `5002`. Historical backup files and containerd snapshot-layer objects retaining old numeric GIDs were intentionally preserved rather than normalized.
 
-The 2026-09-18 Palworld rename used a group rename preserving GID `985` followed by a user rename preserving UID `995` and a home move to `/home/game`. The 2026-09-19 storage-identity migration then changed group `game` from GID `985` to `5001`, leaving UID `995` unchanged. Before that change 10,732 objects beneath `/home/game` used GID `985`; a targeted group migration left zero old-GID objects beneath `/home/game`. The 1,014 old-GID objects found outside the home were all under `/var/lib/containerd` and were intentionally left untouched. Current checks verified `game:x:995:5001::/home/game:/usr/bin/zsh`, group `game:x:5001`, Docker supplementary GID `984`, and `/home/game` plus both Palworld project directories owned `995:5001`.
+The 2026-09-18 Palworld rename used a group rename preserving GID `985` followed by a user rename preserving UID `995` and a home move to `/home/game`. The 2026-09-19 storage-identity migration then changed group `game` from GID `985` to `5001`, leaving UID `995` unchanged. Before that change 10,732 objects beneath `/home/game` used GID `985`; a targeted group migration left zero old-GID objects beneath `/home/game`. The 1,014 old-GID objects found outside the home were all under `/var/lib/containerd` and were intentionally left untouched. Checks at that checkpoint verified `game:x:995:5001::/home/game:/usr/bin/zsh`, group `game:x:5001`, Docker supplementary GID `984`, and `/home/game` plus both Palworld project directories owned `995:5001`. JAR-88 later retained `995:5001` while replacing `game` with `gameserver`.
 
 Media's UID remains **127**. Its primary `media` group changed from historical GID **129** to **5000**. Recorded cleanup checks under `/home/media`, including the final old-GID symlink check, found no remaining GID 129 entries in the checked scope. This is not a claim that GID 129 is absent from every filesystem on Rotom.
 
@@ -206,7 +206,7 @@ Rotom locally maps numeric GID `988` to the name `fwupd-refresh`; this display n
 
 ### JAR-9 identity rollback — 2026-09-21
 
-The temporary JAR-9 `game-servers` rename was fully reversed. Current identity is again `game` with UID `995`, primary GID `5001`, home `/home/game`, shell `/usr/bin/zsh`, and Docker supplementary membership. Final rollback output verified `game-servers` absent. Palworld and Gamarr are again owned/operated under the `game` domain. The unused UNAS `Game_Servers` share is not an active identity/storage contract.
+The temporary JAR-9 `game-servers` rename was fully reversed. At that checkpoint the identity was again `game` with UID `995`, primary GID `5001`, home `/home/game`, shell `/usr/bin/zsh`, and Docker supplementary membership. Final rollback output verified `game-servers` absent. Palworld and Gamarr were then owned/operated under the `game` domain. JAR-88 later replaced it with `gameserver`; the unused UNAS `Game_Servers` share was never an active identity/storage contract.
 
 ### Infrastructure / smart-home identity migration — 2026-09-21
 
@@ -276,17 +276,17 @@ The Docker service directories and their Compose files have matching service own
 |---|---|
 | infra | arcane, cloudflare-ddns, homepage, nginx-proxy-manager retain their recorded modes; JAR-85 retired the inactive `/home/infra/docker/downloads` symlink after verifying Arcane directly mounts the Downloads Docker root and its current database has no reference to the symlink |
 | media | jellyfin, radarr, sonarr remain active; no retained Prowlarr/qBittorrent rollback project remains |
-| downloads | active `prowlarr` and `qbittorrentvpn` are under `/home/downloads/docker`, owned by Downloads `901:5005`; qBittorrent `.env` remains mode `0600` with a narrow Infra read ACL for Arcane discovery |
-| game | palworld-server-jared and palworld-server-fran retain their recorded directory/Compose modes; active `gamarr` is under `/home/game/docker/gamarr` with local config owned for `game` (`995:5001`) |
+| downloads | at that checkpoint `prowlarr` and `qbittorrentvpn` were under `/home/downloads/docker`, owned by Downloads `901:5005`; qBittorrent `.env` was mode `0600` with a narrow Infra read ACL for Arcane discovery |
+| game | at that checkpoint palworld-server-jared and palworld-server-fran retained their recorded directory/Compose modes; `gamarr` was under `/home/game/docker/gamarr` with local config owned for `game` (`995:5001`) |
 | smarthome | home-assistant and homebridge: directories 0770; compose.yaml 0660 |
 | web | alohamillworks.com: directory 0755, compose.yaml 0644; jaredwines.com: directory 0775, compose.yaml 0664; JAR-19 verified `web:web` ownership |
 | jared | docker directory exists, but no Compose service directory was found beneath it |
 
 During the earlier Prowlarr migrations, direct access through private service homes required `sudo` or the service identity; those migrations did not broaden `/home/media` permissions. JAR-21 final state is `/home/downloads/docker/prowlarr`, and the old Media/Infra rollback trees are removed.
 
-The post-migration old-name audit found no active `game-server` references in the inspected systemd unit overrides, `/etc/cron.d`, sudoers fragments, `/usr/local/bin`, `/usr/local/sbin`, shell profile files, symlink targets, `/etc/subuid`, or `/etc/subgid`; no `game` user crontab or old-name linger/mail state was present. The one active match was `/home/game/.codex/config.toml`, which was updated to `/home/game/docker/palworld-server-jared`. Old-name strings remain in historical shell/Codex history, session, snapshot, cache, and bundled reference material and were intentionally left as history rather than rewritten.
+The post-migration audit at that checkpoint found no active `game-server` references in the inspected systemd unit overrides, `/etc/cron.d`, sudoers fragments, `/usr/local/bin`, `/usr/local/sbin`, shell profile files, symlink targets, `/etc/subuid`, or `/etc/subgid`; no `game` user crontab or old-name linger/mail state was present. The one then-active match was `/home/game/.codex/config.toml`, which was updated to `/home/game/docker/palworld-server-jared`. JAR-88 later superseded the active domain; old-name strings remain in historical records rather than being rewritten.
 
-The parent home mode prevents unrelated local accounts from traversing into these otherwise group-readable Docker trees unless a targeted ACL grants access. At the baseline audit, direct traversal tests confirmed that each named account could read and traverse its own home but could not read or traverse the other six named homes. Media's later group migration changes its numeric group to 5000 while preserving this service-account organization. The Palworld account/home migration initially preserved `995:985`; the later Game GID migration changed current group ownership to `5001`. `/home/game` remains mode `0750`; after the targeted migration, zero GID-985 objects remained beneath it and the key roots `/home/game`, `/home/game/docker`, and both Palworld project directories were verified `995:5001`. The baseline full cross-account traversal matrix was not repeated after these changes. The inspection container binds the host root read-only, so its write-test results for the local homes were not used to evaluate host write permission; the authoritative owner and mode metadata above shows that each owner has write permission.
+The parent home mode prevented unrelated local accounts from traversing into these otherwise group-readable Docker trees unless a targeted ACL granted access. At the baseline audit, direct traversal tests confirmed that each named account could read and traverse its own home but could not read or traverse the other six named homes. Media's later group migration changed its numeric group to 5000 while preserving this service-account organization. The Palworld account/home migration initially preserved `995:985`; the later Game GID migration changed group ownership to `5001`. At that checkpoint `/home/game` was mode `0750`; after the targeted migration, zero GID-985 objects remained beneath it and the key roots `/home/game`, `/home/game/docker`, and both Palworld project directories were verified `995:5001`. JAR-88 later retained the numeric identity under `/home/gameserver` and `/srv/rotom/.../gameserver`. The baseline full cross-account traversal matrix was not repeated after these changes.
 
 ### Historical documentation permissions — 2026-09-16
 
@@ -321,7 +321,7 @@ Runtime mounts create these notable access paths:
 - Glances has a read-only bind of the host root and a read-only Docker socket. Its former read-only `/mnt/nas-rotom-backup` bind was removed on 2026-09-18.
 - Media storage: Sonarr and Radarr read/write `/mnt/nas-media` at `/media` and additionally bind `/mnt/nas-media/torrents` read-only at `/media/torrents`; Jellyfin mounts the library subtree read-only. qBittorrentVPN binds that torrent directory read/write. The enabled Downloader compatibility view has no current container consumer and is proposed for retirement. Prowlarr has no NAS bind.
 - Home Assistant has read-only access to /run/dbus.
-- Game storage: Palworld uses local `/srv/rotom/appdata/game` data and no Game NAS bind. JAR-87 moves JDownloader/Igir ROM writes to narrowly scoped Media paths as `995:5000`; the Game library remains rollback material and qBittorrent has no Game bind.
+- Gameserver storage: Palworld uses local `/srv/rotom/appdata/gameserver` data and no NAS world bind. JAR-87 keeps JDownloader/Igir ROM writes on narrowly scoped Media paths as `995:5000`; original Game NAS content remains rollback material and qBittorrent has no Game/Gameserver payload bind.
 - Cloudflare DDNS receives a read-only secret-file mount. Its contents were not inspected.
 
 
@@ -377,7 +377,6 @@ The human-facing `/usr/local/bin/backup-restic-to-nas` launcher is `root:root` m
 ## 3. Preserved Pre-Migration Operational and Follow-up Findings
 
 1. **Pre-migration:** Docker was the main cross-service privilege bypass because all named service accounts were Docker-group members. That historical GID `984` membership is not current authority; the current VM last verified Docker group GID `989` with no members.
-2. **Pre-migration:** Media `127:5000` and Game `995:5001` were final-library NAS domains, while `downloads 901:5005` owned Prowlarr/qBittorrentVPN and the torrent tree. **Current VM:** the same numeric `901:5005` identity is named `downloaders`, with current paths `/home/downloaders` and `/mnt/nas-downloaders`; the compatibility-view names intentionally retain `downloads`.
 3. JAR-6 implemented Infra through Auth storage GIDs `5002`–`5009` and verified intended-account versus unrelated-account NFS behavior for each new share.
 4. **Current Phase B:** Restic backup storage remains access-protected at mounted NAS metadata `988:988` mode `0700`; JAR-32 moved the active mount to `/mnt/nas-rotom-restic-backup` without broadening ordinary-user access. The 2026-09-27 audit refreshed the mounted metadata but did not isolate the underlying local directory while fully unmounted.
 5. SSH password/public-key policy and the existing sudo/docker privilege model were not changed by JAR-6.
@@ -399,7 +398,7 @@ Current non-socket exception fields are Home Assistant's host networking, privil
 - **Needs Verification — UNAS identity persistence:** service-share root metadata persistence across a future UNAS/UniFi Drive restart/update has not been observed. Resolve after such an event with read-only `findmnt`/`stat` checks from Rotom and UNAS-side share/export inspection.
 - **Historical by design:** backup/containerd objects may retain old primary GIDs; do not normalize them recursively without a specific verified need.
 - **Needs Verification — credential-rotation record:** VPN credential rotation after prior chat exposure is not established by the RPD. Do not print, compare, or read credential values to prove this. Resolve through provider/account rotation history or administrator records; there is no safe host-only metadata check that proves a secret was rotated.
-- **Needs Verification — live Downloader-NFS loss:** boot/recreation recovery is verified, but a running qBittorrent session's behavior during sudden mount loss is not. Read-only inspection can confirm whether a runtime watchdog exists in Compose/systemd; actual failure behavior requires a separately planned non-destructive maintenance test.
+- **Needs Verification — live Media-NFS loss:** fail-closed recreation and the current Media guard are documented, but a running qBittorrent session's behavior during sudden loss of the active Media payload mount has not been exercised. Read-only inspection can confirm the guard definition; actual behavior requires a separately planned non-destructive maintenance test.
 
 ## 5. Preserved Pre-Migration Consolidated Verification — through 2026-09-21
 

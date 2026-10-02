@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — JAR-88 Gameserver export and guest mount verified
+**Documentation updated:** 2026-10-01 — complete RPD consistency audit
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -21,13 +21,13 @@ This document records the current Phase B storage architecture and preserves the
 **Document:** `04-NAS-and-Storage.md`  
 **Baseline evidence:** 2026-09-14 22:46 PDT; read-only update 2026-09-15  
 **Documentation updated:** 2026-10-01 — boot-time Game/Filesync automount recovery recorded; storage boundaries unchanged  
-**Status:** All twelve required application/storage NFS mounts remain guest-only systemd automounts. Guest `Rotom_Restic_Backup` remains unchanged. JAR-68 normalized the two PVE-only backup exports to `PVE_Restic_Backup` for host-config Restic and `Rotom_VM_Backup` for whole-VM VZDump; canonical mounts are `/mnt/nas-pve-restic-backup` and `/mnt/pve/nas-rotom-vm-backup`. The PVE host still has no Rotom application NFS mounts.
+**Status:** The current guest contract has eleven NFS systemd automounts and no bindfs compatibility views. Guest `Rotom_Restic_Backup` remains unchanged. JAR-88 replaced Game with Gameserver; Downloads, Apps, and Auth are retired. JAR-68 normalized the two PVE-only backup exports to `PVE_Restic_Backup` for host-config Restic and `Rotom_VM_Backup` for whole-VM VZDump; canonical mounts are `/mnt/nas-pve-restic-backup` and `/mnt/pve/nas-rotom-vm-backup`. The PVE host still has no Rotom application NFS mounts.
 
 The original audit was read-only. It did not recursively enumerate the NAS, modify mounts or permissions, restart containers, inspect secrets, traverse Restic repository internals, or create a hardlink test file. Later user-supplied checks, completed media GID changes, and the 2026-09-18 backup-share access-protection deployment are recorded below; they are separate from that audit. Unchanged capacity, mount, and systemd observations retain their original evidence dates.
 
 ## 2. Current Storage State — 2026-09-29 JAR-47 final recovery policy
 
-The Rotom guest storage contract remains twelve NFS systemd automounts. JAR-86 retired the unused read-only Media bindfs view after confirming it had no active container or Compose consumer; PVE has only backup-specific NAS mounts and does not host the guest application shares.
+The Rotom guest storage contract is eleven NFS systemd automounts: nine service boundaries plus guest Restic and Shared Drive. JAR-86 retired the final bindfs compatibility view, and JAR-88 replaced the active Game mount with Gameserver. PVE has only backup-specific NAS mounts and does not host the guest application shares.
 
 ### NAS protection classification — JAR-47
 
@@ -50,7 +50,7 @@ UniFi Drive snapshots are enabled for every NAS drive. The supplied Media settin
 
 ### Guest storage and post-reboot acceptance
 
-All twelve guest NFS automounts and both read-only bindfs views passed the historical final post-reboot verification. Both views are now retired: JAR-86 removed the unused Media view and its recovery-helper branch after fresh dependency preflight. `/mnt/nas-downloaders/.rotom-qbt-nas-ready` remained valid in that verification; qBittorrentVPN saw the expected mounts and WireGuard `10.2.0.2/32`. Current finished media/library and torrent/download separation remains unchanged.
+The former twelve-mount/two-bindfs layout passed its dated post-reboot verification. Both bindfs views and the Downloads, Apps, and Auth guest boundaries are now retired; JAR-88 replaced Game with Gameserver. `/mnt/nas-downloaders/.rotom-qbt-nas-ready` remains on the retained Downloader boundary, but qBittorrent's active payload and guard are Media-only.
 
 ### JAR-79 empty Game torrent-directory retirement — 2026-10-01
 
@@ -60,9 +60,9 @@ All twelve guest NFS automounts and both read-only bindfs views passed the histo
 
 JAR-81 retained `/mnt/nas-downloaders`, its fstab automount, and `.rotom-qbt-nas-ready/`, while removing only its obsolete `torrents/` tree. The sole 10,482,662,507-byte Backrooms file was byte-identical to the retained Media copy (SHA-256 `0cad312d8f5997c3a641a1d5cf112c02492a56fb7da803bb0db02e99535fd58d`); after its deletion, five verified-empty descendant directories and then `torrents/` were removed with targeted `rmdir`. JAR-86 subsequently retired the unused `/mnt/nas-downloads-media-ro` bindfs view and removed only its branch from the recovery helper; the helper retains NFS readiness validation for the Downloader root/sentinel and Media paths. Media libraries, Media torrents, NAS snapshot policy, Game data, and backup artifacts were not changed.
 
-### JAR-83 minimal Game marker restoration — 2026-10-01
+### Historical JAR-83 minimal Game marker restoration — 2026-10-01 (superseded by JAR-87/JAR-88)
 
-The existing `Game/.data` export remains authorized only to Rotom and is the fstab-backed `/mnt/nas-game` automount with its original NFSv3/service-GID root (`988:5001`, mode `2770`). JAR-76 created setgid Game-owned `downloads/romm-inbox`, `downloads/romm-review`, and `library/games/roms` paths. The separate `.rotom-qbt-media-ready/` marker remains owned by the Downloader/Media contract and qBittorrentVPN binds it read-only with `create_host_path: false`; its payload remains Media-only at `/mnt/nas-media/torrents`. The active 15-second guard still requires both the Media and Game NFS/marker pairs. JDownloader may write only the ROM inbox; the organizer copies DAT-matched content to the Game library and moves unmatched input to review without deletion. Palworld worlds remain VM-local.
+At the JAR-83 checkpoint, `Game/.data` was the fstab-backed `/mnt/nas-game` automount and a two-share qBittorrent guard used both Media and Game markers. JAR-87 moved the ROM pipeline and qBittorrent contract to Media only, then JAR-88 removed the active Game guest mount. Preserve this paragraph only as historical implementation evidence.
 
 ### JAR-87 Media ROM and Games-torrent layout — 2026-10-01
 
@@ -72,11 +72,11 @@ The active ROM paths are Media-owned setgid directories: `downloads/romm-inbox`,
 
 `Gameserver/.data` is the current NFSv3 export authorized to Rotom and mounted at canonical `/mnt/nas-gameserver` through the fstab/systemd-automount pattern. Its root is numeric `988:5001`, mode `2770`; `gameserver` (`995:5001`) passed write/traverse and unrelated service identities were denied traversal. Six retained Game files copied to Gameserver with matching SHA-256 manifests. Original `Game/.data` remains unchanged on UNAS but is no longer mounted on Rotom; it is rollback data, not an active service contract. Palworld worlds remain VM-local.
 
-### Boot-time Game/Filesync automount recovery finding — 2026-10-01
+### Historical boot-time Game/Filesync automount recovery finding — 2026-10-01 (pre-JAR-88)
 
 At the 12:57 PDT guest boot, the initial NFS mount attempts for `/mnt/nas-game` and `/mnt/nas-filesync` failed with `Network is unreachable` before the NAS route was available. The failed Game mount left its local empty mountpoint visible, so Docker could not satisfy the JDownloader/RomM Game binds; Media/Game-dependent containers also retained their startup errors after the NAS returned. A targeted `systemctl reset-failed` plus mount start restored both exports as their expected NFSv3 mounts. The Game root and its ROM inbox/library/marker paths, the Media payload/marker paths, and the Filesync mount were then verified.
 
-`x-systemd.automount` provides on-demand mounting; it is not a readiness assertion for a consumer. The Game `.rotom-qbt-media-ready` sentinel plus qBittorrent guard provides that assertion for qBittorrentVPN only. It does not automatically recover JDownloader or RomM after a Game mount failure.
+`x-systemd.automount` provides on-demand mounting; it is not a readiness assertion for a consumer. This incident's Game marker/bind topology is superseded: JAR-87 made qBittorrent and the ROM pipeline Media-only, and JAR-88 replaced the active Game mount with Gameserver. The general automount readiness lesson remains current.
 
 ### Retired empty `Downloads` boundary — 2026-09-29
 
@@ -193,7 +193,7 @@ The historical bare-metal Media mount deliberately remained on `192.168.1.70:/va
 
 ### Rolled-back JAR-9 `Game_Servers` share
 
-`/mnt/nas-game-servers` remains absent from `/etc/fstab` and unmounted. During the JAR-6 UNAS audit the former `Game_Servers/.data` path was observed absent on the NAS rather than merely unexported. No JAR-6 command deleted or reinitialized that path; the documentation records the observed as-built deviation only. The active Game storage contract remains `/mnt/nas-game` backed by `Game/.data`.
+`/mnt/nas-game-servers` remained absent from `/etc/fstab` and unmounted at this checkpoint. During the JAR-6 UNAS audit the former `Game_Servers/.data` path was observed absent on the NAS rather than merely unexported. No JAR-6 command deleted or reinitialized that path; the documentation records the observed as-built deviation only. The then-active Game contract was `/mnt/nas-game` backed by `Game/.data`; JAR-88 later replaced it with `/mnt/nas-gameserver` backed by `Gameserver/.data`.
 
 ## 4. Preserved Pre-Migration Mounts and Exports
 
@@ -229,7 +229,7 @@ The service-home links were recreated as `/home/<service>/nas-<service> -> /mnt/
 
 ### JAR-22 twelve-mount revalidation — 2026-09-22
 
-JAR-22 deliberately traversed each canonical NAS mountpoint to trigger its existing systemd automount and then queried the underlying NFS mount. All twelve current mount contracts were active and matched the documented sources. Media remained `192.168.1.70:/var/nfs/shared/Media`; Game, Infra, Smarthome, Documents, Downloads, Web, Filesync, Apps, Auth, Backup, and Shared Drive resolved to their documented UNAS `.data` exports. Every observed mount used NFSv3 with `sec=sys`.
+JAR-22 deliberately traversed each canonical NAS mountpoint to trigger its existing systemd automount and then queried the underlying NFS mount. All twelve then-current mount contracts were active and matched the documented sources. Media remained `192.168.1.70:/var/nfs/shared/Media`; Game, Infra, Smarthome, Documents, Downloads, Web, Filesync, Apps, Auth, Backup, and Shared Drive resolved to their documented UNAS `.data` exports. Every observed mount used NFSv3 with `sec=sys`.
 
 Root metadata also matched the current storage contract: Media `988:5000` mode `2770`, Game `988:5001` mode `2770`, Infra through Auth `988:5002` through `988:5009` mode `2770`, Backup `988:988` mode `0700`, and Shared Drive `988:988` mode `0770`. Every corresponding `.automount` unit reported active. This was read-only validation of existing behavior; no fstab entry, export, permission, sentinel, bindfs view, or NAS object was changed.
 
@@ -240,7 +240,7 @@ A September 23 reboot sequence exposed a timing failure without changing the und
 
 The Downloads safety contract was reverified before recovery: `/mnt/nas-downloads/torrents` existed as a setgid directory owned `901:5005`, `/mnt/nas-downloads/.rotom-qbt-nas-ready` existed as a setgid directory owned `901:5005`, qBittorrentVPN was running with the sentinel mounted read-only at `/run/rotom-nas-downloads`, and both persistent bindfs views were then started successfully. Media and Game service-account traversal passed. Existing Radarr, Sonarr, and Gamarr containers were started in place and verified without recreation.
 
-To make transient boot-time NFS readiness recoverable, JAR-23 added `/usr/local/sbin/rotom-nas-docker-recovery` and enabled `/etc/systemd/system/rotom-nas-docker-recovery.service`. The helper actively starts/verifies the real Downloads/Media/Game NFS mount units, checks the Downloads torrent tree and sentinel, restores both bindfs views, verifies Media/Game traversal, and starts only stopped NAS-backed containers whose Docker error indicates a NAS/mount startup failure. It currently covers qBittorrentVPN, Radarr, Sonarr, Gamarr, and Jellyfin. A manual healthy-state execution completed successfully without restarting already-running containers. Full reboot validation remains deferred.
+To make transient boot-time NFS readiness recoverable, JAR-23 added `/usr/local/sbin/rotom-nas-docker-recovery` and enabled `/etc/systemd/system/rotom-nas-docker-recovery.service`. At that checkpoint the helper started/verified the real Downloads/Media/Game NFS mount units, checked the Downloads torrent tree and sentinel, restored both bindfs views, verified Media/Game traversal, and started only stopped NAS-backed containers whose Docker error indicated a NAS/mount startup failure. It then covered qBittorrentVPN, Radarr, Sonarr, Gamarr, and Jellyfin. A manual healthy-state execution completed successfully without restarting already-running containers. Later retirements and JAR-88 supersede this historical coverage list.
 
 ### JAR-24 final-backup storage verification — 2026-09-25
 
@@ -313,7 +313,7 @@ No global `RequiresMountsFor=/mnt/nas-downloads` dependency is configured on `do
 
 The audit intentionally limited traversal depth.
 
-### `/mnt/nas-media`
+### Historical `/mnt/nas-media` restoration tree
 
 Current JAR-21 storage role:
 
@@ -326,7 +326,7 @@ Current JAR-21 storage role:
 
 The former `/mnt/nas-media/torrents` rollback tree was removed after checksum verification against active Downloads storage.
 
-### `/mnt/nas-game`
+### Historical `/mnt/nas-game` restoration tree
 
 Current JAR-21 storage role:
 
@@ -358,7 +358,7 @@ Current active torrent layout:
 ```
 
 
-### `/mnt/nas-rotom-backup`
+### Historical `/mnt/nas-rotom-backup` restoration tree
 
 Immediate children observed:
 
@@ -486,7 +486,7 @@ These commands inspect metadata; they do not alter permissions or repository con
 
 ## 10. Preserved Pre-Migration Docker-to-NAS Storage Relationships
 
-### `/mnt/nas-media`
+### Historical `/mnt/nas-media` Docker relationship
 
 | Container | Host source | Container path | Access |
 | --- | --- | --- | --- |
@@ -494,7 +494,7 @@ These commands inspect metadata; they do not alter permissions or repository con
 | Sonarr | `/mnt/nas-media` | `/media` | read-write |
 | Radarr | `/mnt/nas-media` | `/media` | read-write |
 
-### `/mnt/nas-game`
+### Historical `/mnt/nas-game` Docker relationship
 
 | Container | Host source | Container path | Access |
 | --- | --- | --- | --- |
@@ -515,7 +515,7 @@ Palworld remains on local storage under `/home/game/docker`.
 
 The two `*-ro` sources are bindfs views of `/mnt/nas-downloads`, not separate NAS exports.
 
-### `/mnt/nas-rotom-backup`
+### Historical `/mnt/nas-rotom-backup` Docker relationship
 
 No Docker container is intended to bind-mount `/mnt/nas-rotom-backup`. The former Glances read-only bind remains removed.
 
@@ -614,6 +614,8 @@ Docker itself has no global NAS dependency.
 
 ## 15. Reconstruction-Critical Information
 
+The current eleven-mount, Gameserver, Media-only qBittorrent, and `downloader` identity contracts are authoritative in sections 2 and 17. The dated Game/Downloader material retained below is historical recovery evidence and must be reconciled rather than replayed.
+
 A Rotom rebuild must preserve the following storage contract.
 
 ### NAS server
@@ -633,7 +635,7 @@ fstab:      defaults,_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=
 
 The historical bare-metal `/var/nfs/shared/Media` source remains preserved in dated pre-migration sections only.
 
-### Game mount — current VM-era contract
+### Historical Game mount — superseded by JAR-88
 
 ```text
 Source:     192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Game/.data
@@ -652,7 +654,7 @@ fstab:      defaults,_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=
 Repository: /mnt/nas-rotom-restic-backup/rotom-restic-backup
 ```
 
-### Docker path contract — current VM-era sources
+### Historical Docker path contract — superseded by JAR-87/JAR-88
 
 ```text
 Jellyfin:       /mnt/nas-media/library                  -> /data/library           RO
@@ -669,7 +671,7 @@ Glances:        no `/mnt/nas-rotom-restic-backup` bind
 
 The bindfs service names and qBittorrent container-side sentinel path intentionally retain the historical `downloads` spelling for compatibility; their host source is current `/mnt/nas-downloaders`.
 
-### Numeric identity contract
+### Historical numeric identity contract — reconcile with current section 2
 
 ```text
 Rotom media account: UID 127, primary GID 5000
@@ -691,7 +693,7 @@ Backup root: UID 988, GID 988, mode 0700; ordinary named accounts denied, root-r
 
 Rebuild Media with GID 5000, not the historical GID 129. Preserve the existing NAS owners, bind-mount layout, and service-directory ownership. Restore configuration and data without applying blanket ownership changes to NAS or Restic contents.
 
-### Current library and download layout
+### Historical library and download layout — reconcile with current section 2
 
 ```text
 /mnt/nas-media/library/movies
@@ -732,9 +734,9 @@ JAR-6 changed only storage identity/boundary state for the new shares. It did no
 
 Backup and Shared Drive remain separate from the service-GID sequence. Backup is `988:988` mode `0700`; Shared Drive is `988:988` mode `0770`.
 
-## 16A. Live Post-Boot Storage Verification — 2026-09-27
+## 16A. Historical Live Post-Boot Storage Verification — 2026-09-27
 
-A read-only audit after a fresh Rotom VM reboot verified all twelve current fstab entries use the expected UNAS `.data` sources and `_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s` pattern. All twelve generated `.automount` units were loaded and active. The active NFS tree showed current `Downloader/.data`, Media, Game, service shares, Shared Drive, and `Rotom_Restic_Backup/.data`.
+A read-only audit after a fresh Rotom VM reboot verified all twelve then-current fstab entries used the expected UNAS `.data` sources and `_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s` pattern. All twelve generated `.automount` units were loaded and active. The then-active NFS tree showed `Downloader/.data`, Media, Game, service shares, Shared Drive, and `Rotom_Restic_Backup/.data`.
 
 The two compatibility views remained mounted read-only from `/mnt/nas-downloaders`; traversal tests passed as `media` and `game`. Mounted Restic storage presented numeric `988:988` mode `0700`. The earlier raw `/mnt` listing showed the automount-facing path as `root:root`/`0755` before clean mounted-root interpretation; because this audit did not isolate the underlying local directory while fully unmounted, only the mounted NFS metadata is current authority. No permission repair is indicated.
 
@@ -742,10 +744,10 @@ Service-home symlinks were also freshly verified for all ten service identities,
 
 ## 17. Outstanding / Needs Verification
 
-Current JAR-31 production storage is restored and the reboot recovery path is verified. JAR-32/JAR-33 also verified the VM-era Restic repository and baseline; automatic Restic execution remains disabled as an operational commissioning choice, not missing storage evidence. `/mnt` remains outside the guest Restic source scope.
+Current storage and backup automation are documented above; this section retains unresolved checks only. Historical JAR-31/JAR-32/JAR-33 commissioning states do not override later JAR-47/JAR-88 evidence. `/mnt` remains outside the guest Restic source scope.
 
-- **Needs Verification — UNAS metadata persistence:** recheck service-share root metadata after a future UNAS/UniFi Drive restart/update, especially Downloader `988:5005`, Media `988:5000`, Game `988:5001`, current Restic share `Rotom_Restic_Backup` at `988:988` mode `0700`, and service GIDs `5002`–`5009`. Resolve read-only with `findmnt` and `stat` from Rotom plus UNAS-side export/share inspection after the event.
-- **Needs Verification — live Downloader-NFS loss:** boot/recreation recovery is verified, but sudden NFS loss while qBittorrent is already running is not. Read-only inspection can verify the absence/presence of a watchdog in the current Compose/systemd definitions; actual runtime behavior requires a separately planned non-destructive maintenance test.
+- **Needs Verification — UNAS metadata persistence:** recheck service-share root metadata after a future UNAS/UniFi Drive restart/update, especially Downloader `988:5005`, Media `988:5000`, Gameserver `988:5001`, current Restic share `Rotom_Restic_Backup` at `988:988` mode `0700`, and current service GIDs `5002`–`5008`. Resolve read-only with `findmnt` and `stat` from Rotom plus UNAS-side export/share inspection after the event.
+- **Needs Verification — live Media-NFS loss:** fail-closed recreation and the Media guard are documented, but sudden loss of the active Media payload while qBittorrent is already running is untested. Read-only inspection can verify the guard definition; actual runtime behavior requires a separately planned non-destructive maintenance test.
 
 **Retired/historical:** do not recreate the old `Downloads/.data` export merely because it appears below. Current fstab/mount/showmount evidence uses `Downloader/.data`; `Downloads/.data` is retained only as dated recovery context.
 

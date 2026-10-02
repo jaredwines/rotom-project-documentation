@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; current supplied 2026-10-01 Docker inventory is 25 container objects / 24 running, with deployment details separately evidenced per service
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — JAR-88 Gameserver path migration verified
+**Documentation updated:** 2026-10-01 — complete RPD consistency audit
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -30,15 +30,17 @@ Services are grouped by the Linux account directory containing their active Comp
 
 The Proxmox VE host `pve` remains hypervisor-only; the application Docker runtime is inside the Debian `rotom` VM. Current runtime foundation remains Docker Engine `29.8.1`, containerd `2.3.6`, Docker Compose `v5.5.1`, local Docker root `/var/lib/docker`, and package-created Docker group GID `989` with no members.
 
-JAR-34 created the non-migrating v2 declarative namespace at `/srv/rotom`. It contains empty domain reservations under `stacks/` and service-owned empty domain roots under `appdata/`; it contains no placeholder Compose files, containers, databases, or production bind mounts. Existing production projects under `/home/<service>/docker` remain current until their individual Phase D workload tickets migrate and verify them. `/srv/rotom` is a local Git repository for only `stacks/`, `scripts/`, and support files; `.gitignore` excludes `appdata/`, `secrets/`, `backup-staging/`, databases, logs, caches, generated state, and environment files.
+JAR-34 created the initially empty v2 declarative namespace at `/srv/rotom`. Subsequent Phase D tickets populated the current domain modules and state described below; the original empty-reservation state is historical. `/srv/rotom` is a local Git repository for only `stacks/`, `scripts/`, and support files; `.gitignore` excludes `appdata/`, `secrets/`, `backup-staging/`, databases, logs, caches, generated state, and environment files.
 
 JAR-88 restores the Gameserver name for the active Palworld domain: locked `gameserver` is `995:5001` with home `/home/gameserver`; `downloader` remains `901:5005` and `customapps` remains `904:5008`. Palworld Compose/appdata/environment paths are under `/srv/rotom/{stacks,appdata,secrets}/gameserver`; each module was recreated separately against the same VM-local world. Existing numeric PUID/PGID values remain unchanged. JAR-87 Media-ROM and qBittorrent contracts do not use Gameserver NAS storage.
 
-JAR-36 created unused external bridge networks `rotom-proxy` (`172.29.0.0/16`), `rotom-arr` (`172.30.0.0/16`), and `rotom-monitoring` (`172.31.0.0/16`). Future migrated stacks attach only services needing cross-stack connectivity, use Docker DNS/service names, and may retain private default networks. No current container is attached; current ports and bridge networks remain authoritative until owning workload migration tickets.
+JAR-36 created external bridge networks `rotom-proxy` (`172.29.0.0/16`), `rotom-arr` (`172.30.0.0/16`), and `rotom-monitoring` (`172.31.0.0/16`). Later migrations attached the applicable services as documented in the current domain sections; workloads use only the cross-stack networks they need and may retain private default networks.
 
 JAR-37 is the accepted Phase C runtime gate. Docker's daemon-wide `json-file` cap is `max-size=10m`, `max-file=3`; the current long-running containers use `restart: unless-stopped`. Healthchecks remain image-specific rather than synthetic: Arcane, Homepage, and Gamarr currently report healthy, while a missing healthcheck does not by itself indicate a fault. The reusable local policy is `/srv/rotom/stacks/RUNTIME-POLICY.md`: it requires backup/recovery readiness, configuration review, target-stack-only pull/recreation, readiness and application/storage/network/proxy verification, and target-stack-only rollback. Future mutable bind state belongs under `/srv/rotom/appdata/<domain>/...` where image support permits; Compose files must not contain secret values.
 
 ### JAR-75 Filesync Syncthing — 2026-09-29
+
+Syncthing `2.0.0` runs from `/srv/rotom/stacks/filesync/syncthing/compose.yaml` as numeric `903:5007`, with persistent configuration/database below `/srv/rotom/appdata/filesync/syncthing`. Its sole payload bind is `/mnt/nas-filesync -> /filesync` with `create_host_path: false`; its GUI is loopback-only at `127.0.0.1:8384` for NPM. The disposable acceptance peer and payload were removed, so no production folder or peer is currently configured.
 
 ### JAR-77 Gamarr retirement — 2026-09-30
 
@@ -60,11 +62,11 @@ JAR-87 supersedes the current portions of JAR-76/JAR-83: RomM now binds `/mnt/na
 
 JDownloader now runs from `/srv/rotom/stacks/gameserver/jdownloader` with local config and protected inputs under the matching Gameserver appdata/secrets paths; its sole NAS write bind remains Media inbox. Palworld Jared and Fran run from `/srv/rotom/stacks/gameserver/palworld-{jared,fran}` with local binds `/srv/rotom/appdata/gameserver/palworld-{jared,fran} -> /palworld`, not NFS. Both were healthy after individual recreations and retained their existing UDP mappings.
 
-### Boot-time Game NAS recovery finding — 2026-10-01
+### Historical pre-JAR-88 Game NAS recovery finding — 2026-10-01
 
 During the 12:57 PDT guest boot, the initial `/mnt/nas-game` NFS mount failed while the NAS network route was unavailable. Docker consequently left JDownloader and RomM stopped with Game-bind startup errors; qBittorrentVPN, Radarr, Sonarr, and Jellyfin also remained stopped after their NAS bind startup failures. After the NAS returned, targeted remounts restored Game and Filesync, the expected Game inbox/library and Game/Media marker paths were verified, and the six affected containers were started successfully.
 
-This does not change the payload topology or legacy-tree decision: current torrents remain exclusively at `/mnt/nas-media/torrents`, and the removed documented legacy `/home/*/docker` trees were not consumers. The Game `.rotom-qbt-media-ready` directory is a qBittorrentVPN sentinel only; `rotom-qbittorrent-media-guard` checks it with the Media mount/marker every 15 seconds and stops qBittorrentVPN when either safety pair is invalid, but does not restart it. JDownloader and RomM require their Game bind paths to start, but have no Game-specific sentinel, guard, or automatic recovery path.
+This incident is preserved as dated diagnostic evidence. JAR-87 subsequently made the ROM and qBittorrent contracts Media-only, and JAR-88 removed the active `/mnt/nas-game` guest contract in favor of `/mnt/nas-gameserver`. Do not use the incident's former Game marker/bind wording as current reconstruction guidance.
 
 ### JAR-84 legacy service-home Docker-tree retirement — 2026-10-01
 
@@ -76,15 +78,15 @@ NPM now runs from `/srv/rotom/stacks/infra/nginx-proxy-manager/compose.yaml` wit
 
 ### JAR-73 Uptime Kuma — 2026-09-30
 
+`uptime-kuma` uses `louislam/uptime-kuma:2` from `/srv/rotom/stacks/infra/uptime-kuma/compose.yaml`. Its SQLite data is VM-local at `/srv/rotom/appdata/infra/uptime-kuma`; it joins `rotom-proxy` and publishes only `127.0.0.1:3002:3001`. It has no Docker socket, NAS mount, or broad host listener. NPM routes `uptime.rotom.casa` with TLS and WebSockets; the administrative UI is authenticated and no public status page is enabled.
+
 ### PVE web UI Homepage entry — 2026-09-30
 
 NPM serves the PVE HTTPS UI at `https://pve.rotom.casa`, forwarding over HTTPS to `192.168.1.68:8006`; the route has forced TLS, WebSocket upgrade, and an enabled access list. Homepage's **Rotom Management** section includes a **PVE** link to that URL without a `siteMonitor`, so the dashboard does not create a separate monitor request to the privileged PVE UI. Local-SNI HTTPS returned the Proxmox login page; Homepage stayed healthy and returned local HTTP `200`. The route did not require a Compose, container, listener, DNS, certificate, PVE-service, or network-policy change.
 
-`uptime-kuma` uses `louislam/uptime-kuma:2` from `/srv/rotom/stacks/infra/uptime-kuma/compose.yaml`. Its SQLite data is VM-local at `/srv/rotom/appdata/infra/uptime-kuma`; it joins `rotom-proxy` and publishes only `127.0.0.1:3002:3001` for retained host-networked NPM compatibility. It has no Docker socket, NAS mount, or broad host listener. NPM routes `uptime.rotom.casa` with TLS and WebSockets; the administrative UI is authenticated and no public status page is enabled. Homepage's targeted `extra_hosts` mapping resolves `uptime.rotom.casa` to `192.168.1.69`, so its Uptime Kuma `siteMonitor` does not depend on container DNS availability.
+Homepage's targeted `extra_hosts` mapping resolves `uptime.rotom.casa` to `192.168.1.69`, so its Uptime Kuma `siteMonitor` does not depend on container DNS availability.
 
-Syncthing `2.0.0` runs from `/srv/rotom/stacks/filesync/syncthing/compose.yaml` as numeric `903:5007`, with persistent configuration/database below `/srv/rotom/appdata/filesync/syncthing`. It uses `restart: unless-stopped` and its image-provided healthcheck. Its only payload bind is `/mnt/nas-filesync -> /filesync`; the long bind has `create_host_path: false`, preventing Docker from substituting an unmounted local directory. An isolated nonexistent-source Compose probe verified this fails before fallback-directory creation. It has no Docker socket, privilege, added capability, device mapping, or unrelated NAS bind. It retains a private default network and attaches to `rotom-proxy`; its GUI is published only as `127.0.0.1:8384` for host-networked NPM compatibility. GUI authentication is configured and NPM forces TLS for `syncthing.rotom.casa`. The disposable test peer and acceptance payload were removed after verification, so no production folder or peer is preconfigured.
-
-JAR-78 establishes the current Game domain at local stack roots `/srv/rotom/stacks/game/palworld-jared` and `/srv/rotom/stacks/game/palworld-fran`. Their authoritative world/runtime binds are `/srv/rotom/appdata/game/palworld-jared -> /palworld` and `/srv/rotom/appdata/game/palworld-fran -> /palworld`; root-only environment files remain under `/srv/rotom/secrets/game` and are not documented here. Each container uses its own private default network, `restart: unless-stopped`, image-provided healthcheck, and retained UDP mapping: Jared `8211/udp` plus `27015/udp`; Fran `8212/udp` plus `27016/udp`. Both are currently healthy after controlled one-at-a-time recreation. Native Palworld backup directories are under their local appdata roots. Neither stack mounts `/mnt/nas-game`; the retired `/home/game/docker/palworld-server-*` trees are historical rollback evidence only.
+**Historical JAR-78 state, superseded by JAR-88:** JAR-78 established `/srv/rotom/{stacks,appdata,secrets}/game`. JAR-88 later renamed those active roots to `gameserver`, preserved both VM-local worlds and UDP mappings, and left original Game material only as rollback evidence.
 
 Docker socket access is exceptional: Arcane has the raw read-write socket for deliberate Docker administration only, with automatic updates and auto-heal disabled; Homepage has the read-only socket for dashboard metadata; Glances has the read-only socket plus its read-only host-root monitoring bind. A read-only socket mount does not prove a read-only Docker API. All other current application containers have no socket. Current deliberate runtime exceptions are Home Assistant (host networking, privileged, read-only D-Bus), Homebridge/Nginx Proxy Manager/Cloudflare DDNS (host networking), qBittorrentVPN (`CAP_NET_ADMIN` for WireGuard), and the stated Arcane/Glances mounts. Phase D workload tickets must rejustify rather than inherit any exception.
 
@@ -119,7 +121,7 @@ At JAR-68, `jaredwines.com` was intentionally undeployed and had no container ob
 
 The supplied root `docker ps -a` output records **25 container objects: 24 running and one exited**. `syncthing` is the sole exited object (`Exited (0)`); both Palworld containers are running and healthy; Gamarr is absent, consistent with JAR-77 retirement. The running set is `jdownloader`, `romm`, `nginx-proxy-manager`, `qbittorrentvpn`, both Palworld servers, `jellyfin`, `homepage`, `prowlarr`, `uptime-kuma`, `rotom-docs`, `romm-valkey`, `romm-db`, `paperless`, `paperless-db`, `paperless-broker`, `alohamillworks.com`, `homebridge`, `home-assistant`, `sonarr`, `radarr`, `arcane`, `cloudflare-ddns`, and `glances`.
 
-`jdownloader` is the private JAR-87 direct-download service. Its authoritative Compose file remains `/srv/rotom/stacks/game/jdownloader/compose.yaml`; it runs as `995:5000` with `unless-stopped`, no host-published ports, no added capabilities, and `no-new-privileges`. Its only writable NAS bind is `/mnt/nas-media/downloads/romm-inbox -> /opt/JDownloader/Downloads`; local configuration and protected inputs remain in their existing Game-domain paths.
+`jdownloader` is the private JAR-87 direct-download service. After JAR-88 its authoritative Compose file is `/srv/rotom/stacks/gameserver/jdownloader/compose.yaml`; it runs as `995:5000` with `unless-stopped`, no host-published ports, no added capabilities, and `no-new-privileges`. Its only writable NAS bind is `/mnt/nas-media/downloads/romm-inbox -> /opt/JDownloader/Downloads`; local configuration and protected inputs are under the matching Gameserver appdata/secrets roots.
 
 ### JAR-38 Infra v2 convergence — 2026-09-28
 
@@ -147,7 +149,7 @@ RomM 5.3.1 with MariaDB 11 and Valkey 9 runs from `/srv/rotom/stacks/media/romm/
 
 Jellyfin, Radarr, Sonarr, and Prowlarr are active v2 modules under `/srv/rotom/stacks/media/<app>/compose.yaml`; JAR-84 directly verified all four Compose labels and active bind sources. Jellyfin retains its read-only `/mnt/nas-media/library` bind, while Radarr/Sonarr mount `/mnt/nas-media/torrents` at `/media/torrents`. qBittorrentVPN retains its v2 downloader stack/appdata paths and Media payload binds. The former service-home Radarr/Sonarr/Prowlarr/qBittorrentVPN trees are retired recovery artifacts; the Jellyfin tree is deliberately retained. All proxyable services attach `rotom-proxy`; Radarr/Sonarr/Prowlarr attach `rotom-arr`; qBittorrentVPN also attaches `rotom-arr`. Existing ports remain NPM compatibility upstreams.
 
-Core infrastructure; Compose files under `/home/infra/docker/`.
+The table below is the original service inventory with later path/status corrections applied selectively. Use the v2 convergence sections above—not the `/home` labels in older rows—as current reconstruction authority.
 
 | Current container name | Observed image | Observed status | Published ports | Container-only ports shown | Compose file |
 | --- | --- | --- | --- | --- | --- |
@@ -241,9 +243,9 @@ Arcane remains owned by Infra. For project discovery it has `/home/downloads/doc
 
 ## 3. Media — `media`
 
-Media services; Compose files under `/home/media/docker/`.
+The table below preserves the original Media inventory; its Compose-file column carries later verified v2 paths where available.
 
-| Current container name | Observed image | Observed status | Published ports | Container-only ports shown | Compose file |
+| Historical container name | Observed image | Dated status | Published ports | Container-only ports shown | Historical Compose file |
 | --- | --- | --- | --- | --- | --- |
 | `jellyfin` | `lscr.io/linuxserver/jellyfin:latest` | Running at JAR-84 verification | `0.0.0.0:8096->8096/tcp`, `[::]:8096->8096/tcp` | `8920/tcp` | `/srv/rotom/stacks/media/jellyfin/compose.yaml` |
 | `radarr` | `lscr.io/linuxserver/radarr:latest` | Running at JAR-84 verification | `0.0.0.0:7878->7878/tcp`, `[::]:7878->7878/tcp` | None shown | `/srv/rotom/stacks/media/radarr/compose.yaml` |
@@ -261,21 +263,23 @@ UMASK=002
 
 Prowlarr and qBittorrentVPN are Downloads-owned services at `901:5005` after JAR-21. Radarr, Sonarr, and Jellyfin remain media-owned at numeric `127:5000`; Jellyfin additionally has GPU-related supplementary groups needed for `/dev/dri` access.
 
-`/mnt/nas-media` has root ownership `988:5000`, mode `2770`. Existing mixed owner UIDs in the library are preserved. The former Media torrent tree was removed after JAR-21; active torrent objects are now created in Downloads storage under the Downloads identity/GID contract.
+`/mnt/nas-media` has root ownership `988:5000`, mode `2770`. Existing mixed owner UIDs in the library are preserved. The JAR-21 move to Downloads is historical; JAR-56/JAR-87 subsequently made `/mnt/nas-media/torrents` the active qBittorrent payload, written as UID:GID `901:5000`.
 
 Sonarr and Radarr mount the complete Media NAS at `/media` and bind `/mnt/nas-media/torrents` read-only at `/media/torrents`; Jellyfin's library mount remains read-only. qBittorrentVPN binds `/mnt/nas-media/torrents` read/write. JAR-86 retired the unused `/mnt/nas-downloads-media-ro` bindfs view after confirming it had no container or Compose consumer. Only qBittorrent uses the VPN and its kill switch was directly verified. **JAR-49 current state:** PVE attaches the NUC's Iris Plus Graphics 655 as optional `hostpci0`; Rotom maps its Intel `01:00.0` GPU to `/dev/dri/card1` and `/dev/dri/renderD128`. Active Jellyfin maps `/dev/dri`, adds guest GIDs `44` (video) and `992` (render), and runs under its existing `127:5000` service identity. Jellyfin is deliberately configured for QSV at `/dev/dri/renderD128`, with H.264/HEVC hardware processing enabled. A forced live H.264 transcode initialized Intel `iHD`/VA-API and used `h264_qsv`, then exited `0`; this attachment, device mapping, and Jellyfin runtime survived a complete PVE reboot. QSV is optional: remove `hostpci0` and the Compose device/group mappings to return Jellyfin to software transcoding on portable hardware. Coffee Lake Gen9.5 supports H.264 plus HEVC 8/10-bit acceleration but not AV1; H.264 High 10 and HEVC RExt remain software-only limitations. Low-Power encoder and VPP tone-mapping remain disabled because HuC firmware was not commissioned.
 
 Ordinary `jared` access to the media NAS is intentionally excluded. Administration uses `sudo -iu media` on Rotom after connecting as Jared. Jared's final account listing confirms he is not a member of media GID `5000`. UNAS's observed `--manage-gids` behavior means adding a client-side supplementary group alone does not grant the tested NFS access; using primary GID 5000 succeeded. See 04 and 07 for identity details and verification commands.
 
-## 4. Game — `game`
+## 4. Gameserver — `gameserver`
 
-Palworld services use the locked `game` identity at UID/GID `995:5001` and local state under `/srv/rotom/appdata/game/`. Palworld stays on local storage. Gamarr is retired; the old Game library is retained only for JAR-52 rollback.
+Palworld services use the locked `gameserver` identity at UID/GID `995:5001` and local state under `/srv/rotom/appdata/gameserver/`. Palworld stays on VM-local storage. Both current Compose modules are under `/srv/rotom/stacks/gameserver`, both containers are healthy, and their UDP mappings are unchanged. Gamarr is retired; original Game material is rollback-only.
 
-| Current container name | Observed image | Observed status | Published ports | Container-only ports shown | Compose file |
+The following table is the dated JAR-68/pre-retirement snapshot. Current JAR-88 paths and health are stated above.
+
+| Historical container name | Observed image | Dated status | Published ports | Container-only ports shown | Historical Compose file |
 | --- | --- | --- | --- | --- | --- |
-| `palworld-server-fran` | `thijsvanloef/palworld-server-docker:latest` | **Intentionally stopped** at final JAR-68 acceptance; preserved, not dead/restarting/OOM; `unless-stopped` | `0.0.0.0:8212->8212/udp`, `[::]:8212->8212/udp`, `0.0.0.0:27016->27016/udp`, `[::]:27016->27016/udp` | `25575/tcp` | `/home/game/docker/palworld-server-fran/compose.yaml` |
-| `palworld-server-jared` | `thijsvanloef/palworld-server-docker:latest` | **Intentionally stopped** at final JAR-68 acceptance; preserved, not dead/restarting/OOM; `unless-stopped` | `0.0.0.0:8211->8211/udp`, `[::]:8211->8211/udp`, `0.0.0.0:27015->27015/udp`, `[::]:27015->27015/udp` | `25575/tcp` | `/home/game/docker/palworld-server-jared/compose.yaml` |
-| `gamarr` | `ghcr.io/gamarr-app/gamarr:latest` | Running; healthy in fresh 2026-09-19 audit (image-provided healthcheck) | `0.0.0.0:6767->6767/tcp`, `[::]:6767->6767/tcp` | None shown | `/home/game/docker/gamarr/compose.yaml` |
+| `palworld-server-fran` | `thijsvanloef/palworld-server-docker:latest` | **Intentionally stopped** at final JAR-68 acceptance; later healthy after JAR-88 | `0.0.0.0:8212->8212/udp`, `[::]:8212->8212/udp`, `0.0.0.0:27016->27016/udp`, `[::]:27016->27016/udp` | `25575/tcp` | `/home/game/docker/palworld-server-fran/compose.yaml` (retired legacy path) |
+| `palworld-server-jared` | `thijsvanloef/palworld-server-docker:latest` | **Intentionally stopped** at final JAR-68 acceptance; later healthy after JAR-88 | `0.0.0.0:8211->8211/udp`, `[::]:8211->8211/udp`, `0.0.0.0:27015->27015/udp`, `[::]:27015->27015/udp` | `25575/tcp` | `/home/game/docker/palworld-server-jared/compose.yaml` (retired legacy path) |
+| `gamarr` | `ghcr.io/gamarr-app/gamarr:latest` | Historical 2026-09-19 running/healthy state; retired by JAR-77 | `0.0.0.0:6767->6767/tcp`, `[::]:6767->6767/tcp` | None shown | `/home/game/docker/gamarr/compose.yaml` (retired) |
 
 ### Palworld account/home migration — 2026-09-18
 
@@ -372,28 +376,28 @@ JAR-6 added **no Docker integration** for the eight new service NAS shares. No r
 
 ## 7. Shared Docker Architecture and Storage Notes
 
-- The current Compose inventory follows `/home/<account>/docker/<service>/compose.yaml` across six active workload-owner directories: `infra`, `media`, `game`, `smarthome`, `downloaders`, and `web`. The additional service-account homes (`documents`, `filesync`, and `customapps` at compatibility path `/home/apps`) currently have no deployed application workload. The former `auth` account/home and NAS boundary were retired on 2026-09-29.
+- Current active application Compose definitions are predominantly under `/srv/rotom/stacks/<domain>/<service>/compose.yaml`; NPM is also v2. Retained `/home/<service>/docker` trees are compatibility or rollback material unless a current service entry explicitly identifies one as active. Documents (Paperless) and Filesync (Syncthing) have deployed workloads; Customapps remains reserved, and Auth is retired.
 - JAR-22 records 16 running containers and 16 total container objects. `jaredwines.com` has a retained Compose project at `/home/web/docker/jaredwines.com/compose.yaml` but no current container object. `glances` shares the Homepage Compose stack at `/home/infra/docker/homepage/compose.yaml`.
 - Published mappings include both IPv4 and IPv6 bindings for most mapped services. Glances shows an IPv4 loopback binding only. These listings do not establish firewall rules, router forwarding, or external reachability.
 - The original container/path inventories alone do not establish volumes, networks, environment variables, dependencies, VPN behavior, or reverse-proxy routing. Later evidence adds the media identity settings and mounts above; use 03 and 04 for separately audited network and storage details. Full current Compose contents still need inspection before editing any service.
 
-### Service groups and NAS mounts — current guest state through JAR-31
+### Service groups and NAS mounts — current guest state through JAR-88
 
 Production workloads are restored under the current service-account layout. The table below describes current guest identity/storage relationships; historical Docker-group membership is not implied.
 
 | Service account | Current guest UID:GID | Current guest NAS mount | Current Docker/application use |
 |---|---:|---|---|
 | media | `127:5000` | `/mnt/nas-media` | Jellyfin/Radarr/Sonarr; active torrent path is `/mnt/nas-media/torrents` |
-| game | `995:5001` | `/mnt/nas-game` | Both Palworld servers plus private JDownloader; Game ROM inbox/review/library are current JAR-76 paths |
-| infra | `997:5002` | `/mnt/nas-infra` | Arcane/DDNS/Homepage/Glances/NPM configs remain local under `/home/infra/docker` |
-| smarthome | `126:5003` | `/mnt/nas-smarthome` | Home Assistant/Homebridge configs remain local under `/home/smarthome/docker` |
-| documents | `900:5004` | `/mnt/nas-documents` | Storage boundary only |
-| downloaders | `901:5005` | `/mnt/nas-downloaders` | Active Prowlarr/qBittorrentVPN owner; current NFS source `Downloader/.data`; qBittorrent `wg0` verified |
+| gameserver | `995:5001` | `/mnt/nas-gameserver` | Both Palworld servers plus private JDownloader; Palworld is VM-local and JDownloader writes only the Media ROM inbox |
+| infra | `997:5002` | `/mnt/nas-infra` | Active modules/state are under `/srv/rotom`; retained `/home/infra` material is compatibility/rollback only where documented |
+| smarthome | `126:5003` | `/mnt/nas-smarthome` | Home Assistant/Homebridge definitions and state are under `/srv/rotom` |
+| documents | `900:5004` | `/mnt/nas-documents` | Paperless deployed with VM-local state; NAS boundary unused by Paperless |
+| downloader | `901:5005` | `/mnt/nas-downloaders` | Active Prowlarr/qBittorrentVPN owner; compatibility home `/home/downloaders`; current NFS source `Downloader/.data`; qBittorrent `wg0` verified |
 | web | `902:5006` | `/mnt/nas-web` | Aloha active; Jared Wines retained but intentionally undeployed |
-| filesync | `903:5007` | `/mnt/nas-filesync` | Storage boundary only |
+| filesync | `903:5007` | `/mnt/nas-filesync` | Syncthing deployed; no production folder/payload configured |
 | customapps | `904:5008` | `/mnt/nas-customapps` | Reserved storage boundary only; compatibility home `/home/apps` |
 
-Current application restores use `/home/<service>/docker/<project>`. JAR-86 retired the unused `/mnt/nas-downloads-media-ro` Media read-only compatibility view and its recovery-helper branch; its source `/mnt/nas-downloaders`, root, and active qBittorrent sentinel `/mnt/nas-downloaders/.rotom-qbt-nas-ready` remain. JAR-81 removed only the obsolete Downloader `torrents/` tree. The unused Game view was already retired.
+Current application definitions use the per-domain `/srv/rotom/stacks` modules described above. JAR-86 retired the unused `/mnt/nas-downloads-media-ro` compatibility view and its recovery-helper branch; `/mnt/nas-downloaders` and its sentinel remain as the retained Downloader boundary, while qBittorrent's payload and guard are Media-only. JAR-88 replaced the active Game guest mount with Gameserver.
 
 The current `docker` group should be re-read before future privilege changes. JAR-30 GID `989` with no members is the last explicit verification; JAR-31 application restoration does not by itself demonstrate group membership changes.
 
@@ -471,7 +475,7 @@ No additional Docker service is promoted to current state by this restructure. A
 The VM-era backup baseline is no longer a Docker gap. The current verified guest recovery snapshot is `f666d63c` (`2026-09-27 13:30:28 PDT`, 17.410 GiB), and post-run `restic check` passed 21/21 snapshots with no errors. Guest Restic automation is now recommissioned under enabled/active `rotom-restic-backup.timer`; this does not change Docker backup scope, and `/mnt` remains outside the host Restic source set.
 
 - **Intentional:** Fran is not recreated, and her historical backup sudoers rule is not installed.
-- **Needs Verification — live Downloader-NFS loss:** startup/recreation fail-closed behavior and boot-time recovery are verified, but behavior after sudden NFS loss while qBittorrent is already running is not. Read-only inspection of the current Compose/systemd definitions can confirm that no runtime watchdog is documented; actual failure behavior would require a separately planned non-destructive maintenance test and must not be inferred.
+- **Needs Verification — live Media-NFS loss:** startup/recreation fail-closed behavior and the Media guard are documented, but application behavior during sudden loss of the active Media NFS payload while qBittorrent is already running has not been exercised. Read-only inspection can confirm the guard definition; actual loss behavior requires a separately planned non-destructive maintenance test and must not be inferred.
 - **Known Arcane metadata drift:** current auto-update/auto-heal settings were freshly verified on 2026-09-27 (document 06). JAR-85 verified the active Arcane container mounts `/home/downloaders/docker` directly; the former `/home/infra/docker/downloads` discovery symlink was unreferenced by the current Arcane database and retired. Historical Arcane records that name the old symlink remain historical evidence. Its persisted qBittorrentVPN project status remains stale/`unknown` even though Docker runtime and WireGuard are current and healthy enough to be running.
 
 ## 14. Related Documentation

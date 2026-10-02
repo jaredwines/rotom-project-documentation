@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — JAR-88 Gameserver domain/NAS migration verified
+**Documentation updated:** 2026-10-01 — complete RPD consistency audit
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -42,16 +42,16 @@ The accepted Phase B architecture now uses **PVE** as the product abbreviation a
 | JAR-88 Gameserver v2 | Independent Palworld modules run under `/srv/rotom/stacks/gameserver`, with VM-local live state under `/srv/rotom/appdata/gameserver` and locked `gameserver` at `995:5001`. `/mnt/nas-gameserver` is canonical NFSv3 `Gameserver/.data`; original Game data is rollback-only and not guest-mounted. JAR-87 Media ROM/qBittorrent contracts remain independent. |
 | JAR-43 Smart Home v2 | Home Assistant and Homebridge run from independent modules under `/srv/rotom/stacks/smarthome`, with authoritative mutable state under `/srv/rotom/appdata/smarthome`. They retain host networking for discovery and the established NPM compatibility routes. JAR-51 retired the inactive prior `/home/smarthome/docker/{home-assistant,homebridge}` rollback trees after reference and service validation; `/mnt/nas-smarthome` remains an unused reserved boundary. |
 | JAR-45 Web v2 | Aloha Millworks runs from `/srv/rotom/stacks/web` with site content under `/srv/rotom/appdata/web` and joins `rotom-proxy`; its `7778` listener remains the required compatibility upstream for retained host-networked NPM. Jared Wines is migrated to v2 state/Compose but remains intentionally unstarted and unpublished; its Homepage **Hosted Websites** card was restored on 2026-09-30 and currently reflects the unavailable target. The former legacy Web trees were explicitly retired on 2026-09-29. |
-| JAR-44 Documents foundation | `/srv/rotom/stacks/documents/DOMAIN-CONTRACT.md` defines the future Paperless contract: Documents `900:5004`, VM-local appdata and secrets, `rotom-proxy` web expectations, and a reserved non-authoritative NAS boundary. No document app or data is deployed. |
+| JAR-44 / JAR-8 Documents | JAR-44 established the Documents contract; JAR-8 then deployed Paperless-ngx, PostgreSQL, and Valkey under `/srv/rotom`. State remains VM-local and `/mnt/nas-documents` remains a reserved, unused Paperless boundary. |
 | JAR-46 Future domains | Tracked `customapps` contract defines v2 local appdata/secrets, proxy expectations, and recovery-review triggers; the Filesync contract is now implemented by JAR-75 Syncthing. The former Auth Linux account and NAS boundary were retired on 2026-09-29. |
 | JAR-75 Filesync Syncthing | Syncthing `2.0.0` runs as `903:5007` from `/srv/rotom/stacks/filesync/syncthing`, with VM-local configuration/database at `/srv/rotom/appdata/filesync/syncthing` and its sole payload bind `/mnt/nas-filesync -> /filesync`. The non-creating bind fails closed if NFS is absent. GUI authentication is configured; NPM provides forced-TLS `https://syncthing.rotom.casa` through loopback-only `127.0.0.1:8384`. New synchronized folders use trash-can versioning (`.stversions`); NAS payloads remain outside guest Restic and require appropriate UNAS snapshot recovery protection before becoming authoritative. |
 | JAR-8 Paperless | Paperless-ngx v3.2.1, PostgreSQL 18, and Valkey 9 run from `/srv/rotom/stacks/documents/paperless`; all mutable state is VM-local under Documents appdata and the web service uses `rotom-proxy` plus loopback NPM compatibility routing. `paperless.rotom.casa` is externally verified through the retained NPM route. |
 | JAR-71 Remote Desktop Commander | Native outbound-only `desktop-commander.service` runs as locked, dedicated `desktopcmd` (`1001:1001`). Its `0700` home holds pinned agent `0.2.52`, the sole writable workspace, and sensitive pairing state; it has no sudo, Docker, service-group, NAS, proxy, DNS, or inbound-listener access. |
-| Rotom v2 filesystem foundation | JAR-34 created `/srv/rotom` as an empty, root-administered v2 namespace. `stacks/` and `scripts/` are locally Git-versioned declarative content; `appdata/` contains service-owned empty domain roots; `secrets/` and `backup-staging/` are root-only. Existing `/home/<service>/docker` workloads remain authoritative compatibility paths until their owning Phase D migrations. |
+| Rotom v2 filesystem foundation | JAR-34 created `/srv/rotom` as the root-administered v2 namespace. `stacks/` and `scripts/` hold declarative content; `appdata/` holds mutable service state; `secrets/` and `backup-staging/` are root-only. Phase D migrations now make `/srv/rotom` authoritative for the deployed modules identified in document 02; retained `/home/<service>/docker` trees are compatibility or rollback material unless explicitly stated otherwise. |
 | Reserved v2 NAS boundaries | `Customapps` remains the empty reserved export at `/mnt/nas-customapps`; `customapps` (`904:5008`) deliberately retains compatibility home `/home/apps`. JAR-88 restored the Gameserver guest contract at `/mnt/nas-gameserver` and retained Game as NAS-only rollback data. The separate empty `Downloads` and obsolete `Apps` guest contracts remain retired. |
-| Palworld | `palworld-server-jared` and `palworld-server-fran` are running and healthy with `unless-stopped`; their active worlds/saves were reverified and preserved through JAR-78 |
+| Palworld | `palworld-server-jared` and `palworld-server-fran` are running and healthy with `unless-stopped`; their active worlds/saves were reverified and preserved through JAR-88 |
 | qBittorrentVPN | Running; fail-closed Media-only design retained; Games uses `/media/torrents/games` plus `/media/torrents/incomplete/games`; only the Media sentinel is bound read-only |
-| Guest NAS | Twelve fstab-backed systemd automounts; JAR-86 retired the unused Media bindfs compatibility view while preserving the Downloader root/sentinel and all Media paths; the Game Downloads view was already retired. Automount can fail during early boot before NAS networking is usable; a later remount restores the share but does not itself restart failed consumers. |
+| Guest NAS | Eleven fstab-backed systemd NFS automounts and no bindfs compatibility views. JAR-88 replaced Game with Gameserver; Downloads, Apps, and Auth are retired. Automount can fail during early boot before NAS networking is usable; a later remount restores a share but does not itself restart failed consumers. |
 | JAR-47 recovery policy | Final four-layer model: application-aware artifacts, guest Restic, separate PVE VM VZDump, and UNAS local snapshots for authoritative NAS Media. All layers remain on the same UNAS appliance where applicable; snapshots are rollback protection, not off-site protection. |
 | Guest Restic | Canonical repository `/mnt/nas-rotom-restic-backup/rotom-restic-backup`; `rotom-restic-backup*`; snapshot `3c85d5be` (2026-10-01 02:30 PDT) is the verified JAR-84 recovery point, including byte-verified legacy-tree archives; retention is 7 daily / 4 weekly / 12 monthly. |
 | PVE host-config Restic | NAS `PVE_Restic_Backup/.data`; mount `/mnt/nas-pve-restic-backup`; repo `/mnt/nas-pve-restic-backup/pve-restic-backup`; repo ID `8ca0218c645dc2968c2b21d67dbda3840794d8bc9c157c0515a85af30eb3d0e3`; worker/unit/timer `pve-restic-backup*`; staging `/var/backups/pve-restic-recovery`; timer enabled/active daily `04:00`; retention `7 daily / 4 weekly / 12 monthly` |
@@ -64,7 +64,7 @@ The accepted Phase B architecture now uses **PVE** as the product abbreviation a
 
 ## 3. Current Workload Ownership — Restored Through JAR-31
 
-JAR-31 restored the production Compose/application layer into the Debian VM while retaining the Phase B service-account split. The Linux-side download identity is **`downloaders`** at UID:GID `901:5005`; current active Prowlarr/qBittorrent project discovery uses `/home/downloaders/docker`. Historical sections retain the old `downloads` name where they describe pre-migration state.
+JAR-31 restored the production Compose/application layer into the Debian VM while retaining the Phase B service-account split. The Linux-side download identity is **`downloaders`** at UID:GID `901:5005`. Current Prowlarr and qBittorrent Compose definitions are under `/srv/rotom/stacks`; `/home/downloaders/docker` remains only as the parent mounted by Arcane for compatibility/discovery. Historical sections retain the old `downloads` name where they describe pre-migration state.
 
 ChatGPT-controlled browser work is not part of the Rotom administration or documentation workflow. Available Sources replacements are handled manually by Jared when needed. The canonical RPD maintenance contract selects behavior by execution environment and uses `rpd path` to resolve the active checkout rather than making shared workflow instructions depend on a physical path. ChatGPT on Mac delivers changed replacement files plus the complete RPD ZIP and instructs Jared to copy the changed files into the checkout returned by `rpd path`, manually replace Available Sources, then publish with a relevant `rpd commit`, `rpd check`, and `rpd push`; ChatGPT itself performs no Git publication. Codex on Mac or Rotom resolves its local checkout with `rpd path`, edits that checkout directly when RPD maintenance is authorized, and completes the final state through the guarded `rpd` commit/check/push flow. The Git checkouts remain operational mirrors/references and do not replace the Available Sources membership boundary or the maintenance contract in document 00. Apple Passwords/iCloud Passwords remains the credential source of truth; never record credential values or authentication material in the project documentation. See document 06 for the standing administration/Codex workflow and document 00 for RPD maintenance governance.
 
@@ -74,10 +74,10 @@ ChatGPT-controlled browser work is not part of the Rotom administration or docum
 | media | Jellyfin, Radarr, Sonarr |
 | gameserver | Palworld servers for Fran and Jared at UID:GID `995:5001`; home `/home/gameserver` |
 | smarthome | Home Assistant and Homebridge |
-| documents | Service-account skeleton reserved for future document workloads; no application deployed |
+| documents | Paperless-ngx v3.2.1 with PostgreSQL 18 and Valkey 9; authoritative state remains VM-local under `/srv/rotom/appdata/documents/paperless` |
 | downloader | Active Prowlarr/qBittorrentVPN domain; UID:GID `901:5005`; compatibility home and mount remain `/home/downloaders` / `/mnt/nas-downloaders` |
 | web | Aloha Millworks active; Jared Wines project retained but intentionally undeployed |
-| filesync | Service-account skeleton reserved for future synchronization workloads; built-in Linux `sync` remains untouched |
+| filesync | Syncthing 2.0.0; VM-local configuration/database under `/srv/rotom/appdata/filesync/syncthing`, with `/mnt/nas-filesync` as its sole payload boundary; built-in Linux `sync` remains untouched |
 | customapps | Service-account skeleton reserved for future application workloads; compatibility home `/home/apps` retained |
 | desktopcmd | Dedicated non-human Remote Desktop Commander identity; only `/home/desktopcmd/workspace` is its intended writable work area; no service-storage role or NAS mount |
 | jared | Interactive administrator with full sudo; Fran's pre-migration administrator identity is preserved but not yet recreated in the VM |
@@ -86,7 +86,7 @@ The pre-migration system granted Docker group GID `984` to all named operational
 
 ### Current service identities, storage, and application state
 
-The ten storage-facing service accounts retain their JAR-29 numeric identity contract. Current workload restoration did not require broadening ordinary NFS permissions.
+The nine current storage-facing service accounts preserve the applicable JAR-29 numeric identity contracts; Auth has since been retired. Current workload restoration did not require broadening ordinary NFS permissions.
 
 | Account | UID : primary GID | Current NAS mount | Current state |
 |---|---:|---|---|
@@ -94,13 +94,13 @@ The ten storage-facing service accounts retain their JAR-29 numeric identity con
 | gameserver | 995 : 5001 | `/mnt/nas-gameserver` | Active Jared/Fran Palworld identity; original Game content is rollback material only |
 | infra | 997 : 5002 | `/mnt/nas-infra` | Active core infrastructure owner; Arcane restored with preserved named volume |
 | smarthome | 126 : 5003 | `/mnt/nas-smarthome` | Active Home Assistant/Homebridge owner; authoritative application state is local under `/srv/rotom/appdata/smarthome` |
-| documents | 900 : 5004 | `/mnt/nas-documents` | Restored storage boundary; no application deployed |
-| downloaders | 901 : 5005 | `/mnt/nas-downloaders` | Active Prowlarr/qBittorrentVPN owner; current backing export `Downloader/.data`; qBittorrent `wg0` verified after reboot |
+| documents | 900 : 5004 | `/mnt/nas-documents` | Paperless is deployed with VM-local state; the NAS boundary remains unused by Paperless |
+| downloader | 901 : 5005 | `/mnt/nas-downloaders` | Active Prowlarr/qBittorrentVPN owner; compatibility home `/home/downloaders`; current backing export `Downloader/.data`; qBittorrent `wg0` verified after reboot |
 | web | 902 : 5006 | `/mnt/nas-web` | Aloha active; Jared Wines intentionally undeployed |
-| filesync | 903 : 5007 | `/mnt/nas-filesync` | Restored storage boundary; no application deployed |
+| filesync | 903 : 5007 | `/mnt/nas-filesync` | Syncthing is deployed; no production folder or authoritative payload is configured |
 | customapps | 904 : 5008 | `/mnt/nas-customapps` | Reserved storage boundary; no application deployed; compatibility home `/home/apps` retained |
 
-All ten service-home shortcuts remain `/home/<service>/nas-<service> -> /mnt/nas-<service>`, including `/home/downloaders/nas-downloaders` and the deliberate compatibility exception `/home/apps/nas-customapps -> /mnt/nas-customapps` for `customapps`. Backup and Shared Drive remain separate root-controlled mounts. Fran is not yet recreated in the new VM.
+All nine current service-home shortcuts use `/home/<service>/nas-<service> -> /mnt/nas-<service>`, including `/home/downloaders/nas-downloaders` and the deliberate compatibility exception `/home/apps/nas-customapps -> /mnt/nas-customapps` for `customapps`. Backup and Shared Drive remain separate root-controlled mounts. Fran is not yet recreated in the new VM.
 
 ### Preserved pre-migration identities and NAS separation
 
@@ -146,28 +146,28 @@ The adopted access policy keeps `jared` outside the media group. Administer medi
 | Path | Current role |
 |---|---|
 | `/mnt/nas-media` | NFSv3 `Media/.data`; root `988:5000` mode `2770`; active Jellyfin/Radarr/Sonarr final-library domain |
-| `/mnt/nas-game` | NFSv3 `Game/.data`; root `988:5001` mode `2770`; retained JAR-87 ROM rollback library; no qBittorrent marker contract |
-| `/mnt/nas-infra` | Infra service share; root `988:5002` mode `2770`; application configs remain local under `/home/infra` |
-| `/mnt/nas-smarthome` | Smarthome service share; root `988:5003` mode `2770`; HA/Homebridge state remains local under `/home/smarthome` |
-| `/mnt/nas-documents` | Documents service share; root `988:5004` mode `2770`; no application deployed |
+| `/mnt/nas-gameserver` | NFSv3 `Gameserver/.data`; root `988:5001` mode `2770`; current Gameserver service boundary. Original `Game/.data` remains NAS-only rollback data and is not guest-mounted. |
+| `/mnt/nas-infra` | Infra service share; root `988:5002` mode `2770`; migrated application state remains VM-local under `/srv/rotom/appdata/infra` |
+| `/mnt/nas-smarthome` | Smarthome service share; root `988:5003` mode `2770`; HA/Homebridge state remains VM-local under `/srv/rotom/appdata/smarthome` |
+| `/mnt/nas-documents` | Documents service share; root `988:5004` mode `2770`; Paperless state remains VM-local and does not use this boundary |
 | `/mnt/nas-downloaders` | NFSv3 **`Downloader/.data`**; root `988:5005` mode `2770`; active writable Downloader boundary with Movies/Shows directory layout and sentinel. JAR-79 found qBittorrentVPN currently sources its payload binds from Media, not this mount. |
-| `/mnt/nas-web` | Web service share; root `988:5006` mode `2770`; website content remains local under `/home/web` |
-| `/mnt/nas-filesync` | Filesync service share; root `988:5007` mode `2770`; no application deployed |
+| `/mnt/nas-web` | Web service share; root `988:5006` mode `2770`; website content remains VM-local under `/srv/rotom/appdata/web` |
+| `/mnt/nas-filesync` | Filesync service share; root `988:5007` mode `2770`; Syncthing's sole payload boundary, currently without a production folder/payload |
 | `/mnt/nas-customapps` | NFSv3 `Customapps/.data`; root `988:5008` mode `2770`; reserved `customapps` boundary; compatibility home `/home/apps` retained |
-| `/mnt/nas-rotom-restic-backup` | NFSv3 `Rotom_Restic_Backup/.data`; mounted share root `988:988` mode `0700`; canonical repository `/mnt/nas-rotom-restic-backup/rotom-restic-backup`; current verified snapshot `f666d63c`; `rotom-restic-backup.timer` enabled/active |
+| `/mnt/nas-rotom-restic-backup` | NFSv3 `Rotom_Restic_Backup/.data`; mounted share root `988:988` mode `0700`; canonical repository `/mnt/nas-rotom-restic-backup/rotom-restic-backup`; current verified recovery point `3c85d5be`; `rotom-restic-backup.timer` enabled/active |
 | `/mnt/nas-pve-restic-backup` *(PVE host only)* | NFSv3 `PVE_Restic_Backup/.data`; systemd automount from PVE `/etc/fstab`; canonical repository `/mnt/nas-pve-restic-backup/pve-restic-backup` (repo ID `8ca0218c645dc2968c2b21d67dbda3840794d8bc9c157c0515a85af30eb3d0e3`); staging `/var/backups/pve-restic-recovery`; current snapshot `35d4b0c2`; `pve-restic-backup.timer` enabled/active for `04:00` |
 | `/mnt/nas-shared-drive` | NFSv3 Shared Drive; contains JAR-25 raw NVMe rollback image; outside host Restic because `/mnt` is excluded |
-| `/home/infra/docker` | Active core infrastructure Compose trees: Arcane, DDNS, Homepage/Glances, NPM |
-| `/home/media/docker` | Active Jellyfin/Radarr/Sonarr Compose/config trees |
-| `/home/downloaders/docker` | Active Prowlarr/qBittorrentVPN Compose/config trees; Arcane mounts this root read-only for discovery |
-| `/home/smarthome/docker` | Active Home Assistant/Homebridge Compose/config trees |
-| `/home/game/docker` | Both Palworld projects present with saves preserved; both Palworld containers intentionally stopped; Gamarr legacy trees retired by JAR-77 |
-| `/home/web/docker` | Aloha active; Jared Wines project retained but intentionally undeployed |
+| `/srv/rotom/stacks` | Current declarative Compose modules for migrated Infra, Media, Downloader, Gameserver, Smarthome, Documents, Web, and Filesync workloads |
+| `/srv/rotom/appdata` | Current VM-local mutable application state, separated by domain; protected by guest Restic `/srv` scope |
+| `/home/infra/docker/nginx-proxy-manager` | Retained NPM rollback tree only; active NPM is under `/srv/rotom` |
+| `/home/media/docker/jellyfin` | Retained Jellyfin legacy material only; active Jellyfin is under `/srv/rotom` |
+| `/home/downloaders/docker` | Retained parent for Arcane's compatibility/discovery mount; active Prowlarr/qBittorrent definitions are under `/srv/rotom` |
+| `/home/web/docker` | Retired legacy website project trees; current Aloha and retained Jared Wines v2 state are under `/srv/rotom` |
 | `/var/lib/docker` | Current Docker runtime root on VM-local ext4; not NFS-backed |
 | `/var/lib/docker/volumes` | Current Docker named-volume store; includes restored `arcane_arcane-data` |
-| `/var/backups/system-info` | Active backup staging/recovery inventory path; all three required SQLite sources remain part of the normal backup path; current verified snapshot is `f666d63c` |
+| `/var/backups/system-info` | Active backup staging/recovery inventory path; all three required SQLite sources remain part of the normal backup path; application-aware recovery was verified by JAR-47 |
 
-All twelve canonical **guest** NFS mountpoints remain guest fstab/systemd automounts. The PVE-only `/mnt/nas-pve-restic-backup` automount is an additional host backup path and does not change the guest twelve-mount count. The 2026-09-27 post-boot audit freshly verified all twelve generated `.automount` units active and the current NFS sources, including `Downloader/.data` and `Rotom_Restic_Backup/.data`. JAR-31 additionally restored the two bindfs compatibility views and the targeted NAS/Docker recovery helper; fresh Media/Game traversal checks again passed. The former `/mnt/nas-rotom-backup` export is no longer part of current Rotom configuration: it is unmounted and the old NAS `Rotom_Home_Server_Backup` share is retained only as rollback data. The mounted `/mnt/nas-rotom-restic-backup` NFS root freshly verified as numeric `988:988` mode `0700`. The audit did not isolate the underlying local directory while fully unmounted, so its local-directory mode remains non-authoritative unless separately checked.
+The current guest contract contains **eleven** fstab/systemd NFS automounts: the nine service boundaries listed above plus guest Restic and Shared Drive. JAR-88 replaced the active Game mount with Gameserver; the separate Downloads, Apps, and Auth guest boundaries and both bindfs compatibility views are retired. The PVE-only `/mnt/nas-pve-restic-backup` automount is an additional host backup path and is not part of the guest count. The former `/mnt/nas-rotom-backup` export is likewise no longer active; the old NAS `Rotom_Home_Server_Backup` share remains rollback-only. Historical twelve- and fifteen-mount checkpoints below remain dated evidence rather than current inventory.
 
 Historical JAR-21/JAR-29 records name `/mnt/nas-downloads` and/or `Downloads/.data`; those remain historical recovery evidence. Current live fstab, generated mount unit, active NFS source, and `showmount` identify `/mnt/nas-downloaders -> Downloader/.data`. The distinct empty `Downloads` drive and `/mnt/nas-downloads` guest contract were retired on 2026-09-29 after a mounted zero-byte inspection and no-reference scan; they must not be confused with the active singular `Downloader/.data` share.
 
