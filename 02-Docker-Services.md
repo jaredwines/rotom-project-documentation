@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; current supplied 2026-10-01 Docker inventory is 25 container objects / 24 running, with deployment details separately evidenced per service
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — boot-time Game NAS recovery limitation verified
+**Documentation updated:** 2026-10-01 — JAR-88 Gameserver path migration verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -32,7 +32,7 @@ The Proxmox VE host `pve` remains hypervisor-only; the application Docker runtim
 
 JAR-34 created the non-migrating v2 declarative namespace at `/srv/rotom`. It contains empty domain reservations under `stacks/` and service-owned empty domain roots under `appdata/`; it contains no placeholder Compose files, containers, databases, or production bind mounts. Existing production projects under `/home/<service>/docker` remain current until their individual Phase D workload tickets migrate and verify them. `/srv/rotom` is a local Git repository for only `stacks/`, `scripts/`, and support files; `.gitignore` excludes `appdata/`, `secrets/`, `backup-staging/`, databases, logs, caches, generated state, and environment files.
 
-JAR-78 supersedes the Gameserver naming for the active Palworld domain: locked `game` is `995:5001` with home `/home/game`; `downloader` remains `901:5005` and `customapps` remains `904:5008`. The NAS-recovery helper retains the Game NFS readiness check; the unused Game Downloads bindfs view is retired. The Palworld modules were recreated one at a time after their paths moved to the Game domain. Existing numeric PUID/PGID values remain unchanged.
+JAR-88 restores the Gameserver name for the active Palworld domain: locked `gameserver` is `995:5001` with home `/home/gameserver`; `downloader` remains `901:5005` and `customapps` remains `904:5008`. Palworld Compose/appdata/environment paths are under `/srv/rotom/{stacks,appdata,secrets}/gameserver`; each module was recreated separately against the same VM-local world. Existing numeric PUID/PGID values remain unchanged. JAR-87 Media-ROM and qBittorrent contracts do not use Gameserver NAS storage.
 
 JAR-36 created unused external bridge networks `rotom-proxy` (`172.29.0.0/16`), `rotom-arr` (`172.30.0.0/16`), and `rotom-monitoring` (`172.31.0.0/16`). Future migrated stacks attach only services needing cross-stack connectivity, use Docker DNS/service names, and may retain private default networks. No current container is attached; current ports and bridge networks remain authoritative until owning workload migration tickets.
 
@@ -55,6 +55,10 @@ The existing `Game/.data` export is again automounted at `/mnt/nas-game`, but it
 ### JAR-87 Media ROM pipeline and Games torrents — 2026-10-01
 
 JAR-87 supersedes the current portions of JAR-76/JAR-83: RomM now binds `/mnt/nas-media/library/games:/romm/library:ro`; private JDownloader and Igir use `995:5000` for the Media inbox, review, and ROM library. qBittorrentVPN binds only `/mnt/nas-media/torrents` plus the read-only Media sentinel, and its enabled guard checks only that Media NFS/marker pair every 15 seconds. Its `Games` category uses `/media/torrents/games` and `/media/torrents/incomplete/games`; Movies/Shows remain unchanged. The Game source library is retained unchanged as rollback material, but its former qBittorrent marker is absent.
+
+### JAR-88 Gameserver module paths — 2026-10-01
+
+JDownloader now runs from `/srv/rotom/stacks/gameserver/jdownloader` with local config and protected inputs under the matching Gameserver appdata/secrets paths; its sole NAS write bind remains Media inbox. Palworld Jared and Fran run from `/srv/rotom/stacks/gameserver/palworld-{jared,fran}` with local binds `/srv/rotom/appdata/gameserver/palworld-{jared,fran} -> /palworld`, not NFS. Both were healthy after individual recreations and retained their existing UDP mappings.
 
 ### Boot-time Game NAS recovery finding — 2026-10-01
 

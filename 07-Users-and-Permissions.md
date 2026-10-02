@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-10-01 — JAR-76 Game ROM pipeline verified
+**Documentation updated:** 2026-10-01 — JAR-88 Gameserver identity migration verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -24,7 +24,7 @@ This is the canonical detailed owner of Rotom account identity and permission fa
 
 ## 2. Current Phase B Identity and Access Model — 2026-09-28 JAR-68 final
 
-**Current JAR-78 correction:** The active Palworld service account is `game` (`995:5001`); `downloader` remains `901:5005` and `customapps` remains `904:5008`. `gameserver` is absent from NSS. No UID/GID, Docker-group membership, or broad ownership rewrite was performed; the service home remains `/home/game`, and active Game-domain service paths are now under `/srv/rotom`.
+**Current JAR-88 state:** The active Palworld service account is `gameserver` (`995:5001`), preserving the former Game numeric identity; `game` is absent from NSS. Its home is `/home/gameserver`, and active local paths are under `/srv/rotom/{stacks,appdata,secrets}/gameserver`. `downloader` remains `901:5005` and `customapps` remains `904:5008`. No broad ownership rewrite or Docker-group change was performed.
 
 **Current Customapps storage correction — 2026-09-29:** `/home/apps` remains the deliberately retained compatibility home for `customapps`, but its obsolete `nas-apps` shortcut and the separate Apps mount were retired. The current reserved NAS boundary is `Customapps/.data -> /mnt/nas-customapps`, reached through `/home/apps/nas-customapps`; it remains empty and no application workload is deployed.
 
@@ -37,7 +37,7 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 | PVE host | hostname `pve`; routine administration as Linux user `jared` (UID/GID `1000:1000`, groups `sudo` and `users`); canonical Mac aliases `pve` / `pve.rotom.casa`; key `~/.ssh/id_ed25519_pve`; PVE identity `jared@pam` has propagated `Administrator` access at `/`; matching root-authorized key removed; root retained for emergency recovery |
 | Debian VM `jared` | UID/GID `1000:1000`; supplementary `sudo`; key-only Mac login via `~/.ssh/id_ed25519_rotom` |
 | media | `127:5000`, `/home/media`; Jellyfin/Radarr/Sonarr |
-| game | `995:5001`, `/home/game`; both Palworld containers; JAR-87 JDownloader/Igir use UID `995` with Media primary GID `5000`; Gamarr retired |
+| gameserver | `995:5001`, `/home/gameserver`; both Palworld containers; JAR-87 JDownloader/Igir use UID `995` with Media primary GID `5000`; Gamarr retired |
 | infra | `997:5002`, `/home/infra`; Arcane/DDNS/Homepage/Glances/NPM |
 | smarthome | `126:5003`, `/home/smarthome`; Home Assistant/Homebridge |
 | documents | `900:5004`, `/home/documents` |
@@ -51,7 +51,7 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 
 ### JAR-87 Media ROM service boundary
 
-JDownloader and the Igir container execution use UID `995` with primary GID `5000` for Media writes. The Media ROM inbox, review, and library directories are narrowly scoped setgid paths; qBittorrent's Media-only sentinel remains outside this write contract. Existing protected MyJDownloader inputs remain under `/srv/rotom/secrets/game/jdownloader`; their values and all credentials are never recorded in the RPD.
+JDownloader and the Igir container execution use UID `995` with primary GID `5000` for Media writes. The Media ROM inbox, review, and library directories are narrowly scoped setgid paths; qBittorrent's Media-only sentinel remains outside this write contract. Existing protected MyJDownloader inputs remain under `/srv/rotom/secrets/gameserver/jdownloader`; their values and all credentials are never recorded in the RPD.
 
 PVE host-config Restic is root-operated. `/usr/local/sbin/pve-restic-backup` is the privileged worker; root-owned `/usr/local/bin/backup-restic-to-nas` re-executes through `sudo` when a non-root user invokes it, so Jared can start the existing root workflow through normal sudo authentication without direct access to the worker or its protected credential. `/etc/restic/nas-password` remains protected and its contents are never documented. The repository is `/mnt/nas-pve-restic-backup/pve-restic-backup` and staging is `/var/backups/pve-restic-recovery`. Whole-VM manual backup likewise uses root-owned `/usr/local/bin/backup-rotom-vm-to-nas`, which re-executes through `sudo` for non-root invocation, plus `rotom-vm-vzdump-manual.service` and `/usr/local/sbin/rotom-vm-vzdump-manual`. Jared is a PVE member of `systemd-journal`, allowing direct read-only service-log access such as `journalctl -fu rotom-vm-vzdump-manual.service`; this does not grant permission to alter services.
 

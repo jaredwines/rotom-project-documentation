@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-01 — autonomous JAR ticket execution command adopted
+**Documentation updated:** 2026-10-01 — JAR-88 Gameserver migration verified
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -27,6 +27,8 @@ Documentation updated: **2026-09-28** through JAR-34's verified non-migrating `/
 JAR-78 retired the unused `rotom-downloads-game-ro.service` and `/mnt/nas-downloads-game-ro` view after confirming no container consumer. JAR-79 then removed qBittorrent's unused Games category and its two empty Downloader directories. JAR-81 retains the Downloader NFS root and sentinel while removing only its obsolete `torrents/` tree. JAR-86 then retired the unused Media bindfs view and removed only its recovery-helper branch, retaining the separate Downloader and Media NFS readiness checks. JAR-83 restores the established `/mnt/nas-game` automount as a minimal marker contract and makes its marker an explicit qBittorrent safety dependency.
 
 JAR-87 retains `romm-igir.timer`, enabled and active every 15 minutes, with root-owned `/usr/local/sbin/romm-igir-run` and `romm-igir.service`. It locks before work, validates required Media mounts and DAT availability, runs pinned Igir as `995:5000`, and never deletes input: DAT-matched files are copied to `/mnt/nas-media/library/games/roms` and retained in the Media inbox `.processed` area, while unmatched input goes to the Media review directory. RomM quick scans remain at minutes 7, 22, 37, and 52.
+
+JAR-88 moved only Igir’s VM-local state root to `/srv/rotom/appdata/gameserver/romm-igir`; its timer, worker, UID:GID, and all Media NAS inputs/outputs are unchanged. The old Game mount is no longer part of automation or a qBittorrent guard.
 
 ### Boot-time Game NAS recovery finding — 2026-10-01
 
@@ -100,7 +102,7 @@ The NAS backup service is a root oneshot service. It requires /mnt/nas-rotom-bac
 
 The backup status API service is enabled and active. It restarts on failure and starts after networking, but has no explicit NAS mount dependency.
 
-The current fstab-backed NAS paths keep their existing automount model. JAR-78 retired the stale unavailable `/mnt/nas-gameserver` entry and local mountpoint; `/mnt/nas-game` is the sole active Game contract. The retired `/mnt/nas-downloads` boundary and reserved `/mnt/nas-customapps` boundary do not create a global Docker NAS dependency. JAR-86 retired the unreferenced `rotom-downloads-media-ro.service` and local view; the Downloader and Media NFS readiness checks remain independent.
+The current fstab-backed NAS paths keep their existing automount model. JAR-88 restored `/mnt/nas-gameserver` as the active Gameserver contract and retired only the active guest `/mnt/nas-game` mount; original Game data remains on UNAS for rollback. The retired `/mnt/nas-downloads` boundary and reserved `/mnt/nas-customapps` boundary do not create a global Docker NAS dependency. JAR-86 retired the unreferenced `rotom-downloads-media-ro.service` and local view; the Downloader and Media NFS readiness checks remain independent.
 
 qBittorrent uses a service-specific Docker/Compose startup guard rather than a global Docker→NAS systemd dependency. The active `/mnt/nas-downloads/torrents` bind and Downloads sentinel bind use `create_host_path: false`; deliberate removal of the Downloads sentinel caused recreation to fail as required. This prevents local-directory fallback on recreation. A live runtime NFS-loss watchdog was not implemented.
 
