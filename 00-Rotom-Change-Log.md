@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-01 — JAR-89 stage completed qBittorrent Games downloads for RomM
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Added independently disableable `romm-qbt-importer.timer` and a split-privilege importer. Its root-only API snapshot reads completed qBittorrent `Games` metadata through the existing container; the importer itself runs as `995:5000`, reads only the Media Games tree, and writes only the RomM inbox plus a durable `/srv` ledger/quarantine record. It copies—not moves—stable, allowlisted payloads through a temporary name and atomic finalization, with a 10 GiB capacity reserve, locking, content-hash idempotency, and metadata quarantine. JAR-88's DAT directory/file had retained group `gameserver`, blocking the existing `995:5000` Igir process; only those two objects were changed to group `media` to restore its documented read contract.
+- **Evidence:** qBittorrent API preflight confirmed the Media Games path and ignored the live incomplete torrent. Dry run passed; timer and service are enabled/healthy. Authorized 13,766-byte Game Boy Chess fixture torrent `d8bdd257930b47c288d9e0ce0479cda8633fa624` completed and remained `stalledUP` for seeding; after the stable interval, exactly one inbox copy was staged and a repeat run staged zero. Igir validated it, retained it under `.processed`, and the 20:52 PDT scheduled RomM scan completed with two visible ROMs. The fixture source SHA-256 remained `2af2da965493f3433604bcc9f051f09c23c1250c4181f15d56ada0c76c15b6be`; no torrent payload was deleted.
+- **Outstanding:** None. Operational rollback/disable is `sudo systemctl disable --now romm-qbt-importer.timer`; it leaves qBittorrent, Igir, RomM, staged/processed items, and existing torrent payloads unchanged. NAS-resident payloads remain outside guest Restic and use existing UNAS snapshots; importer code/units/ledger are within existing guest Restic roots.
+
 ## 2026-10-01 — Complete RPD consistency audit and current-state cleanup
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.

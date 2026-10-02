@@ -146,12 +146,15 @@
 #     rotom-restic-backup-status-api.service   enabled/active; TCP 8787; Homepage /backup-status
 #     rotom-weekly-maintenance.service          JAR-74 root oneshot; ExecStart=/usr/local/sbin/weekly-host-maintenance
 #     rotom-weekly-maintenance.timer            ENABLED/ACTIVE; Sunday 01:15; Persistent=true; AccuracySec=1min; RandomizedDelaySec=0
+#     romm-qbt-importer.{service,timer}          JAR-89 enabled 5-minute Games-to-RomM staging; disableable independently
 # /usr/local/
 #   sbin/rotom-nas-docker-recovery       current helper; uses retained /mnt/nas-downloaders and /mnt/nas-media NFS checks
 #   sbin/rotom-restic-backup             current root-protected backup implementation; repository /mnt/nas-rotom-restic-backup/rotom-restic-backup
 #   sbin/rotom-restic-backup-status-api  current root-protected status API
 #   sbin/weekly-host-maintenance          root:root 0750; locked safe weekly maintenance worker
 #   sbin/weekly-linux-update             restored script; cron not installed
+#   sbin/romm-qbt-api-snapshot           JAR-89 root-only qBittorrent localhost API snapshot helper
+#   sbin/romm-qbt-importer               JAR-89 `995:5000` stable/atomic Games importer; no Docker control
 #   bin/backup-restic-to-nas             current shared manual launcher
 # /var/lib/docker/
 #   current Docker runtime on VM-local ext4
@@ -184,6 +187,7 @@
 #     web/jaredwines.com/              JAR-45 retained unstarted site content
 #     gameserver/jdownloader/config/          JAR-88 persistent JDownloader configuration; included in guest Restic /srv source
 #     gameserver/romm-igir/{dats,reports,npm-cache}/ JAR-88 worker state; included in guest Restic /srv source
+#     gameserver/romm-qbt-importer/{ledger.sqlite3,quarantine/} JAR-89 durable non-secret importer state; included in guest Restic /srv source
 #   secrets/                         root:root 0700; credentials/private material only, Git-ignored
 #     documents/                     JAR-44 root-only Documents secret boundary
 #       paperless/                   JAR-8 protected Paperless credentials
@@ -202,10 +206,11 @@
 #   The separate empty `/mnt/nas-downloads` / NAS
 #   `Downloads` drive and stale `/mnt/nas-apps` boundary are retired;
 #   `customapps` uses `/mnt/nas-customapps`.
-#   JAR-87 current ROM paths are under Media: downloads/romm-inbox (JDownloader-only write),
+#   JAR-87 current ROM paths are under Media: downloads/romm-inbox (JDownloader and JAR-89 importer write),
 #   downloads/romm-review (unmatched input), and library/games/roms (Igir copy
 #   target, mounted read-only by RomM). `.rotom-qbt-media-ready` remains the
 #   separate qBittorrent read-only safety marker.
+#   JAR-89 reads only torrents/games and atomically copies completed idle/seeding allowlisted payloads into the same inbox; sources remain for seeding. The retained `jar89-gbchess.zip` fixture is a verified test artifact.
 # /srv/rotom/stacks/NETWORKING.md
 #   JAR-36 tracked Compose contract for external rotom-proxy, rotom-arr, and
 #   rotom-monitoring bridges; the networks initially have no containers.
