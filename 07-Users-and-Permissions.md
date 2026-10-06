@@ -37,7 +37,7 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 | PVE host | hostname `pve`; routine administration as Linux user `jared` (UID/GID `1000:1000`, groups `sudo` and `users`); canonical Mac aliases `pve` / `pve.rotom.casa`; key `~/.ssh/id_ed25519_pve`; PVE identity `jared@pam` has propagated `Administrator` access at `/`; matching root-authorized key removed; root retained for emergency recovery |
 | Debian VM `jared` | UID/GID `1000:1000`; supplementary `sudo`; key-only Mac login via `~/.ssh/id_ed25519_rotom` |
 | media | `127:5000`, `/home/media`; Jellyfin/Radarr/Sonarr |
-| gameserver | `995:5001`, `/home/gameserver`; both Palworld containers; JAR-87 JDownloader/Igir use UID `995` with Media primary GID `5000`; Gamarr retired |
+| gameserver | `995:5001`, `/home/gameserver`; both Palworld containers; Igir, the qBittorrent importer, and the browser-upload bridge use UID `995` with Media primary GID `5000`; JDownloader was retired on 2026-10-05; Gamarr retired |
 | infra | `997:5002`, `/home/infra`; Arcane/DDNS/Homepage/Glances/NPM |
 | smarthome | `126:5003`, `/home/smarthome`; Home Assistant/Homebridge |
 | documents | `900:5004`, `/home/documents`; Paperless application identity; authoritative media is `/mnt/nas-documents/paperless`, with other state VM-local |
@@ -55,7 +55,7 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 
 The bridge runs `gameserver:media` (`995:5000`) and reads its only browser password privately from root-owned `/srv/rotom/secrets/media/romm-upload/password`. Its writable scope is the existing Media inbox only.
 
-JDownloader and the Igir container execution use UID `995` with primary GID `5000` for Media writes. The Media ROM inbox, review, and library directories are narrowly scoped setgid paths; qBittorrent's Media-only sentinel remains outside this write contract. Existing protected MyJDownloader inputs remain under `/srv/rotom/secrets/gameserver/jdownloader`; their values and all credentials are never recorded in the RPD.
+Igir uses UID `995` with primary GID `5000` for Media writes. The Media ROM inbox, review, and library directories are narrowly scoped setgid paths; qBittorrent's Media-only sentinel remains outside this write contract. The unused JDownloader service and its dedicated protected MyJDownloader inputs were retired on 2026-10-05.
 
 JAR-89 preserves this numeric boundary: the importer process is `995:5000`, with read-only Games-torrent access and write access only to the existing ROM inbox plus its own `/srv` state. Its API helper is root-owned and does not expose or store qBittorrent credentials. The existing Igir DAT directory and lone DAT file are `root:media` with their existing `0750`/`0640` modes so the documented `995:5000` process can traverse/read them; no account, Docker-group, or broad ownership change was made.
 
@@ -327,7 +327,7 @@ Runtime mounts create these notable access paths:
 - Glances has a read-only bind of the host root and a read-only Docker socket. Its former read-only `/mnt/nas-rotom-backup` bind was removed on 2026-09-18.
 - Media storage: Sonarr and Radarr read/write `/mnt/nas-media` at `/media` and additionally bind `/mnt/nas-media/torrents` read-only at `/media/torrents`; Jellyfin mounts the library subtree read-only. qBittorrentVPN binds that torrent directory read/write. The enabled Downloader compatibility view has no current container consumer and is proposed for retirement. Prowlarr has no NAS bind.
 - Home Assistant has read-only access to /run/dbus.
-- Gameserver storage: Palworld uses local `/srv/rotom/appdata/gameserver` data and no NAS world bind. JAR-87 keeps JDownloader/Igir ROM writes on narrowly scoped Media paths as `995:5000`; original Game NAS content remains rollback material and qBittorrent has no Game/Gameserver payload bind.
+- Gameserver storage: Palworld uses local `/srv/rotom/appdata/gameserver` data and no NAS world bind. Igir, the qBittorrent importer, and the browser-upload bridge keep ROM-inbox writes on narrowly scoped Media paths as `995:5000`; JDownloader was retired on 2026-10-05. Original Game NAS content remains rollback material and qBittorrent has no Game/Gameserver payload bind.
 - Cloudflare DDNS receives a read-only secret-file mount. Its contents were not inspected.
 
 

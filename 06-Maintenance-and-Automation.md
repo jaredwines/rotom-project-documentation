@@ -38,7 +38,7 @@ JAR-89 adds enabled `romm-qbt-importer.timer` every five minutes. Its root-only 
 
 The 12:57 PDT guest boot demonstrated that automounts can be attempted before the NAS route is usable: Game and Filesync failed with `Network is unreachable`, and Docker retained NAS-bind startup failures after network storage returned. The targeted recovery remounted Game and Filesync, verified the documented Game/Media paths and markers, and started JDownloader, RomM, qBittorrentVPN, Radarr, Sonarr, and Jellyfin; zero systemd units remained failed.
 
-The current automatic scopes remain deliberate: `rotom-nas-docker-recovery.service` checks/retries Downloader and Media consumers only, while `rotom-qbittorrent-media-guard.timer` checks the Media payload/marker every 15 seconds and stops qBittorrentVPN if it is unsafe. Neither mechanism restarts qBittorrentVPN after recovery, nor covers JDownloader or RomM.
+The current automatic scopes remain deliberate: `rotom-nas-docker-recovery.service` checks/retries Downloader and Media consumers only, while `rotom-qbittorrent-media-guard.timer` checks the Media payload/marker every 15 seconds and stops qBittorrentVPN if it is unsafe. Neither mechanism restarts qBittorrentVPN after recovery, nor covers RomM. JDownloader was retired on 2026-10-05.
 
 JAR-36 maintains three empty Docker network contracts; they are not scheduled automation and have no container attachments. The tracked `/srv/rotom/stacks/NETWORKING.md` contract directs later workload tickets to attach only required services and use Docker DNS.
 
