@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-05 — Retire unused JDownloader service
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Retired the unused private JDownloader Compose module. Removed only its container, project network, image, Compose definition, 296 KiB VM-local configuration, and two dedicated protected MyJDownloader input files. The shared Media RomM inbox, its contents, and the independent Igir, qBittorrent importer, and browser-upload paths remain intact.
+- **Evidence:** Pre-removal inspection verified that JDownloader had no host-published ports, no dependent containers, and only its dedicated local configuration/secret directories plus the shared `/mnt/nas-media/downloads/romm-inbox` bind. `docker compose down` removed `jdownloader` and `jdownloader_default`; the three dedicated paths are absent. After confirming no remaining container used it, the pinned JDownloader image was untagged and deleted. The shared inbox remains present at 7.5 GiB; RomM and qBittorrentVPN remain running, while `romm-igir.timer`, `romm-qbt-importer.timer`, and `romm-upload-bridge.service` remain active.
+- **Outstanding:** None. Historical JDownloader records remain preserved as historical evidence.
+
 ## 2026-10-05 — JAR-91 move Paperless document media to Documents NAS
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.

@@ -56,7 +56,7 @@ The existing `Game/.data` export is again automounted at `/mnt/nas-game`, but it
 
 ### JAR-87 Media ROM pipeline and Games torrents — 2026-10-01
 
-JAR-87 supersedes the current portions of JAR-76/JAR-83: RomM now binds `/mnt/nas-media/library/games:/romm/library:ro`; private JDownloader and Igir use `995:5000` for the Media inbox, review, and ROM library. qBittorrentVPN binds only `/mnt/nas-media/torrents` plus the read-only Media sentinel, and its enabled guard checks only that Media NFS/marker pair every 15 seconds. Its `Games` category uses `/media/torrents/games` and `/media/torrents/incomplete/games`; Movies/Shows remain unchanged. The Game source library is retained unchanged as rollback material, but its former qBittorrent marker is absent.
+JAR-87 supersedes the current portions of JAR-76/JAR-83: RomM now binds `/mnt/nas-media/library/games:/romm/library:ro`; Igir uses `995:5000` for the Media inbox, review, and ROM library. qBittorrentVPN binds only `/mnt/nas-media/torrents` plus the read-only Media sentinel, and its enabled guard checks only that Media NFS/marker pair every 15 seconds. Its `Games` category uses `/media/torrents/games` and `/media/torrents/incomplete/games`; Movies/Shows remain unchanged. The Game source library is retained unchanged as rollback material, but its former qBittorrent marker is absent. The private JDownloader service was retired on 2026-10-05; its shared inbox remains available to the importer and browser-upload paths.
 
 ### JAR-89 qBittorrent Games importer — 2026-10-01
 
@@ -70,7 +70,7 @@ For the RomM route, NPM also has the read-only host bind `/mnt/nas-media/library
 
 ### JAR-88 Gameserver module paths — 2026-10-01
 
-JDownloader now runs from `/srv/rotom/stacks/gameserver/jdownloader` with local config and protected inputs under the matching Gameserver appdata/secrets paths; its sole NAS write bind remains Media inbox. Palworld Jared and Fran run from `/srv/rotom/stacks/gameserver/palworld-{jared,fran}` with local binds `/srv/rotom/appdata/gameserver/palworld-{jared,fran} -> /palworld`, not NFS. Both were healthy after individual recreations and retained their existing UDP mappings.
+JDownloader was moved to `/srv/rotom/stacks/gameserver/jdownloader` with matching local configuration and protected inputs under JAR-88; that standalone module was retired on 2026-10-05, along with its container and private network. Palworld Jared and Fran run from `/srv/rotom/stacks/gameserver/palworld-{jared,fran}` with local binds `/srv/rotom/appdata/gameserver/palworld-{jared,fran} -> /palworld`, not NFS. Both were healthy after individual recreations and retained their existing UDP mappings.
 
 ### Historical pre-JAR-88 Game NAS recovery finding — 2026-10-01
 
@@ -406,7 +406,7 @@ Production workloads are restored under the current service-account layout. The 
 | Service account | Current guest UID:GID | Current guest NAS mount | Current Docker/application use |
 |---|---:|---|---|
 | media | `127:5000` | `/mnt/nas-media` | Jellyfin/Radarr/Sonarr; active torrent path is `/mnt/nas-media/torrents` |
-| gameserver | `995:5001` | `/mnt/nas-gameserver` | Both Palworld servers plus private JDownloader; Palworld is VM-local and JDownloader writes only the Media ROM inbox |
+| gameserver | `995:5001` | `/mnt/nas-gameserver` | Both Palworld servers; Palworld is VM-local. Igir, qBittorrent importer, and the browser-upload bridge retain the separate `995:5000` Media ROM-inbox contract; JDownloader was retired on 2026-10-05. |
 | infra | `997:5002` | `/mnt/nas-infra` | Active modules/state are under `/srv/rotom`; retained `/home/infra` material is compatibility/rollback only where documented |
 | smarthome | `126:5003` | `/mnt/nas-smarthome` | Home Assistant/Homebridge definitions and state are under `/srv/rotom` |
 | documents | `900:5004` | `/mnt/nas-documents` | Paperless application state is VM-local; authoritative media is `/mnt/nas-documents/paperless` with a fail-closed bind |
