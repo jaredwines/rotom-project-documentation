@@ -86,7 +86,7 @@ JAR-87 moves the active ROM pipeline to Media NAS: RomM reads `/mnt/nas-media/li
 
 JAR-89 adds importer code under `/usr/local/sbin`, its systemd units under `/etc/systemd/system`, and durable non-secret SQLite ledger/quarantine state under `/srv/rotom/appdata/gameserver/romm-qbt-importer`; all are covered by the existing guest Restic roots without changing policy, credentials, retention, or schedules. The copied inbox/processed/library and retained torrent source remain NAS-resident and outside guest Restic; existing Media UNAS snapshots remain their recovery layer.
 
-JAR-90 adds the bridge binary/unit, NPM route state, and root-only credential under existing guest Restic roots. Uploaded Media data remains NAS-resident and covered by existing Media snapshots.
+JAR-90's bridge binary/unit, NPM route state, and root-only credential were retired on 2026-10-05. Historical Restic coverage remains historical evidence; no active browser-upload state remains.
 
 JAR-5 keeps its documentation portal Compose definition and controlled-publish script under `/srv/rotom/stacks/infra/rotom-docs` and its generated source/site output under `/srv/rotom/appdata/infra/rotom-docs`; these VM-local paths are within the established guest Restic `/srv` source scope. The portal source is a deliberately derived, reproducible copy of canonical RPD material, not a new authority or a NAS dataset. JAR-5 did not run, modify, or validate Restic, retention, pruning, repositories, credentials, schedules, or restores.
 

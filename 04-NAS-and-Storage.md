@@ -76,9 +76,9 @@ The active ROM paths are Media-owned setgid directories: `downloads/romm-inbox`,
 
 ### JAR-89 Games-torrent staging contract — 2026-10-01
 
-### JAR-90 browser-upload inbox contract — 2026-10-01
+### JAR-90 browser-upload inbox contract — retired 2026-10-05
 
-The bridge writes only allowlisted regular files to `Media/downloads/romm-inbox` as `995:5000` mode `0660`, through hidden temporary files, `fsync`, and atomic rename. It has no library access; unmatched files retain the existing Igir review behavior.
+The browser-upload bridge was retired on 2026-10-05. It no longer writes to the shared inbox; qBittorrent importer staging remains the active automated ingress.
 
 The importer reads only `/mnt/nas-media/torrents/games` and stages eligible copies into the pre-existing `downloads/romm-inbox`; it never moves or deletes a qBittorrent payload, and it never gives RomM direct access to the torrent tree. Unsupported/duplicate/failed candidates leave source data in place and receive only local `/srv` quarantine metadata; Igir continues to route unmatched staged inputs to `downloads/romm-review`. The retained authorized `jar89-gbchess.zip` source remains in the Games torrent tree for seeding; its validated staged copy is retained in `.processed` as existing pipeline evidence.
 
