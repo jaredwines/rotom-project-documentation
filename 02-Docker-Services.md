@@ -60,9 +60,9 @@ JAR-87 supersedes the current portions of JAR-76/JAR-83: RomM now binds `/mnt/na
 
 ### JAR-89 qBittorrent Games importer — 2026-10-01
 
-### JAR-90 authenticated ROM upload bridge — 2026-10-01
+### JAR-90 authenticated ROM upload bridge — retired 2026-10-05
 
-Native `romm-upload-bridge.service` listens only at `127.0.0.1:8090`, runs `gameserver:media` (`995:5000`), has an inbox-only write scope, a root-only systemd-supplied password, 4 GiB upload cap, 10 GiB reserve, and atomic finalization. RomM's Media library bind remains read-only.
+The former bridge service, binary, protected credential, loopback `8090` listener, and NPM host `26` were removed on 2026-10-05. No browser-upload ingress remains. RomM's Media library bind remains read-only.
 
 For the RomM route, NPM also has the read-only host bind `/mnt/nas-media/library/games:/mnt/nas-media/library/games:ro` and proxy-host `21`'s generated internal `/library/` alias. The NPM Compose file has no `user`, `PUID`, or `PGID` override: its root container identity is the retained image default, not a JAR-90 privilege change. NPM has no Docker socket. RomM independently binds the same library read-only and its internal Nginx workers run as `romm`.
 

@@ -30,7 +30,7 @@ JAR-87 retains `romm-igir.timer`, enabled and active every 15 minutes, with root
 
 JAR-88 moved only Igir’s VM-local state root to `/srv/rotom/appdata/gameserver/romm-igir`; its timer, worker, UID:GID, and all Media NAS inputs/outputs are unchanged. The old Game mount is no longer part of automation or a qBittorrent guard.
 
-JAR-90 adds enabled `romm-upload-bridge.service`, independently reversible with `sudo systemctl disable --now romm-upload-bridge.service`. It does not schedule or bypass Igir; the existing 15-minute Igir timer remains the sole inbox-to-library automation.
+JAR-90's `romm-upload-bridge.service` was retired on 2026-10-05. The existing 15-minute Igir timer remains the sole inbox-to-library automation, with qBittorrent importer staging as the active automated ingress.
 
 JAR-89 adds enabled `romm-qbt-importer.timer` every five minutes. Its root-only API snapshot uses the already-running qBittorrent container's localhost API, while the importer has the narrow `995:5000` Media read/inbox-write contract, no Docker socket, and durable local state at `/srv/rotom/appdata/gameserver/romm-qbt-importer`. It requires a completed idle/seeding `Games` torrent, unchanged 60-second manifest, allowlisted format, capacity reserve, and unique content hash before atomic staging. Disable future staging with `sudo systemctl disable --now romm-qbt-importer.timer`; this does not affect qBittorrent, Igir, RomM, or existing files. JAR-89 also corrected the existing DAT directory and its single DAT file from group `gameserver` to `media`, restoring the documented Igir `995:5000` read path without changing UIDs, modes, or DAT content.
 

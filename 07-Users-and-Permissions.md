@@ -51,9 +51,9 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 
 ### JAR-87 Media ROM service boundary
 
-### JAR-90 upload-bridge boundary
+### JAR-90 upload-bridge boundary — retired 2026-10-05
 
-The bridge runs `gameserver:media` (`995:5000`) and reads its only browser password privately from root-owned `/srv/rotom/secrets/media/romm-upload/password`. Its writable scope is the existing Media inbox only.
+The bridge, its root-only password, and its `gameserver:media` write boundary were removed on 2026-10-05. No browser-upload service identity remains.
 
 Igir uses UID `995` with primary GID `5000` for Media writes. The Media ROM inbox, review, and library directories are narrowly scoped setgid paths; qBittorrent's Media-only sentinel remains outside this write contract. The unused JDownloader service and its dedicated protected MyJDownloader inputs were retired on 2026-10-05.
 

@@ -27,9 +27,9 @@ JAR-75 adds Syncthing as a proxied Filesync management service. Syncthing joins 
 
 ### JAR-10 RomM route — 2026-09-29
 
-### JAR-90 ROM upload route — 2026-10-01
+### JAR-90 ROM upload route — retired 2026-10-05
 
-NPM proxy host 26 routes `romm-upload.rotom.casa` with certificate ID 24 and forced TLS to loopback-only `127.0.0.1:8090`. Authentication is enforced by the bridge because this NPM OpenResty build lacks the Basic Auth module. No DNS, firewall, or WAN policy changed.
+NPM proxy host `26` for `romm-upload.rotom.casa` is deleted/disabled and its generated configuration is absent. The former loopback `127.0.0.1:8090` bridge listener and its credential were removed; no browser-upload route remains. No DNS, firewall, or WAN policy changed.
 
 RomM joins `rotom-proxy` and its database/broker remain private. Retained host-networked NPM routes `romm.rotom.casa` to the loopback-only `127.0.0.1:8081` compatibility listener using wildcard certificate ID 24; external HTTPS validation passed.
 
