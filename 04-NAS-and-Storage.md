@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-05 — JAR-91 Paperless media NAS cutover
+**Documentation updated:** 2026-10-05 — PVE capacity and current VZDump archive audit
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -52,7 +52,7 @@ The prior VM-local media tree is retained, and the root-only local rollback copy
 - NAS share/export: `Rotom_VM_Backup/.data`, authorized to PVE `192.168.1.68`.
 - PVE storage ID: `nas-rotom-vm-backup`.
 - Mount: `/mnt/pve/nas-rotom-vm-backup`; PVE-managed NFS, `content backup`.
-- Six earlier VMID 100 backups were deliberately removed after exact storage/VM safety checks. The storage now contains the fresh verified baseline `vzdump-qemu-100-2026_09_28-00_09_19.vma.zst`, `47,415,540,796` bytes. zstd integrity and full `vma verify` passed; VM100 remained running. The archive is currently unprotected and participates in normal retention.
+- The earlier fully verified 2026-09-28 baseline archive is historical evidence and was absent from the 2026-10-05 storage list. That list contained eight current unprotected VMID `100` archives: six scheduled `05:00` archives from 2026-09-30 through 2026-10-05, a separately listed 2026-09-29 archive, and manual `vzdump-qemu-100-2026_10_05-22_47_06.vma.zst` (`56,432,423,998` bytes). The manual service logged successful completion. The listing confirms availability, schedule output, and normal retention participation; it does not claim new zstd or full `vma verify` checks for the current archive set.
 
 ### Guest storage and post-reboot acceptance
 

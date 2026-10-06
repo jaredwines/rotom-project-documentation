@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Restic backup architecture, scope, retention, verification, restore evidence, and recovery boundaries  
 **Recovery scope:** pre-migration Rotom plus current Proxmox/VM foundation  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-05 — JAR-91 Paperless media NAS recovery boundary recorded
+**Documentation updated:** 2026-10-05 — current PVE VZDump archive audit and disk-capacity finding
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -27,7 +27,20 @@ JAR-69 monitoring reads this native job through the PVE LAN-only status endpoint
 
 The manual path is `/usr/local/bin/backup-rotom-vm-to-nas` -> `rotom-vm-vzdump-manual.service` -> `/usr/local/sbin/rotom-vm-vzdump-manual`, with non-blocking lock `/run/lock/rotom-vm-vzdump-manual.lock`. The root-owned launcher re-executes through `sudo` when started by a non-root user, preserving the root-only worker and systemd ownership; Jared uses normal sudo authentication when needed. Systemd owns the long-running VZDump so it survives SSH disconnect. Jared can follow it directly with `journalctl -fu rotom-vm-vzdump-manual.service` through PVE `systemd-journal` membership.
 
-All six prior VMID 100 backups on the canonical storage were deliberately deleted after exact safety checks. A single fresh backup was then created: `vzdump-qemu-100-2026_09_28-00_09_19.vma.zst`, size `47,415,540,796` bytes. The service completed `Result=success` / `ExecMainStatus=0`; `zstd -t` passed; full `zstd -dc | vma verify -` passed; VM100 stayed running. This archive is currently **unprotected**, so normal `7/4/6` retention can eventually prune it.
+The fully verified 2026-09-28 baseline archive is retained as historical evidence only; it was absent from the supplied 2026-10-05 listing. That read-only PVE listing recorded these eight current, unprotected VMID `100` archives:
+
+| Archive | Bytes | Evidence |
+|---|---:|---|
+| `vzdump-qemu-100-2026_09_29-20_07_46.vma.zst` | 64,010,097,455 | Current listing |
+| `vzdump-qemu-100-2026_09_30-05_00_05.vma.zst` | 63,673,120,772 | Scheduled archive listing |
+| `vzdump-qemu-100-2026_10_01-05_00_08.vma.zst` | 62,998,463,732 | Scheduled archive listing |
+| `vzdump-qemu-100-2026_10_02-05_00_08.vma.zst` | 63,872,978,564 | Scheduled archive listing |
+| `vzdump-qemu-100-2026_10_03-05_00_07.vma.zst` | 62,236,905,225 | Scheduled archive listing |
+| `vzdump-qemu-100-2026_10_04-05_00_10.vma.zst` | 61,741,752,940 | Scheduled archive listing |
+| `vzdump-qemu-100-2026_10_05-05_00_04.vma.zst` | 55,848,522,545 | Scheduled archive listing |
+| `vzdump-qemu-100-2026_10_05-22_47_06.vma.zst` | 56,432,423,998 | Manual service completed successfully at 23:00:53 PDT |
+
+The scheduled entries verify the final-name `rotom-vm-daily` job is producing retained archives. The manual service logged `Backup job finished successfully`; VMID `100` remained available to the guest agent and was later cleanly restarted during the unrelated temporary disk-size rollback. The listing and service result prove availability/completion, but no new zstd or full VMA integrity verification was supplied for these current archives. They remain unprotected and participate in normal `7/4/6` retention.
 
 ### JAR-57 isolated portability restore — 2026-09-29
 
@@ -585,7 +598,7 @@ A read-only repository listing after the scheduled 03:01 run showed 17 snapshots
 - PVE manual launcher: `/usr/local/bin/backup-rotom-vm-to-nas`; re-executes through `sudo` for non-root invocation, starts fixed `rotom-vm-vzdump-manual.service` with `--no-block`, and refuses duplicate active manual runs. Jared can follow the unit without `sudo` through `systemd-journal` membership.
 - PVE manual worker/service: `/usr/local/sbin/rotom-vm-vzdump-manual` + `/etc/systemd/system/rotom-vm-vzdump-manual.service`; VMID 100 / `nas-rotom-vm-backup` / snapshot / zstd; lock `/run/lock/rotom-vm-vzdump-manual.lock`. The old local `backup-proxmox-to-nas.pre-systemd.*` rollback helper was deliberately removed after final acceptance.
 - PVE automatic scheduler: native job `rotom-vm-daily` in `/etc/pve/jobs.cfg`, node `pve`, VMID 100, `05:00`, snapshot + zstd, `repeat-missed=0`, retention 7 daily / 4 weekly / 6 monthly.
-- Current observed VM archive: `/mnt/pve/nas-rotom-vm-backup/dump/vzdump-qemu-100-2026_09_28-00_09_19.vma.zst`, `47,415,540,796` bytes; zstd integrity PASS; full VMA verify PASS; currently unprotected.
+- Current observed whole-VM archive set: eight unprotected VMID `100` archives listed on 2026-10-05; see section 2 for exact names and sizes. The former 2026-09-28 archive retains its historical zstd/VMA verification evidence but is absent from the current list.
 - Host Restic excludes `/mnt`; NAS Media/Game/Shared Drive content therefore requires its own protection policy unless safely reproducible.
 
 ## 18. Proposed Improvements

@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-05 — Verify PVE VM backup cadence and retain the 100 GiB VM disk baseline
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** A manual whole-VM VZDump completed before a temporary capacity assessment. VMID `100`'s thin VirtIO SCSI disk was briefly enlarged from `100 GiB` to `150 GiB`, but no guest partition or filesystem was changed. After the backup completed, the VM was cleanly stopped, its thin LV and Proxmox `scsi0` configuration were restored to `100 GiB`, and it booted successfully. The recorded current configuration therefore remains the original `100 GiB` disk. The PVE storage audit also records the current Samsung NVMe/LVM layout and distinguishes host-root free space, thin-pool free space, and unassigned VG capacity.
+- **Evidence:** PVE reported `nvme0n1` at `232.9 GiB`; LVM root `67.75 GiB` with about `57 GiB` filesystem availability, swap `8 GiB`, thin pool `136.46 GiB` at `69.06%` allocated with about `42.2 GiB` free, and VG `VFree` `16 GiB`. Post-rollback `lvs` reported `vm-100-disk-1` at `100.00 GiB`; `qm config 100` reported `scsi0 ... size=100G`; and VMID `100` was running. The manual VZDump logged successful completion at `2026-10-05 23:00:53 PDT`; the subsequent PVE archive listing showed eight current VMID `100` archives, including six `05:00` scheduler-produced archives from 2026-09-30 through 2026-10-05, a separately listed 2026-09-29 archive, and manual `vzdump-qemu-100-2026_10_05-22_47_06.vma.zst`. `qm agent 100 ping` returned successfully.
+- **Outstanding:** The 2026-10-05 archive listing proves archive availability and successful VZDump completion, but no new zstd or full VMA verification was supplied for those current archives. The earlier 2026-09-28 fully verified archive is historical evidence only and was absent from the current listing. Do not allocate the entire nominal thin-pool headroom without a separate capacity plan and margin.
+
 ## 2026-10-05 — Retire JAR-88 local Palworld rollback artifacts and reclaim Docker image space
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.
