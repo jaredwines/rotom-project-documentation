@@ -63,6 +63,22 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-05 — Repair guest Restic NPM SQLite staging source
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Corrected the root-only guest Restic worker's NPM SQLite source from retired `/home/infra/docker/nginx-proxy-manager/data/database.sqlite` to the active v2 database at `/srv/rotom/appdata/infra/nginx-proxy-manager/data/database.sqlite`.
+- **Evidence:** Scheduled runs on 2026-10-02 through 2026-10-05 failed only at the stale-path preflight. The corrected worker passed `bash -n`; a manual service run created snapshot `8efea294` at 2026-10-05 21:45 PDT, completed normal `7 daily / 4 weekly / 12 monthly` retention/prune, and exited `0`. The prior failed-unit state was cleared; weekly maintenance remains enabled for its next scheduled run.
+- **Outstanding:** Observe the next unattended guest Restic run after this repair. Existing PVE, NAS, router, WOL, and recovery-rehearsal gaps remain unchanged.
+
+## 2026-10-01 — JAR-90 authenticated Media ROM upload bridge
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Added root-managed `romm-upload-bridge.service` and TLS route `romm-upload.rotom.casa`. The bridge runs `995:5000`, authenticates against a root-only credential, writes atomically only to the existing Media inbox, and delegates validation/review/library writes to unchanged Igir/RomM.
+- **Evidence:** TLS checks returned `401` unauthenticated and `200` authenticated; invalid, oversized, interrupted, and duplicate uploads behaved safely (`422`, `413`, no final/partial file, `409`). A 13,766-byte fixture staged `gameserver:media` `0660`, Igir succeeded, and the next scheduled RomM scan completed. RomM library mount remained `rw=false`; existing containers/timers were healthy and zero units failed.
+- **Outstanding:** Roll back with `sudo systemctl disable --now romm-upload-bridge.service`, then remove only proxy host 26 and bridge paths. Credential is root-only at `/srv/rotom/secrets/media/romm-upload/password` and is never recorded here.
+
 ## 2026-10-01 — JAR-89 stage completed qBittorrent Games downloads for RomM
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.

@@ -51,6 +51,10 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 
 ### JAR-87 Media ROM service boundary
 
+### JAR-90 upload-bridge boundary
+
+The bridge runs `gameserver:media` (`995:5000`) and reads its only browser password privately from root-owned `/srv/rotom/secrets/media/romm-upload/password`. Its writable scope is the existing Media inbox only.
+
 JDownloader and the Igir container execution use UID `995` with primary GID `5000` for Media writes. The Media ROM inbox, review, and library directories are narrowly scoped setgid paths; qBittorrent's Media-only sentinel remains outside this write contract. Existing protected MyJDownloader inputs remain under `/srv/rotom/secrets/gameserver/jdownloader`; their values and all credentials are never recorded in the RPD.
 
 JAR-89 preserves this numeric boundary: the importer process is `995:5000`, with read-only Games-torrent access and write access only to the existing ROM inbox plus its own `/srv` state. Its API helper is root-owned and does not expose or store qBittorrent credentials. The existing Igir DAT directory and lone DAT file are `root:media` with their existing `0750`/`0640` modes so the documented `995:5000` process can traverse/read them; no account, Docker-group, or broad ownership change was made.

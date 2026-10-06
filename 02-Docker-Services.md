@@ -60,6 +60,10 @@ JAR-87 supersedes the current portions of JAR-76/JAR-83: RomM now binds `/mnt/na
 
 ### JAR-89 qBittorrent Games importer — 2026-10-01
 
+### JAR-90 authenticated ROM upload bridge — 2026-10-01
+
+Native `romm-upload-bridge.service` listens only at `127.0.0.1:8090`, runs `gameserver:media` (`995:5000`), has an inbox-only write scope, a root-only systemd-supplied password, 4 GiB upload cap, 10 GiB reserve, and atomic finalization. RomM's Media library bind remains read-only.
+
 `romm-qbt-importer.service` is an independently disableable root-orchestrated oneshot invoked every five minutes by its enabled timer. A root-only helper snapshots the existing qBittorrent localhost API from inside `qbittorrentvpn`; the importer runs as `gameserver` UID `995` with group `media` GID `5000`, without Docker control. It accepts only completed, non-active `Games` torrents in `stalledUP`, `queuedUP`, `pausedUP`, or `stoppedUP` states, rejects all others, waits for an unchanged 60-second manifest, then copies allowlisted content to the existing inbox by temporary name plus atomic rename. It retains sources for seeding, uses a 10 GiB free-space reserve, lock, SQLite ledger, SHA-256 duplicate detection, and local actionable quarantine metadata. The authorized `jar89-gbchess.zip` fixture passed this path exactly once and remained seeding; the existing Igir worker validated it and RomM's scheduled scan completed.
 
 ### JAR-88 Gameserver module paths — 2026-10-01
