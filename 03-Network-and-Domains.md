@@ -27,6 +27,10 @@ JAR-75 adds Syncthing as a proxied Filesync management service. Syncthing joins 
 
 ### JAR-10 RomM route — 2026-09-29
 
+### JAR-90 ROM upload route — 2026-10-01
+
+NPM proxy host 26 routes `romm-upload.rotom.casa` with certificate ID 24 and forced TLS to loopback-only `127.0.0.1:8090`. Authentication is enforced by the bridge because this NPM OpenResty build lacks the Basic Auth module. No DNS, firewall, or WAN policy changed.
+
 RomM joins `rotom-proxy` and its database/broker remain private. Retained host-networked NPM routes `romm.rotom.casa` to the loopback-only `127.0.0.1:8081` compatibility listener using wildcard certificate ID 24; external HTTPS validation passed.
 
 Paperless web service attaches to `rotom-proxy` and exposes only `127.0.0.1:8000`; PostgreSQL and Valkey stay internal. Retained host-networked NPM routes `paperless.rotom.casa` to that loopback endpoint with existing wildcard certificate ID 24. Local SNI HTTPS returned a login redirect. Although Rotom's own public-IP hairpin path does not reach this route, a 2026-09-29 independent public TLS assessment reached it externally, received the expected `302` login redirect, and followed it to the login page with HTTP `200`.

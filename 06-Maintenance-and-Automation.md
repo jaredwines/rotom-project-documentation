@@ -30,6 +30,8 @@ JAR-87 retains `romm-igir.timer`, enabled and active every 15 minutes, with root
 
 JAR-88 moved only Igir’s VM-local state root to `/srv/rotom/appdata/gameserver/romm-igir`; its timer, worker, UID:GID, and all Media NAS inputs/outputs are unchanged. The old Game mount is no longer part of automation or a qBittorrent guard.
 
+JAR-90 adds enabled `romm-upload-bridge.service`, independently reversible with `sudo systemctl disable --now romm-upload-bridge.service`. It does not schedule or bypass Igir; the existing 15-minute Igir timer remains the sole inbox-to-library automation.
+
 JAR-89 adds enabled `romm-qbt-importer.timer` every five minutes. Its root-only API snapshot uses the already-running qBittorrent container's localhost API, while the importer has the narrow `995:5000` Media read/inbox-write contract, no Docker socket, and durable local state at `/srv/rotom/appdata/gameserver/romm-qbt-importer`. It requires a completed idle/seeding `Games` torrent, unchanged 60-second manifest, allowlisted format, capacity reserve, and unique content hash before atomic staging. Disable future staging with `sudo systemctl disable --now romm-qbt-importer.timer`; this does not affect qBittorrent, Igir, RomM, or existing files. JAR-89 also corrected the existing DAT directory and its single DAT file from group `gameserver` to `media`, restoring the documented Igir `995:5000` read path without changing UIDs, modes, or DAT content.
 
 ### Boot-time Game NAS recovery finding — 2026-10-01
@@ -473,7 +475,7 @@ The Homebridge container-name typo was corrected on 2026-09-19 from `homebrige` 
 Phase B virtualization is accepted, guest Restic automation has been recommissioned under the normalized names, Proxmox host-config Restic is commissioned at `04:00`, and JAR-67 native Proxmox VZDump scheduling remains active. Remaining maintenance/automation items are deliberately separated by state:
 
 - **Verified / commissioned:** guest `rotom-restic-backup.timer` is enabled/active on the daily `03:00` schedule; JAR-47 snapshot `aedd8e57` completed after v2 application-aware staging, and `restic check` passed 21/21 snapshots.
-- **Needs Verification — first post-rename Restic scheduled run:** the timer has a populated next trigger, but the first timer-triggered run under `rotom-restic-backup.timer` has not yet been observed. Manual execution of the same privileged implementation is verified.
+- **Needs Verification — first unattended Restic run after repair:** scheduled runs on 2026-10-02 through 2026-10-05 failed before backup because the worker retained the retired NPM SQLite source. The 2026-10-05 one-line source correction passed `bash -n` and a manual service run completed successfully with snapshot `8efea294`; observe the next timer-triggered run before treating unattended execution as re-established.
 - **Verified / commissioned:** PVE host-config Restic manual/service execution, rename, snapshot cleanup, and repository integrity are verified; `pve-restic-backup.timer` is enabled/active for daily `04:00`, and current surviving snapshot is `35d4b0c2`.
 - **Needs Verification — future unattended PVE Restic run:** a future timer-triggered execution under final `pve-restic-backup.timer` may be observed for operational evidence.
 - **Needs Verification — future scheduler-triggered VZDump run:** `rotom-vm-daily` is enabled for `05:00`; manual VZDump and the fresh verified archive are complete, while a future unattended scheduler-triggered run under the final name may be observed.
