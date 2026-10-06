@@ -72,7 +72,7 @@ At the JAR-83 checkpoint, `Game/.data` was the fstab-backed `/mnt/nas-game` auto
 
 ### JAR-87 Media ROM and Games-torrent layout — 2026-10-01
 
-The active ROM paths are Media-owned setgid directories: `downloads/romm-inbox`, `downloads/romm-inbox/.processed`, `downloads/romm-review`, and `library/games/{,roms}` are used by `995:5000`; `torrents/games` and `torrents/incomplete/games` are used by qBittorrent's `901:5000` Media contract. The two-file, 128 KiB Game ROM source was copied to Media with matching SHA-256 manifests and is retained unchanged for rollback. The former Game qBittorrent marker was removed only after qBittorrentVPN ran against the Media-only bind/guard; no Game source data was deleted.
+The former `downloads/romm-inbox` and `.processed` tree was deleted with its ingestion services on 2026-10-05. The separate `downloads/romm-review` directory and `library/games/{,roms}` remain preserved; `torrents/games` and `torrents/incomplete/games` remain qBittorrent's `901:5000` Media contract. The two-file, 128 KiB Game ROM source was copied to Media with matching SHA-256 manifests and is retained unchanged for rollback. The former Game qBittorrent marker was removed only after qBittorrentVPN ran against the Media-only bind/guard; no Game source data was deleted.
 
 ### JAR-89 Games-torrent staging contract — 2026-10-01
 
@@ -80,7 +80,7 @@ The active ROM paths are Media-owned setgid directories: `downloads/romm-inbox`,
 
 The browser-upload bridge was retired on 2026-10-05. It no longer writes to the shared inbox; qBittorrent importer staging remains the active automated ingress.
 
-The importer reads only `/mnt/nas-media/torrents/games` and stages eligible copies into the pre-existing `downloads/romm-inbox`; it never moves or deletes a qBittorrent payload, and it never gives RomM direct access to the torrent tree. Unsupported/duplicate/failed candidates leave source data in place and receive only local `/srv` quarantine metadata; Igir continues to route unmatched staged inputs to `downloads/romm-review`. The retained authorized `jar89-gbchess.zip` source remains in the Games torrent tree for seeding; its validated staged copy is retained in `.processed` as existing pipeline evidence.
+The importer and Igir were retired on 2026-10-05, together with the inbox and their local state. Existing qBittorrent payloads remain in place; the separate review directory and RomM library are preserved.
 
 ### JAR-88 Gameserver drive and mount — 2026-10-01
 

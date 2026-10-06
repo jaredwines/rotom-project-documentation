@@ -63,13 +63,13 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
-## 2026-10-05 — JAR-90 browser ROM upload retirement
+## 2026-10-05 — Retire RomM inbox and ingestion services
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
 - **Status:** **Retired / Verified.**
-- **Changes:** Disabled and removed `romm-upload-bridge.service`, its binary, systemd unit, root-only credential, and `romm-upload.rotom.casa` NPM proxy host `26`. NPM host `26` is marked deleted/disabled and its generated configuration is absent. The shared inbox, qBittorrent Games importer, Igir, RomM, and the ordinary `romm.rotom.casa` route were retained unchanged.
-- **Evidence:** No bridge unit, binary, credential, listener on `127.0.0.1:8090`, or generated proxy-host `26` configuration remains. NPM configuration passed validation and reload. `romm-igir.timer` and `romm-qbt-importer.timer` remained active, and RomM returned local HTTP `200`.
-- **Outstanding:** None. Historical JAR-90 upload-bridge records remain historical evidence only.
+- **Changes:** Deleted the 7.5 GiB `/mnt/nas-media/downloads/romm-inbox` and retired its three ingestion paths: Igir, the qBittorrent Games importer, and the browser-upload bridge. Their units, timers, scripts, VM-local state, and the upload credential were removed. NPM proxy host `26` is marked deleted and its generated configuration is absent. The distinct 3.5 GiB review directory, 15 GiB RomM library, RomM, qBittorrentVPN, and the ordinary `romm.rotom.casa` route remain.
+- **Evidence:** The inbox and all service-specific paths are absent; the two timers are disabled and the bridge unit is absent. Proxy host `26` is soft-deleted and its generated configuration is absent. NPM, RomM, and qBittorrentVPN remain running; final `systemctl --failed` is empty.
+- **Outstanding:** None. Historical JAR-87 through JAR-90 ingestion records remain historical evidence only.
 
 ## 2026-10-05 — Retire unused JDownloader service
 

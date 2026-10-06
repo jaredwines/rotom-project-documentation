@@ -37,7 +37,7 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 | PVE host | hostname `pve`; routine administration as Linux user `jared` (UID/GID `1000:1000`, groups `sudo` and `users`); canonical Mac aliases `pve` / `pve.rotom.casa`; key `~/.ssh/id_ed25519_pve`; PVE identity `jared@pam` has propagated `Administrator` access at `/`; matching root-authorized key removed; root retained for emergency recovery |
 | Debian VM `jared` | UID/GID `1000:1000`; supplementary `sudo`; key-only Mac login via `~/.ssh/id_ed25519_rotom` |
 | media | `127:5000`, `/home/media`; Jellyfin/Radarr/Sonarr |
-| gameserver | `995:5001`, `/home/gameserver`; both Palworld containers; Igir, the qBittorrent importer, and the browser-upload bridge use UID `995` with Media primary GID `5000`; JDownloader was retired on 2026-10-05; Gamarr retired |
+| gameserver | `995:5001`, `/home/gameserver`; both Palworld containers; JDownloader, Igir, qBittorrent importer, and browser-upload bridge were retired on 2026-10-05; Gamarr retired |
 | infra | `997:5002`, `/home/infra`; Arcane/DDNS/Homepage/Glances/NPM |
 | smarthome | `126:5003`, `/home/smarthome`; Home Assistant/Homebridge |
 | documents | `900:5004`, `/home/documents`; Paperless application identity; authoritative media is `/mnt/nas-documents/paperless`, with other state VM-local |
@@ -51,13 +51,9 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 
 ### JAR-87 Media ROM service boundary
 
-### JAR-90 upload-bridge boundary — retired 2026-10-05
+### JAR-87 through JAR-90 ROM-ingestion boundary — retired 2026-10-05
 
-The bridge, its root-only password, and its `gameserver:media` write boundary were removed on 2026-10-05. No browser-upload service identity remains.
-
-Igir uses UID `995` with primary GID `5000` for Media writes. The Media ROM inbox, review, and library directories are narrowly scoped setgid paths; qBittorrent's Media-only sentinel remains outside this write contract. The unused JDownloader service and its dedicated protected MyJDownloader inputs were retired on 2026-10-05.
-
-JAR-89 preserves this numeric boundary: the importer process is `995:5000`, with read-only Games-torrent access and write access only to the existing ROM inbox plus its own `/srv` state. Its API helper is root-owned and does not expose or store qBittorrent credentials. The existing Igir DAT directory and lone DAT file are `root:media` with their existing `0750`/`0640` modes so the documented `995:5000` process can traverse/read them; no account, Docker-group, or broad ownership change was made.
+The JDownloader, Igir, qBittorrent importer, and browser-upload service identities and write boundaries are retired. Their dedicated configuration, state, scripts, and credentials are absent. qBittorrent's Media-only sentinel and RomM's read-only library access remain unchanged.
 
 PVE host-config Restic is root-operated. `/usr/local/sbin/pve-restic-backup` is the privileged worker; root-owned `/usr/local/bin/backup-restic-to-nas` re-executes through `sudo` when a non-root user invokes it, so Jared can start the existing root workflow through normal sudo authentication without direct access to the worker or its protected credential. `/etc/restic/nas-password` remains protected and its contents are never documented. The repository is `/mnt/nas-pve-restic-backup/pve-restic-backup` and staging is `/var/backups/pve-restic-recovery`. Whole-VM manual backup likewise uses root-owned `/usr/local/bin/backup-rotom-vm-to-nas`, which re-executes through `sudo` for non-root invocation, plus `rotom-vm-vzdump-manual.service` and `/usr/local/sbin/rotom-vm-vzdump-manual`. Jared is a PVE member of `systemd-journal`, allowing direct read-only service-log access such as `journalctl -fu rotom-vm-vzdump-manual.service`; this does not grant permission to alter services.
 
