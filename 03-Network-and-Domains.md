@@ -33,6 +33,8 @@ NPM proxy host 26 routes `romm-upload.rotom.casa` with certificate ID 24 and for
 
 RomM joins `rotom-proxy` and its database/broker remain private. Retained host-networked NPM routes `romm.rotom.casa` to the loopback-only `127.0.0.1:8081` compatibility listener using wildcard certificate ID 24; external HTTPS validation passed.
 
+Proxy host `21` additionally defines an internal-only `/library/` location aliased to NPM's read-only `/mnt/nas-media/library/games` bind. It is not a public browseable library route. NPM's container startup identity remains the pre-existing image default root identity; no NPM user/PUID/PGID or Docker-socket change was made for JAR-90.
+
 Paperless web service attaches to `rotom-proxy` and exposes only `127.0.0.1:8000`; PostgreSQL and Valkey stay internal. Retained host-networked NPM routes `paperless.rotom.casa` to that loopback endpoint with existing wildcard certificate ID 24. Local SNI HTTPS returned a login redirect. Although Rotom's own public-IP hairpin path does not reach this route, a 2026-09-29 independent public TLS assessment reached it externally, received the expected `302` login redirect, and followed it to the login page with HTTP `200`.
 
 ### JAR-45 Web v2 network compatibility — 2026-09-29

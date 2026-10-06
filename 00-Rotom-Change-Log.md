@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-05 — JAR-90 RomM download proxy-path documentation reconciliation
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Documentation only / Live configuration verified.**
+- **Changes:** Recorded the existing NPM read-only Media game-library bind and proxy-host `21` internal `/library/` alias used by the RomM route. NPM retains its image-default root container startup identity; no JAR-90 change added a `user`, `PUID`, or `PGID` override, and it has no Docker socket. RomM retains its independent read-only library bind and currently runs its internal Nginx workers as `romm`, not root.
+- **Evidence:** Compared the pre-download-fix NPM Compose backup with the active Compose file: the sole Compose delta is `/mnt/nas-media/library/games:/mnt/nas-media/library/games:ro`. Active generated proxy-host `21` configuration has `location /library/ { internal; alias /mnt/nas-media/library/games/; }`. Active RomM `/init` starts Nginx with `user romm;`, and running worker processes are `romm`.
+- **Outstanding:** None. Any future change to NPM or RomM process identity, bind access, or download routing requires a fresh least-privilege review and verification.
+
 ## 2026-10-05 — Repair guest Restic NPM SQLite staging source
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`.
