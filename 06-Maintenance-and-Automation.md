@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-01 — complete RPD consistency audit
+**Documentation updated:** 2026-10-05 — current PVE VZDump archive and scheduler audit
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -71,7 +71,7 @@ JAR-72 reorganized Homepage cards without changing monitoring behavior or any ap
 ### Current PVE recovery points
 
 - PVE host-config Restic: surviving canonical snapshot `35d4b0c2`; two pre-rename snapshots deliberately forgotten; repository check PASS.
-- Whole-VM: exactly one fresh verified archive `vzdump-qemu-100-2026_09_28-00_09_19.vma.zst`, `47,415,540,796` bytes; zstd and full VMA verification PASS; currently unprotected and subject to normal `7/4/6` retention.
+- Whole-VM: the 2026-10-05 PVE list contains eight current unprotected VMID `100` archives: six scheduler-produced `05:00` archives from 2026-09-30 through 2026-10-05, a separately listed 2026-09-29 archive, and manual `vzdump-qemu-100-2026_10_05-22_47_06.vma.zst`. The earlier 2026-09-28 archive's zstd/VMA checks remain historical evidence; it was absent from the current list. See document 05 for exact archive names, sizes, and verification limits.
 
 The intended staggered cadence remains guest Restic around `03:00`, PVE host-config Restic at `04:00`, and whole-VM PVE backup at `05:00`.
 
@@ -472,8 +472,8 @@ Phase B virtualization is accepted, guest Restic automation has been recommissio
 - **Needs Verification — first unattended Restic run after repair:** scheduled runs on 2026-10-02 through 2026-10-05 failed before backup because the worker retained the retired NPM SQLite source. The 2026-10-05 one-line source correction passed `bash -n` and a manual service run completed successfully with snapshot `8efea294`; observe the next timer-triggered run before treating unattended execution as re-established.
 - **Verified / commissioned:** PVE host-config Restic manual/service execution, rename, snapshot cleanup, and repository integrity are verified; `pve-restic-backup.timer` is enabled/active for daily `04:00`, and current surviving snapshot is `35d4b0c2`.
 - **Needs Verification — future unattended PVE Restic run:** a future timer-triggered execution under final `pve-restic-backup.timer` may be observed for operational evidence.
-- **Needs Verification — future scheduler-triggered VZDump run:** `rotom-vm-daily` is enabled for `05:00`; manual VZDump and the fresh verified archive are complete, while a future unattended scheduler-triggered run under the final name may be observed.
-- **Retention decision:** current PVE storage contains exactly one fresh verified archive, `vzdump-qemu-100-2026_09_28-00_09_19.vma.zst`. It is unprotected and subject to normal `rotom-vm-daily` retention; protect it only if a permanent baseline is desired.
+- **Verified — scheduler-triggered VZDump runs:** the 2026-10-05 PVE listing contains six `05:00` VMID `100` archives from 2026-09-30 through 2026-10-05, confirming the final-name `rotom-vm-daily` job produces retained archives. The supplied listing does not independently verify compression or VMA payload integrity for each archive.
+- **Retention observation:** eight current unprotected VMID `100` archives were listed under normal `7 daily / 4 weekly / 6 monthly` retention. Archive availability changes with retention; select and verify a recovery point at incident time.
 - **Intentional / commissioning decision:** `/usr/local/sbin/weekly-linux-update` exists, but `/etc/cron.d/weekly-linux-update` is absent. Decide separately whether to restore the historical Sunday 04:00 schedule.
 - **Intentional:** Fran is not recreated; do not install her historical backup sudoers rule until that account is deliberately restored.
 - **Needs Verification — live Media-NFS loss:** the current Media guard is documented, but an already-running qBittorrent session's behavior during sudden loss of the Media payload mount has not been exercised. Read-only inspection can confirm the guard definition; actual behavior requires a separately planned non-destructive maintenance test.

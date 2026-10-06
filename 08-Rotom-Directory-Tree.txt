@@ -59,8 +59,8 @@
 # /run/lock/rotom-vm-vzdump-manual.lock
 # /etc/pve/jobs.cfg  job `rotom-vm-daily`: node pve; VMID 100; storage nas-rotom-vm-backup; 05:00; snapshot; zstd; repeat-missed=0; retention 7 daily / 4 weekly / 6 monthly
 # /mnt/pve/nas-rotom-vm-backup/              PVE-managed NFS Rotom_VM_Backup/.data, content=backup
-#   dump/vzdump-qemu-100-2026_09_28-00_09_19.vma.zst  47,415,540,796 bytes; zstd PASS; full VMA verify PASS; currently unprotected
-# - Six older VMID 100 backups were deliberately removed before this fresh baseline. Historical local backup-proxmox-to-nas.pre-systemd.* launcher was also deliberately deleted.
+#   Current 2026-10-05 listing: eight unprotected VMID 100 archives, six scheduled at 05:00 from 2026-09-30 through 2026-10-05, a separately listed 2026_09_29-20_07_46 archive, plus manual 2026_10_05-22_47_06 (56,432,423,998 bytes); see document 05 for exact archive list/sizes.
+# - The former 2026_09_28-00_09_19 archive had zstd PASS/full VMA verify PASS but is absent from the current list; preserve those checks as historical evidence only. Historical local backup-proxmox-to-nas.pre-systemd.* launcher was deliberately deleted.
 # - Old active storage/job/manual names are absent.
 # - JAR-57 used temporary `jar57-test` directory storage below this mount only to restore archive `vzdump-qemu-100-2026_09_28-19_28_32.vma.zst` as disposable VMID 101. It booted q35/OVMF/x86-64-v2-AES with no host attachment and network link down; the VM, storage definition, and now-empty `jar57-test/images` tree were subsequently removed. This is historical test evidence, not a persistent storage path.
 #
