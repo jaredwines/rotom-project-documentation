@@ -22,8 +22,7 @@
 # - JAR-82: Infra v2 Compose includes `/srv/rotom/stacks/infra/nginx-proxy-manager/compose.yaml`; NPM retains host networking and binds authoritative root-owned data/certificate state from `/srv/rotom/appdata/infra/nginx-proxy-manager/{data,letsencrypt}`. The former `/home/infra/docker/nginx-proxy-manager` Compose/data tree is retained rollback material, not active configuration.
 # - JAR-85: root inspection confirmed `/home/infra` ownership/ACLs and the mounted Infra NFS boundary. Active Arcane mounts `/home/downloaders/docker` directly, and its current database has no old discovery-path reference. The inactive `/home/infra/docker/downloads` symlink and two superseded non-sensitive Homepage files were retired after reference and recovery review. NPM, its historical Compose copy, credentials, certificate/database state, RPD, `.ssh`, and NAS paths remain untouched.
 # - JAR-73: Uptime Kuma Compose is `/srv/rotom/stacks/infra/uptime-kuma/compose.yaml`; its local SQLite data is `/srv/rotom/appdata/infra/uptime-kuma`, and its sole listener is `127.0.0.1:3002`. Root-only Rotom alert worker/unit/timer are `/usr/local/sbin/rotom-alerting`, `/etc/systemd/system/rotom-alerting.service`, and `.timer`, with state under `/var/lib/rotom-alerting`; PVE has the parallel `/usr/local/sbin/pve-alerting` and `pve-alerting.{service,timer}`. Protected alert inputs remain below `/srv/rotom/secrets/infra` and are never documented by value.
-# - JAR-10/JAR-87: RomM/MariaDB/Valkey are deployed at `/srv/rotom/stacks/media/romm`; `/mnt/nas-media/library/games` is read-only in RomM. The shared `/mnt/nas-media/downloads/romm-inbox` is used by the qBittorrent importer; `romm-igir.timer` runs every 15 minutes as `995:5000` and copies DAT-matched content to the Media library or routes unmatched files to Media review without deletion. The retained Game library is rollback material.
-# - JAR-90 browser upload was retired 2026-10-05: the bridge binary/unit, root-only credential, loopback `8090` listener, and NPM proxy host 26 are absent.
+# - JAR-10/JAR-87: RomM/MariaDB/Valkey are deployed at `/srv/rotom/stacks/media/romm`; `/mnt/nas-media/library/games` is read-only in RomM. JDownloader, the Media inbox, Igir, qBittorrent importer, and browser-upload bridge were retired on 2026-10-05; the separate review directory and library remain preserved. The retained Game library is rollback material.
 # - JAR-90 RomM route: active NPM Compose additionally binds `/mnt/nas-media/library/games` read-only at the same container path. Proxy host 21 has an internal-only `/library/` alias to that bind; it is not a public file listing. NPM retains its image-default root container startup identity and has no Docker socket. RomM's separate read-only library bind and `romm` Nginx workers are unchanged.
 # - Historical pre-JAR-88 boot finding: Game and Filesync automount attempts raced NAS routing and left several NAS-backed containers stopped. JAR-87 later made the ROM/qBittorrent contracts Media-only, and JAR-88 replaced the active Game guest mount with Gameserver. Preserve the incident as automount-readiness evidence, not as current Game-bind/marker topology. `rotom-nas-docker-recovery` remains Downloader/Media-only.
 # - JAR-49: active Jellyfin Compose labels resolve to `/home/media/docker/jellyfin/compose.yaml`, not the existing `/srv/rotom/stacks/media/jellyfin` directory. Jellyfin maps `/dev/dri` and guest groups `44`/`992`, uses QSV on `/dev/dri/renderD128`, and has a verified live `h264_qsv` transcode. Other Media module locations were not re-audited by JAR-49.
@@ -148,15 +147,12 @@
 #     rotom-restic-backup-status-api.service   enabled/active; TCP 8787; Homepage /backup-status
 #     rotom-weekly-maintenance.service          JAR-74 root oneshot; ExecStart=/usr/local/sbin/weekly-host-maintenance
 #     rotom-weekly-maintenance.timer            ENABLED/ACTIVE; Sunday 01:15; Persistent=true; AccuracySec=1min; RandomizedDelaySec=0
-#     romm-qbt-importer.{service,timer}          JAR-89 enabled 5-minute Games-to-RomM staging; disableable independently
 # /usr/local/
 #   sbin/rotom-nas-docker-recovery       current helper; uses retained /mnt/nas-downloaders and /mnt/nas-media NFS checks
 #   sbin/rotom-restic-backup             current root-protected backup implementation; repository /mnt/nas-rotom-restic-backup/rotom-restic-backup
 #   sbin/rotom-restic-backup-status-api  current root-protected status API
 #   sbin/weekly-host-maintenance          root:root 0750; locked safe weekly maintenance worker
 #   sbin/weekly-linux-update             restored script; cron not installed
-#   sbin/romm-qbt-api-snapshot           JAR-89 root-only qBittorrent localhost API snapshot helper
-#   sbin/romm-qbt-importer               JAR-89 `995:5000` stable/atomic Games importer; no Docker control
 #   bin/backup-restic-to-nas             current shared manual launcher
 # /var/lib/docker/
 #   current Docker runtime on VM-local ext4
@@ -186,8 +182,6 @@
 #     smarthome/homebridge/           JAR-43 authoritative Homebridge state
 #     web/alohamillworks.com/          JAR-45 authoritative Aloha content
 #     web/jaredwines.com/              JAR-45 retained unstarted site content
-#     gameserver/romm-igir/{dats,reports,npm-cache}/ JAR-88 worker state; included in guest Restic /srv source
-#     gameserver/romm-qbt-importer/{ledger.sqlite3,quarantine/} JAR-89 durable non-secret importer state; included in guest Restic /srv source
 #   secrets/                         root:root 0700; credentials/private material only, Git-ignored
 #     documents/                     JAR-44 root-only Documents secret boundary
 #       paperless/                   JAR-8 protected Paperless credentials
@@ -206,11 +200,11 @@
 #   The separate empty `/mnt/nas-downloads` / NAS
 #   `Downloads` drive and stale `/mnt/nas-apps` boundary are retired;
 #   `customapps` uses `/mnt/nas-customapps`.
-#   JAR-87 current ROM paths are under Media: downloads/romm-inbox (JAR-89 importer and upload bridge write),
-#   downloads/romm-review (unmatched input), and library/games/roms (Igir copy
-#   target, mounted read-only by RomM). `.rotom-qbt-media-ready` remains the
+#   Current ROM paths are the preserved downloads/romm-review and library/games/roms
+#   (mounted read-only by RomM). The former inbox/processed tree and all automated
+#   ingestion were retired on 2026-10-05. `.rotom-qbt-media-ready` remains the
 #   separate qBittorrent read-only safety marker.
-#   JAR-89 reads only torrents/games and atomically copies completed idle/seeding allowlisted payloads into the same inbox; sources remain for seeding. The retained `jar89-gbchess.zip` fixture is a verified test artifact.
+#   JAR-89's former importer is retired; existing Games torrent payloads and the retained `jar89-gbchess.zip` fixture remain unchanged.
 # /srv/rotom/stacks/NETWORKING.md
 #   JAR-36 tracked Compose contract for external rotom-proxy, rotom-arr, and
 #   rotom-monitoring bridges; the networks initially have no containers.

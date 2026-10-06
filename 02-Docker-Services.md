@@ -56,9 +56,9 @@ The existing `Game/.data` export is again automounted at `/mnt/nas-game`, but it
 
 ### JAR-87 Media ROM pipeline and Games torrents — 2026-10-01
 
-JAR-87 supersedes the current portions of JAR-76/JAR-83: RomM now binds `/mnt/nas-media/library/games:/romm/library:ro`; Igir uses `995:5000` for the Media inbox, review, and ROM library. qBittorrentVPN binds only `/mnt/nas-media/torrents` plus the read-only Media sentinel, and its enabled guard checks only that Media NFS/marker pair every 15 seconds. Its `Games` category uses `/media/torrents/games` and `/media/torrents/incomplete/games`; Movies/Shows remain unchanged. The Game source library is retained unchanged as rollback material, but its former qBittorrent marker is absent. The private JDownloader service was retired on 2026-10-05; its shared inbox remains available to the importer and browser-upload paths.
+RomM binds `/mnt/nas-media/library/games:/romm/library:ro`. JDownloader, the Media inbox, Igir, qBittorrent Games importer, and browser-upload bridge were retired on 2026-10-05. qBittorrentVPN continues to use `/mnt/nas-media/torrents` plus the read-only Media sentinel; its `Games` category uses `/media/torrents/games` and `/media/torrents/incomplete/games`. The RomM library and separate review directory remain preserved, and the Game source library remains rollback material.
 
-### JAR-89 qBittorrent Games importer — 2026-10-01
+### JAR-89 qBittorrent Games importer — retired 2026-10-05
 
 ### JAR-90 authenticated ROM upload bridge — retired 2026-10-05
 
@@ -66,7 +66,7 @@ The former bridge service, binary, protected credential, loopback `8090` listene
 
 For the RomM route, NPM also has the read-only host bind `/mnt/nas-media/library/games:/mnt/nas-media/library/games:ro` and proxy-host `21`'s generated internal `/library/` alias. The NPM Compose file has no `user`, `PUID`, or `PGID` override: its root container identity is the retained image default, not a JAR-90 privilege change. NPM has no Docker socket. RomM independently binds the same library read-only and its internal Nginx workers run as `romm`.
 
-`romm-qbt-importer.service` is an independently disableable root-orchestrated oneshot invoked every five minutes by its enabled timer. A root-only helper snapshots the existing qBittorrent localhost API from inside `qbittorrentvpn`; the importer runs as `gameserver` UID `995` with group `media` GID `5000`, without Docker control. It accepts only completed, non-active `Games` torrents in `stalledUP`, `queuedUP`, `pausedUP`, or `stoppedUP` states, rejects all others, waits for an unchanged 60-second manifest, then copies allowlisted content to the existing inbox by temporary name plus atomic rename. It retains sources for seeding, uses a 10 GiB free-space reserve, lock, SQLite ledger, SHA-256 duplicate detection, and local actionable quarantine metadata. The authorized `jar89-gbchess.zip` fixture passed this path exactly once and remained seeding; the existing Igir worker validated it and RomM's scheduled scan completed.
+The importer timer/service, API snapshot helper, importer binary, and durable local state were removed on 2026-10-05 with the inbox. qBittorrentVPN and existing torrent payloads remain unchanged.
 
 ### JAR-88 Gameserver module paths — 2026-10-01
 
