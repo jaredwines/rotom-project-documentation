@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-10-01 — complete RPD consistency audit
+**Documentation updated:** 2026-10-05 — JAR-91 Paperless Documents identity mapping
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -40,7 +40,7 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 | gameserver | `995:5001`, `/home/gameserver`; both Palworld containers; JAR-87 JDownloader/Igir use UID `995` with Media primary GID `5000`; Gamarr retired |
 | infra | `997:5002`, `/home/infra`; Arcane/DDNS/Homepage/Glances/NPM |
 | smarthome | `126:5003`, `/home/smarthome`; Home Assistant/Homebridge |
-| documents | `900:5004`, `/home/documents`; Paperless workload with VM-local state |
+| documents | `900:5004`, `/home/documents`; Paperless application identity; authoritative media is `/mnt/nas-documents/paperless`, with other state VM-local |
 | downloader | `901:5005`, compatibility home `/home/downloaders`; Prowlarr/qBittorrentVPN |
 | web | `902:5006`, `/home/web`; Aloha active; Jared Wines undeployed |
 | filesync/customapps | `903:5007`, `904:5008` respectively; Syncthing runs as Filesync, while `customapps` remains reserved and retains compatibility home `/home/apps` |
@@ -363,6 +363,10 @@ The observed UNAS `rpc.mountd --manage-gids` behavior rebuilds supplementary gro
 For every new JAR-6 share, the intended service account could traverse/list/create; new files used the account UID and matching GID `5002`–`5009`; child directories inherited setgid; and disposable objects were removed. A different unrelated service account, verified not to belong to the target GID, could not traverse, list, or write. The same positive/negative behavior was repeated successfully after a normal Rotom reboot.
 
 Jared remains outside these service storage groups for ordinary work. Because the roots are `2770`, ordinary Jared denial is expected. For service-specific maintenance, use `sudo -iu <service-user>` rather than broadening group membership. Root/sudo and Docker-daemon control remain privileged routes across these ordinary filesystem boundaries.
+
+### JAR-91 Paperless Documents identity mapping — 2026-10-05
+
+Paperless's Compose web service uses `USERMAP_UID=900` and `USERMAP_GID=5004`, rather than a rootless Compose `user:` override. Its supervisor starts as root only to initialize the image; the live Paperless application workers run as `documents`. The sole NAS write bind is `/mnt/nas-documents/paperless -> /usr/src/paperless/media`; its target and entries are `900:5004`, with the target directory mode `2770`. Paperless database, broker, configuration/search state, consume, exports, and secrets remain outside that NAS bind on VM-local storage. No user/group membership, NAS share-root ownership, or broad NAS permission was changed.
 
 Seven JAR-6 shares remain boundary-only. Downloads now contains authoritative torrent data and is bound into qBittorrent. qBittorrent runs as `901:5005` and uses the Downloads share/sentinel; Media and Game are final-library domains rather than torrent-storage domains.
 

@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RPD maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-01 — complete RPD consistency audit
+**Documentation updated:** 2026-10-05 — JAR-91 Paperless media NAS cutover
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-05 — JAR-91 move Paperless document media to Documents NAS
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Moved only Paperless-managed media to `/mnt/nas-documents/paperless`; kept PostgreSQL, Valkey, Paperless data/configuration, consume, exports, secrets, and NPM unchanged and VM-local. The web service now maps Paperless to `900:5004` and has a non-creating Compose bind, so a missing NAS path fails closed. A dated root-protected local rollback copy and the original local media tree remain retained.
+- **Evidence:** The NFSv3 Documents export was mounted read/write with 3.5 TiB free. Five media files totaling 384,771 bytes matched SHA-256 manifests before and after cutover; the NAS target is `900:5004` mode `2770`. Paperless was recreated, is healthy, runs its application workers as `documents`, uses the NAS media bind, and returned the expected loopback/public HTTPS login redirects. The indexed `jared-wines-resume` original and thumbnail were directly confirmed on the NAS target.
+- **Outstanding:** Authenticated existing-original download, controlled browser upload/OCR/search/thumbnail validation, planned NAS automount/reconnect behavior, and a NAS-side snapshot restore into an isolated directory remain untested. Documents snapshot-policy details must be confirmed on the NAS before treating snapshot recovery as verified. RPD records the current as-built design; it does not claim those acceptance tests passed.
 
 ## 2026-10-05 — JAR-90 RomM download proxy-path documentation reconciliation
 

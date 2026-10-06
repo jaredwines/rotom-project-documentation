@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — complete RPD consistency audit
+**Documentation updated:** 2026-10-05 — JAR-91 Paperless media NAS cutover
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -44,10 +44,10 @@ The accepted Phase B architecture now uses **PVE** as the product abbreviation a
 | JAR-88 Gameserver v2 | Independent Palworld modules run under `/srv/rotom/stacks/gameserver`, with VM-local live state under `/srv/rotom/appdata/gameserver` and locked `gameserver` at `995:5001`. `/mnt/nas-gameserver` is canonical NFSv3 `Gameserver/.data`; original Game data is rollback-only and not guest-mounted. JAR-87 Media ROM/qBittorrent contracts remain independent. |
 | JAR-43 Smart Home v2 | Home Assistant and Homebridge run from independent modules under `/srv/rotom/stacks/smarthome`, with authoritative mutable state under `/srv/rotom/appdata/smarthome`. They retain host networking for discovery and the established NPM compatibility routes. JAR-51 retired the inactive prior `/home/smarthome/docker/{home-assistant,homebridge}` rollback trees after reference and service validation; `/mnt/nas-smarthome` remains an unused reserved boundary. |
 | JAR-45 Web v2 | Aloha Millworks runs from `/srv/rotom/stacks/web` with site content under `/srv/rotom/appdata/web` and joins `rotom-proxy`; its `7778` listener remains the required compatibility upstream for retained host-networked NPM. Jared Wines is migrated to v2 state/Compose but remains intentionally unstarted and unpublished; its Homepage **Hosted Websites** card was restored on 2026-09-30 and currently reflects the unavailable target. The former legacy Web trees were explicitly retired on 2026-09-29. |
-| JAR-44 / JAR-8 Documents | JAR-44 established the Documents contract; JAR-8 then deployed Paperless-ngx, PostgreSQL, and Valkey under `/srv/rotom`. State remains VM-local and `/mnt/nas-documents` remains a reserved, unused Paperless boundary. |
+| JAR-44 / JAR-8 / JAR-91 Documents | JAR-44 established the Documents contract; JAR-8 deployed Paperless-ngx, PostgreSQL, and Valkey under `/srv/rotom`; JAR-91 moved only Paperless-managed media to `/mnt/nas-documents/paperless`. Database, broker, configuration/search state, consume, exports, secrets, and NPM remain VM-local. |
 | JAR-46 Future domains | Tracked `customapps` contract defines v2 local appdata/secrets, proxy expectations, and recovery-review triggers; the Filesync contract is now implemented by JAR-75 Syncthing. The former Auth Linux account and NAS boundary were retired on 2026-09-29. |
 | JAR-75 Filesync Syncthing | Syncthing `2.0.0` runs as `903:5007` from `/srv/rotom/stacks/filesync/syncthing`, with VM-local configuration/database at `/srv/rotom/appdata/filesync/syncthing` and its sole payload bind `/mnt/nas-filesync -> /filesync`. The non-creating bind fails closed if NFS is absent. GUI authentication is configured; NPM provides forced-TLS `https://syncthing.rotom.casa` through loopback-only `127.0.0.1:8384`. New synchronized folders use trash-can versioning (`.stversions`); NAS payloads remain outside guest Restic and require appropriate UNAS snapshot recovery protection before becoming authoritative. |
-| JAR-8 Paperless | Paperless-ngx v3.2.1, PostgreSQL 18, and Valkey 9 run from `/srv/rotom/stacks/documents/paperless`; all mutable state is VM-local under Documents appdata and the web service uses `rotom-proxy` plus loopback NPM compatibility routing. `paperless.rotom.casa` is externally verified through the retained NPM route. |
+| JAR-8 / JAR-91 Paperless | Paperless-ngx v3.2.1, PostgreSQL 18, and Valkey 9 run from `/srv/rotom/stacks/documents/paperless`. Its authoritative media root is `/mnt/nas-documents/paperless`; all other mutable state remains VM-local under Documents appdata. The web service uses `rotom-proxy` plus loopback NPM compatibility routing, and `paperless.rotom.casa` is externally verified through the retained route. |
 | JAR-71 Remote Desktop Commander | Native outbound-only `desktop-commander.service` runs as locked, dedicated `desktopcmd` (`1001:1001`). Its `0700` home holds pinned agent `0.2.52`, the sole writable workspace, and sensitive pairing state; it has no sudo, Docker, service-group, NAS, proxy, DNS, or inbound-listener access. |
 | Rotom v2 filesystem foundation | JAR-34 created `/srv/rotom` as the root-administered v2 namespace. `stacks/` and `scripts/` hold declarative content; `appdata/` holds mutable service state; `secrets/` and `backup-staging/` are root-only. Phase D migrations now make `/srv/rotom` authoritative for the deployed modules identified in document 02; retained `/home/<service>/docker` trees are compatibility or rollback material unless explicitly stated otherwise. |
 | Reserved v2 NAS boundaries | `Customapps` remains the empty reserved export at `/mnt/nas-customapps`; `customapps` (`904:5008`) deliberately retains compatibility home `/home/apps`. JAR-88 restored the Gameserver guest contract at `/mnt/nas-gameserver` and retained Game as NAS-only rollback data. The separate empty `Downloads` and obsolete `Apps` guest contracts remain retired. |
@@ -76,7 +76,7 @@ ChatGPT-controlled browser work is not part of the Rotom administration or docum
 | media | Jellyfin, Radarr, Sonarr |
 | gameserver | Palworld servers for Fran and Jared at UID:GID `995:5001`; home `/home/gameserver` |
 | smarthome | Home Assistant and Homebridge |
-| documents | Paperless-ngx v3.2.1 with PostgreSQL 18 and Valkey 9; authoritative state remains VM-local under `/srv/rotom/appdata/documents/paperless` |
+| documents | Paperless-ngx v3.2.1 with PostgreSQL 18 and Valkey 9; authoritative media is `/mnt/nas-documents/paperless`, while application state remains VM-local under `/srv/rotom/appdata/documents/paperless` |
 | downloader | Active Prowlarr/qBittorrentVPN domain; UID:GID `901:5005`; compatibility home and mount remain `/home/downloaders` / `/mnt/nas-downloaders` |
 | web | Aloha Millworks active; Jared Wines project retained but intentionally undeployed |
 | filesync | Syncthing 2.0.0; VM-local configuration/database under `/srv/rotom/appdata/filesync/syncthing`, with `/mnt/nas-filesync` as its sole payload boundary; built-in Linux `sync` remains untouched |
@@ -96,7 +96,7 @@ The nine current storage-facing service accounts preserve the applicable JAR-29 
 | gameserver | 995 : 5001 | `/mnt/nas-gameserver` | Active Jared/Fran Palworld identity; original Game content is rollback material only |
 | infra | 997 : 5002 | `/mnt/nas-infra` | Active core infrastructure owner; Arcane restored with preserved named volume |
 | smarthome | 126 : 5003 | `/mnt/nas-smarthome` | Active Home Assistant/Homebridge owner; authoritative application state is local under `/srv/rotom/appdata/smarthome` |
-| documents | 900 : 5004 | `/mnt/nas-documents` | Paperless is deployed with VM-local state; the NAS boundary remains unused by Paperless |
+| documents | 900 : 5004 | `/mnt/nas-documents` | Paperless media is active at `/mnt/nas-documents/paperless`; database, broker, configuration/search state, consume, exports, and secrets remain VM-local |
 | downloader | 901 : 5005 | `/mnt/nas-downloaders` | Active Prowlarr/qBittorrentVPN owner; compatibility home `/home/downloaders`; current backing export `Downloader/.data`; qBittorrent `wg0` verified after reboot |
 | web | 902 : 5006 | `/mnt/nas-web` | Aloha active; Jared Wines intentionally undeployed |
 | filesync | 903 : 5007 | `/mnt/nas-filesync` | Syncthing is deployed; no production folder or authoritative payload is configured |
@@ -151,7 +151,7 @@ The adopted access policy keeps `jared` outside the media group. Administer medi
 | `/mnt/nas-gameserver` | NFSv3 `Gameserver/.data`; root `988:5001` mode `2770`; current Gameserver service boundary. Original `Game/.data` remains NAS-only rollback data and is not guest-mounted. |
 | `/mnt/nas-infra` | Infra service share; root `988:5002` mode `2770`; migrated application state remains VM-local under `/srv/rotom/appdata/infra` |
 | `/mnt/nas-smarthome` | Smarthome service share; root `988:5003` mode `2770`; HA/Homebridge state remains VM-local under `/srv/rotom/appdata/smarthome` |
-| `/mnt/nas-documents` | Documents service share; root `988:5004` mode `2770`; Paperless state remains VM-local and does not use this boundary |
+| `/mnt/nas-documents` | Documents service share; root `988:5004` mode `2770`; Paperless media is authoritative at `paperless/` as `900:5004`, while non-media application state remains VM-local |
 | `/mnt/nas-downloaders` | NFSv3 **`Downloader/.data`**; root `988:5005` mode `2770`; active writable Downloader boundary with Movies/Shows directory layout and sentinel. JAR-79 found qBittorrentVPN currently sources its payload binds from Media, not this mount. |
 | `/mnt/nas-web` | Web service share; root `988:5006` mode `2770`; website content remains VM-local under `/srv/rotom/appdata/web` |
 | `/mnt/nas-filesync` | Filesync service share; root `988:5007` mode `2770`; Syncthing's sole payload boundary, currently without a production folder/payload |

@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; current supplied 2026-10-01 Docker inventory is 25 container objects / 24 running, with deployment details separately evidenced per service
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — complete RPD consistency audit
+**Documentation updated:** 2026-10-05 — JAR-91 Paperless media NAS cutover
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -336,9 +336,17 @@ Prowlarr Torznab integration uses base URL `http://192.168.1.69:9696/2`; Gamarr 
 
 ### JAR-8 Paperless-ngx deployment — 2026-09-29
 
-Paperless-ngx `v3.2.1`, PostgreSQL `18`, and Valkey `9` run from `/srv/rotom/stacks/documents/paperless/compose.yaml` (local commit `86a8432`). Mutable data, media, exports, consume, database, and broker state are VM-local below `/srv/rotom/appdata/documents/paperless`; credentials remain only under `/srv/rotom/secrets/documents/paperless`. The web service has loopback-only `8000` access and joins `rotom-proxy`; database/broker have no host ports. NPM route `paperless.rotom.casa -> 127.0.0.1:8000` uses the existing wildcard certificate.
+Paperless-ngx `v3.2.1`, PostgreSQL `18`, and Valkey `9` run from `/srv/rotom/stacks/documents/paperless/compose.yaml` (local commit `86a8432`). At the JAR-8 deployment checkpoint, mutable data, media, exports, consume, database, and broker state were VM-local below `/srv/rotom/appdata/documents/paperless`; JAR-91 later moved only media to the Documents NAS boundary. Credentials remain only under `/srv/rotom/secrets/documents/paperless`. The web service has loopback-only `8000` access and joins `rotom-proxy`; database/broker have no host ports. NPM route `paperless.rotom.casa -> 127.0.0.1:8000` uses the existing wildcard certificate.
 
 A harmless local PDF import completed OCR, title search, original retrieval, and survived web-service recreation. Its supported export (manifest, metadata, PDF, thumbnail) is protected local backup staging. Generic guest Restic includes `/srv`, but no verified snapshot includes this deployment. Rotom's public-IP hairpin TLS cannot test the route locally, but an independent public TLS assessment verified the expected login redirect and HTTP `200` login page through `paperless.rotom.casa`.
+
+### JAR-91 Paperless media NAS cutover — 2026-10-05
+
+Paperless media is authoritative at `/mnt/nas-documents/paperless`, mounted in the web service at `/usr/src/paperless/media`. The Compose definition uses long bind syntax with `create_host_path: false`, so an absent Documents NFS mount cannot become an empty local media directory. `USERMAP_UID=900` and `USERMAP_GID=5004` map Paperless application workers to the Documents identity; the target root is `900:5004` mode `2770`, and all migrated media entries were confirmed `900:5004`.
+
+PostgreSQL, Valkey, Paperless data/configuration/search state, consume, exports, and secrets remain VM-local at their existing Documents paths. NPM routing is unchanged. The five-file, 384,771-byte media transfer matched SHA-256 manifests before and after cutover; Paperless recreated healthy and the local/public routes returned the expected login redirect. A root-protected local rollback copy is `/srv/rotom/backup-staging/documents/jar91-20261005-220500/`, and the original local media tree remains retained pending acceptance.
+
+The authenticated existing-original download, controlled web upload/OCR/search/thumbnail check, NAS automount/reconnect behavior, and isolated NAS snapshot restore are still required acceptance checks. Do not remove the local rollback material or the original local media tree until those checks are accepted.
 
 ## 5. Smart Home — `smarthome`
 
@@ -401,7 +409,7 @@ Production workloads are restored under the current service-account layout. The 
 | gameserver | `995:5001` | `/mnt/nas-gameserver` | Both Palworld servers plus private JDownloader; Palworld is VM-local and JDownloader writes only the Media ROM inbox |
 | infra | `997:5002` | `/mnt/nas-infra` | Active modules/state are under `/srv/rotom`; retained `/home/infra` material is compatibility/rollback only where documented |
 | smarthome | `126:5003` | `/mnt/nas-smarthome` | Home Assistant/Homebridge definitions and state are under `/srv/rotom` |
-| documents | `900:5004` | `/mnt/nas-documents` | Paperless deployed with VM-local state; NAS boundary unused by Paperless |
+| documents | `900:5004` | `/mnt/nas-documents` | Paperless application state is VM-local; authoritative media is `/mnt/nas-documents/paperless` with a fail-closed bind |
 | downloader | `901:5005` | `/mnt/nas-downloaders` | Active Prowlarr/qBittorrentVPN owner; compatibility home `/home/downloaders`; current NFS source `Downloader/.data`; qBittorrent `wg0` verified |
 | web | `902:5006` | `/mnt/nas-web` | Aloha active; Jared Wines retained but intentionally undeployed |
 | filesync | `903:5007` | `/mnt/nas-filesync` | Syncthing deployed; no production folder/payload configured |

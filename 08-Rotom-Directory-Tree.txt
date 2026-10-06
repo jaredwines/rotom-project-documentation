@@ -176,7 +176,7 @@
 #     source/                        generated controlled RPD source copy; not canonical authority
 #     site/                          generated static portal output; served read-only
 #   stacks/documents/DOMAIN-CONTRACT.md JAR-44 Paperless deployment/recovery contract; no Compose placeholder
-#   stacks/documents/paperless/compose.yaml JAR-8 Paperless/PostgreSQL/Valkey stack
+#   stacks/documents/paperless/compose.yaml JAR-8/JAR-91 Paperless/PostgreSQL/Valkey stack; Documents media bind uses create_host_path:false and USERMAP 900:5004
 #   stacks/filesync/syncthing/compose.yaml JAR-75 Syncthing 2.0.0; numeric 903:5007; loopback-only 8384 for NPM; sole NAS bind /mnt/nas-filesync -> /filesync with create_host_path:false
 #   stacks/gameserver/jdownloader/compose.yaml JAR-88 current private MyJDownloader service; no host port; sole NAS write bind is the Media ROM inbox
 #   stacks/media/romm/compose.yaml       JAR-87 read-only Media game-library bind; scheduled quick scan enabled
@@ -197,6 +197,7 @@
 #     {filesync,customapps}/         root-only domain secret boundaries; Auth is retired
 #   scripts/                         root-owned declarative helper namespace
 #   backup-staging/game/jar76-20261001/ JAR-76 retained targeted Compose/config rollback material
+#   backup-staging/documents/jar91-20261005-220500/ JAR-91 root-protected Paperless pre-cutover local-media/Compose rollback material
 #   backup-staging/                  root:root 0700; app-consistent export staging, Git-ignored; JAR-47 holds verified Paperless and Palworld recovery artifacts
 #   .git/                            local history only; no remote configured by JAR-34
 #   .gitignore                       excludes mutable/sensitive/generated state
@@ -232,7 +233,7 @@
 #     docker/nginx-proxy-manager/   RETAINED JAR-82 rollback source; not active configuration
 #   smarthome/   126:5003  mode 0750  -> nas-smarthome -> /mnt/nas-smarthome
 #     docker/{home-assistant,homebridge}/ JAR-51 legacy rollback trees retired after current-v2 validation
-#   documents/   900:5004  mode 0750  -> nas-documents -> /mnt/nas-documents; Paperless state is under /srv/rotom/appdata/documents
+#   documents/   900:5004  mode 0750  -> nas-documents -> /mnt/nas-documents; Paperless media is authoritative at /mnt/nas-documents/paperless, while non-media state is under /srv/rotom/appdata/documents
 #   downloaders/ 901:5005  mode 0750  -> nas-downloaders -> /mnt/nas-downloaders
 #     docker/prowlarr/              ACTIVE
 #     docker/qbittorrentvpn/        ACTIVE; wg0 verified

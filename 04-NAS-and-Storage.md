@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — complete RPD consistency audit
+**Documentation updated:** 2026-10-05 — JAR-91 Paperless media NAS cutover
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -20,7 +20,7 @@ This document records the current Phase B storage architecture and preserves the
 **Project:** Rotom-Home-Server  
 **Document:** `04-NAS-and-Storage.md`  
 **Baseline evidence:** 2026-09-14 22:46 PDT; read-only update 2026-09-15  
-**Documentation updated:** 2026-10-01 — boot-time Game/Filesync automount recovery recorded; storage boundaries unchanged  
+**Documentation updated:** 2026-10-05 — JAR-91 Paperless media is authoritative at the Documents NAS boundary; snapshot recovery remains unverified
 **Status:** The current guest contract has eleven NFS systemd automounts and no bindfs compatibility views. Guest `Rotom_Restic_Backup` remains unchanged. JAR-88 replaced Game with Gameserver; Downloads, Apps, and Auth are retired. JAR-68 normalized the two PVE-only backup exports to `PVE_Restic_Backup` for host-config Restic and `Rotom_VM_Backup` for whole-VM VZDump; canonical mounts are `/mnt/nas-pve-restic-backup` and `/mnt/pve/nas-rotom-vm-backup`. The PVE host still has no Rotom application NFS mounts.
 
 The original audit was read-only. It did not recursively enumerate the NAS, modify mounts or permissions, restart containers, inspect secrets, traverse Restic repository internals, or create a hardlink test file. Later user-supplied checks, completed media GID changes, and the 2026-09-18 backup-share access-protection deployment are recorded below; they are separate from that audit. Unchanged capacity, mount, and systemd observations retain their original evidence dates.
@@ -31,7 +31,13 @@ The Rotom guest storage contract is eleven NFS systemd automounts: nine service 
 
 ### NAS protection classification — JAR-47
 
-UniFi Drive snapshots are enabled for every NAS drive. The supplied Media settings evidence records a **daily 12:00 AM UNAS-local** snapshot schedule with a **16-snapshot** limit. `Media/library` (including `library/games`) is authoritative NAS data and uses this snapshot policy for local rollback. `Media/torrents` is transient/reproducible payload and is deliberately outside the authoritative-library claim. Customapps, Web, Smarthome, Infra, and unused service boundaries may remain empty; empty boundaries are not represented as backup-protected data. JAR-88 made `Gameserver` the current guest contract at `/mnt/nas-gameserver`; original `Game` remains retained NAS rollback data without a guest mount. JAR-75 deploys Syncthing against the Filesync boundary, but it has no production folder or payload yet. Before Filesync content becomes authoritative, confirm its applicable UNAS snapshot retention/recovery policy; Syncthing uses trash-can versions in each folder's `.stversions` as an additional local recovery layer. Paperless remains VM-local, so `nas-documents` has no current authoritative Paperless content. Snapshot retention protects against ordinary deletion/corruption but remains on the same UNAS appliance and is not off-site protection.
+UniFi Drive snapshots are recorded as enabled for every NAS drive. The supplied Media settings evidence records a **daily 12:00 AM UNAS-local** snapshot schedule with a **16-snapshot** limit. `Media/library` (including `library/games`) is authoritative NAS data and uses this snapshot policy for local rollback. `Media/torrents` is transient/reproducible payload and is deliberately outside the authoritative-library claim. JAR-91 makes `/mnt/nas-documents/paperless` authoritative Paperless-managed document media; it is outside guest Restic because `/mnt` is excluded. Confirm the effective Documents snapshot schedule/retention on the NAS and perform an isolated restore before claiming snapshot recovery is verified. Customapps, Web, Smarthome, Infra, and unused service boundaries may remain empty; empty boundaries are not represented as backup-protected data. JAR-88 made `Gameserver` the current guest contract at `/mnt/nas-gameserver`; original `Game` remains retained NAS rollback data without a guest mount. JAR-75 deploys Syncthing against the Filesync boundary, but it has no production folder or payload yet. Before Filesync content becomes authoritative, confirm its applicable UNAS snapshot retention/recovery policy; Syncthing uses trash-can versions in each folder's `.stversions` as an additional local recovery layer. Snapshot retention protects against ordinary deletion/corruption but remains on the same UNAS appliance and is not off-site protection.
+
+### JAR-91 Documents Paperless media authority — 2026-10-05
+
+The existing NFSv3 `Documents/.data` export at `/mnt/nas-documents` was mounted read/write with 3.5 TiB free. Only its `paperless/` child was created. It is `900:5004`, mode `2770`; the five migrated regular files and their directories are also `900:5004`. Paperless has the sole write bind, `/mnt/nas-documents/paperless -> /usr/src/paperless/media`; Compose uses `create_host_path: false`. The root remains `988:5004` mode `2770`; no broad share ownership rewrite occurred.
+
+The prior VM-local media tree is retained, and the root-only local rollback copy is `/srv/rotom/backup-staging/documents/jar91-20261005-220500/`. NAS media is now authoritative; the local copies are rollback material, not a replacement backup policy. Guest Restic excludes `/mnt`, so NAS-side snapshot/recovery protection remains required. The effective Documents snapshot policy and an isolated snapshot restore remain **Needs Verification**.
 
 ### PVE host-config Restic storage
 
@@ -110,7 +116,7 @@ At the final pre-migration baseline, Rotom used one local NVMe system disk and N
 | `/mnt/nas-game` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Game/.data` | NFSv3 `sec=sys` | `988:5001` mode `2770` | Retained JAR-87 ROM rollback library and historical material; Palworld remains local VM state |
 | `/mnt/nas-infra` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Infra/.data` | NFSv3 `sec=sys` | `988:5002` mode `2770` | Infra storage boundary; currently no workload data |
 | `/mnt/nas-smarthome` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Smarthome/.data` | NFSv3 `sec=sys` | `988:5003` mode `2770` | Smarthome storage boundary; HA/Homebridge remain local |
-| `/mnt/nas-documents` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Documents/.data` | NFSv3 `sec=sys` | `988:5004` mode `2770` | Documents storage boundary; currently empty |
+| `/mnt/nas-documents` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Documents/.data` | NFSv3 `sec=sys` | `988:5004` mode `2770` | Documents storage boundary; authoritative Paperless media is the targeted `paperless/` child (`900:5004`, mode `2770`) |
 | `/mnt/nas-downloads` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Downloads/.data` | NFSv3 `sec=sys` | `988:5005` mode `2770` | Active centralized torrent storage; canonical tree `/mnt/nas-downloads/torrents` |
 | `/mnt/nas-web` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Web/.data` | NFSv3 `sec=sys` | `988:5006` mode `2770` | Web storage boundary; websites remain local |
 | `/mnt/nas-filesync` | `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Filesync/.data` | NFSv3 `sec=sys` | `988:5007` mode `2770` | JAR-75 Syncthing's sole payload boundary; no production payload currently configured |
@@ -729,7 +735,7 @@ The service-storage identity pattern is now implemented for all ten service doma
 | game | 995 | 5001 | `/mnt/nas-game` | Active final Game library |
 | infra | 997 | 5002 | `/mnt/nas-infra` | Commissioned boundary; no workload data |
 | smarthome | 126 | 5003 | `/mnt/nas-smarthome` | Commissioned boundary; HA/Homebridge local |
-| documents | 900 | 5004 | `/mnt/nas-documents` | Commissioned boundary; empty |
+| documents | 900 | 5004 | `/mnt/nas-documents` | Paperless authoritative media at `paperless/`; effective Documents snapshot recovery still needs verification |
 | downloads | 901 | 5005 | `/mnt/nas-downloads` | Active centralized torrent storage and download-stack identity |
 | web | 902 | 5006 | `/mnt/nas-web` | Commissioned boundary; websites local |
 | filesync | 903 | 5007 | `/mnt/nas-filesync` | Commissioned boundary; empty |
@@ -756,6 +762,7 @@ Current storage and backup automation are documented above; this section retains
 
 - **Needs Verification — UNAS metadata persistence:** recheck service-share root metadata after a future UNAS/UniFi Drive restart/update, especially Downloader `988:5005`, Media `988:5000`, Gameserver `988:5001`, current Restic share `Rotom_Restic_Backup` at `988:988` mode `0700`, and current service GIDs `5002`–`5008`. Resolve read-only with `findmnt` and `stat` from Rotom plus UNAS-side export/share inspection after the event.
 - **Needs Verification — live Media-NFS loss:** fail-closed recreation and the Media guard are documented, but sudden loss of the active Media payload while qBittorrent is already running is untested. Read-only inspection can verify the guard definition; actual runtime behavior requires a separately planned non-destructive maintenance test.
+- **Needs Verification — Documents Paperless recovery:** Paperless media is live on `/mnt/nas-documents/paperless`, but the effective Documents snapshot schedule/retention, an isolated snapshot restore, and Paperless behavior across a planned Documents automount/reconnect event are untested. Do not remove JAR-91's retained local source or rollback copy until those checks are accepted.
 
 **Retired/historical:** do not recreate the old `Downloads/.data` export merely because it appears below. Current fstab/mount/showmount evidence uses `Downloader/.data`; `Downloads/.data` is retained only as dated recovery context.
 
