@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-05 — Retire JAR-88 local Palworld rollback artifacts and reclaim Docker image space
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** At Jared's direction, removed the complete root-only JAR-88 local rollback directory `/srv/rotom/backup-staging/game/jar88-20261001`, including the stopped-state Jared and Fran Palworld appdata archives and migration evidence. This retires the fast VM-local JAR-88 rollback copy; it does not alter the authoritative current Palworld state under `/srv/rotom/appdata/gameserver`, either live world, the original unmounted Game NAS rollback data, or Restic retention. Docker dangling images were then pruned; Jared subsequently ran `docker image prune -a`, leaving only images referenced by current containers. The documented weekly-maintenance policy remains limited to dangling images.
+- **Evidence:** Before removal, the target contained only JAR-88 migration evidence and two stopped-state archives totaling about 14 GiB; no active Compose, systemd, or `/usr/local` reference used it, and `rotom-restic-backup.service` was inactive. After removal and image pruning, `/` changed from 75 GiB used / 13 GiB free (86%) to 47 GiB used / 41 GiB free (54%). Docker reports 22 images, all active, with 0 B reclaimable; all 24 containers remained running, checked health states remained healthy, and `systemctl --failed` was empty. The unrelated 18 MiB `arcane_arcane-data` volume remains preserved because existing RPD records it as rollback material.
+- **Outstanding:** The JAR-88 local rollback directory is intentionally unavailable. Existing guest Restic recovery evidence and the separate original Game NAS rollback data remain subject to their recorded recovery limitations.
+
 ## 2026-10-05 — Retire RomM inbox and ingestion services
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
@@ -133,7 +141,7 @@ Keep future entries brief: the change log should point to the detailed documents
 - **Status:** **Implemented / Verified.**
 - **Changes:** Selected `/mnt/nas-gameserver` as canonical; commissioned and mounted `Gameserver/.data`; retained original `Game` unchanged but removed its active guest mount. Renamed `game` to `gameserver` preserving `995:5001`, moved its home, v2 paths, and local Igir state, and recreated Palworld modules individually. JDownloader, RomM, Igir, and qBittorrentVPN retain Media-only contracts.
 - **Evidence:** The new NFSv3 export is Rotom-only, root `988:5001` mode `2770`, and passed intended service write plus unrelated-account denial tests. Source/target Game manifests matched six files. Root-only rollback artifacts remain under `/srv/rotom/backup-staging/game/jar88-20261001`; both worlds retained their IDs and both containers returned healthy with unchanged UDP mappings. Post-stop manifests record normal Palworld save/backup rotation.
-- **Outstanding:** Original Game export and JAR-88 rollback artifacts remain intentionally retained pending acceptance/recovery review; no source data was deleted.
+- **Outstanding:** Historical at the time of this entry: original Game export and JAR-88 rollback artifacts were intentionally retained pending acceptance/recovery review. The JAR-88 local rollback directory was later retired on 2026-10-05; no source data was deleted by this JAR-88 migration.
 
 ## 2026-10-01 — JAR-87 move ROM pipeline and Game torrents to Media NAS
 
