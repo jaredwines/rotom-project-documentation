@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-13 — Retire downloader remnants
+**Documentation updated:** 2026-10-13 — Align Hosted Websites and Game Servers local domains
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -12,6 +12,10 @@
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
 
 ## 1. Purpose and Scope
+
+### Current local-domain alignment — 2026-10-13
+
+Current automation and Compose references must use `/home/hosted-websites` and `/srv/rotom/{stacks,appdata}/hosted-websites` for websites (`hosted-websites` `902:5004`), and `/home/game-servers` and `/srv/rotom/{stacks,appdata,secrets}/game-servers` for Palworld (`game-servers` `995:5001`). The guest `/mnt/nas-web` automount is retired; `/mnt/nas-gameserver` remains. Older `web`/`gameserver` statements in dated maintenance evidence are not current operating instructions.
 
 ### Current qBittorrent and Filesync automation state — 2026-10-13
 
@@ -176,7 +180,7 @@ APT daily timers are enabled. The unattended-upgrades package and standard unatt
 
 At the pre-migration configuration baseline, all 17 documented service definitions used the `unless-stopped` restart policy. JAR-22 later had 16 deployed container objects because Jared Wines was intentionally absent; current JAR-31 runtime is likewise 16 deployed containers.
 
-JAR-22 verified 16 running containers and 16 total container objects. Aloha remains running from `/home/web/docker/alohamillworks.com`. Jared Wines retains `/home/web/docker/jaredwines.com/compose.yaml`, but no current container object exists; do not recreate one solely to match older inventory wording.
+JAR-22 verified 16 running containers and 16 total container objects. Aloha now runs from `/srv/rotom/stacks/hosted-websites/alohamillworks.com`; Jared Wines retains `/srv/rotom/stacks/hosted-websites/jaredwines.com/compose.yaml`, but no current container object exists; do not recreate one solely to match older inventory wording. The JAR-22 `/home/web` paths are historical.
 
 Arcane, Homepage, both Palworld servers, and Gamarr currently report Docker health checks. Gamarr's healthcheck is supplied by the image (`/etc/s6-overlay/s6-rc.d/svc-gamarr/data/check`); its Compose file has no explicit `healthcheck:` key. qBittorrentVPN has no Docker healthcheck and remains verified through functional/VPN checks instead.
 

@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Retire Documents local remnants
+**Documentation updated:** 2026-10-13 — Align Hosted Websites and Game Servers local domains
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -17,6 +17,12 @@ Purpose: front-page index and quick-reference architecture summary.
 **legacy documentation state labels:** **Current** means the latest supported recorded state; **Historical** preserves dated evidence that may no longer apply; **Retired** means intentionally no longer active; **Proposed** is not implemented; **Needs Verification** means the legacy documentation lacks enough current evidence and should not be treated as settled.
 
 ## 2. Current Rotom Summary
+
+### Hosted Websites / Game Servers local-domain alignment — 2026-10-13
+
+**Hosted Websites** is the current website service identity: `hosted-websites` (`902:5004`), home `/home/hosted-websites`, and local Compose/appdata roots `/srv/rotom/{stacks,appdata}/hosted-websites`. Aloha Millworks was recreated from those roots and its public HTTPS endpoint returned `200`; Jared Wines remains intentionally undeployed. The guest-side Web NFS contract is **retired**: its fstab entry, automount, local `/mnt/nas-web` mountpoint, and former home symlink were removed. No NAS-side Web export or data was inspected, altered, or deleted.
+
+**Game Servers** is the current Palworld service identity: `game-servers` (`995:5001`), home `/home/game-servers`, and local Compose/appdata/secrets roots `/srv/rotom/{stacks,appdata,secrets}/game-servers`. The Jared and Fran Palworld containers were recreated without starting and are deliberately non-running (`created`); their persistent file counts remained 301 and 212 respectively. `/home/game-servers/nas-gameserver -> /mnt/nas-gameserver` remains; no NAS Gameserver path was renamed or changed. Historical `web` and `gameserver` references below are retained as dated evidence only.
 
 ### Documents local-remnant retirement — 2026-10-13
 

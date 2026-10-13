@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — JAR-94 Media-to-Library NAS cutover
+**Documentation updated:** 2026-10-13 — Retire guest Web NFS contract
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -12,6 +12,10 @@
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
 
 ## 1. Purpose and Scope
+
+### Current guest Web-mount retirement — 2026-10-13
+
+`/mnt/nas-web` is **retired on Rotom**: its guest fstab entry, systemd automount, local mountpoint, and former Hosted Websites home symlink are absent. This does not establish removal of the NAS Web export or its data; neither was inspected or changed. Website services use only the local `/srv/rotom/{stacks,appdata}/hosted-websites` roots. The separate `/mnt/nas-gameserver` NFS contract remains active and its retained home symlink is now `/home/game-servers/nas-gameserver`.
 
 ### Current Library service storage — 2026-10-13
 

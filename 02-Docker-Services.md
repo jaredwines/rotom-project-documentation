@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; a 2026-10-10 live Docker inventory recorded 24 container objects, all running. The prior detailed 2026-10-01 snapshot (25 container objects / 24 running) predates the 2026-10-05 retirement of JDownloader and related ROM-ingestion components and is historical.
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Retire downloader remnants
+**Documentation updated:** 2026-10-13 — Align Hosted Websites and Game Servers local domains
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -12,6 +12,12 @@
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
 
 ## 1. Purpose and Scope
+
+### Current local-domain alignment — 2026-10-13
+
+The active website Compose/appdata roots are `/srv/rotom/{stacks,appdata}/hosted-websites`, owned by `hosted-websites` `902:5004`; old `web` paths are historical. Aloha Millworks was recreated from the new roots and public HTTPS returned `200`; Jared Wines remains undeployed. The guest `/mnt/nas-web` contract is retired locally and is not an application bind.
+
+The active Palworld Compose/appdata/secrets roots are `/srv/rotom/{stacks,appdata,secrets}/game-servers`, owned by `game-servers` `995:5001`; old `gameserver` paths are historical. Jared and Fran were recreated **without starting** and are deliberately non-running (`created`). Their labels and binds resolve only to the new local roots; no world data or NAS Gameserver content was changed.
 
 This inventory is based on the uploaded `rotom-docker-containers.txt` (container names, images, statuses, and ports) and `rotom-compose-locations.txt` (Compose file paths), with verified Docker inspection and status updates from the conversation incorporated on 2026-09-14. The original table statuses are recorded observations rather than continuously live values; later dated verification sections incorporate fresh Docker state and health checks where they were explicitly captured. The original source files do not specify a capture timestamp.
 
@@ -333,7 +339,7 @@ Ordinary `jared` access to the media NAS is intentionally excluded. Administrati
 
 ## 4. Gameserver — `gameserver`
 
-Palworld services use the locked `gameserver` identity at UID/GID `995:5001` and local state under `/srv/rotom/appdata/gameserver/`. Palworld stays on VM-local storage. Both current Compose modules are under `/srv/rotom/stacks/gameserver`, both containers are healthy, and their UDP mappings are unchanged. Gamarr is retired; original Game material is rollback-only.
+Palworld services use the locked `game-servers` identity at UID/GID `995:5001` and local state under `/srv/rotom/appdata/game-servers/`. Palworld stays on VM-local storage. Both current Compose modules are under `/srv/rotom/stacks/game-servers`, and their UDP mappings are unchanged. Jared and Fran were recreated without starting and are deliberately non-running (`created`). Gamarr is retired; original Game material is rollback-only.
 
 The following table is the dated JAR-68/pre-retirement snapshot. Current JAR-88 paths and health are stated above.
 

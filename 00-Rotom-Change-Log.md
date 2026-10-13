@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-13 — Retire Documents local remnants
+**Documentation updated:** 2026-10-13 — Align Hosted Websites and Game Servers local domains
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-13 — Align Hosted Websites and Game Servers local domains
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Recorded the completed local rename from `web` to `hosted-websites` (`902:5004`) and from `gameserver` to `game-servers` (`995:5001`). Active website and Palworld Compose/state paths now use the matching hyphenated domains. Recorded retirement of Rotom's guest-only Web NFS fstab/automount/mountpoint and stale home symlink; NAS-side Web export/data was not changed. Preserved historical names, paths, and prior IDs as dated evidence rather than rewriting them as current state.
+- **Evidence:** 2026-10-13 live identity, ownership, path, Compose-label/bind, and mount checks. Aloha was recreated from `/srv/rotom/{stacks,appdata}/hosted-websites` and its public HTTPS probe returned `200`. Palworld Jared and Fran were recreated without starting; persistent local file counts remained 301 and 212. `/mnt/nas-gameserver` and its retained home symlink remain; `/mnt/nas-web` is absent.
+- **Outstanding:** Available Sources replacement remains manual by Jared. NAS-side Web export/data was intentionally not inspected; verify it separately before any NAS cleanup or recovery action.
 
 ## 2026-10-13 — Retire Documents local remnants
 
