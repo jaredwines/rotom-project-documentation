@@ -13,6 +13,10 @@ Record substantive changes to this document in the change log as part of the sam
 
 ## 1. Purpose and Scope
 
+### Current Library restoration recovery note — 2026-10-13
+
+qBittorrentVPN and Prowlarr were restored from the retained JAR-84 local archive to their current Library paths. No new Restic snapshot or backup verification was requested or created. Their VM-local `/srv/rotom` state remains within ordinary guest Restic scope on a future run; Media torrent payloads remain outside that scope. Paperless remains absent pending NAS creation of `/mnt/nas-library/paperless` with the required ownership.
+
 ### JAR-94 targeted Platform recovery — 2026-10-13
 
 Restic snapshot `02c9c4e7` was used for a restricted staged recovery of the shared-service stack, appdata, and secrets after their local deletion. The snapshot's service paths were still named `infra` despite its documented Platform-era checkpoint; after staged inspection, only the recovered shared-service paths were deliberately renamed and promoted to `/srv/rotom/{stacks,appdata,secrets}/platform`. Do not infer that this snapshot's historical account/path names are current reconstruction targets. It was not used to recreate retired Documents, Downloader, or Filesync workloads, and NAS data remained outside this recovery.

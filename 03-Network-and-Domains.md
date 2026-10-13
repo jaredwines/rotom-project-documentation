@@ -13,6 +13,10 @@ Record substantive changes to this document in the change log as part of the sam
 
 ## 1. Purpose and Scope
 
+### Current Library routes — 2026-10-13
+
+qBittorrentVPN is active with a loopback-only `127.0.0.1:8080` listener; NPM proxy host `14` serves `qBittorrent.rotom.casa` and returned `200`. Prowlarr is active on `9696`; NPM proxy host `18` returned its expected `302`. Paperless remains absent; its retained NPM host is not evidence of an active service. The retained Syncthing NPM record was not changed when the absent service's Homepage presentation was removed.
+
 JAR-94 above is authoritative for the current Platform service set. Older route and upstream statements below are retained as dated evidence and must not be read as proof that retired Syncthing, Paperless, Prowlarr, or qBittorrentVPN services remain active.
 
 ### JAR-94 current service-exposure state — 2026-10-13

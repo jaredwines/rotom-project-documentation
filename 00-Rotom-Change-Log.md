@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-13 — Restore Library download services and remove Filesync presentation
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Restored qBittorrentVPN and Prowlarr as Library (`127:5000`) services under `/srv/rotom/{stacks,appdata}/library` from the retained local JAR-84 archive. qBittorrent keeps its Media-only sentinel/guard and WireGuard; its CSRF-protected UI is loopback-only at `127.0.0.1:8080`. Removed the active Homepage File Sync/Syncthing section/card and empty `/srv/rotom/secrets/filesync`; no Syncthing container, unit, stack, or appdata remained. Paperless was not recreated because `/mnt/nas-library/paperless` is absent and the mounted Library root is not accessible to Library identity.
+- **Evidence:** Root Docker, mount, NPM, systemd, configuration, and HTTP checks. qBittorrent `wg0` was `10.2.0.2/32`; its guard and NPM route passed with HTTP `200`. Prowlarr local/NPM returned `302`. Homepage restarted healthy, returned `200`, and its active configuration no longer references File Sync/Syncthing. No new backup was requested or created.
+- **Outstanding:** Provision NAS `Library/.data/paperless` as `127:5000` mode `2770` before restoring Paperless with a fail-closed media bind. The retained NPM Syncthing proxy record was not changed.
+
 ## 2026-10-13 — JAR-94 Platform identity recovery and service-domain retirement
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.

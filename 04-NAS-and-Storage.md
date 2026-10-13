@@ -13,6 +13,10 @@ Record substantive changes to this document in the change log as part of the sam
 
 ## 1. Purpose and Scope
 
+### Current Library service storage — 2026-10-13
+
+Restored qBittorrentVPN writes only to `/mnt/nas-media/torrents` and requires `/mnt/nas-media/.rotom-qbt-media-ready`; both are active NFS-backed paths. Prowlarr has no NAS bind. Paperless remains absent: its designated media path is `/mnt/nas-library/paperless`, which does not exist below the mounted Library root (`988:988`, mode `2770`). Provision that NAS child as `127:5000`, mode `2770`, before enabling Paperless's non-creating bind.
+
 JAR-94 above is authoritative for current guest mount state. References below to the retired Infra, Documents, Downloader, and Filesync mount contracts are historical evidence only; NAS exports/data were not deleted by that retirement.
 
 ### JAR-94 retired local NFS contracts — 2026-10-13

@@ -13,6 +13,10 @@ Record substantive changes to this document in the change log as part of the sam
 
 ## 1. Purpose and Scope
 
+### Current qBittorrent and Filesync automation state — 2026-10-13
+
+qBittorrentVPN is active again. Its enabled Media guard and NAS recovery helper passed their current Media checks after restoration; the guard protects only the Media payload/sentinel contract. Syncthing remains absent, with no Filesync unit, stack, appdata, or secret directory; Homepage no longer presents File Sync/Syncthing. The retained Syncthing NPM proxy record is outside this automation change.
+
 ### JAR-94 current retired-workload automation debt — 2026-10-13
 
 The active NAS recovery helper now validates only Media, but it still calls `recover_container qbittorrentvpn` even though qBittorrentVPN is retired and absent. The enabled qBittorrent media guard and root alert worker also retain non-operative qBittorrent checks. Syncthing and Paperless branches were removed with their retired local dependencies; the former Filesync systemd unit is absent. Treat the remaining qBittorrent references as cleanup debt, not runtime evidence, until a separate targeted automation cleanup is authorized and verified.

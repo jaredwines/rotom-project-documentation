@@ -18,6 +18,10 @@ Purpose: front-page index and quick-reference architecture summary.
 
 ## 2. Current Rotom Summary
 
+### Current Library restoration and Filesync cleanup — 2026-10-13
+
+qBittorrentVPN and Prowlarr are active again as Library (`127:5000`) services at `/srv/rotom/stacks/library/{qbittorrentvpn,prowlarr}`, with state under matching `/srv/rotom/appdata/library` paths. qBittorrent uses only `/mnt/nas-media/torrents` plus the read-only Media sentinel; WireGuard is active and its CSRF-protected UI is loopback-only at `127.0.0.1:8080`, served by NPM. Prowlarr retains `9696`, `rotom-arr`, `rotom-proxy`, and its NPM route. Paperless remains absent: `/mnt/nas-library/paperless` must be NAS-provisioned as `127:5000` mode `2770` before its fail-closed media bind can be deployed. Syncthing remains retired; its active Homepage File Sync section/card and empty local Filesync secret directory are removed. Its retained NPM proxy record was not changed.
+
 ### JAR-94 current Platform recovery and domain retirement — 2026-10-13
 
 `platform` is the active shared-service Linux identity, preserving UID:GID `997:5002` with home `/home/platform`; it replaces the prior `infra` identity and owns the relocated Rotom legacy documentation checkout at `/home/platform/documentation/rotom-runbook`. Nginx Proxy Manager, Homepage, Arcane, Glances, Uptime Kuma, Rotom Docs, and Cloudflare DDNS are active from `/srv/rotom/{stacks,appdata,secrets}/platform`. Syncthing was not restored: `filesync` and its NFS contract are retired.
