@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-10-12 — Retire Customapps from Rotom
+**Documentation updated:** 2026-10-13 — Complete legacy documentation current-state audit
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -46,12 +46,12 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 | Debian VM `jared` | UID/GID `1000:1000`; supplementary `sudo`; key-only Mac login via `~/.ssh/id_ed25519_rotom` |
 | library | `127:5000`, `/home/library`; Jellyfin/Radarr/Sonarr/Prowlarr/RomM/qBittorrentVPN/Paperless |
 | gameserver | `995:5001`, `/home/gameserver`; both Palworld containers; JDownloader, Igir, qBittorrent importer, and browser-upload bridge were retired on 2026-10-05; Gamarr retired |
-| infra | `997:5002`, `/home/infra`; Arcane/DDNS/Homepage/Glances/NPM |
+| platform | `997:5002`, `/home/platform`; Arcane/DDNS/Homepage/Glances/NPM/Rotom Docs |
 | smarthome | `126:5003`, `/home/smarthome`; Home Assistant/Homebridge |
-| documents | `900:5004`, `/home/documents`; Paperless application identity; authoritative media is `/mnt/nas-documents/paperless`, with other state VM-local |
-| downloader | `901:5005`, compatibility home `/home/downloaders`; Prowlarr/qBittorrentVPN |
+| documents | **Retired**; historical `900:5004` / `/home/documents` record only |
+| downloader | **Retired**; `/home/downloaders/docker` is only the root-owned Arcane compatibility remnant |
 | web | `902:5006`, `/home/web`; Aloha active; Jared Wines undeployed |
-| filesync | `903:5007`; Syncthing runs as Filesync |
+| filesync | **Retired**; historical `903:5007` / Syncthing record only |
 | desktopcmd | `1001:1001`, locked non-human account with `/home/desktopcmd` mode `0700`; Remote Desktop Commander only; no sudo, SSH authorized keys, Docker/socket, service-group, or NAS-specific access |
 | Docker group | GID `989`, no members |
 

@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-13 — Homepage Platform layout
+**Documentation updated:** 2026-10-13 — Complete legacy documentation current-state audit
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-13 — Complete legacy documentation current-state audit
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Documentation only.**
+- **Changes:** Reviewed the complete nine-file Available Sources set. Relabelled superseded JAR-94 recovery claims as historical rather than current, preserving their evidence while leaving the newer JAR-95/Homepage overlay authoritative. Corrected the current account table to show Platform as active and Documents, Downloader, and Filesync as retired. Clarified that the stale Homepage Uptime Kuma card is a presentation artifact and not evidence of a restored Uptime Kuma workload or NPM route.
+- **Evidence:** Cross-document review of documents `00`–`08`, with the current Homepage/JAR-95 state established by the 2026-10-13 verified records already captured above.
+- **Outstanding:** **Needs Verification:** decide whether to remove or intentionally retain the stale Uptime Kuma Homepage card; test its expected presentation only after that decision. Historical PVE alerting retirement remains supported by JAR-95 evidence but lacks fresh direct PVE SSH evidence.
 
 ## 2026-10-13 — Homepage Platform layout and JAR-95 mapping correction
 

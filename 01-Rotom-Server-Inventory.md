@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Homepage Platform layout
+**Documentation updated:** 2026-10-13 — Complete legacy documentation current-state audit
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -40,7 +40,9 @@ Older sections bearing JAR-94 refer to a different historical workload-retiremen
 
 qBittorrentVPN and Prowlarr are active again as Library (`127:5000`) services at `/srv/rotom/stacks/library/{qbittorrentvpn,prowlarr}`, with state under matching `/srv/rotom/appdata/library` paths. qBittorrent uses only Library torrent/sentinel paths; WireGuard is active and its CSRF-protected UI is loopback-only at `127.0.0.1:8080`, served by NPM. Prowlarr retains `9696`, `rotom-arr`, `rotom-proxy`, and its NPM route. Paperless remains absent: `/mnt/nas-library/paperless` must be NAS-provisioned as `127:5000` mode `2770` before its fail-closed media bind can be deployed. Syncthing remains retired; its active Homepage File Sync section/card and empty local Filesync secret directory are removed. Its retained NPM proxy record was not changed.
 
-### JAR-94 current Platform recovery and domain retirement — 2026-10-13
+### Historical JAR-94 Platform recovery and domain retirement — 2026-10-13
+
+Superseded for current service/presentation state by the JAR-95 and Homepage overlays above; retained as recovery evidence.
 
 `platform` is the active shared-service Linux identity, preserving UID:GID `997:5002` with home `/home/platform`; it replaces the prior `infra` identity and owns the relocated Rotom legacy documentation checkout at `/home/platform/documentation/rotom-runbook`. Nginx Proxy Manager, Homepage, Arcane, Glances, Uptime Kuma, Rotom Docs, and Cloudflare DDNS are active from `/srv/rotom/{stacks,appdata,secrets}/platform`. Syncthing was not restored: `filesync` and its NFS contract are retired.
 

@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Homepage Platform layout
+**Documentation updated:** 2026-10-13 — Complete legacy documentation current-state audit
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -27,7 +27,9 @@ qBittorrentVPN is active with a loopback-only `127.0.0.1:8080` listener; NPM pro
 
 JAR-94 above is authoritative for the current Platform service set. Older route and upstream statements below are retained as dated evidence and must not be read as proof that retired Syncthing, Paperless, Prowlarr, or qBittorrentVPN services remain active.
 
-### JAR-94 current service-exposure state — 2026-10-13
+### Historical JAR-94 service-exposure state — 2026-10-13
+
+Superseded for current service/presentation state by the JAR-95 and Homepage overlays above; retained as recovery evidence.
 
 Nginx Proxy Manager, Homepage, Arcane, Glances, Uptime Kuma, Rotom Docs, and Cloudflare DDNS were recovered as the active Platform workload. No current container serves Syncthing, Paperless, Prowlarr, or qBittorrentVPN. The recovered NPM state was preserved rather than selectively rewritten, so proxy records for retired upstreams require a separate authenticated configuration audit before they are treated as usable routes. This section supersedes any unqualified current-service claims below; historical routing evidence remains historical.
 
