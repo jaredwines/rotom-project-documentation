@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-12 — Retire Customapps from Rotom
+**Documentation updated:** 2026-10-13 — JAR-95 monitoring and alerting retirement
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-13 — JAR-95 monitoring and alerting retirement
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Recorded retirement of Uptime Kuma (Rotom stack, appdata, container/image, NPM route, Homepage mapping, and Platform alerting inputs) and JAR-73 Rotom alerting (worker, unit/timer, script/state, Healthchecks checks, and Rotom-specific Pushover configuration). qBittorrent's Library safety guard remains enabled/active, but its alert hook is gone. Corrected the prior active `pve-alerting` claim as a live-state discrepancy: JAR-95 retirement evidence establishes that PVE has no alert worker, unit/timer, script, or cron job. Unrelated PVE monitoring/status services remain in scope and were not retired.
+- **Evidence:** Direct 2026-10-13 Rotom inspection found no Uptime/alert stack, appdata, secret, unit, script, container/image, NPM route, or Homepage mapping; the enabled/active qBittorrent guard contains only fail-closed stop/log behavior; Homepage returned local-host and public HTTPS `200`. PVE retirement state is supported by the completed JAR-95 evidence; direct PVE SSH reinspection from this environment was unavailable (local alias resolution and direct key authentication both failed).
+- **Outstanding:** Available Sources replacement remains manual by Jared. Historical JAR-73/JAR-94 entries remain evidence only; JAR-95 makes no assertion that a public status page existed and does not remove unrelated PVE monitoring/status services.
 
 ## 2026-10-13 — JAR-94 Media-to-Library NAS cutover
 

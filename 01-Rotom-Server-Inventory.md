@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — JAR-94 Media-to-Library NAS cutover
+**Documentation updated:** 2026-10-13 — JAR-95 monitoring and alerting retirement
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -17,6 +17,12 @@ Purpose: front-page index and quick-reference architecture summary.
 **legacy documentation state labels:** **Current** means the latest supported recorded state; **Historical** preserves dated evidence that may no longer apply; **Retired** means intentionally no longer active; **Proposed** is not implemented; **Needs Verification** means the legacy documentation lacks enough current evidence and should not be treated as settled.
 
 ## 2. Current Rotom Summary
+
+### JAR-95 monitoring and alerting retirement — 2026-10-13
+
+Uptime Kuma is retired: its Platform stack/appdata, Docker container and image, NPM route, Homepage mapping, and Platform alerting inputs are absent. JAR-73 Rotom alerting is also retired: `rotom-alerting` worker, unit/timer, script/state, Healthchecks checks, and Rotom-specific Pushover configuration are absent. qBittorrentVPN remains running and its Library mount/sentinel safety guard is enabled and active; the guard now only logs and stops the container on an unsafe mount, with no alert hook. Homepage remains healthy; its local `Host: rotom.casa` and public HTTPS probes returned `200`.
+
+The previous active `pve-alerting` claim is a live-state discrepancy corrected by JAR-95 retirement evidence: PVE has no active alert worker, unit/timer, script, or cron job. The PVE CPU-temperature and backup-status APIs remain unrelated active monitoring/status services and are not part of this retirement. This entry supersedes unqualified current JAR-73/JAR-94 alert/Uptime statements below, which remain dated historical evidence. It does not assert that a public status page existed.
 
 ### JAR-94 Media-to-Library NAS cutover — 2026-10-13
 

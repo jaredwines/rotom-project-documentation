@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; a 2026-10-10 live Docker inventory recorded 24 container objects, all running. The prior detailed 2026-10-01 snapshot (25 container objects / 24 running) predates the 2026-10-05 retirement of JDownloader and related ROM-ingestion components and is historical.
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — JAR-94 Media-to-Library NAS cutover
+**Documentation updated:** 2026-10-13 — JAR-95 monitoring and alerting retirement
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -27,6 +27,10 @@ Services are grouped by the Linux account directory containing their active Comp
 **Port notation:** Entries containing `->` are published host-to-container mappings. Bare ports are listed separately as container-only ports with no host mapping shown. “None shown” means the source PORTS field was blank; it does not establish network mode or lack of connectivity.
 
 ## 1A. Current Phase B Docker State
+
+### JAR-95 Uptime Kuma retirement — 2026-10-13
+
+Uptime Kuma is retired. No `uptime-kuma` container or image, Platform Compose stack/appdata, NPM route, or Homepage mapping remains. The current Docker inventory instead includes Homepage, NPM, Arcane, Glances, Rotom Docs, Cloudflare DDNS, the Library services, web, Smart Home, and the deliberately stopped Palworld containers; no Uptime Kuma object is present. This supersedes unqualified current Uptime Kuma statements below, which are retained as dated historical evidence. JAR-95 makes no assertion that a public status page existed.
 
 ### JAR-94 Media-to-Library NAS cutover — 2026-10-13
 

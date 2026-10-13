@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-12 — Retire Customapps from Rotom
+**Documentation updated:** 2026-10-13 — JAR-95 monitoring and alerting retirement
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -14,6 +14,10 @@ Record substantive changes to this document in the change log as part of the sam
 ## 1. Purpose and Scope
 
 ### Current Library routes — 2026-10-13
+
+### JAR-95 current monitoring-route state — 2026-10-13
+
+The Uptime Kuma NPM route and Homepage mapping are retired; no Uptime Kuma listener or Docker service remains. This is not evidence of a public status page, and JAR-95 makes no claim that one existed. Homepage itself remains healthy: local `Host: rotom.casa` and public HTTPS checks returned `200`. The PVE HTTPS UI route plus the read-only PVE CPU-temperature (`8788`) and backup-status (`8789`) services remain unrelated and were not changed.
 
 qBittorrentVPN is active with a loopback-only `127.0.0.1:8080` listener; NPM proxy host `14` serves `qBittorrent.rotom.casa` and returned `200`. Prowlarr is active on `9696`; NPM proxy host `18` returned its expected `302`. Paperless remains absent; its retained NPM host is not evidence of an active service. The retained Syncthing NPM record was not changed when the absent service's Homepage presentation was removed.
 

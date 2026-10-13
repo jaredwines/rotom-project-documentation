@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-13 — JAR-94 Media-to-Library NAS cutover
+**Documentation updated:** 2026-10-13 — JAR-95 monitoring and alerting retirement
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -14,6 +14,12 @@ Record substantive changes to this document in the change log as part of the sam
 ## 1. Purpose and Scope
 
 ### Current qBittorrent and Filesync automation state — 2026-10-13
+
+### JAR-95 monitoring and alerting retirement — 2026-10-13
+
+Uptime Kuma and the JAR-73 alerting layer are retired. No Uptime Kuma stack/appdata/container/image, NPM route, Homepage mapping, Platform alerting input, `rotom-alerting` worker/unit/timer/script/state, Healthchecks check, or Rotom-specific Pushover configuration remains. The active qBittorrent Library guard is intentionally retained: `rotom-qbittorrent-media-guard.timer` is enabled/active and its script only validates the Library NFS/sentinel pair, logs unsafe state, and stops a running qBittorrentVPN; its former alert hook is absent.
+
+JAR-95 retirement evidence also corrects the prior active `pve-alerting` claim as a live-state discrepancy: PVE has no alert worker, unit/timer, script, or cron job. Do not infer retirement of the unrelated `pve-cpu-temp-api` or `pve-backup-status-api` monitoring/status services. Historical JAR-73 alerting details below remain dated evidence only.
 
 qBittorrentVPN is active again. Its enabled Library guard and NAS recovery helper passed their Library checks after cutover; the guard protects only the Library payload/sentinel contract and failed closed when the sentinel was temporarily absent. The root alert monitor and recovery helper use Library paths. Syncthing remains absent, with no Filesync unit, stack, appdata, or secret directory; Homepage no longer presents File Sync/Syncthing. The retained Syncthing NPM proxy record is outside this automation change.
 
