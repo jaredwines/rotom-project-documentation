@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-01 — complete legacy documentation consistency audit
+**Documentation updated:** 2026-10-12 — Retire Customapps from Rotom
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -106,7 +106,7 @@ JAR-69 adds the separate read-only `/usr/local/sbin/pve-backup-status-api` with 
 
 ### Current NAS / NFS connectivity
 
-The Rotom guest currently has eleven fstab-backed NFS systemd automounts and no bindfs compatibility views. JAR-88 replaced the active Game guest mount with Gameserver; the separate Downloads, Apps, and Auth guest contracts are retired. Two PVE-only backup exports are canonical:
+The Rotom guest currently has ten fstab-backed NFS systemd automounts and no bindfs compatibility views. JAR-88 replaced the active Game guest mount with Gameserver; the separate Downloads, Apps, Auth, and Customapps guest contracts are retired. Two PVE-only backup exports are canonical:
 
 - `PVE_Restic_Backup/.data` -> `/mnt/nas-pve-restic-backup` on `192.168.1.68`; repository subdirectory `pve-restic-backup`.
 - `Rotom_VM_Backup/.data` -> PVE storage `nas-rotom-vm-backup` at `/mnt/pve/nas-rotom-vm-backup`.

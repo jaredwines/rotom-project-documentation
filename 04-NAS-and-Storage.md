@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-05 — PVE capacity and current VZDump archive audit
+**Documentation updated:** 2026-10-12 — Retire Customapps from Rotom
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -20,18 +20,18 @@ This document records the current Phase B storage architecture and preserves the
 **Project:** Rotom-Home-Server  
 **Document:** `04-NAS-and-Storage.md`  
 **Baseline evidence:** 2026-09-14 22:46 PDT; read-only update 2026-09-15  
-**Documentation updated:** 2026-10-05 — JAR-91 Paperless media is authoritative at the Documents NAS boundary; snapshot recovery remains unverified
-**Status:** The current guest contract has eleven NFS systemd automounts and no bindfs compatibility views. Guest `Rotom_Restic_Backup` remains unchanged. JAR-88 replaced Game with Gameserver; Downloads, Apps, and Auth are retired. JAR-68 normalized the two PVE-only backup exports to `PVE_Restic_Backup` for host-config Restic and `Rotom_VM_Backup` for whole-VM VZDump; canonical mounts are `/mnt/nas-pve-restic-backup` and `/mnt/pve/nas-rotom-vm-backup`. The PVE host still has no Rotom application NFS mounts.
+**Documentation updated:** 2026-10-12 — Retire Customapps from Rotom; JAR-91 Paperless media remains authoritative at the Documents NAS boundary and snapshot recovery remains unverified
+**Status:** The current guest contract has ten NFS systemd automounts and no bindfs compatibility views. Guest `Rotom_Restic_Backup` remains unchanged. JAR-88 replaced Game with Gameserver; Downloads, Apps, Auth, and Customapps are retired. JAR-68 normalized the two PVE-only backup exports to `PVE_Restic_Backup` for host-config Restic and `Rotom_VM_Backup` for whole-VM VZDump; canonical mounts are `/mnt/nas-pve-restic-backup` and `/mnt/pve/nas-rotom-vm-backup`. The PVE host still has no Rotom application NFS mounts.
 
 The original audit was read-only. It did not recursively enumerate the NAS, modify mounts or permissions, restart containers, inspect secrets, traverse Restic repository internals, or create a hardlink test file. Later user-supplied checks, completed media GID changes, and the 2026-09-18 backup-share access-protection deployment are recorded below; they are separate from that audit. Unchanged capacity, mount, and systemd observations retain their original evidence dates.
 
 ## 2. Current Storage State — 2026-09-29 JAR-47 final recovery policy
 
-The Rotom guest storage contract is eleven NFS systemd automounts: nine service boundaries plus guest Restic and Shared Drive. JAR-86 retired the final bindfs compatibility view, and JAR-88 replaced the active Game mount with Gameserver. PVE has only backup-specific NAS mounts and does not host the guest application shares.
+The Rotom guest storage contract is ten NFS systemd automounts: eight service boundaries plus guest Restic and Shared Drive. JAR-86 retired the final bindfs compatibility view, JAR-88 replaced the active Game mount with Gameserver, and the unused Customapps guest contract was retired on 2026-10-12. PVE has only backup-specific NAS mounts and does not host the guest application shares.
 
 ### NAS protection classification — JAR-47
 
-UniFi Drive snapshots are recorded as enabled for every NAS drive. The supplied Media settings evidence records a **daily 12:00 AM UNAS-local** snapshot schedule with a **16-snapshot** limit. `Media/library` (including `library/games`) is authoritative NAS data and uses this snapshot policy for local rollback. `Media/torrents` is transient/reproducible payload and is deliberately outside the authoritative-library claim. JAR-91 makes `/mnt/nas-documents/paperless` authoritative Paperless-managed document media; it is outside guest Restic because `/mnt` is excluded. Confirm the effective Documents snapshot schedule/retention on the NAS and perform an isolated restore before claiming snapshot recovery is verified. Customapps, Web, Smarthome, Infra, and unused service boundaries may remain empty; empty boundaries are not represented as backup-protected data. JAR-88 made `Gameserver` the current guest contract at `/mnt/nas-gameserver`; original `Game` remains retained NAS rollback data without a guest mount. JAR-75 deploys Syncthing against the Filesync boundary, but it has no production folder or payload yet. Before Filesync content becomes authoritative, confirm its applicable UNAS snapshot retention/recovery policy; Syncthing uses trash-can versions in each folder's `.stversions` as an additional local recovery layer. Snapshot retention protects against ordinary deletion/corruption but remains on the same UNAS appliance and is not off-site protection.
+UniFi Drive snapshots are recorded as enabled for every NAS drive. The supplied Media settings evidence records a **daily 12:00 AM UNAS-local** snapshot schedule with a **16-snapshot** limit. `Media/library` (including `library/games`) is authoritative NAS data and uses this snapshot policy for local rollback. `Media/torrents` is transient/reproducible payload and is deliberately outside the authoritative-library claim. JAR-91 makes `/mnt/nas-documents/paperless` authoritative Paperless-managed document media; it is outside guest Restic because `/mnt` is excluded. Confirm the effective Documents snapshot schedule/retention on the NAS and perform an isolated restore before claiming snapshot recovery is verified. Web, Smarthome, Infra, and unused service boundaries may remain empty; empty boundaries are not represented as backup-protected data. The NAS-side Customapps export was empty when last mounted but is no longer a Rotom guest boundary. JAR-88 made `Gameserver` the current guest contract at `/mnt/nas-gameserver`; original `Game` remains retained NAS rollback data without a guest mount. JAR-75 deploys Syncthing against the Filesync boundary, but it has no production folder or payload yet. Before Filesync content becomes authoritative, confirm its applicable UNAS snapshot retention/recovery policy; Syncthing uses trash-can versions in each folder's `.stversions` as an additional local recovery layer. Snapshot retention protects against ordinary deletion/corruption but remains on the same UNAS appliance and is not off-site protection.
 
 ### JAR-91 Documents Paperless media authority — 2026-10-05
 
@@ -74,11 +74,9 @@ At the JAR-83 checkpoint, `Game/.data` was the fstab-backed `/mnt/nas-game` auto
 
 The former `downloads/romm-inbox` and `.processed` tree was deleted with its ingestion services on 2026-10-05. The separate `downloads/romm-review` directory and `library/games/{,roms}` remain preserved; `torrents/games` and `torrents/incomplete/games` remain qBittorrent's `901:5000` Media contract. The two-file, 128 KiB Game ROM source was copied to Media with matching SHA-256 manifests and is retained unchanged for rollback. The former Game qBittorrent marker was removed only after qBittorrentVPN ran against the Media-only bind/guard; no Game source data was deleted.
 
-### JAR-89 Games-torrent staging contract — 2026-10-01
-
 ### JAR-90 browser-upload inbox contract — retired 2026-10-05
 
-The browser-upload bridge was retired on 2026-10-05. It no longer writes to the shared inbox; qBittorrent importer staging remains the active automated ingress.
+The browser-upload bridge was retired on 2026-10-05. It no longer writes to the shared inbox. The importer and Igir were retired in the same cleanup, so no automated ROM ingress remains.
 
 The importer and Igir were retired on 2026-10-05, together with the inbox and their local state. Existing qBittorrent payloads remain in place; the separate review directory and RomM library are preserved.
 
@@ -99,6 +97,10 @@ The separate `Downloads/.data` drive was mounted for final inspection and contai
 ### Retired stale `Apps` guest boundary; retained `Customapps` — 2026-09-29
 
 Live account evidence identifies the service identity as `customapps` (`904:5008`) with compatibility home `/home/apps`. The separate obsolete `Apps/.data -> /mnt/nas-apps` target was unavailable, had no workload configuration reference beyond fstab, and was the sole failed mount unit. Its fstab/automount contract, empty local mountpoint, and stale `/home/apps/nas-apps` shortcut were removed. `/home/apps/nas-customapps` now points to the retained empty `Customapps/.data` export at `/mnt/nas-customapps`, which mounted successfully. Jared confirmed the NAS `Apps` drive was deleted; do not remove `Customapps`.
+
+### Retired Customapps guest boundary — 2026-10-12
+
+Root mounted the NFSv3 `Customapps/.data` export read/write and confirmed its root was empty (`988:5008`, mode `2770`) before retiring only the Rotom side. The `/mnt/nas-customapps` fstab entry, generated mount/automount units, and local mountpoint were removed; final `findmnt --verify` had zero parse errors. The `customapps` account/group (`904:5008`), absent configured `/home/apps` path, actual default-only `/home/customapps` tree, and empty local `/srv/rotom/{stacks,appdata,secrets}/customapps` directories were also removed after no workload, Compose, systemd, cron, or process consumer was found. The NAS export/drive was not deleted or reverified after unmount because Rotom has no authorized NAS-management path; it remains a separate UniFi cleanup.
 
 ### Retired unused `Auth` account and guest boundary — 2026-09-29
 

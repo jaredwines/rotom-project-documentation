@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-05 — JAR-91 Paperless media NAS cutover
+**Documentation updated:** 2026-10-12 — Retire Customapps from Rotom
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,54 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-12 — Retire Customapps from Rotom
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Retired the unused `customapps` (`904:5008`) Linux account/group; its absent configured `/home/apps` path and actual default-only `/home/customapps` tree; the `/mnt/nas-customapps` fstab/systemd automount contract and local mountpoint; and the empty `/srv/rotom/{stacks,appdata,secrets}/customapps` directories. The only stack file was the future-domain contract. No running process, active system/cron/stack reference, workload, Compose definition, or failed unit remained.
+- **Evidence:** Root mounted `Customapps/.data` read/write and found it empty before retirement; its generated mount had zero tasks. The targeted fstab removal passed `findmnt --verify` with zero parse errors (two pre-existing unrelated `/media/cdrom0` warnings), generated units and local mountpoint were absent, and final checks found no account/group, home, local Customapps directory, active configuration reference, or failed unit.
+- **Outstanding:** The UniFi NAS-side `Customapps` export/drive was not deleted or independently rechecked after the guest retirement because Rotom has no authorized NAS-management path. It was empty when mounted; remove it separately through the UniFi management plane if intended.
+
+## 2026-10-12 — Grant Jared read access to local home trees
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `07-Users-and-Permissions.md`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Added the named `jared` POSIX ACL with read/traverse access recursively to local service-home content and added the matching default named-user ACL to `/home` and local service directories for ordinary future descendants. Jared's own home is already readable through ownership, so its redundant named ACL was removed to preserve SSH-required private-key protections. The change does not apply to targets of `nas-*` shortcut symlinks: those are independent NFS permission boundaries that do not support the requested local POSIX ACL operation.
+- **Evidence:** Live root inspection confirmed the access/default ACL on `/home` and representative service and `desktopcmd` directories; Jared-context local-tree checks found no unreadable regular files or inaccessible directories, and all service-home roots remained non-writable to Jared. The GitHub private key initially appeared group-readable through the ACL mask, then recovered to its required owner-only `0600` mode after removal of the redundant ACL from Jared's owner tree. Ownership and base owner/group ACL entries were retained; the required ACL mask is reflected as `r-x` in the conventional group-class mode display.
+- **Outstanding:** Default ACL inheritance applies to ordinary future local content; a creating application can later restrict or replace it. NAS shortcut targets remain governed by their existing NAS permissions. This corrects the 2026-10-10 current-policy wording that said ACL application did not change displayed mode bits: POSIX ACL masks necessarily determine that display, without granting the base group new access.
+
+## 2026-10-10 — Complete Available Sources documentation audit
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Documentation only.** No live Rotom, PVE, Docker, NAS, network, backup, account, proxy, or external-service state was changed.
+- **Changes:** Reviewed every current Available Sources member (`00`–`08`) a second time against the latest recorded evidence. Reconciled the current Docker inventory to the 2026-10-10 24-running-container record, aligned the directory-tree recovery-helper scope with the documented Downloader/Media/Documents/Filesync contract, removed orphaned headings, and clarified dated historical versus current state without rewriting historical evidence. `05-Backup-and-Restore.md` was reviewed and left unchanged because it remains the canonical supported backup/recovery record.
+- **Evidence:** Complete cross-document legacy documentation review; no new live inspection was performed during this documentation-only audit.
+- **Outstanding:** Existing Needs Verification items remain, including the next timer-triggered guest Restic run after repair, NAS snapshot recovery for Documents/Filesync before payload becomes authoritative, NAS metadata persistence, recovery rehearsals, alert/WOL delivery, certificate renewal, and exposure-policy review.
+
+## 2026-10-10 — Extend NAS-backed Docker recovery to Documents and Filesync
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `06-Maintenance-and-Automation.md`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Extended the enabled root-owned `/usr/local/sbin/rotom-nas-docker-recovery` helper without changing any Compose restart policy. It now mounts and validates the Documents and Filesync NFS boundaries in addition to its retained Downloader/Media checks, then can recover `paperless`, `romm`, and `syncthing` alongside the existing covered consumers. The helper still leaves running containers untouched and starts a stopped container only when its policy is `unless-stopped` or `always` and Docker recorded a NAS/mount startup-failure signature.
+- **Evidence:** A 2026-10-10 live run mounted `/mnt/nas-documents`, `/mnt/nas-media`, and `/mnt/nas-filesync`, recovered the three previously stopped containers, and completed successfully. Paperless and Syncthing reported healthy; local Paperless, RomM, and Syncthing endpoints returned `302`, `200`, and `200` respectively. Fresh `docker ps -a` showed 24 container objects, all running; `systemctl --failed` was empty.
+- **Outstanding:** Normal future-boot observation remains useful, but the helper's live recovery path is verified.
+
+## 2026-10-10 — Grant Jared read access to the Rotom v2 namespace
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `07-Users-and-Permissions.md`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Added a named `jared` POSIX ACL with read/traverse access recursively to the existing `/srv/rotom` tree, including application state, protected inputs, and backup staging. Added the matching default named-user ACL to every existing directory so new descendants inherit the access policy. Ownership, group ownership, and mode bits were not changed.
+- **Evidence:** Live root ACL inspection confirmed `user:jared:r-x` plus a matching default ACL on representative top-level and protected/service-owned directories. A Jared-context traversal check found no unreadable regular file or inaccessible directory in `/srv/rotom`; protected top-level `secrets/` and `backup-staging/` remained non-writable to Jared. One pre-existing descendant is owned by Jared and therefore remains writable through its owner permissions; it was not changed.
+- **Outstanding:** Default ACL inheritance provides the policy for ordinary new content; a creating application can later restrict or replace an ACL/mode, which must be evaluated if Jared loses access to such content.
+
+## 2026-10-06 — Complete Available Sources consistency audit
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Documentation only.** No live Rotom, PVE, Docker, NAS, network, backup, account, proxy, or external-service state was changed.
+- **Changes:** Reviewed every current Available Sources member (`00`–`08`) and reconciled the current-state layer with the latest recorded 2026-10-05 evidence. Reclassified the detailed 2026-10-01 Docker listing as historical because it predates JDownloader and ROM-ingestion retirement; removed conflicting claims that the retired Media inbox/importer paths remain active; corrected the current guest Restic recovery-point reference from the older `f666d63c` checkpoint to explicitly verified `8efea294`; and marked the superseded JAR-83 Game-marker contract historical. Updated audit dates and state wording where needed without rewriting dated historical evidence. `05-Backup-and-Restore.md` was reviewed and left unchanged because it already held the governing recovery-point evidence.
+- **Evidence:** Complete cross-document review of the current nine-file Available Sources set, using the documented 2026-10-05 retirement and Restic-repair evidence. No new live inspection was performed.
+- **Outstanding:** Observe the next timer-triggered guest Restic run after the NPM staging repair. Existing NAS-metadata persistence, PVE unattended-run, recovery-rehearsal, alert/WOL, certificate-renewal, and exposure-policy checks remain as documented.
 
 ## 2026-10-05 — Verify PVE VM backup cadence and retain the 100 GiB VM disk baseline
 

@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-10-05 — JAR-91 Paperless Documents identity mapping
+**Documentation updated:** 2026-10-12 — Retire Customapps from Rotom
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -24,9 +24,9 @@ This is the canonical detailed owner of Rotom account identity and permission fa
 
 ## 2. Current Phase B Identity and Access Model — 2026-09-28 JAR-68 final
 
-**Current JAR-88 state:** The active Palworld service account is `gameserver` (`995:5001`), preserving the former Game numeric identity; `game` is absent from NSS. Its home is `/home/gameserver`, and active local paths are under `/srv/rotom/{stacks,appdata,secrets}/gameserver`. `downloader` remains `901:5005` and `customapps` remains `904:5008`. No broad ownership rewrite or Docker-group change was performed.
+**Current JAR-88 state:** The active Palworld service account is `gameserver` (`995:5001`), preserving the former Game numeric identity; `game` is absent from NSS. Its home is `/home/gameserver`, and active local paths are under `/srv/rotom/{stacks,appdata,secrets}/gameserver`. `downloader` remains `901:5005`. No broad ownership rewrite or Docker-group change was performed.
 
-**Current Customapps storage correction — 2026-09-29:** `/home/apps` remains the deliberately retained compatibility home for `customapps`, but its obsolete `nas-apps` shortcut and the separate Apps mount were retired. The current reserved NAS boundary is `Customapps/.data -> /mnt/nas-customapps`, reached through `/home/apps/nas-customapps`; it remains empty and no application workload is deployed.
+**Current Customapps retirement — 2026-10-12:** The unused `customapps` account/group (`904:5008`) was removed. Its configured `/home/apps` path was already absent; the actual default-only `/home/customapps` tree and dangling NAS shortcut were removed. The empty v2 Customapps stack, appdata, and secrets directories and its Rotom guest NFS mount contract were also retired. The NAS-side export was empty at final guest inspection but remains outside Rotom until deleted through UniFi management.
 
 **Current Auth retirement — 2026-09-29:** The unused `auth` account/group (`905:5009`), default-profile `/home/auth`, `nas-auth` shortcut, and Auth NAS boundary were retired after no process, workload, Docker mount, or operational configuration consumer was found. Historical snapshots may contain this identity; do not recreate it by default.
 
@@ -43,17 +43,27 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 | documents | `900:5004`, `/home/documents`; Paperless application identity; authoritative media is `/mnt/nas-documents/paperless`, with other state VM-local |
 | downloader | `901:5005`, compatibility home `/home/downloaders`; Prowlarr/qBittorrentVPN |
 | web | `902:5006`, `/home/web`; Aloha active; Jared Wines undeployed |
-| filesync/customapps | `903:5007`, `904:5008` respectively; Syncthing runs as Filesync, while `customapps` remains reserved and retains compatibility home `/home/apps` |
+| filesync | `903:5007`; Syncthing runs as Filesync |
 | desktopcmd | `1001:1001`, locked non-human account with `/home/desktopcmd` mode `0700`; Remote Desktop Commander only; no sudo, SSH authorized keys, Docker/socket, service-group, or NAS-specific access |
 | Docker group | GID `989`, no members |
 
-### Current PVE backup privilege boundary
+### Current `/srv/rotom` Jared access — 2026-10-10
 
-### JAR-87 Media ROM service boundary
+Root applied the named POSIX ACL `user:jared:r-X` recursively to the existing `/srv/rotom` tree, including `stacks/`, `scripts/`, `appdata/`, `secrets/`, and `backup-staging/`. Every existing directory carries the matching default named-user ACL, so ordinary newly created descendants inherit Jared read/traverse access. The access ACL and default ACL mask are `r-x`; ownership and the base owner/group ACL entries were not changed. POSIX presents that ACL mask through the conventional group-class mode display, but it does not grant the base group new access. Jared can read regular files and list/traverse directories but does not receive write access through this ACL, including at the `secrets/` and `backup-staging/` roots.
+
+An application can subsequently set a restrictive mode or ACL that constrains or replaces inherited access; investigate such a case from the live ACL rather than assuming the default remains effective. One existing backup-staging descendant is owned by Jared and retains its pre-existing owner write permission; that condition was observed but not changed by this access-policy update.
+
+### Current `/home` Jared access — 2026-10-12
+
+Root applied the same named POSIX ACL `user:jared:r-X` recursively to local service-home content and placed the matching default named-user ACL on `/home` and the local service directories. Jared can read regular files and list/traverse all local home trees, including service homes and the otherwise locked `desktopcmd` home; service-home roots remain non-writable to Jared. Jared's own home remains readable and writable through its pre-existing owner permissions, so its redundant named ACL was removed to preserve owner-only SSH private-key protection.
+
+The `nas-*` entries within service homes are shortcut symlinks to NFS storage. Their targets rejected the local ACL operation as unsupported and remain governed by their existing NAS permission boundaries; no NAS ownership, export, or data change was made. Ownership and base owner/group ACL entries throughout local `/home` remain unchanged. As with `/srv/rotom`, ACL mask `r-x` is reflected in the conventional group-class mode display without granting the base group new access. Future ordinary local descendants inherit the default ACL unless a creating application subsequently restricts or replaces it.
 
 ### JAR-87 through JAR-90 ROM-ingestion boundary — retired 2026-10-05
 
 The JDownloader, Igir, qBittorrent importer, and browser-upload service identities and write boundaries are retired. Their dedicated configuration, state, scripts, and credentials are absent. qBittorrent's Media-only sentinel and RomM's read-only library access remain unchanged.
+
+### Current PVE backup privilege boundary
 
 PVE host-config Restic is root-operated. `/usr/local/sbin/pve-restic-backup` is the privileged worker; root-owned `/usr/local/bin/backup-restic-to-nas` re-executes through `sudo` when a non-root user invokes it, so Jared can start the existing root workflow through normal sudo authentication without direct access to the worker or its protected credential. `/etc/restic/nas-password` remains protected and its contents are never documented. The repository is `/mnt/nas-pve-restic-backup/pve-restic-backup` and staging is `/var/backups/pve-restic-recovery`. Whole-VM manual backup likewise uses root-owned `/usr/local/bin/backup-rotom-vm-to-nas`, which re-executes through `sudo` for non-root invocation, plus `rotom-vm-vzdump-manual.service` and `/usr/local/sbin/rotom-vm-vzdump-manual`. Jared is a PVE member of `systemd-journal`, allowing direct read-only service-log access such as `journalctl -fu rotom-vm-vzdump-manual.service`; this does not grant permission to alter services.
 
@@ -321,9 +331,9 @@ Runtime mounts create these notable access paths:
 - Arcane has a read/write Docker socket and a read/write bind of `/home/infra/docker`; JAR-21 also gives it a read-only same-path bind of `/home/downloads/docker` for project discovery.
 - Homepage has a read-only Docker socket.
 - Glances has a read-only bind of the host root and a read-only Docker socket. Its former read-only `/mnt/nas-rotom-backup` bind was removed on 2026-09-18.
-- Media storage: Sonarr and Radarr read/write `/mnt/nas-media` at `/media` and additionally bind `/mnt/nas-media/torrents` read-only at `/media/torrents`; Jellyfin mounts the library subtree read-only. qBittorrentVPN binds that torrent directory read/write. The enabled Downloader compatibility view has no current container consumer and is proposed for retirement. Prowlarr has no NAS bind.
+- Media storage: Sonarr and Radarr read/write `/mnt/nas-media` at `/media` and additionally bind `/mnt/nas-media/torrents` read-only at `/media/torrents`; Jellyfin mounts the library subtree read-only. qBittorrentVPN binds that torrent directory read/write. No Downloader bindfs compatibility view remains in the current topology; Prowlarr has no NAS bind.
 - Home Assistant has read-only access to /run/dbus.
-- Gameserver storage: Palworld uses local `/srv/rotom/appdata/gameserver` data and no NAS world bind. Igir, the qBittorrent importer, and the browser-upload bridge keep ROM-inbox writes on narrowly scoped Media paths as `995:5000`; JDownloader was retired on 2026-10-05. Original Game NAS content remains rollback material and qBittorrent has no Game/Gameserver payload bind.
+- Gameserver storage: Palworld uses local `/srv/rotom/appdata/gameserver` data and no NAS world bind. JDownloader, Igir, the qBittorrent importer, and the browser-upload bridge were retired on 2026-10-05, so no current Gameserver ROM-inbox write boundary exists. Original Game NAS content remains rollback material and qBittorrent has no Game/Gameserver payload bind.
 - Cloudflare DDNS receives a read-only secret-file mount. Its contents were not inspected.
 
 
