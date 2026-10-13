@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Retire downloader remnants
+**Documentation updated:** 2026-10-13 — Retire Documents local remnants
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -17,6 +17,10 @@ Purpose: front-page index and quick-reference architecture summary.
 **legacy documentation state labels:** **Current** means the latest supported recorded state; **Historical** preserves dated evidence that may no longer apply; **Retired** means intentionally no longer active; **Proposed** is not implemented; **Needs Verification** means the legacy documentation lacks enough current evidence and should not be treated as settled.
 
 ## 2. Current Rotom Summary
+
+### Documents local-remnant retirement — 2026-10-13
+
+The retired Documents domain has no local appdata or secret root: `/srv/rotom/appdata/documents` and `/srv/rotom/secrets/documents` were removed after verification that they were empty and had no active Compose/container reference. The `documents` account/group, home, local mount, and stack are also absent. This does not alter NAS Documents data/export or historical Paperless recovery evidence; it means no local Documents state or secret material is available to restore.
 
 ### Downloader-remnant retirement — 2026-10-13
 
@@ -93,7 +97,7 @@ The accepted Phase B architecture now uses **PVE** as the product abbreviation a
 | JAR-88 Gameserver v2 | Independent Palworld modules run under `/srv/rotom/stacks/gameserver`, with VM-local live state under `/srv/rotom/appdata/gameserver` and locked `gameserver` at `995:5001`. `/mnt/nas-gameserver` is canonical NFSv3 `Gameserver/.data`; original Game data is rollback-only and not guest-mounted. JAR-87 Media ROM/qBittorrent contracts remain independent. |
 | JAR-43 Smart Home v2 | Home Assistant and Homebridge run from independent modules under `/srv/rotom/stacks/smarthome`, with authoritative mutable state under `/srv/rotom/appdata/smarthome`. They retain host networking for discovery and the established NPM compatibility routes. JAR-51 retired the inactive prior `/home/smarthome/docker/{home-assistant,homebridge}` rollback trees after reference and service validation; `/mnt/nas-smarthome` remains an unused reserved boundary. |
 | JAR-45 Web v2 | Aloha Millworks runs from `/srv/rotom/stacks/web` with site content under `/srv/rotom/appdata/web` and joins `rotom-proxy`; its `7778` listener remains the required compatibility upstream for retained host-networked NPM. Jared Wines is migrated to v2 state/Compose but remains intentionally unstarted and unpublished; its Homepage **Hosted Websites** card was restored on 2026-09-30 and currently reflects the unavailable target. The former legacy Web trees were explicitly retired on 2026-09-29. |
-| JAR-44 / JAR-8 / JAR-91 Documents | JAR-44 established the Documents contract; JAR-8 deployed Paperless-ngx, PostgreSQL, and Valkey under `/srv/rotom`; JAR-91 moved only Paperless-managed media to `/mnt/nas-documents/paperless`. Database, broker, configuration/search state, consume, exports, secrets, and NPM remain VM-local. |
+| JAR-44 / JAR-8 / JAR-91 Documents | Historical: JAR-44 established the Documents contract; JAR-8 deployed Paperless-ngx, PostgreSQL, and Valkey under `/srv/rotom`; JAR-91 moved only Paperless-managed media to `/mnt/nas-documents/paperless`. The former local Documents appdata/secrets roots were removed on 2026-10-13; see the current retirement overlay. |
 | Future domains | The unused Customapps Rotom account, guest mount, and local v2 trees were retired on 2026-10-12. Its NAS-side export was empty at the final guest inspection but remains a separate UniFi-management cleanup. Filesync is implemented by JAR-75 Syncthing; Auth was retired on 2026-09-29. |
 | JAR-75 Filesync Syncthing | Syncthing `2.0.0` runs as `903:5007` from `/srv/rotom/stacks/filesync/syncthing`, with VM-local configuration/database at `/srv/rotom/appdata/filesync/syncthing` and its sole payload bind `/mnt/nas-filesync -> /filesync`. The non-creating bind fails closed if NFS is absent. GUI authentication is configured; NPM provides forced-TLS `https://syncthing.rotom.casa` through loopback-only `127.0.0.1:8384`. New synchronized folders use trash-can versioning (`.stversions`); NAS payloads remain outside guest Restic and require appropriate UNAS snapshot recovery protection before becoming authoritative. |
 | JAR-8 / JAR-91 / JAR-92 Paperless | Paperless-ngx v3.2.1, PostgreSQL 18, and Valkey 9 run from `/srv/rotom/stacks/library/paperless` as Library (`127:5000`). Its authoritative media root remains `/mnt/nas-documents/paperless`; all other mutable state remains VM-local under Library appdata. The web service uses `rotom-proxy` plus loopback NPM compatibility routing, and `paperless.rotom.casa` is externally verified through the retained route. |

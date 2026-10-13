@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-13 — Retire downloader remnants
+**Documentation updated:** 2026-10-13 — Retire Documents local remnants
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-13 — Retire Documents local remnants
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Removed the unused retired Documents local state roots `/srv/rotom/appdata/documents` and `/srv/rotom/secrets/documents`. No Documents account/group, home, local mount, Compose stack, container, or active Compose reference remains. Historical Paperless/Documents deployment and recovery records are retained, but neither local Documents appdata nor local Documents secrets are available for recovery.
+- **Evidence:** 2026-10-13 preflight found each exact target was an empty 4 KiB directory, with no active Compose/container reference and no `documents` account/group. Post-removal checks found both paths absent; the active container set remained running.
+- **Outstanding:** NAS Documents data/export and historical Restic evidence were not inspected or changed. Available Sources replacement remains manual by Jared.
 
 ## 2026-10-13 — Retire downloader remnants
 
