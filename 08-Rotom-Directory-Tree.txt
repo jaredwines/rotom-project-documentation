@@ -22,9 +22,9 @@
 # - JAR-82: Infra v2 Compose includes `/srv/rotom/stacks/infra/nginx-proxy-manager/compose.yaml`; NPM retains host networking and binds authoritative root-owned data/certificate state from `/srv/rotom/appdata/infra/nginx-proxy-manager/{data,letsencrypt}`. The former `/home/infra/docker/nginx-proxy-manager` Compose/data tree is retained rollback material, not active configuration.
 # - JAR-85: root inspection confirmed `/home/infra` ownership/ACLs and the mounted Infra NFS boundary. Active Arcane mounts `/home/downloaders/docker` directly, and its current database has no old discovery-path reference. The inactive `/home/infra/docker/downloads` symlink and two superseded non-sensitive Homepage files were retired after reference and recovery review. NPM, its historical Compose copy, credentials, certificate/database state, legacy documentation, `.ssh`, and NAS paths remain untouched.
 # - JAR-73: Uptime Kuma Compose is `/srv/rotom/stacks/infra/uptime-kuma/compose.yaml`; its local SQLite data is `/srv/rotom/appdata/infra/uptime-kuma`, and its sole listener is `127.0.0.1:3002`. Root-only Rotom alert worker/unit/timer are `/usr/local/sbin/rotom-alerting`, `/etc/systemd/system/rotom-alerting.service`, and `.timer`, with state under `/var/lib/rotom-alerting`; PVE has the parallel `/usr/local/sbin/pve-alerting` and `pve-alerting.{service,timer}`. Protected alert inputs remain below `/srv/rotom/secrets/infra` and are never documented by value.
-# - JAR-10/JAR-87: RomM/MariaDB/Valkey are deployed at `/srv/rotom/stacks/media/romm`; `/mnt/nas-media/library/games` is read-only in RomM. JDownloader, the Media inbox, Igir, qBittorrent importer, and browser-upload bridge were retired on 2026-10-05; the separate review directory and library remain preserved. The retained Game library is rollback material.
+# - JAR-92: Library is the active former-Media domain, retaining `127:5000` and `/home/library`; active modules/state/secrets are under `/srv/rotom/{stacks,appdata,secrets}/library`. RomM remains read-only on `/mnt/nas-media/library/games`; qBittorrent remains Media-payload-only with its existing guard. Paperless also runs as Library, while its sole NAS media bind remains the separate `/mnt/nas-documents/paperless` boundary. The Documents export root/subtree were retagged only for Paperless access; database, broker, configuration, consume, export, and secrets remain VM-local. Homepage Library retains the former Media three-column placement and includes qBittorrent and Paperless exactly once. The isolated UNAS snapshot-restore check was explicitly waived; authenticated Paperless browser acceptance remains outstanding.
 # - JAR-90 RomM route: active NPM Compose additionally binds `/mnt/nas-media/library/games` read-only at the same container path. Proxy host 21 has an internal-only `/library/` alias to that bind; it is not a public file listing. NPM retains its image-default root container startup identity and has no Docker socket. RomM's separate read-only library bind and `romm` Nginx workers are unchanged.
-# - Historical pre-JAR-88 boot finding: Game and Filesync automount attempts raced NAS routing and left several NAS-backed containers stopped. JAR-87 later made the ROM/qBittorrent contracts Media-only, and JAR-88 replaced the active Game guest mount with Gameserver. Preserve the incident as automount-readiness evidence, not as current Game-bind/marker topology. `rotom-nas-docker-recovery` remains Downloader/Media-only.
+# - Historical pre-JAR-88 boot finding: Game and Filesync automount attempts raced NAS routing and left several NAS-backed containers stopped. JAR-87 later made the ROM/qBittorrent contracts Media-only, and JAR-88 replaced the active Game guest mount with Gameserver. Preserve the incident as automount-readiness evidence, not as current Game-bind/marker topology. At that checkpoint `rotom-nas-docker-recovery` was Downloader/Media-only; JAR-92 supersedes that helper scope.
 # - JAR-49: active Jellyfin Compose labels resolve to `/home/media/docker/jellyfin/compose.yaml`, not the existing `/srv/rotom/stacks/media/jellyfin` directory. Jellyfin maps `/dev/dri` and guest groups `44`/`992`, uses QSV on `/dev/dri/renderD128`, and has a verified live `h264_qsv` transcode. Other Media module locations were not re-audited by JAR-49.
 # - 2026-09-29: the distinct empty NAS `Downloads` drive and unused `/mnt/nas-downloads` guest contract were retired after a mounted zero-byte/no-reference inspection. Active `Downloader` storage and retained `Game` rollback data are unchanged.
 # - 2026-09-29: the obsolete NAS `Apps` drive plus its `Apps/.data -> /mnt/nas-apps` fstab/automount, local mountpoint, and `nas-apps` shortcut were retired.
@@ -149,7 +149,7 @@
 #     rotom-weekly-maintenance.service          JAR-74 root oneshot; ExecStart=/usr/local/sbin/weekly-host-maintenance
 #     rotom-weekly-maintenance.timer            ENABLED/ACTIVE; Sunday 01:15; Persistent=true; AccuracySec=1min; RandomizedDelaySec=0
 # /usr/local/
-#   sbin/rotom-nas-docker-recovery       current helper; validates /mnt/nas-downloaders, /mnt/nas-media, /mnt/nas-documents, and /mnt/nas-filesync before conditionally recovering covered NAS-failed containers
+#   sbin/rotom-nas-docker-recovery       current helper; validates /mnt/nas-media, /mnt/nas-documents, and /mnt/nas-filesync before conditionally recovering covered NAS-failed containers
 #   sbin/rotom-restic-backup             current root-protected backup implementation; repository /mnt/nas-rotom-restic-backup/rotom-restic-backup
 #   sbin/rotom-restic-backup-status-api  current root-protected status API
 #   sbin/weekly-host-maintenance          root:root 0750; locked safe weekly maintenance worker
@@ -160,7 +160,7 @@
 #   volumes/arcane_arcane-data/     restored Arcane persistent named-volume data
 #
 # /srv/rotom/                       JAR-34 v2 foundation; root:root 0755
-#   stacks/{infra,media,downloader,gameserver,smarthome,documents,web,filesync}/
+#   stacks/{infra,library,downloader,gameserver,smarthome,documents,web,filesync}/
 #                                     root-owned declarative namespace; migrated domains have owning modules
 #   stacks/NETWORKING.md             JAR-36 shared external-network/Docker-DNS contract
 #   stacks/RUNTIME-POLICY.md         JAR-37 controlled-update, Compose, and exception policy
@@ -173,9 +173,9 @@
 #     source/                        generated controlled legacy documentation source copy; not canonical authority
 #     site/                          generated static portal output; served read-only
 #   stacks/documents/DOMAIN-CONTRACT.md JAR-44 Paperless deployment/recovery contract; no Compose placeholder
-#   stacks/documents/paperless/compose.yaml JAR-8/JAR-91 Paperless/PostgreSQL/Valkey stack; Documents media bind uses create_host_path:false and USERMAP 900:5004
+#   stacks/library/paperless/compose.yaml JAR-8/JAR-91/JAR-92 Paperless/PostgreSQL/Valkey stack; Documents media bind uses create_host_path:false and USERMAP 127:5000
 #   stacks/filesync/syncthing/compose.yaml JAR-75 Syncthing 2.0.0; numeric 903:5007; loopback-only 8384 for NPM; sole NAS bind /mnt/nas-filesync -> /filesync with create_host_path:false
-#   stacks/media/romm/compose.yaml       JAR-87 read-only Media game-library bind; scheduled quick scan enabled
+#   stacks/library/romm/compose.yaml     JAR-87 read-only Media game-library bind; scheduled quick scan enabled
 #   appdata/<domain>/                service-owned mutable state; migrated domains have owning state trees
 #     filesync/syncthing/             JAR-75 persistent Syncthing configuration/database; included in guest Restic /srv source
 #     smarthome/home-assistant/       JAR-43 authoritative Home Assistant state
@@ -209,8 +209,8 @@
 #   rotom-monitoring bridges; the networks initially have no containers.
 #
 # /home/
-#   media/       127:5000  mode 0750  -> nas-media -> /mnt/nas-media
-#     docker/jellyfin/              retained legacy material; active Compose is under /srv/rotom/stacks/media/jellyfin
+#   library/     127:5000  mode 0750  -> nas-library -> /mnt/nas-media
+#     docker/jellyfin/              retained legacy material; active Compose is under /srv/rotom/stacks/library/jellyfin
 #     docker/{radarr,sonarr}/        retired by JAR-84 after verified v2 recovery archives
 #   gameserver/  995:5001  mode 0750  -> nas-gameserver -> /mnt/nas-gameserver
 #     docker/palworld-server-{jared,fran}/ JAR-42 legacy rollback trees retired 2026-09-29
@@ -223,10 +223,9 @@
 #     docker/nginx-proxy-manager/   RETAINED JAR-82 rollback source; not active configuration
 #   smarthome/   126:5003  mode 0750  -> nas-smarthome -> /mnt/nas-smarthome
 #     docker/{home-assistant,homebridge}/ JAR-51 legacy rollback trees retired after current-v2 validation
-#   documents/   900:5004  mode 0750  -> nas-documents -> /mnt/nas-documents; Paperless media is authoritative at /mnt/nas-documents/paperless, while non-media state is under /srv/rotom/appdata/documents
+#   documents/   900:5004  mode 0750  -> nas-documents -> /mnt/nas-documents; Paperless media is authoritative at /mnt/nas-documents/paperless, while non-media state is under /srv/rotom/appdata/library/paperless
 #   downloaders/ 901:5005  mode 0750  -> nas-downloaders -> /mnt/nas-downloaders
-#     docker/prowlarr/              ACTIVE
-#     docker/qbittorrentvpn/        ACTIVE; wg0 verified
+#     docker/{prowlarr,qbittorrentvpn}/ retained compatibility/rollback material; active modules are under `/srv/rotom/stacks/library`
 #   web/         902:5006  mode 0750  -> nas-web -> /mnt/nas-web
 #     docker/{alohamillworks.com,jaredwines.com}/ JAR-45 legacy rollback trees retired 2026-09-29
 #   filesync/    903:5007  mode 0750  -> nas-filesync -> /mnt/nas-filesync; Syncthing config/database is under /srv/rotom/appdata/filesync

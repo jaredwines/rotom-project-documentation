@@ -36,7 +36,7 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 |---|---|
 | PVE host | hostname `pve`; routine administration as Linux user `jared` (UID/GID `1000:1000`, groups `sudo` and `users`); canonical Mac aliases `pve` / `pve.rotom.casa`; key `~/.ssh/id_ed25519_pve`; PVE identity `jared@pam` has propagated `Administrator` access at `/`; matching root-authorized key removed; root retained for emergency recovery |
 | Debian VM `jared` | UID/GID `1000:1000`; supplementary `sudo`; key-only Mac login via `~/.ssh/id_ed25519_rotom` |
-| media | `127:5000`, `/home/media`; Jellyfin/Radarr/Sonarr |
+| library | `127:5000`, `/home/library`; Jellyfin/Radarr/Sonarr/Prowlarr/RomM/qBittorrentVPN/Paperless |
 | gameserver | `995:5001`, `/home/gameserver`; both Palworld containers; JDownloader, Igir, qBittorrent importer, and browser-upload bridge were retired on 2026-10-05; Gamarr retired |
 | infra | `997:5002`, `/home/infra`; Arcane/DDNS/Homepage/Glances/NPM |
 | smarthome | `126:5003`, `/home/smarthome`; Home Assistant/Homebridge |
@@ -370,11 +370,17 @@ For every new JAR-6 share, the intended service account could traverse/list/crea
 
 Jared remains outside these service storage groups for ordinary work. Because the roots are `2770`, ordinary Jared denial is expected. For service-specific maintenance, use `sudo -iu <service-user>` rather than broadening group membership. Root/sudo and Docker-daemon control remain privileged routes across these ordinary filesystem boundaries.
 
-### JAR-91 Paperless Documents identity mapping — 2026-10-05
+### Historical JAR-91 Paperless Documents identity mapping — 2026-10-05 (superseded by JAR-92)
 
-Paperless's Compose web service uses `USERMAP_UID=900` and `USERMAP_GID=5004`, rather than a rootless Compose `user:` override. Its supervisor starts as root only to initialize the image; the live Paperless application workers run as `documents`. The sole NAS write bind is `/mnt/nas-documents/paperless -> /usr/src/paperless/media`; its target and entries are `900:5004`, with the target directory mode `2770`. Paperless database, broker, configuration/search state, consume, exports, and secrets remain outside that NAS bind on VM-local storage. No user/group membership, NAS share-root ownership, or broad NAS permission was changed.
+### JAR-92 Library identity and Paperless storage mapping — 2026-10-13
 
-Seven JAR-6 shares remain boundary-only. Downloads now contains authoritative torrent data and is bound into qBittorrent. qBittorrent runs as `901:5005` and uses the Downloads share/sentinel; Media and Game are final-library domains rather than torrent-storage domains.
+The former `media` user/group is `library`, retaining `127:5000`, a locked password, and home `/home/library`. The active Library application set includes Jellyfin, Radarr, Sonarr, Prowlarr, RomM, qBittorrentVPN, and Paperless. qBittorrent uses `127:5000` with only its Media payload/guard bind.
+
+Paperless uses `USERMAP_UID=127` and `USERMAP_GID=5000`; its live web, consumer, scheduler, and worker processes run as Library. The Documents NFS export remains a distinct document boundary, but its root is `988:5000` mode `2770` and its sole Paperless subtree is `127:5000`; no other Documents export content was present or changed. POSIX ACL mutation is unsupported by this NFSv3 export, and a supplementary Documents-GID test was denied, so this exact ownership migration is the supported least-scope access design. Database/broker state retains image ownership and remains VM-local.
+
+Before JAR-92, Paperless's Compose web service used `USERMAP_UID=900` and `USERMAP_GID=5004`, and its live workers ran as `documents`. This preserved JAR-91 evidence is superseded by the Library mapping immediately above; the NAS bind path itself remains `/mnt/nas-documents/paperless -> /usr/src/paperless/media`.
+
+The historical JAR-91 Downloads assertion is superseded: qBittorrent runs as Library and uses only the retained Media payload/guard. The Downloader share has no qBittorrent payload or recovery-helper role.
 
 ### Pre-migration SSH access — historical baseline
 

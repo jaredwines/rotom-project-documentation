@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-13 — JAR-92 Library-domain and Paperless ownership migration
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Renamed the active Media Linux identity and local workload roots to Library while retaining `127:5000`; migrated qBittorrentVPN and Paperless to Library-owned active Compose/appdata/secrets paths; retained the existing Media and Documents NFS export names and paths. qBittorrent remains Media-payload-only with its existing guard, WireGuard, and fail-closed bind contract. Paperless document media remains isolated on the Documents export, whose sole Paperless subtree was retagged to `127:5000` because the NFSv3 export rejects POSIX ACLs and server-managed supplementary groups cannot grant Library access. Homepage now presents the three-column Library section in the former Media position, with qBittorrent and Paperless each appearing there exactly once.
+- **Evidence:** Live account/mount/container inspection; targeted rollback copies under `/root/jar-92-20261013-precutover` and `/root/jar-92-20261013-paperless-precutover`; Compose validation and targeted recreations; Library media/document access checks; pre/post Paperless manifest (7 files, 5 directories, 600,486 apparent bytes, 786,432 allocated bytes); qBittorrent WireGuard/guard checks; recovery-helper run; expected local/proxied HTTP responses; Homepage healthy; zero failed systemd units.
+- **Outstanding:** Jared explicitly waived the isolated UNAS snapshot-restore acceptance check. Authenticated Paperless browser upload/OCR and original-download acceptance remain user-interaction checks; no credentials were accessed.
+
 ## 2026-10-12 — Retire Customapps from Rotom
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.

@@ -13,6 +13,10 @@ Record substantive changes to this document in the change log as part of the sam
 
 ## 1. Purpose and Scope
 
+### JAR-92 recovery-helper scope — 2026-10-13
+
+`rotom-nas-docker-recovery` now validates Media, Documents, and Filesync NFS dependencies before conditionally recovering covered NAS-failed containers. The obsolete Downloader readiness-sentinel check was removed because qBittorrentVPN's active payload and fail-closed guard are Media-only. The helper successfully completed after the Library and Paperless recreations.
+
 This document is the canonical detailed owner for what Rotom does automatically or routinely over time, including systemd/cron/application automation and the surrounding operational administration workflow. The legacy documentation maintenance contract is governed exclusively by `00-Rotom-Change-Log.md`; this document does not duplicate it. Full Restic configuration remains canonical in `05-Backup-and-Restore.md`.
 
 ### Evidence provenance
@@ -61,7 +65,7 @@ JAR-72 reorganized Homepage cards without changing monitoring behavior or any ap
 ### Rotom VM
 
 - Docker/containerd remain enabled. The supplied 2026-10-01 root Docker output is a historical 25-object / 24-running snapshot: it predates the 2026-10-05 retirement of JDownloader and the related ROM-ingestion components. Both Palworld containers were healthy and Syncthing was exited (`0`) at that snapshot; Gamarr was absent. A 2026-10-10 live `docker ps -a` recorded 24 container objects, all running; Paperless and Syncthing were healthy after NAS recovery.
-- `rotom-nas-docker-recovery.service` remains the NAS-backed container recovery helper. Its current scope is Downloader, Media, Documents, and Filesync consumers; a 2026-10-10 live run remounted the affected shares and recovered Paperless, RomM, and Syncthing. The guest now has eleven NFS automounts; both bindfs views are retired, and qBittorrentVPN's guard is Media-only.
+- `rotom-nas-docker-recovery.service` remains the NAS-backed container recovery helper. Its current scope is Media, Documents, and Filesync consumers; a 2026-10-10 live run remounted the affected shares and recovered Paperless, RomM, and Syncthing. The guest now has eleven NFS automounts; both bindfs views are retired, and qBittorrentVPN's guard is Media-payload-only.
 - Guest Restic remains `rotom-restic-backup.service` / `.timer` around `03:00`, with manual `backup-restic-to-nas`; guest naming was intentionally not changed by JAR-68.
 - JAR-47 repaired the v2 Home Assistant SQLite staging path and verified snapshot `aedd8e57`; its restricted restore passed Palworld archive checksums and Home Assistant SQLite integrity. Media uses daily 12:00 AM UNAS-local snapshots with a 16-snapshot limit for authoritative library rollback.
 - JAR-71 Remote Desktop Commander is the native enabled `desktop-commander.service`, running outbound-only as `desktopcmd` with `UMask=0077`, `NoNewPrivileges=true`, and `PrivateTmp=true`. It has no Docker, NAS, proxy, DNS, or inbound-listener dependency; `/home/desktopcmd/workspace` is its only intended writable work area.
@@ -80,7 +84,7 @@ The intended staggered cadence remains guest Restic around `03:00`, PVE host-con
 | Time or trigger | Automation | Verified behavior |
 |---|---|---|
 | Boot | Docker | Docker and containerd are enabled. Docker starts after networking and containerd. |
-| Post-Docker boot / retry on failure | `rotom-nas-docker-recovery.service` | Verifies the retained Downloader, Media, Documents, and Filesync NFS contracts, then recovers only stopped covered containers with recorded NAS/mount startup errors. Enabled; live recovery validation passed on 2026-10-10. |
+| Post-Docker boot / retry on failure | `rotom-nas-docker-recovery.service` | Verifies the retained Media, Documents, and Filesync NFS contracts, then recovers only stopped covered containers with recorded NAS/mount startup errors. Enabled; live recovery validation passed on 2026-10-10 and JAR-92 removed the obsolete Downloader check. |
 | Every minute and container start | Cloudflare DDNS | Checks its configured DNS record and updates it if needed. |
 | Every 30 seconds | Arcane auto-heal | Enabled; may restart unhealthy managed containers. |
 | Midnight | Arcane automatic updates | Enabled with no exclusions. |
@@ -111,7 +115,7 @@ No rc.local hook exists. The at scheduler is not installed. No per-user crontabs
 
 After the September 23 boot race left the Downloads bindfs views and several NAS-backed containers stopped, JAR-23 added root-owned executable `/usr/local/sbin/rotom-nas-docker-recovery` and systemd unit `/etc/systemd/system/rotom-nas-docker-recovery.service`. The unit is enabled under `multi-user.target`, `Requires=docker.service`, runs after `docker.service` and `network-online.target`, and uses `Restart=on-failure` with a 30-second delay so a transiently unavailable NAS can be retried without making all Docker services depend on the NAS.
 
-The helper explicitly starts/verifies `/mnt/nas-downloaders` and `/mnt/nas-media` as NFS, verifies the Downloader `.rotom-qbt-nas-ready` sentinel and Media library path, then inspects qBittorrentVPN, Radarr, Sonarr, and Jellyfin. JAR-77 removed its retired Gamarr branch, JAR-78 retired the unused Game bindfs branch, and JAR-86 retired the unused Media bindfs view and its helper branch. Already-running containers are left untouched. A stopped container is started only when its restart policy is `unless-stopped`/`always` and its recorded Docker error matches a NAS/mount startup-failure signature; other stopped containers are left stopped. This protects intentionally stopped workloads from being indiscriminately started.
+The helper explicitly starts/verifies `/mnt/nas-media`, `/mnt/nas-documents`, and `/mnt/nas-filesync` as NFS, verifies the Media library/qBittorrent guard and Paperless media paths, then inspects the covered Library, Paperless, and Syncthing workloads. JAR-77 removed its retired Gamarr branch, JAR-78 retired the unused Game bindfs branch, JAR-86 retired the unused Media bindfs view and its helper branch, and JAR-92 removed the obsolete Downloader root/sentinel dependency. Already-running containers are left untouched. A stopped container is started only when its restart policy is `unless-stopped`/`always` and its recorded Docker error matches a NAS/mount startup-failure signature; other stopped containers are left stopped. This protects intentionally stopped workloads from being indiscriminately started.
 
 Manual validation on the healthy server completed `Result=success`, `ExecMainStatus=0`, and `active (exited)` while reporting all five covered containers already running. Zero failed systemd units remained. The helper SHA-256 was `ea1ac1b6db7da89317b50b0de95a07a4be2cab5a7d530e5c3c1c1ed30bdb9d85`; the unit SHA-256 was `92b3b8d4bce02f574abb49b63031bcdca066a999459a6cebc79a7ac178486ac0`. Duplicate journal messages during the test were cosmetic because the helper logs both to stdout and `logger`. Full reboot-path validation is intentionally deferred until preservation work is complete.
 

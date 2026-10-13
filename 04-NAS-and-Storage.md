@@ -147,7 +147,7 @@ Each operational service account now has a local home-directory shortcut named `
 
 | Service account | Convenience path | Canonical target |
 |---|---|---|
-| `media` | `/home/media/nas-media` | `/mnt/nas-media` |
+| `library` | `/home/library/nas-library` | `/mnt/nas-media` |
 | `game` | `/home/game/nas-game` | `/mnt/nas-game` |
 | `infra` | `/home/infra/nas-infra` | `/mnt/nas-infra` |
 | `smarthome` | `/home/smarthome/nas-smarthome` | `/mnt/nas-smarthome` |
@@ -760,11 +760,17 @@ Service-home symlinks were also freshly verified for all ten service identities,
 
 ## 17. Outstanding / Needs Verification
 
+### JAR-92 Library and Paperless storage state — 2026-10-13
+
+The Media NFS source/export and `/mnt/nas-media` automount remain intentionally unchanged; Library retains `127:5000` access and qBittorrent continues to use only `/mnt/nas-media/torrents` plus `.rotom-qbt-media-ready`. `/mnt/nas-downloaders` contains no qBittorrent payload files and is no longer a qBittorrent recovery-helper dependency.
+
+The separate Documents NFS source/export and `/mnt/nas-documents` path also remain unchanged. Its root contains only `paperless/` and was retagged from group `5004` to `5000` (`988:5000`, mode `2770`); the exact Paperless media subtree was retagged from `900:5004` to `127:5000`. This was the least supported scope after NFSv3 rejected POSIX ACL mutation and a `127:5000` process with supplementary `5004` remained denied by server-managed groups. No audiovisual/game/qBittorrent data was retagged or granted a Documents bind.
+
 Current storage and backup automation are documented above; this section retains unresolved checks only. Historical JAR-31/JAR-32/JAR-33 commissioning states do not override later JAR-47/JAR-88 evidence. `/mnt` remains outside the guest Restic source scope.
 
 - **Needs Verification — UNAS metadata persistence:** recheck service-share root metadata after a future UNAS/UniFi Drive restart/update, especially Downloader `988:5005`, Media `988:5000`, Gameserver `988:5001`, current Restic share `Rotom_Restic_Backup` at `988:988` mode `0700`, and current service GIDs `5002`–`5008`. Resolve read-only with `findmnt` and `stat` from Rotom plus UNAS-side export/share inspection after the event.
 - **Needs Verification — live Media-NFS loss:** fail-closed recreation and the Media guard are documented, but sudden loss of the active Media payload while qBittorrent is already running is untested. Read-only inspection can verify the guard definition; actual runtime behavior requires a separately planned non-destructive maintenance test.
-- **Needs Verification — Documents Paperless recovery:** Paperless media is live on `/mnt/nas-documents/paperless`, but the effective Documents snapshot schedule/retention, an isolated snapshot restore, and Paperless behavior across a planned Documents automount/reconnect event are untested. Do not remove JAR-91's retained local source or rollback copy until those checks are accepted.
+- **Needs Verification — Documents Paperless recovery:** Paperless media is live on `/mnt/nas-documents/paperless` under Library numeric ownership. Jared explicitly waived the JAR-92 isolated UNAS snapshot-restore acceptance check; effective Documents snapshot schedule/retention, an isolated snapshot restore, planned automount/reconnect behavior, and authenticated browser upload/OCR/original-download acceptance remain untested. Retain the JAR-92 rollback copies until these checks are accepted.
 
 **Retired/historical:** do not recreate the old `Downloads/.data` export merely because it appears below. Current fstab/mount/showmount evidence uses `Downloader/.data`; `Downloads/.data` is retained only as dated recovery context.
 
