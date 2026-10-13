@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; a 2026-10-10 live Docker inventory recorded 24 container objects, all running. The prior detailed 2026-10-01 snapshot (25 container objects / 24 running) predates the 2026-10-05 retirement of JDownloader and related ROM-ingestion components and is historical.
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — JAR-93 Platform-domain migration
+**Documentation updated:** 2026-10-13 — JAR-94 Media-to-Library NAS cutover
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -28,9 +28,15 @@ Services are grouped by the Linux account directory containing their active Comp
 
 ## 1A. Current Phase B Docker State
 
+### JAR-94 Media-to-Library NAS cutover — 2026-10-13
+
+Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Nginx Proxy Manager were recreated against `/mnt/nas-library`. Their NAS binds are respectively `library`, broad Library plus read-only `torrents`, `library/games`, Library `torrents` plus the non-creating Library sentinel, and `library/games`. All were running after recreation; RomM's database was healthy; local Jellyfin/Radarr/Sonarr responses were `302` and qBittorrent/RomM were `200`. The qBittorrent sentinel-absence recreation test failed closed as designed, then passed after restoration. No active Compose definition references `/mnt/nas-media`.
+
+The prior JAR-94 heading below records a separate historical workload-retirement task and must not be used as current service state.
+
 ### Current Library qBittorrentVPN/Prowlarr restoration — 2026-10-13
 
-`qbittorrentvpn` and `prowlarr` were recreated from the retained JAR-84 archive as Library (`127:5000`) services. Their Compose files are `/srv/rotom/stacks/library/{qbittorrentvpn,prowlarr}/compose.yaml`, with state below matching `/srv/rotom/appdata/library` paths. qBittorrent retains `NET_ADMIN`, WireGuard, Media-only non-creating torrent/sentinel binds, `rotom-arr`, `rotom-proxy`, and its enabled Media guard; its UI is CSRF-protected and published only at `127.0.0.1:8080` for NPM. Prowlarr retains `9696`, `rotom-arr`, and `rotom-proxy`. Both containers were running; qBittorrent `wg0` was `10.2.0.2/32`, qBittorrent local/NPM returned `200`, and Prowlarr local/NPM returned `302`. Paperless remains unrecreated because `/mnt/nas-library/paperless` is absent.
+`qbittorrentvpn` and `prowlarr` were recreated from the retained JAR-84 archive as Library (`127:5000`) services. Their Compose files are `/srv/rotom/stacks/library/{qbittorrentvpn,prowlarr}/compose.yaml`, with state below matching `/srv/rotom/appdata/library` paths. qBittorrent retains `NET_ADMIN`, WireGuard, Library non-creating torrent/sentinel binds, `rotom-arr`, `rotom-proxy`, and its enabled Library guard; its UI is CSRF-protected and published only at `127.0.0.1:8080` for NPM. Prowlarr retains `9696`, `rotom-arr`, and `rotom-proxy`. Both containers were running; qBittorrent `wg0` was `10.2.0.2/32`, qBittorrent local/NPM returned `200`, and Prowlarr local/NPM returned `302`. Paperless remains unrecreated because `/mnt/nas-library/paperless` is absent.
 
 ### JAR-94 current Platform recovery and retired workloads — 2026-10-13
 

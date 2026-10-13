@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-12 — Retire Customapps from Rotom
+**Documentation updated:** 2026-10-13 — JAR-94 Media-to-Library NAS cutover
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -15,9 +15,9 @@ Record substantive changes to this document in the change log as part of the sam
 
 ### Current Library service storage — 2026-10-13
 
-Restored qBittorrentVPN writes only to `/mnt/nas-media/torrents` and requires `/mnt/nas-media/.rotom-qbt-media-ready`; both are active NFS-backed paths. Prowlarr has no NAS bind. Paperless remains absent: its designated media path is `/mnt/nas-library/paperless`, which does not exist below the mounted Library root (`988:988`, mode `2770`). Provision that NAS child as `127:5000`, mode `2770`, before enabling Paperless's non-creating bind.
+JAR-94 migrated the active media contract from `/mnt/nas-media` to the `Library/.data` export at `/mnt/nas-library`. Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Nginx Proxy Manager bind only Library paths. The Library root is `988:5000` mode `2770`; `library/` is `977:5000` mode `2775`, `torrents/` is `0:5000` mode `2775`, and the qBittorrent sentinel is `901:5000` mode `2750`. qBittorrent uses the Library torrent/sentinel paths with non-creating binds, and its 15-second guard checks the Library NFS mount and sentinel.
 
-JAR-94 above is authoritative for current guest mount state. References below to the retired Infra, Documents, Downloader, and Filesync mount contracts are historical evidence only; NAS exports/data were not deleted by that retirement.
+The Media export and data were retained unchanged as rollback material, but its guest fstab contract and NFS mount are retired. The final convergence found zero differences across 5,929 entries / 205,137,536,813 bytes; the user accepted the authenticated workflow validation. Earlier legacy documentation sections labelled JAR-94 describe a different retired-workload task and are historical identifier-collision evidence, not this cutover.
 
 ### JAR-94 retired local NFS contracts — 2026-10-13
 

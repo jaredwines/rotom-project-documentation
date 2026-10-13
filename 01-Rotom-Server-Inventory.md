@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — JAR-93 Platform-domain migration
+**Documentation updated:** 2026-10-13 — JAR-94 Media-to-Library NAS cutover
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -18,9 +18,15 @@ Purpose: front-page index and quick-reference architecture summary.
 
 ## 2. Current Rotom Summary
 
+### JAR-94 Media-to-Library NAS cutover — 2026-10-13
+
+The active media contract is `/mnt/nas-library`, backed by `Library/.data`; `/mnt/nas-media` is no longer an active guest mount or configuration contract. Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Nginx Proxy Manager use Library binds. qBittorrent's Library sentinel/guard is fail-closed and its reversible missing-sentinel recreation test passed. Media export data remains retained for rollback. The user accepted the authenticated application workflow after cutover.
+
+Older sections bearing JAR-94 refer to a different historical workload-retirement task; they do not describe this NAS cutover.
+
 ### Current Library restoration and Filesync cleanup — 2026-10-13
 
-qBittorrentVPN and Prowlarr are active again as Library (`127:5000`) services at `/srv/rotom/stacks/library/{qbittorrentvpn,prowlarr}`, with state under matching `/srv/rotom/appdata/library` paths. qBittorrent uses only `/mnt/nas-media/torrents` plus the read-only Media sentinel; WireGuard is active and its CSRF-protected UI is loopback-only at `127.0.0.1:8080`, served by NPM. Prowlarr retains `9696`, `rotom-arr`, `rotom-proxy`, and its NPM route. Paperless remains absent: `/mnt/nas-library/paperless` must be NAS-provisioned as `127:5000` mode `2770` before its fail-closed media bind can be deployed. Syncthing remains retired; its active Homepage File Sync section/card and empty local Filesync secret directory are removed. Its retained NPM proxy record was not changed.
+qBittorrentVPN and Prowlarr are active again as Library (`127:5000`) services at `/srv/rotom/stacks/library/{qbittorrentvpn,prowlarr}`, with state under matching `/srv/rotom/appdata/library` paths. qBittorrent uses only Library torrent/sentinel paths; WireGuard is active and its CSRF-protected UI is loopback-only at `127.0.0.1:8080`, served by NPM. Prowlarr retains `9696`, `rotom-arr`, `rotom-proxy`, and its NPM route. Paperless remains absent: `/mnt/nas-library/paperless` must be NAS-provisioned as `127:5000` mode `2770` before its fail-closed media bind can be deployed. Syncthing remains retired; its active Homepage File Sync section/card and empty local Filesync secret directory are removed. Its retained NPM proxy record was not changed.
 
 ### JAR-94 current Platform recovery and domain retirement — 2026-10-13
 

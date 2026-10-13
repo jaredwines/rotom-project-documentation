@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-13 — JAR-93 Platform-domain migration
+**Documentation updated:** 2026-10-13 — JAR-94 Media-to-Library NAS cutover
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -15,7 +15,7 @@ Record substantive changes to this document in the change log as part of the sam
 
 ### Current qBittorrent and Filesync automation state — 2026-10-13
 
-qBittorrentVPN is active again. Its enabled Media guard and NAS recovery helper passed their current Media checks after restoration; the guard protects only the Media payload/sentinel contract. Syncthing remains absent, with no Filesync unit, stack, appdata, or secret directory; Homepage no longer presents File Sync/Syncthing. The retained Syncthing NPM proxy record is outside this automation change.
+qBittorrentVPN is active again. Its enabled Library guard and NAS recovery helper passed their Library checks after cutover; the guard protects only the Library payload/sentinel contract and failed closed when the sentinel was temporarily absent. The root alert monitor and recovery helper use Library paths. Syncthing remains absent, with no Filesync unit, stack, appdata, or secret directory; Homepage no longer presents File Sync/Syncthing. The retained Syncthing NPM proxy record is outside this automation change.
 
 ### JAR-94 current retired-workload automation debt — 2026-10-13
 

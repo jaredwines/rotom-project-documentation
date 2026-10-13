@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-13 — JAR-94 Media-to-Library NAS cutover
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Migrated the active Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Nginx Proxy Manager NAS contract from Media to Library. Removed the active Media fstab contract, retargeted the Library service-home link, recovery helper, qBittorrent guard, and NAS alert monitor; preserved Media export data and root-only pre-cutover configuration rollback material. The existing unrelated JAR-94 history is explicitly retained as an identifier collision.
+- **Evidence:** Library ownership and sentinel contract were provisioned and Library identity write access passed. Final non-destructive rsync convergence transferred zero files across 5,929 entries / 205,137,536,813 bytes. All affected Compose files validated and services were recreated; RomM DB was healthy, local endpoint checks passed, active bind inspection showed Library only, and the qBittorrent missing-sentinel recreation failed closed then recovered. Jared accepted the authenticated workflow validation.
+- **Outstanding:** Preserve the retained Media export/data until a separately authorized rollback-retirement decision. Available Sources replacement remains manual by Jared.
+
 ## 2026-10-13 — Move Rotom legacy documentation checkout to Platform documentation
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
