@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Restic backup architecture, scope, retention, verification, restore evidence, and recovery boundaries  
 **Recovery scope:** pre-migration Rotom plus current Proxmox/VM foundation  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-12 — Retire Customapps from Rotom
+**Documentation updated:** 2026-10-13 — JAR-93 Platform-domain migration
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -12,6 +12,10 @@
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
 
 ## 1. Purpose and Scope
+
+### JAR-93 Platform recovery point — 2026-10-13
+
+Before the Platform migration, a supported guest Restic run completed successfully and retained snapshot `02c9c4e7` at `2026-10-13 00:36:25 PDT`; normal retention pruned the temporary same-day snapshot `177e33f0`. The root-owned Restic worker's NPM SQLite staging source now points to `/srv/rotom/appdata/platform/nginx-proxy-manager/data/database.sqlite`. Guest Restic continues to include `/srv` and exclude `/mnt`; NAS content remains outside this guest backup boundary.
 
 ### JAR-92 Paperless recovery limitation — 2026-10-13
 

@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; a 2026-10-10 live Docker inventory recorded 24 container objects, all running. The prior detailed 2026-10-01 snapshot (25 container objects / 24 running) predates the 2026-10-05 retirement of JDownloader and related ROM-ingestion components and is historical.
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-12 — Retire Customapps from Rotom
+**Documentation updated:** 2026-10-13 — JAR-93 Platform-domain migration
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -27,6 +27,12 @@ Services are grouped by the Linux account directory containing their active Comp
 **Port notation:** Entries containing `->` are published host-to-container mappings. Bare ports are listed separately as container-only ports with no host mapping shown. “None shown” means the source PORTS field was blank; it does not establish network mode or lack of connectivity.
 
 ## 1A. Current Phase B Docker State
+
+### JAR-93 Platform-domain migration — 2026-10-13
+
+The active deployment roots for Nginx Proxy Manager, Homepage, Arcane, Glances, Uptime Kuma, Cloudflare DDNS, Rotom Docs, and Syncthing are now `/srv/rotom/stacks/platform/<service>` with corresponding mutable state under `/srv/rotom/appdata/platform/<service>` and protected inputs under `/srv/rotom/secrets/platform` where a service has them. Compose validation passed before recreation. No image, published port, Docker network, service identity, NFS bind, URL, reverse-proxy route, or persistent-data contract changed.
+
+Syncthing's module and state are Platform-owned but its container continues as `903:5007` and keeps `/mnt/nas-filesync:/filesync`. The old `infra` and `filesync` v2 stack/state directories were removed after the moves; the unused `homepage/compose.yaml.orig` file was removed. Homepage now has a Platform section for NPM, Arcane, PVE, Uptime Kuma, Syncthing, and Rotom Docs. PVE has no monitor; the remaining Homepage groupings, including Library and hosted sites, are unchanged.
 
 The Proxmox VE host `pve` remains hypervisor-only; the application Docker runtime is inside the Debian `rotom` VM. Current runtime foundation remains Docker Engine `29.8.1`, containerd `2.3.6`, Docker Compose `v5.5.1`, local Docker root `/var/lib/docker`, and package-created Docker group GID `989` with no members.
 

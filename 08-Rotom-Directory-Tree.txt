@@ -8,11 +8,12 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-10-12; retire Customapps from Rotom.
+# Documentation revised: 2026-10-13; JAR-93 Platform-domain migration.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the legacy documentation.
 #
 # CURRENT TOPOLOGY — JAR-68 FINAL, 2026-09-28
+# - JAR-93: Platform is the active shared-service domain. Active Compose modules for Nginx Proxy Manager, Homepage, Arcane, Glances, Uptime Kuma, Cloudflare DDNS, Rotom Docs, and Syncthing are below `/srv/rotom/stacks/platform`; their applicable local state and secrets are below `/srv/rotom/appdata/platform` and `/srv/rotom/secrets/platform`. Syncthing retains `filesync` `903:5007` and its `/mnt/nas-filesync` bind; its enabled legacy-named systemd unit now uses the Platform working directory. The former `/srv/rotom/{stacks,appdata,secrets}/infra`, `/srv/rotom/{stacks,appdata}/filesync`, and unused Homepage compose backup are absent. `/home/infra`, the `infra` identity, legacy documentation checkout, NAS path, URLs, networks, and published ports remain in place. Restic's NPM SQLite staging input and the root alert worker's protected-input paths follow Platform; snapshot `02c9c4e7` is the verified pre-migration recovery point.
 # - Physical NUC runs Proxmox VE as `pve` / `pve.rotom.casa` at 192.168.1.68. `nic0` is Intel I219-V/e1000e MAC 1c:69:7a:0e:f2:f7; WOL `g`; previously documented TSO/GSO mitigation retained.
 # - PVE `pvedaemon` and `pveproxy` are enabled. NPM proxy host `pve.rotom.casa` forwards HTTPS to the PVE UI at `192.168.1.68:8006`, with certificate ID `24`, forced TLS, WebSocket upgrade, and access-list ID `1`; Homepage links to it under `Rotom Management` without a monitor.
 # - Canonical Mac PVE SSH: aliases `pve` / `pve.rotom.casa` -> 192.168.1.68 Jared using ~/.ssh/id_ed25519_pve. PVE Jared has sudo plus `jared@pam` Administrator access; the matching root-authorized key was removed, while root remains emergency recovery. Old `proxmox*` aliases/key filenames are absent. PVE /etc/hosts contains canonical `192.168.1.68 pve.rotom.casa pve`.

@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-12 — Retire Customapps from Rotom
+**Documentation updated:** 2026-10-13 — JAR-93 Platform-domain migration
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -17,6 +17,12 @@ Purpose: front-page index and quick-reference architecture summary.
 **legacy documentation state labels:** **Current** means the latest supported recorded state; **Historical** preserves dated evidence that may no longer apply; **Retired** means intentionally no longer active; **Proposed** is not implemented; **Needs Verification** means the legacy documentation lacks enough current evidence and should not be treated as settled.
 
 ## 2. Current Rotom Summary
+
+### JAR-93 current Platform-domain state — 2026-10-13
+
+The active shared-service deployment domain is **Platform**. Nginx Proxy Manager, Homepage, Arcane, Glances, Uptime Kuma, Cloudflare DDNS, Rotom Docs, and Syncthing now use `/srv/rotom/{stacks,appdata,secrets}/platform` as applicable. The `infra` Linux account, `/home/infra`, legacy documentation checkout, UID/GID, and NAS contract were deliberately retained. Syncthing retains runtime identity `filesync` (`903:5007`) and the existing `/mnt/nas-filesync` NFS bind; only its declarative and local state roots moved to Platform. The removed `/srv/rotom/{stacks,appdata}/filesync` and `/srv/rotom/{stacks,appdata,secrets}/infra` paths are not active.
+
+Homepage groups NPM, Arcane, PVE, Uptime Kuma, Syncthing, and Rotom Docs under **Platform**. PVE deliberately remains without a site monitor. Library, monitoring, Smart Home, hosted websites, and their existing access behavior are unchanged.
 
 ### JAR-92 current Library-domain state — 2026-10-13
 

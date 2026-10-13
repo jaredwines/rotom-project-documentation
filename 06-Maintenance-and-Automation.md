@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-12 — Retire Customapps from Rotom
+**Documentation updated:** 2026-10-13 — JAR-93 Platform-domain migration
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -12,6 +12,12 @@
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
 
 ## 1. Purpose and Scope
+
+### JAR-93 Platform operational paths — 2026-10-13
+
+The root-owned Rotom Docs publisher continues to read the legacy documentation checkout at `/home/infra/documentation/rotom-runbook`, but now publishes its controlled derived source to `/srv/rotom/appdata/platform/rotom-docs/source`. Its Compose/build files reside in `/srv/rotom/stacks/platform/rotom-docs`. The legacy documentation checkout and `infra` service identity did not move.
+
+The root-owned alert worker now reads its protected Platform inputs from `/srv/rotom/secrets/platform`. The enabled `filesync-syncthing.service` retains its name but now has `/srv/rotom/stacks/platform/syncthing` as its working directory. It was inactive after a historical NAS dependency failure; the healthy Syncthing container is the current verified runtime, and the unit is no longer failed.
 
 ### JAR-92 recovery-helper scope — 2026-10-13
 

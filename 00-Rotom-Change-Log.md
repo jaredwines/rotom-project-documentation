@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-13 — JAR-93 Platform-domain migration
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Replaced the active shared-service `infra` deployment domain with `platform`; moved NPM, Homepage, Arcane, Glances, Uptime Kuma, Cloudflare DDNS, Rotom Docs, and Syncthing Compose/state/secrets paths as applicable. Syncthing retained its Filesync runtime identity and NFS bind. Homepage now uses a Platform section containing NPM, Arcane, PVE, Uptime Kuma, Syncthing, and Rotom Docs. Removed the empty legacy v2 roots and obsolete Homepage Compose backup. The `infra` account/home/legacy documentation checkout and all URLs, ports, networks, NAS paths, service identities, and persistent data contracts remain unchanged.
+- **Evidence:** Fresh successful guest Restic snapshot `02c9c4e7` before migration; all eight affected Compose configurations validated; controlled stop/move/recreate completed; post-cutover Homepage local/public HTTP `200`, NPM/Syncthing/Docs HTTPS `200`, Uptime Kuma HTTPS `302`, all four applicable Docker healthchecks healthy, and legacy roots absent. The Restic NPM SQLite staging source, Rotom Docs publisher destination, alert-worker secret paths, and enabled Syncthing systemd working directory were updated to Platform; the alert worker then completed successfully and no failed unit remained.
+- **Outstanding:** The unrelated concurrent Paperless move in `/srv/rotom` was deliberately not changed or included.
+
 ## 2026-10-13 — JAR-92 Library-domain and Paperless ownership migration
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
