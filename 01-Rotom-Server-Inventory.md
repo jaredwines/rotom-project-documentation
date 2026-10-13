@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — JAR-95 monitoring and alerting retirement
+**Documentation updated:** 2026-10-13 — Homepage Platform layout
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -17,6 +17,12 @@ Purpose: front-page index and quick-reference architecture summary.
 **legacy documentation state labels:** **Current** means the latest supported recorded state; **Historical** preserves dated evidence that may no longer apply; **Retired** means intentionally no longer active; **Proposed** is not implemented; **Needs Verification** means the legacy documentation lacks enough current evidence and should not be treated as settled.
 
 ## 2. Current Rotom Summary
+
+### Current Homepage Platform layout — 2026-10-13
+
+Homepage now places Rotom Docs in **Platform**, alongside Nginx Proxy Manager, Arcane, and PVE; the former **Documents** section and its layout key are absent. The former **Rotom Management** section/key is renamed **Platform**. This corrects the JAR-95 current wording about a Homepage mapping: the retired service mapping is absent, while the stale card remains as described below. Homepage was recreated and is healthy; local-host and public HTTPS probes returned `200`.
+
+**Needs Verification — stale Uptime Kuma card:** the live Platform YAML/API still contains an Uptime Kuma card with its historical `siteMonitor`, although JAR-95 retirement evidence establishes no Uptime Kuma container or NPM route. The card is not proof of an active service; remove it or record an intentional retention decision separately.
 
 ### JAR-95 monitoring and alerting retirement — 2026-10-13
 
@@ -62,7 +68,7 @@ The accepted Phase B architecture now uses **PVE** as the product abbreviation a
 | Physical hardware | Intel NUC / Intel Core i5-8259U; 16 GB class RAM; Intel Quick Sync capable iGPU; Samsung 970 EVO Plus 250GB NVMe |
 | PVE network | `vmbr0` `192.168.1.68/24`; gateway/DNS `192.168.1.1`; physical `nic0` Intel I219-V MAC `1c:69:7a:0e:f2:f7`; WOL `g`; TSO/GSO mitigation retained |
 | PVE administration | Routine identity `jared`; canonical Mac aliases `pve` / `pve.rotom.casa`; `HostName 192.168.1.68`; key `~/.ssh/id_ed25519_pve`; PVE identity `jared@pam` has propagated `Administrator` access; member of `sudo` and `systemd-journal`; matching root-authorized key removed; retain root only for emergency recovery |
-| PVE web UI | `pvedaemon` and `pveproxy` are enabled for the PVE HTTPS UI. NPM serves `https://pve.rotom.casa` to `192.168.1.68:8006`; the route uses forced TLS, WebSocket upgrade, and an enabled access list. Homepage links to it from **Rotom Management**. |
+| PVE web UI | `pvedaemon` and `pveproxy` are enabled for the PVE HTTPS UI. NPM serves `https://pve.rotom.casa` to `192.168.1.68:8006`; the route uses forced TLS, WebSocket upgrade, and an enabled access list. Homepage links to it from **Platform**. |
 | PVE local storage — 2026-10-05 observation | `nvme0n1` is `232.9 GiB`: the `pve` VG contains root `<67.75 GiB`, swap `8 GiB`, and `local-lvm` thin pool `136.46 GiB`; `16 GiB` remains unassigned in the VG. Root had about `57 GiB` filesystem availability; the thin pool was `69.06%` allocated with about `42.2 GiB` free. These are distinct capacity domains; root availability and VG `VFree` are not guest filesystem space. |
 | Rotom VM | VMID `100`, name `rotom`; q35 + OVMF; `x86-64-v2-AES`; 8 vCPU; 12 GiB RAM; 100 GiB thin VirtIO SCSI; `onboot: 1`; optional host-specific Intel iGPU attachment `hostpci0: 0000:00:02.0,pcie=1` |
 | Rotom guest | Debian 13.7; `rotom.casa`; MAC `BC:24:11:97:10:47`; UniFi-reserved `192.168.1.69/24`; gateway/DNS `192.168.1.1` |

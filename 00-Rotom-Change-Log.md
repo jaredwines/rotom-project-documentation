@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-13 — JAR-95 monitoring and alerting retirement
+**Documentation updated:** 2026-10-13 — Homepage Platform layout
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-13 — Homepage Platform layout and JAR-95 mapping correction
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Moved the Rotom Docs Homepage card from the now-removed Documents section into Platform, then renamed the former Rotom Management section and matching layout key to Platform. Preserved timestamped live-YAML rollback copies. Corrected the JAR-95 current-state wording: Uptime Kuma's container and NPM route remain retired, but the live Homepage configuration still contains a stale Uptime Kuma card/site monitor; this is not evidence that the retired service is active.
+- **Evidence:** 2026-10-13 active `services.yaml`/`settings.yaml`, Homepage API, Docker health, local-host, and public HTTPS checks. Homepage was recreated after each narrow YAML change and was `running healthy`; both HTTP checks returned `200`.
+- **Outstanding:** **Needs Verification / decision:** remove or intentionally retain the stale Uptime Kuma Homepage card. Confirm its expected presentation after the retired hostname is probed; do not infer a restored service or route from the card alone. Available Sources replacement remains manual by Jared.
 
 ## 2026-10-13 — JAR-95 monitoring and alerting retirement
 

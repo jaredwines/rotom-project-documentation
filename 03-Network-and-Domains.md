@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — JAR-95 monitoring and alerting retirement
+**Documentation updated:** 2026-10-13 — Homepage Platform layout
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -14,6 +14,10 @@ Record substantive changes to this document in the change log as part of the sam
 ## 1. Purpose and Scope
 
 ### Current Library routes — 2026-10-13
+
+### Current Homepage Platform presentation — 2026-10-13
+
+Homepage's former **Rotom Management** section is now **Platform**, with Rotom Docs moved into it and no standalone Documents section. This corrects the JAR-95 current wording: the retired Uptime Kuma NPM route/listener and service mapping remain absent, but the live Platform configuration still has a stale Uptime Kuma card/site monitor. Treat that card as a **Needs Verification** presentation artifact, not as evidence of a restored route or service. Homepage local-host and public HTTPS checks returned `200` after recreation.
 
 ### JAR-95 current monitoring-route state — 2026-10-13
 

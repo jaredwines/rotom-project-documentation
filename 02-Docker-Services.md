@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; a 2026-10-10 live Docker inventory recorded 24 container objects, all running. The prior detailed 2026-10-01 snapshot (25 container objects / 24 running) predates the 2026-10-05 retirement of JDownloader and related ROM-ingestion components and is historical.
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — JAR-95 monitoring and alerting retirement
+**Documentation updated:** 2026-10-13 — Homepage Platform layout
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -27,6 +27,12 @@ Services are grouped by the Linux account directory containing their active Comp
 **Port notation:** Entries containing `->` are published host-to-container mappings. Bare ports are listed separately as container-only ports with no host mapping shown. “None shown” means the source PORTS field was blank; it does not establish network mode or lack of connectivity.
 
 ## 1A. Current Phase B Docker State
+
+### Current Homepage Platform layout — 2026-10-13
+
+The active Homepage configuration names its management section **Platform**. It contains Nginx Proxy Manager, Arcane, PVE, and Rotom Docs; the former standalone Documents section/layout key is absent. Homepage was recreated after the two YAML-only changes and was `running healthy`; local-host and public HTTPS checks returned `200`. Timestamped pre-change YAML copies remain beside the active configuration.
+
+**Needs Verification — stale card only:** Platform also still contains an Uptime Kuma card/site monitor. JAR-95's container/image and NPM-route retirement remains supported; this residual Homepage entry does not restore that service or route and needs a separate retention/removal decision.
 
 ### JAR-95 Uptime Kuma retirement — 2026-10-13
 
