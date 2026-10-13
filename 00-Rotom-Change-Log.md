@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-13 — Move Rotom legacy documentation checkout to Platform documentation
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Recorded the current Rotom legacy documentation checkout and resolver fallback at `/home/platform/documentation/rotom-runbook`; updated current-state Codex, publisher, permissions, and directory-tree references. Dated `/home/infra/documentation` references remain historical evidence.
+- **Evidence:** 2026-10-13 live `retired-helper path` and `/home/jared/.config/retired-helper/repository` both resolved the Platform path; `/home/infra` was absent; `stat` verified `/home/platform` `nobody:nogroup` mode `0750` and its documentation/repository directories `jared:jared` mode `0755`. A scoped live configuration search found no active old-path reference.
+- **Outstanding:** Available Sources replacement remains manual by Jared.
+
 ## 2026-10-13 — Restore Library download services and remove Filesync presentation
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
