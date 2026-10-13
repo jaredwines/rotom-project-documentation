@@ -13,6 +13,12 @@ Record substantive changes to this document in the change log as part of the sam
 
 ## 1. Purpose and Scope
 
+JAR-94 above is authoritative for the current Platform service set. Older route and upstream statements below are retained as dated evidence and must not be read as proof that retired Syncthing, Paperless, Prowlarr, or qBittorrentVPN services remain active.
+
+### JAR-94 current service-exposure state — 2026-10-13
+
+Nginx Proxy Manager, Homepage, Arcane, Glances, Uptime Kuma, Rotom Docs, and Cloudflare DDNS were recovered as the active Platform workload. No current container serves Syncthing, Paperless, Prowlarr, or qBittorrentVPN. The recovered NPM state was preserved rather than selectively rewritten, so proxy records for retired upstreams require a separate authenticated configuration audit before they are treated as usable routes. This section supersedes any unqualified current-service claims below; historical routing evidence remains historical.
+
 ### PVE web UI NPM route — 2026-09-30
 
 NPM proxy host `pve.rotom.casa` forwards using **HTTPS** to the PVE host at `192.168.1.68:8006`. The enabled route uses certificate ID `24`, forced TLS, WebSocket upgrade, and access-list ID `1`. A local-SNI HTTPS request returned the Proxmox Virtual Environment page, while direct `https://192.168.1.68:8006` returned HTTP `200`. This confirms the Rotom-to-PVE proxy path; it does not establish public-WAN reachability or test authenticated VM-console WebSocket use. No DNS, certificate, firewall, VLAN, WAN-forwarding, PVE-service, or other network configuration changed in this verification.

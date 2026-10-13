@@ -28,7 +28,15 @@ Services are grouped by the Linux account directory containing their active Comp
 
 ## 1A. Current Phase B Docker State
 
+### JAR-94 current Platform recovery and retired workloads — 2026-10-13
+
+The active Platform deployment contains Nginx Proxy Manager, Homepage, Arcane, Glances, Uptime Kuma, Rotom Docs, and Cloudflare DDNS below `/srv/rotom/{stacks,appdata,secrets}/platform`; the runtime identity is `platform` (`997:5002`). They were recovered from Restic snapshot `02c9c4e7` into a restricted staging directory, reviewed, path-renamed from the snapshot's stale `infra` layout, and promoted before Compose validation/recreation. NPM, Homepage, Arcane, Glances, Uptime Kuma, Rotom Docs, and DDNS are running; Arcane, Homepage, and Uptime Kuma are healthy.
+
+Syncthing, Paperless, Prowlarr, and qBittorrentVPN are retired and have no container objects or active Compose/appdata/secrets roots. The retired Prowlarr/qBittorrent and Paperless network contracts are absent. Arcane still carries a read-only bind of the empty root-owned `/home/downloaders/docker` compatibility remnant; it must be removed or reconciled in a separate verified cleanup. Historical sections below preserve former service facts only.
+
 ### JAR-93 Platform-domain migration — 2026-10-13
+
+Superseded for current live identity and service state by JAR-94 above; this section is retained as dated JAR-93 evidence.
 
 The active deployment roots for Nginx Proxy Manager, Homepage, Arcane, Glances, Uptime Kuma, Cloudflare DDNS, Rotom Docs, and Syncthing are now `/srv/rotom/stacks/platform/<service>` with corresponding mutable state under `/srv/rotom/appdata/platform/<service>` and protected inputs under `/srv/rotom/secrets/platform` where a service has them. Compose validation passed before recreation. No image, published port, Docker network, service identity, NFS bind, URL, reverse-proxy route, or persistent-data contract changed.
 
@@ -47,6 +55,8 @@ JAR-37 is the accepted Phase C runtime gate. Docker's daemon-wide `json-file` ca
 ### Current NAS-backed recovery verification — 2026-10-10
 
 ### JAR-92 Library-domain migration — 2026-10-13
+
+JAR-94 above supersedes the Paperless, Prowlarr, and qBittorrentVPN portions of this dated section; the remaining Library history is retained as evidence.
 
 `library` retains numeric `127:5000` after the active `media` account/group rename. Former Media-domain module paths are now `/srv/rotom/stacks/library/{jellyfin,radarr,sonarr,prowlarr,romm}` with matching appdata/secrets roots. qBittorrentVPN is `/srv/rotom/stacks/library/qbittorrentvpn`, uses `PUID=127`/`PGID=5000`, and retains its `8080` listener, `rotom-arr` network, WireGuard, `/mnt/nas-media/torrents` read/write bind, and `/mnt/nas-media/.rotom-qbt-media-ready` read-only non-creating guard bind. The recovery helper no longer mounts or validates the obsolete Downloader sentinel before considering qBittorrent recovery.
 
@@ -416,6 +426,8 @@ JAR-6 added **no Docker integration** for the eight new service NAS shares. No r
 - The original container/path inventories alone do not establish volumes, networks, environment variables, dependencies, VPN behavior, or reverse-proxy routing. Later evidence adds the media identity settings and mounts above; use 03 and 04 for separately audited network and storage details. Full current Compose contents still need inspection before editing any service.
 
 ### Service groups and NAS mounts — current guest state through JAR-88
+
+JAR-94 above supersedes the `infra`, `documents`, `downloader`, and `filesync` rows and the retired NAS contracts below; those rows remain dated identity/storage evidence.
 
 Production workloads are restored under the current service-account layout. The table below describes current guest identity/storage relationships; historical Docker-group membership is not implied.
 

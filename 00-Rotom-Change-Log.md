@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-13 — JAR-94 Platform identity recovery and service-domain retirement
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Retired the `infra`, `documents`, `downloader`, and `filesync` accounts; their local homes; Paperless, Prowlarr, qBittorrentVPN, and Syncthing local service trees; and the four Rotom NFS mount contracts for Infra, Documents, Downloader, and Filesync. NAS exports and NAS data were deliberately not deleted. Recreated the shared-service identity as `platform` (`997:5002`, `/home/platform`) and recovered Nginx Proxy Manager, Homepage, Arcane, Glances, Uptime Kuma, Rotom Docs, and Cloudflare DDNS under `/srv/rotom/{stacks,appdata,secrets}/platform`.
+- **Evidence:** Live account, fstab, mount, path, Compose, Docker, endpoint, and failed-unit checks. Restic snapshot `02c9c4e7` was staged before promotion; although recorded as a Platform-era point, its recovered service paths were `infra`, so they were explicitly reviewed and renamed to `platform` before startup. Homepage and Rotom Docs returned `200`; Uptime Kuma returned `302`; NPM admin returned `200`; Arcane, Homepage, and Uptime Kuma were healthy; no failed units remained.
+- **Outstanding:** The empty root-owned `/home/downloaders/docker` directory remains although the `downloader` account is absent. Active Arcane still binds that empty directory read-only, and the enabled recovery helper plus guard/alert scripts retain obsolete `qbittorrentvpn` checks. These are intentional recorded cleanup follow-ups, not evidence that the retired workload is running. legacy documentation content was updated from the verified final state; Available Sources replacement remains manual by Jared.
+
 ## 2026-10-13 — JAR-93 Platform-domain migration
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.

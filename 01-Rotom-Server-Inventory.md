@@ -18,13 +18,23 @@ Purpose: front-page index and quick-reference architecture summary.
 
 ## 2. Current Rotom Summary
 
+### JAR-94 current Platform recovery and domain retirement — 2026-10-13
+
+`platform` is the active shared-service Linux identity, preserving UID:GID `997:5002` with home `/home/platform`; it replaces the prior `infra` identity and owns the relocated Rotom legacy documentation checkout at `/home/platform/documentation/rotom-runbook`. Nginx Proxy Manager, Homepage, Arcane, Glances, Uptime Kuma, Rotom Docs, and Cloudflare DDNS are active from `/srv/rotom/{stacks,appdata,secrets}/platform`. Syncthing was not restored: `filesync` and its NFS contract are retired.
+
+`documents`, `downloader`, `filesync`, and `infra` accounts/groups and their requested local service trees are retired. Paperless, Prowlarr, qBittorrentVPN, and Syncthing containers are absent. The local `/mnt/nas-{infra,documents,downloaders,filesync}` fstab/automount contracts and mountpoints are absent; their NAS exports/data were not deleted. The surviving guest NFS contracts are Media, Gameserver, Smarthome, Web, Rotom Restic Backup, Shared Drive, and Library. The empty root-owned `/home/downloaders/docker` compatibility remnant and stale qBittorrent checks in automation remain documented cleanup items.
+
 ### JAR-93 current Platform-domain state — 2026-10-13
+
+Superseded for current live identity and service state by JAR-94 above; this section is retained as dated JAR-93 evidence.
 
 The active shared-service deployment domain is **Platform**. Nginx Proxy Manager, Homepage, Arcane, Glances, Uptime Kuma, Cloudflare DDNS, Rotom Docs, and Syncthing now use `/srv/rotom/{stacks,appdata,secrets}/platform` as applicable. The `infra` Linux account, `/home/infra`, legacy documentation checkout, UID/GID, and NAS contract were deliberately retained. Syncthing retains runtime identity `filesync` (`903:5007`) and the existing `/mnt/nas-filesync` NFS bind; only its declarative and local state roots moved to Platform. The removed `/srv/rotom/{stacks,appdata}/filesync` and `/srv/rotom/{stacks,appdata,secrets}/infra` paths are not active.
 
 Homepage groups NPM, Arcane, PVE, Uptime Kuma, Syncthing, and Rotom Docs under **Platform**. PVE deliberately remains without a site monitor. Library, monitoring, Smart Home, hosted websites, and their existing access behavior are unchanged.
 
 ### JAR-92 current Library-domain state — 2026-10-13
+
+JAR-94 above supersedes the Paperless, Prowlarr, and qBittorrentVPN portions of this dated section; the remaining Library history is retained as evidence.
 
 The former `media` Linux identity is now `library`, retaining UID:GID `127:5000` and home `/home/library`. Active Library Compose/appdata/secrets roots are `/srv/rotom/{stacks,appdata,secrets}/library`; Jellyfin, Radarr, Sonarr, Prowlarr, RomM, qBittorrentVPN, and Paperless use the applicable Library roots. The NAS export/mount names remain intentionally unchanged: `/mnt/nas-media` remains the Media export holding the audiovisual/game library and qBittorrent payload/guard, while `/mnt/nas-documents` remains the separate Documents export holding Paperless media only. Paperless's export root and sole `paperless/` subtree are `988:5000` and `127:5000` respectively; PostgreSQL, Valkey, configuration, consume, export, secrets, and recovery staging remain VM-local. Homepage presents Library in the prior Media layout position and includes qBittorrent and Paperless exactly once.
 

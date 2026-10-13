@@ -13,6 +13,10 @@ Record substantive changes to this document in the change log as part of the sam
 
 ## 1. Purpose and Scope
 
+### JAR-94 targeted Platform recovery — 2026-10-13
+
+Restic snapshot `02c9c4e7` was used for a restricted staged recovery of the shared-service stack, appdata, and secrets after their local deletion. The snapshot's service paths were still named `infra` despite its documented Platform-era checkpoint; after staged inspection, only the recovered shared-service paths were deliberately renamed and promoted to `/srv/rotom/{stacks,appdata,secrets}/platform`. Do not infer that this snapshot's historical account/path names are current reconstruction targets. It was not used to recreate retired Documents, Downloader, or Filesync workloads, and NAS data remained outside this recovery.
+
 ### JAR-93 Platform recovery point — 2026-10-13
 
 Before the Platform migration, a supported guest Restic run completed successfully and retained snapshot `02c9c4e7` at `2026-10-13 00:36:25 PDT`; normal retention pruned the temporary same-day snapshot `177e33f0`. The root-owned Restic worker's NPM SQLite staging source now points to `/srv/rotom/appdata/platform/nginx-proxy-manager/data/database.sqlite`. Guest Restic continues to include `/srv` and exclude `/mnt`; NAS content remains outside this guest backup boundary.

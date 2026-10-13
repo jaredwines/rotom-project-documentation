@@ -13,7 +13,13 @@ Record substantive changes to this document in the change log as part of the sam
 
 ## 1. Purpose and Scope
 
+### JAR-94 current retired-workload automation debt — 2026-10-13
+
+The active NAS recovery helper now validates only Media, but it still calls `recover_container qbittorrentvpn` even though qBittorrentVPN is retired and absent. The enabled qBittorrent media guard and root alert worker also retain non-operative qBittorrent checks. Syncthing and Paperless branches were removed with their retired local dependencies; the former Filesync systemd unit is absent. Treat the remaining qBittorrent references as cleanup debt, not runtime evidence, until a separate targeted automation cleanup is authorized and verified.
+
 ### JAR-93 Platform operational paths — 2026-10-13
+
+Superseded for current identity and path ownership by JAR-94 above; retained as dated operational evidence.
 
 The root-owned Rotom Docs publisher continues to read the legacy documentation checkout at `/home/infra/documentation/rotom-runbook`, but now publishes its controlled derived source to `/srv/rotom/appdata/platform/rotom-docs/source`. Its Compose/build files reside in `/srv/rotom/stacks/platform/rotom-docs`. The legacy documentation checkout and `infra` service identity did not move.
 

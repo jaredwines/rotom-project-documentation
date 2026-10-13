@@ -13,6 +13,12 @@ Record substantive changes to this document in the change log as part of the sam
 
 ## 1. Purpose and Scope
 
+JAR-94 above is authoritative for current guest mount state. References below to the retired Infra, Documents, Downloader, and Filesync mount contracts are historical evidence only; NAS exports/data were not deleted by that retirement.
+
+### JAR-94 retired local NFS contracts — 2026-10-13
+
+The local `/mnt/nas-infra`, `/mnt/nas-documents`, `/mnt/nas-downloaders`, and `/mnt/nas-filesync` fstab/systemd-automount contracts and mountpoints are retired. Their NAS exports and data were deliberately left outside the scope of this guest cleanup. The active guest NFS contracts are `/mnt/nas-media`, `/mnt/nas-gameserver`, `/mnt/nas-smarthome`, `/mnt/nas-web`, `/mnt/nas-rotom-restic-backup`, `/mnt/nas-shared-drive`, and `/mnt/nas-library`; no inference about NAS-side deletion follows from local retirement.
+
 This document records the current Phase B storage architecture and preserves the pre-migration Rotom storage contracts needed for restoration. It covers current Proxmox/VM local storage plus the historical UniFi NAS exports, mount options, `/mnt/nas-*` contracts, automount behavior, permissions, Docker binds, media/game paths, hardlink behavior, and service dependencies that later tickets must restore deliberately.
 
 ### Evidence provenance
