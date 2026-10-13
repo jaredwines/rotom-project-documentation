@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; a 2026-10-10 live Docker inventory recorded 24 container objects, all running. The prior detailed 2026-10-01 snapshot (25 container objects / 24 running) predates the 2026-10-05 retirement of JDownloader and related ROM-ingestion components and is historical.
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Complete legacy documentation current-state audit
+**Documentation updated:** 2026-10-13 — Retire downloader remnants
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -27,6 +27,10 @@ Services are grouped by the Linux account directory containing their active Comp
 **Port notation:** Entries containing `->` are published host-to-container mappings. Bare ports are listed separately as container-only ports with no host mapping shown. “None shown” means the source PORTS field was blank; it does not establish network mode or lack of connectivity.
 
 ## 1A. Current Phase B Docker State
+
+### Downloader-remnant retirement — 2026-10-13
+
+The retired Downloader compatibility artifacts are absent: `/home/downloaders`, the JAR-84 local Downloader archive/staging directory, and Arcane's read-only bind of the former home. Active Arcane Compose rendered successfully; its live mounts are limited to Platform appdata, Docker socket, Platform secrets, and Platform stacks. Arcane was `running healthy` and its HTTPS endpoint returned `200`. Active Library Prowlarr/qBittorrentVPN services and NAS data were not changed.
 
 ### Current Homepage Platform layout — 2026-10-13
 
@@ -54,7 +58,7 @@ Superseded for current service/presentation state by the JAR-95 and Homepage ove
 
 The active Platform deployment contains Nginx Proxy Manager, Homepage, Arcane, Glances, Uptime Kuma, Rotom Docs, and Cloudflare DDNS below `/srv/rotom/{stacks,appdata,secrets}/platform`; the runtime identity is `platform` (`997:5002`). They were recovered from Restic snapshot `02c9c4e7` into a restricted staging directory, reviewed, path-renamed from the snapshot's stale `infra` layout, and promoted before Compose validation/recreation. NPM, Homepage, Arcane, Glances, Uptime Kuma, Rotom Docs, and DDNS are running; Arcane, Homepage, and Uptime Kuma are healthy.
 
-Syncthing, Paperless, Prowlarr, and qBittorrentVPN are retired and have no container objects or active Compose/appdata/secrets roots. The retired Prowlarr/qBittorrent and Paperless network contracts are absent. Arcane still carries a read-only bind of the empty root-owned `/home/downloaders/docker` compatibility remnant; it must be removed or reconciled in a separate verified cleanup. Historical sections below preserve former service facts only.
+Syncthing, Paperless, Prowlarr, and qBittorrentVPN are retired and have no container objects or active Compose/appdata/secrets roots. The retired Prowlarr/qBittorrent and Paperless network contracts are absent. At that historical checkpoint Arcane still carried a read-only bind of the empty root-owned `/home/downloaders/docker` compatibility remnant; the current Downloader-remnant retirement above records its later removal. Historical sections below preserve former service facts only.
 
 ### JAR-93 Platform-domain migration — 2026-10-13
 
@@ -128,7 +132,7 @@ This incident is preserved as dated diagnostic evidence. JAR-87 subsequently mad
 
 ### JAR-84 legacy service-home Docker-tree retirement — 2026-10-01
 
-Fresh root Docker inspection found every active application Compose label under `/srv/rotom/stacks`, except the retained active NPM project under `/home/infra/docker/nginx-proxy-manager`. The inactive legacy `/home/downloaders/docker/{prowlarr,qbittorrentvpn}` and `/home/media/docker/{radarr,sonarr}` trees were archived, checksum-verified, covered by, and byte-read back from Restic snapshot `3c85d5be` before removal. `/home/game/docker` was verified empty and removed. `/home/downloaders/docker` remains because Arcane read-only mounts its parent; `/home/media/docker/jellyfin` and held `/home/web/docker` were not changed. In particular, JAR-84 supersedes the prior JAR-49 current-location conclusion: active Jellyfin is `/srv/rotom/stacks/media/jellyfin/compose.yaml`, while its former service-home tree remains retained legacy material.
+Fresh root Docker inspection found every active application Compose label under `/srv/rotom/stacks`, except the retained active NPM project under `/home/infra/docker/nginx-proxy-manager`. The inactive legacy `/home/downloaders/docker/{prowlarr,qbittorrentvpn}` and `/home/media/docker/{radarr,sonarr}` trees were archived, checksum-verified, covered by, and byte-read back from Restic snapshot `3c85d5be` before removal. `/home/game/docker` was verified empty and removed. At that time `/home/downloaders/docker` remained because Arcane read-only mounted its parent; the parent and bind were removed on 2026-10-13. `/home/media/docker/jellyfin` and held `/home/web/docker` were not changed. In particular, JAR-84 supersedes the prior JAR-49 current-location conclusion: active Jellyfin is `/srv/rotom/stacks/media/jellyfin/compose.yaml`, while its former service-home tree remains retained legacy material.
 
 ### JAR-82 Nginx Proxy Manager Infra v2 migration — 2026-10-01
 
@@ -187,7 +191,7 @@ The four migrated Infra modules each have an independent root-owned Compose defi
 
 Homepage configuration is now `/srv/rotom/appdata/infra/homepage/config`; Glances configuration is `/srv/rotom/appdata/infra/glances/glances.conf`; Arcane data is `/srv/rotom/appdata/infra/arcane`, owned `997:5002`. Protected inputs are in `/srv/rotom/secrets/infra` and are Git-ignored. Homepage uses the supported `HOMEPAGE_VAR_*` substitution for its protected provider credential; its configuration contains no credential value. Homepage and Glances attach to `rotom-monitoring` and resolve `glances` through Docker DNS. Homepage additionally attaches `rotom-proxy`; Arcane attaches `rotom-proxy`. Glances exposes no host port. Homepage retains host `3001` and Arcane `3552` only as compatibility upstreams for the still-host-networked NPM; those paths returned local/proxied HTTP 200. NPM remains intact on 80/81/443 for JAR-39.
 
-Cloudflare DDNS now uses its ordinary private `cloudflare-ddns_default` bridge, preserves its read-only token mount/capability drop/no-new-privileges contract, and immediately reported `rotom.casa` current. Arcane retains only its documented raw Docker socket and Infra-stack write bind; its original Downloader Compose compatibility bind remains read-only. `autoUpdate=false` and `autoHealEnabled=false` were reverified. To avoid expanding privileged secret access, Arcane has no v2 secret-directory bind; protected-env stack discovery warnings are intentional and do not authorize it to read secrets. The legacy `/home/infra/docker` module directories and `arcane_arcane-data` volume remain untouched rollback artifacts.
+Cloudflare DDNS now uses its ordinary private `cloudflare-ddns_default` bridge, preserves its read-only token mount/capability drop/no-new-privileges contract, and immediately reported `rotom.casa` current. At this historical checkpoint Arcane retained its documented raw Docker socket, Infra-stack write bind, and read-only Downloader Compose compatibility bind; the latter was removed on 2026-10-13. `autoUpdate=false` and `autoHealEnabled=false` were reverified. To avoid expanding privileged secret access, Arcane has no v2 secret-directory bind; protected-env stack discovery warnings are intentional and do not authorize it to read secrets. The legacy `/home/infra/docker` module directories and `arcane_arcane-data` volume remain untouched rollback artifacts.
 
 A controlled guest reboot recovered all four modules; Homepage/Arcane health, Homepage→Glances DNS/API, local and HTTPS Homepage, Arcane HTTPS, DDNS reconciliation, NPM compatibility, qBittorrent `wg0`, and zero failed systemd units passed. JAR-48 later adds baseline dashboard coverage using these existing components only; notification delivery is intentionally not configured.
 
@@ -543,7 +547,7 @@ The VM-era backup baseline is no longer a Docker gap. The latest explicitly veri
 
 - **Intentional:** Fran is not recreated, and her historical backup sudoers rule is not installed.
 - **Needs Verification — live Media-NFS loss:** startup/recreation fail-closed behavior and the Media guard are documented, but application behavior during sudden loss of the active Media NFS payload while qBittorrent is already running has not been exercised. Read-only inspection can confirm the guard definition; actual loss behavior requires a separately planned non-destructive maintenance test and must not be inferred.
-- **Known Arcane metadata drift:** current auto-update/auto-heal settings were freshly verified on 2026-09-27 (document 06). JAR-85 verified the active Arcane container mounts `/home/downloaders/docker` directly; the former `/home/infra/docker/downloads` discovery symlink was unreferenced by the current Arcane database and retired. Historical Arcane records that name the old symlink remain historical evidence. Its persisted qBittorrentVPN project status remains stale/`unknown` even though Docker runtime and WireGuard are current and healthy enough to be running.
+- **Known Arcane metadata drift:** current auto-update/auto-heal settings were freshly verified on 2026-09-27 (document 06). JAR-85 verified an earlier active Arcane container mount of `/home/downloaders/docker`; the former `/home/infra/docker/downloads` discovery symlink was unreferenced by the current Arcane database and retired. The Downloader bind and its empty source were removed on 2026-10-13. Historical Arcane records that name the old symlink remain historical evidence. Its persisted qBittorrentVPN project status may be stale/`unknown`; Docker runtime and WireGuard, not Arcane metadata, are runtime authority.
 
 ## 14. Related Documentation
 

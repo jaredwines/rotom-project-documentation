@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Complete legacy documentation current-state audit
+**Documentation updated:** 2026-10-13 — Retire downloader remnants
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -17,6 +17,10 @@ Purpose: front-page index and quick-reference architecture summary.
 **legacy documentation state labels:** **Current** means the latest supported recorded state; **Historical** preserves dated evidence that may no longer apply; **Retired** means intentionally no longer active; **Proposed** is not implemented; **Needs Verification** means the legacy documentation lacks enough current evidence and should not be treated as settled.
 
 ## 2. Current Rotom Summary
+
+### Downloader-remnant retirement — 2026-10-13
+
+The retired `downloader` account remains absent. Its former empty `/home/downloaders` compatibility tree, Arcane's read-only bind of that tree, and the local JAR-84 Downloader archive/staging directory were removed. Arcane's active Compose configuration now has no Downloader-path mount; it rendered successfully, Arcane was `running healthy`, and its HTTPS endpoint returned `200`. This does not remove or alter the active Library Prowlarr/qBittorrentVPN services, Library safety guard, or NAS data. JAR-84 archive and Restic records below remain historical recovery evidence, not evidence that a local archive remains available.
 
 ### Current Homepage Platform layout — 2026-10-13
 
@@ -46,7 +50,7 @@ Superseded for current service/presentation state by the JAR-95 and Homepage ove
 
 `platform` is the active shared-service Linux identity, preserving UID:GID `997:5002` with home `/home/platform`; it replaces the prior `infra` identity and owns the relocated Rotom legacy documentation checkout at `/home/platform/documentation/rotom-runbook`. Nginx Proxy Manager, Homepage, Arcane, Glances, Uptime Kuma, Rotom Docs, and Cloudflare DDNS are active from `/srv/rotom/{stacks,appdata,secrets}/platform`. Syncthing was not restored: `filesync` and its NFS contract are retired.
 
-`documents`, `downloader`, `filesync`, and `infra` accounts/groups and their requested local service trees are retired. Paperless, Prowlarr, qBittorrentVPN, and Syncthing containers are absent. The local `/mnt/nas-{infra,documents,downloaders,filesync}` fstab/automount contracts and mountpoints are absent; their NAS exports/data were not deleted. The surviving guest NFS contracts are Media, Gameserver, Smarthome, Web, Rotom Restic Backup, Shared Drive, and Library. The empty root-owned `/home/downloaders/docker` compatibility remnant and stale qBittorrent checks in automation remain documented cleanup items.
+`documents`, `downloader`, `filesync`, and `infra` accounts/groups and their requested local service trees are retired. Paperless, Prowlarr, qBittorrentVPN, and Syncthing containers are absent. The local `/mnt/nas-{infra,documents,downloaders,filesync}` fstab/automount contracts and mountpoints are absent; their NAS exports/data were not deleted. The surviving guest NFS contracts are Media, Gameserver, Smarthome, Web, Rotom Restic Backup, Shared Drive, and Library. The then-empty root-owned `/home/downloaders/docker` compatibility remnant was a documented cleanup item; the 2026-10-13 Downloader-remnant retirement above records its removal.
 
 ### JAR-93 current Platform-domain state — 2026-10-13
 
@@ -84,7 +88,7 @@ The accepted Phase B architecture now uses **PVE** as the product abbreviation a
 | JAR-10 / JAR-87 Media and ROM library | RomM mounts `/mnt/nas-media/library/games` read-only. JDownloader, the Media inbox, Igir, qBittorrent Games importer, and browser-upload bridge were retired on 2026-10-05. The separate review directory and RomM library remain preserved; RomM quick scans remain at minutes 7, 22, 37, and 52. The retained Game library is rollback material. |
 | JAR-89 Games staging — retired | The qBittorrent Games importer, its timer/service/scripts, and durable local state were retired on 2026-10-05. qBittorrentVPN itself and existing torrent payloads remain unchanged. |
 | JAR-90 RomM download path / retired browser upload | The browser bridge, credential, loopback listener, and NPM host `26` were retired on 2026-10-05. NPM proxy host `21` for `romm.rotom.casa` has a read-only Media game-library bind and internal `/library/` alias; NPM uses its pre-existing image-default root container identity and has no Docker socket. RomM's own library bind remains read-only and its Nginx workers run as `romm`. |
-| JAR-84 legacy Docker cleanup | Root preflight retired only four verified-inactive service-home project trees and the empty Game `docker` directory. Root-protected archives are under `/srv/rotom/backup-staging/{downloader,media}/jar84-20261001` and are byte-verified in guest Restic snapshot `3c85d5be`. Service homes, NAS shortcuts, Arcane's Downloader-parent mount, Jellyfin, and the held empty Web Docker directory remain intact. |
+| JAR-84 legacy Docker cleanup | Historical: root preflight retired only four verified-inactive service-home project trees and the empty Game `docker` directory. Root-protected archives were created under `/srv/rotom/backup-staging/{downloader,media}/jar84-20261001` and byte-verified in guest Restic snapshot `3c85d5be`. The Downloader archive/tree and Arcane's Downloader-parent mount were later removed on 2026-10-13; Jellyfin and the held empty Web Docker directory remain separate historical/operational subjects. |
 | JAR-77 Gamarr retirement | Gamarr is retired. Its active/legacy Compose and appdata trees, container, private network, port `6767`, Homepage card, NPM host `gamarr.rotom.casa`/ID `19`, and recovery-worker branch are removed. Certificate ID `24`, shared `rotom-arr`/`rotom-proxy`, Media game library/torrents, RomM, Prowlarr, qBittorrentVPN, Jellyfin, Radarr, and Sonarr remain intact. Targeted restore state is root-protected at `/srv/rotom/backup-staging/media/jar77-20260930/gamarr-config-and-compose.tar.gz`. |
 | JAR-88 Gameserver v2 | Independent Palworld modules run under `/srv/rotom/stacks/gameserver`, with VM-local live state under `/srv/rotom/appdata/gameserver` and locked `gameserver` at `995:5001`. `/mnt/nas-gameserver` is canonical NFSv3 `Gameserver/.data`; original Game data is rollback-only and not guest-mounted. JAR-87 Media ROM/qBittorrent contracts remain independent. |
 | JAR-43 Smart Home v2 | Home Assistant and Homebridge run from independent modules under `/srv/rotom/stacks/smarthome`, with authoritative mutable state under `/srv/rotom/appdata/smarthome`. They retain host networking for discovery and the established NPM compatibility routes. JAR-51 retired the inactive prior `/home/smarthome/docker/{home-assistant,homebridge}` rollback trees after reference and service validation; `/mnt/nas-smarthome` remains an unused reserved boundary. |
@@ -109,13 +113,13 @@ The accepted Phase B architecture now uses **PVE** as the product abbreviation a
 | PVE monitoring | CPU: `/usr/local/sbin/pve-cpu-temp-api`; `pve-cpu-temp-api.service`; endpoint `192.168.1.68:8788`; Homepage label `PVE CPU Temperature`. Backup schedules: `/usr/local/sbin/pve-backup-status-api`; `pve-backup-status-api.service`; LAN-only `192.168.1.68:8789`; Homepage `Backup Schedule` section orders Rotom VM, guest Rotom Restic, then PVE Restic cards |
 | Final JAR-68 acceptance | Physical reboot proven; PVE core services active; VM100 autostart passed; final PVE and Rotom post-reboot checks passed; zero failed PVE and Rotom systemd units at acceptance |
 
-## 3. Current Workload Ownership — Restored Through JAR-31
+## 3. Historical JAR-31 Workload Ownership
 
-JAR-31 restored the production Compose/application layer into the Debian VM while retaining the Phase B service-account split. The Linux-side download identity is **`downloaders`** at UID:GID `901:5005`. Current Prowlarr and qBittorrent Compose definitions are under `/srv/rotom/stacks`; `/home/downloaders/docker` remains only as the parent mounted by Arcane for compatibility/discovery. Historical sections retain the old `downloads` name where they describe pre-migration state.
+JAR-31 restored the production Compose/application layer into the Debian VM while retaining the Phase B service-account split. Its Linux-side download identity was **`downloaders`** at UID:GID `901:5005`; its then-current Prowlarr and qBittorrent Compose definitions were under `/srv/rotom/stacks`, and `/home/downloaders/docker` was Arcane's compatibility/discovery parent. That account, home, and bind are retired; current ownership is defined by the dated overlays in section 2. Historical sections retain the old `downloads` name where they describe pre-migration state.
 
 ChatGPT-controlled browser work is not part of the Rotom administration or documentation workflow. Available Sources replacements are handled manually by Jared when needed. The canonical legacy documentation maintenance contract selects behavior by execution environment and uses `retired-helper path` to resolve the active checkout rather than making shared workflow instructions depend on a physical path. ChatGPT on Mac delivers changed replacement files plus the complete legacy documentation ZIP and instructs Jared to copy the changed files into the checkout returned by `retired-helper path`, manually replace Available Sources, then publish with a relevant `retired-helper commit`, `retired-helper check`, and `retired-helper push`; ChatGPT itself performs no Git publication. Codex on Mac or Rotom resolves its local checkout with `retired-helper path`, edits that checkout directly when legacy documentation maintenance is authorized, and completes the final state through the guarded `retired-helper` commit/check/push flow. The Git checkouts remain operational mirrors/references and do not replace the Available Sources membership boundary or the maintenance contract in document 00. Apple Passwords/iCloud Passwords remains the credential source of truth; never record credential values or authentication material in the project documentation. See document 06 for the standing administration/Codex workflow and document 00 for legacy documentation maintenance governance.
 
-| Account | Current responsibility |
+| Account | Historical JAR-31 responsibility |
 |---|---|
 | infra | Arcane, Cloudflare DDNS, Homepage, Glances, Nginx Proxy Manager |
 | media | Jellyfin, Radarr, Sonarr |
@@ -130,11 +134,11 @@ ChatGPT-controlled browser work is not part of the Rotom administration or docum
 
 The pre-migration system granted Docker group GID `984` to all named operational accounts. JAR-30 deliberately did not recreate that root-equivalent privilege model. A fresh 2026-09-27 post-boot read again returned `docker:x:989:` with no members, confirming the current VM still uses `sudo docker` rather than broad Docker-group membership. Historical GID `984` membership must not be inferred current.
 
-### Current service identities, storage, and application state
+### Historical JAR-31 service identities, storage, and application state
 
-The eight current storage-facing service accounts preserve the applicable JAR-29 numeric identity contracts; Auth and Customapps have since been retired. Current workload restoration did not require broadening ordinary NFS permissions.
+The eight then-current storage-facing service accounts preserved the applicable JAR-29 numeric identity contracts; Auth and Customapps were later retired. This historical workload restoration did not require broadening ordinary NFS permissions.
 
-| Account | UID : primary GID | Current NAS mount | Current state |
+| Account | UID : primary GID | Historical JAR-31 NAS mount | Historical JAR-31 state |
 |---|---:|---|---|
 | media | 127 : 5000 | `/mnt/nas-media` | Active Jellyfin/Radarr/Sonarr owner; NFSv3 on demand; ordinary storage boundary retained |
 | gameserver | 995 : 5001 | `/mnt/nas-gameserver` | Active Jared/Fran Palworld identity; original Game content is rollback material only |
@@ -145,7 +149,7 @@ The eight current storage-facing service accounts preserve the applicable JAR-29
 | web | 902 : 5006 | `/mnt/nas-web` | Aloha active; Jared Wines intentionally undeployed |
 | filesync | 903 : 5007 | `/mnt/nas-filesync` | Syncthing is deployed; no production folder or authoritative payload is configured |
 
-All eight current service-home shortcuts use `/home/<service>/nas-<service> -> /mnt/nas-<service>`, including `/home/downloaders/nas-downloaders`. Backup and Shared Drive remain separate root-controlled mounts. Fran is not yet recreated in the new VM.
+All eight then-current service-home shortcuts used `/home/<service>/nas-<service> -> /mnt/nas-<service>`, including `/home/downloaders/nas-downloaders`. The Downloader shortcut and home are now retired. Backup and Shared Drive remain separate root-controlled mounts. Fran is not yet recreated in the new VM.
 
 ### Preserved pre-migration identities and NAS separation
 
@@ -168,7 +172,7 @@ At the pre-migration baseline, all named operational accounts were members of Do
 
 At the pre-migration baseline, Jared was `1000:1000` and Fran was `1001:1001`; only Jared is currently recreated in the Debian VM. Their existing personal UNAS drives are outside the JAR-6 NFS service-share scope and are not mounted as `/mnt/nas-jared` or `/mnt/nas-fran`. Seven of the eight JAR-6 service shares remain boundary-only. JAR-21 activated `/mnt/nas-downloads` as the centralized torrent store for the Downloads service account. Each JAR-6 share root remains numeric owner UID `988`, matching service GID `5002`–`5009`, mode `2770`; ordinary unrelated service-account access was functionally denied. Media remains the final movie/show library domain and Game remains the final game-library domain; qBittorrent no longer writes torrent data to either share.
 
-At the pre-migration baseline, each of the ten service homes had a verified explicit convenience link using `/home/<service>/nas-<service> -> /mnt/nas-<service>`. Those paths were `/home/media/nas-media`, `/home/game/nas-game`, `/home/infra/nas-infra`, `/home/smarthome/nas-smarthome`, `/home/documents/nas-documents`, `/home/downloads/nas-downloads`, `/home/web/nas-web`, `/home/filesync/nas-filesync`, `/home/apps/nas-apps`, and `/home/auth/nas-auth`; JAR-29 current state uses `/home/downloaders/nas-downloaders` instead of the old Downloads shortcut. The links were initially created as generic `nas` names and then renamed in place; supplied verification confirmed every final link target and confirmed the intended service identity could traverse its shortcut, ending with `ALL NAS SHORTCUT RENAMES: PASS`. These links do not replace the canonical `/mnt/nas-*` paths; operational configuration, Docker binds, systemd dependencies, storage guards, and troubleshooting should continue to use the real mountpoints.
+At the pre-migration baseline, each of the ten service homes had a verified explicit convenience link using `/home/<service>/nas-<service> -> /mnt/nas-<service>`. Those paths were `/home/media/nas-media`, `/home/game/nas-game`, `/home/infra/nas-infra`, `/home/smarthome/nas-smarthome`, `/home/documents/nas-documents`, `/home/downloads/nas-downloads`, `/home/web/nas-web`, `/home/filesync/nas-filesync`, `/home/apps/nas-apps`, and `/home/auth/nas-auth`; the later JAR-29 VM-era state used `/home/downloaders/nas-downloaders` instead of the old Downloads shortcut. The links were initially created as generic `nas` names and then renamed in place; supplied verification confirmed every final link target and confirmed the intended service identity could traverse its shortcut, ending with `ALL NAS SHORTCUT RENAMES: PASS`. These links do not replace the canonical `/mnt/nas-*` paths; operational configuration, Docker binds, systemd dependencies, storage guards, and troubleshooting should continue to use the real mountpoints.
 
 At the pre-migration baseline, the Palworld service identity was `game`, UID `995`, primary GID `5001`, home `/home/game`, and a member of Docker group GID `984`. The old passwd/group names and `/home/game-server` were absent. On 2026-09-19 both Palworld Compose files were changed to explicit `PUID=995` / `PGID=5001`, validated, and recreated against the existing trees. Both containers returned healthy and their application processes resolved as `game:game`. A stopped-state checksum manifest covering 234 `.sav` files compared with no differences after recreation. Their verified world IDs remain `DB40338954B844C28CEA21471A392F98` for Jared and `396F5898378F4E9CAE89461F403653D9` for Fran as restoration evidence; JAR-31 later restored both servers in the current VM and verified them healthy after reboot.
 
@@ -188,7 +192,7 @@ The adopted access policy keeps `jared` outside the media group. Administer medi
 
 ## 5. Storage Summary
 
-| Path | Current role |
+| Path | Historical JAR-31 role |
 |---|---|
 | `/mnt/nas-media` | NFSv3 `Media/.data`; root `988:5000` mode `2770`; active Jellyfin/Radarr/Sonarr final-library domain |
 | `/mnt/nas-gameserver` | NFSv3 `Gameserver/.data`; root `988:5001` mode `2770`; current Gameserver service boundary. Original `Game/.data` remains NAS-only rollback data and is not guest-mounted. |
@@ -205,7 +209,7 @@ The adopted access policy keeps `jared` outside the media group. Administer medi
 | `/srv/rotom/appdata` | Current VM-local mutable application state, separated by domain; protected by guest Restic `/srv` scope |
 | `/home/infra/docker/nginx-proxy-manager` | Retained NPM rollback tree only; active NPM is under `/srv/rotom` |
 | `/home/media/docker/jellyfin` | Retained Jellyfin legacy material only; active Jellyfin is under `/srv/rotom` |
-| `/home/downloaders/docker` | Retained parent for Arcane's compatibility/discovery mount; active Prowlarr/qBittorrent definitions are under `/srv/rotom` |
+| `/home/downloaders/docker` | Former Arcane compatibility/discovery mount parent; the home and bind were retired on 2026-10-13 |
 | `/home/web/docker` | Retired legacy website project trees; current Aloha and retained Jared Wines v2 state are under `/srv/rotom` |
 | `/var/lib/docker` | Current Docker runtime root on VM-local ext4; not NFS-backed |
 | `/var/lib/docker/volumes` | Current Docker named-volume store; includes restored `arcane_arcane-data` |
@@ -253,7 +257,7 @@ The current recovery design has three independent logical layers on the same Uni
 - **Maintenance:** PVE CPU bridge uses `pve-cpu-temp-api`; read-only backup schedule bridge uses `pve-backup-status-api` on `192.168.1.68:8789`, serving the PVE Restic and native Rotom VM Homepage cards. The NIC WOL/offload configuration remains as documented. The historical local `backup-proxmox-to-nas.pre-systemd.*` launcher was deliberately removed after final acceptance.
 - **Operational evidence:** physical PVE reboot, VM100 autostart, post-reboot PVE/Rotom acceptance, canonical mount/source checks, qBittorrent VPN state, and zero failed units all passed.
 
-## 7. Current Startup and Dependency Summary
+## 7. Historical JAR-31 Startup and Dependency Summary
 
 1. The Debian VM still boots independently of NAS availability through the fstab/systemd automount design.
 2. Docker and containerd are enabled and returned active after the JAR-31 acceptance reboot. Docker runtime state remains local at `/var/lib/docker`.
@@ -262,10 +266,10 @@ The current recovery design has three independent logical layers on the same Uni
 5. The earlier reboot restored the then-intended 16-running set. Final JAR-68 acceptance later recorded 16 total container objects / 14 intended running because both Palworld containers were deliberately stopped; qBittorrent `wg0` and core checks passed and zero systemd units were failed.
 6. The Proxmox host remains independent of Rotom application NFS and application Docker; no application share is mounted there.
 
-## 8. Current Architecture-Level Findings and Limitations
+## 8. Historical JAR-31 Architecture-Level Findings and Limitations
 
 - The Phase B application layer is restored. The final running set is 16 containers; Jared Wines remains intentionally undeployed.
-- UID/GID `901:5005` is named `downloaders`, with `/home/downloaders` and `/mnt/nas-downloaders`. **Current live evidence identifies the backing NAS export as `Downloader/.data`, not the earlier JAR-29/JAR-30 `Downloads/.data` claim.** Current fstab, generated mount unit, active NFS source, and `showmount` output agree.
+- At the recorded VM-era audit, UID/GID `901:5005` was named `downloaders`, with `/home/downloaders` and `/mnt/nas-downloaders`. Its recorded live evidence identified the backing NAS export as `Downloader/.data`, not the earlier JAR-29/JAR-30 `Downloads/.data` claim. That identity, home, and guest mount are now retired.
 - `/mnt/nas-downloaders` root metadata is `988:5005` mode `2770`; its readiness sentinel was observed. The earlier observed `torrents/{games,incomplete,movies,shows}` tree was retired by JAR-81, and qBittorrent's active payload remains on Media. Historical `Downloads/.data` references remain dated historical evidence.
 - Docker's root `/var/lib/docker` remains VM-local ext4. The application networks now occupy the verified bridge map recorded in documents 02/03; Homepage is `172.24.0.0/16`, Jared Palworld was deliberately moved to `172.27.0.0/16`, and Arcane is `172.28.0.0/16`.
 - Jared Palworld was stopped cleanly for the network relocation, a stopped-state archive was made, five active-save paths matched the pre-move gate, and the server returned healthy with the preserved image and zero restarts.

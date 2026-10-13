@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-10-13 — Complete legacy documentation current-state audit
+**Documentation updated:** 2026-10-13 — Retire downloader remnants
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -28,7 +28,7 @@ This is the canonical detailed owner of Rotom account identity and permission fa
 
 `platform` now owns UID:GID `997:5002` and `/home/platform`, replacing `infra` while preserving the numeric ownership contract for recovered shared-service state. The active legacy documentation checkout moved with the service home to `/home/platform/documentation/rotom-runbook`; Jared's resolver was updated and validated. `infra`, `documents`, `downloader`, and `filesync` accounts/groups are absent.
 
-Their requested service homes and active local application trees were retired, together with the four local NFS contracts. `/home/downloaders` later reappeared as an empty root-owned `0755` directory containing only empty `docker/`; it has no associated account and Arcane's active Compose file retains it as a read-only compatibility bind. This is a verified cleanup item, not a restored Downloader service. Auth remains retired as recorded below.
+Their requested service homes and active local application trees were retired, together with the four local NFS contracts. `/home/downloaders` later reappeared as an empty root-owned `0755` directory containing only empty `docker/`; it had no associated account and Arcane's active Compose file retained it as a read-only compatibility bind. Both the bind and home were removed on 2026-10-13; this did not restore or alter a Downloader service. Auth remains retired as recorded below.
 
 **Current JAR-88 state:** The active Palworld service account is `gameserver` (`995:5001`), preserving the former Game numeric identity; `game` is absent from NSS. Its home is `/home/gameserver`, and active local paths are under `/srv/rotom/{stacks,appdata,secrets}/gameserver`. `downloader` remains `901:5005`. No broad ownership rewrite or Docker-group change was performed.
 
@@ -49,7 +49,7 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 | platform | `997:5002`, `/home/platform`; Arcane/DDNS/Homepage/Glances/NPM/Rotom Docs |
 | smarthome | `126:5003`, `/home/smarthome`; Home Assistant/Homebridge |
 | documents | **Retired**; historical `900:5004` / `/home/documents` record only |
-| downloader | **Retired**; `/home/downloaders/docker` is only the root-owned Arcane compatibility remnant |
+| downloader | **Retired**; account, former home, and Arcane compatibility bind are absent |
 | web | `902:5006`, `/home/web`; Aloha active; Jared Wines undeployed |
 | filesync | **Retired**; historical `903:5007` / Syncthing record only |
 | desktopcmd | `1001:1001`, locked non-human account with `/home/desktopcmd` mode `0700`; Remote Desktop Commander only; no sudo, SSH authorized keys, Docker/socket, service-group, or NAS-specific access |

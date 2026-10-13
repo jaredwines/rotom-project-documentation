@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Restic backup architecture, scope, retention, verification, restore evidence, and recovery boundaries  
 **Recovery scope:** pre-migration Rotom plus current Proxmox/VM foundation  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — JAR-93 Platform-domain migration
+**Documentation updated:** 2026-10-13 — Retire downloader remnants
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -83,9 +83,13 @@ Guest Restic remains intentionally unchanged by JAR-68:
 
 ### JAR-47 verified v2 guest recovery point
 
+### Downloader local-recovery artifact retired — 2026-10-13
+
+The local JAR-84 Downloader recovery archive/staging directory at `/srv/rotom/backup-staging/downloader` was deliberately removed with the final empty Downloader home and obsolete Arcane bind. The archived content and Restic byte-readback described below remain historical evidence, but no local fast-recovery copy remains. Confirm retained Restic snapshot availability before any legacy Downloader recovery attempt.
+
 ### JAR-84 legacy-tree recovery artifacts — 2026-10-01
 
-Before removing four verified-inactive service-home Compose/configuration trees, JAR-84 created root-only archives under `/srv/rotom/backup-staging/downloader/jar84-20261001/` and `/srv/rotom/backup-staging/media/jar84-20261001/`. Their SHA-256 values are `66dd1cf1b10b75b16082f381c7f713f0c688ab9c86667456d4288b3133e0d4ba` (Downloader Prowlarr/qBittorrentVPN) and `91d711aaba034bbc5aceb0732daeb9241003a98977b6358fcf3881fda6489a52` (Media Radarr/Sonarr). Successful normal-retention snapshot `3c85d5be` at 2026-10-01 02:30 PDT contains both; Restic byte-stream readback matched each local checksum before deletion. The archives are VM-local recovery material, not NAS payload backups.
+Before removing four verified-inactive service-home Compose/configuration trees, JAR-84 created root-only archives under `/srv/rotom/backup-staging/downloader/jar84-20261001/` and `/srv/rotom/backup-staging/media/jar84-20261001/`. Their SHA-256 values are `66dd1cf1b10b75b16082f381c7f713f0c688ab9c86667456d4288b3133e0d4ba` (Downloader Prowlarr/qBittorrentVPN) and `91d711aaba034bbc5aceb0732daeb9241003a98977b6358fcf3881fda6489a52` (Media Radarr/Sonarr). Successful normal-retention snapshot `3c85d5be` at 2026-10-01 02:30 PDT contains both; Restic byte-stream readback matched each local checksum before deletion. The Downloader local archive was retired on 2026-10-13; the Media archive's current retention is a separate question. These archives are VM-local recovery material, not NAS payload backups.
 
 ### JAR-88 Gameserver migration rollback evidence — 2026-10-01; local artifacts retired 2026-10-05
 
@@ -253,7 +257,7 @@ The active Prowlarr tree is `/home/downloads/docker/prowlarr`, within the unchan
 
 ### qBittorrentVPN and Gamarr migration — backup implications
 
-JAR-56 moved qBittorrentVPN's active stack/appdata to `/srv/rotom/stacks/downloader/qbittorrentvpn` and `/srv/rotom/appdata/downloader/qbittorrentvpn`; its root-only v2 env file is under `/srv/rotom/secrets/downloader` and must never be displayed. The former `/home/downloaders/docker/qbittorrentvpn` project remains rollback material. JAR-52 moved the active Gamarr game-library contract to `/mnt/nas-media/library/games` while retaining `/mnt/nas-game/library/games` for rollback. JAR-56's active torrent data is `/mnt/nas-media/torrents`, while the complete `/mnt/nas-downloaders/torrents` source remains rollback material. Jared deferred authenticated application import/seeding validation, so none of that rollback material may be retired yet. All of those NAS trees are outside host Restic because `/mnt` is excluded; neither JAR-52 nor JAR-56 establishes NAS-side protection or recovery behavior.
+JAR-56 moved qBittorrentVPN's active stack/appdata to `/srv/rotom/stacks/downloader/qbittorrentvpn` and `/srv/rotom/appdata/downloader/qbittorrentvpn`; its root-only v2 env file is under `/srv/rotom/secrets/downloader` and must never be displayed. The former `/home/downloaders/docker/qbittorrentvpn` project was rollback material until the local Downloader home was retired on 2026-10-13. JAR-52 moved the active Gamarr game-library contract to `/mnt/nas-media/library/games` while retaining `/mnt/nas-game/library/games` for rollback. JAR-56's active torrent data is `/mnt/nas-media/torrents`, while the complete `/mnt/nas-downloaders/torrents` source remains rollback material. Jared deferred authenticated application import/seeding validation, so none of that rollback material may be retired yet. All of those NAS trees are outside host Restic because `/mnt` is excluded; neither JAR-52 nor JAR-56 establishes NAS-side protection or recovery behavior.
 
 The 2026-09-19 Homebridge container-name correction changed the then-current `/home/smart-home/docker/homebridge/compose.yaml` and `/home/jared/rotom-manual-verify.sh`; both known paths are within the normal `/home` Restic include scope. That Homebridge tree is now `/home/smarthome/docker/homebridge`. Snapshot `f0d51eaa` predates the correction; final JAR-19 snapshot `e886c55d` supplies the latest documented recovery point after the correction and later identity/JAR-19 work, but it predates final JAR-6 state and the service-home `nas` symlinks.
 
@@ -577,7 +581,7 @@ JAR-6 did not change backup architecture. After the normal Rotom reboot, read-on
 - Pre-change backup completed and created snapshot `cd230c0a` before the affected Compose projects were stopped.
 - The normal post-change `backup-to-nas` run created snapshot `b67540b0` at `2026-09-21 02:23:25 PDT`.
 - The retention policy then removed same-day snapshot `cd230c0a` and pruned normally; this was expected retention behavior, not a manual repository deletion.
-- Current host backup scope includes the `/home` root and therefore current service homes such as `/home/infra`, `/home/smarthome`, `/home/documents`, `/home/downloaders`, `/home/web`, and `/home/filesync`; retired `/home/apps` and `/home/auth` paths are absent.
+- At the recorded checkpoint, host backup scope included the `/home` root and service homes then present, including `/home/infra`, `/home/smarthome`, `/home/documents`, `/home/downloaders`, `/home/web`, and `/home/filesync`. The retired `/home/downloaders` tree is absent as of 2026-10-13, alongside `/home/apps` and `/home/auth`.
 - Rollback evidence is retained at `/root/rotom-identity-batch-20260921-021305`, within the unchanged `/root` backup source.
 - Application checks passed before the post-change backup: Homepage, Home Assistant, Homebridge, Prowlarr, and qBittorrent returned HTTP 200; qBittorrentVPN had WireGuard `wg0`.
 

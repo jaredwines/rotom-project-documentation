@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-13 — Complete legacy documentation current-state audit
+**Documentation updated:** 2026-10-13 — Retire downloader remnants
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-13 — Retire downloader remnants
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Recorded the completed removal of the already-absent Downloader account's remaining local artifacts: the empty `/home/downloaders` tree, Arcane's obsolete read-only bind of that tree, and the JAR-84 local Downloader recovery archive/staging directory. This changes no active Library service, NAS export, or NAS payload. Historical JAR-84 archive and Restic-readback facts remain evidence; the deleted local Downloader archive is no longer a fast recovery copy.
+- **Evidence:** 2026-10-13 final read-only checks found both retired paths absent; active Arcane Compose rendered successfully; Arcane was `running healthy` with only Platform appdata, Docker socket, Platform secrets, and Platform stacks mounts; `https://arcane.rotom.casa` returned `200`.
+- **Outstanding:** Existing Restic snapshot evidence is historical only; confirm retained snapshot availability before attempting a legacy Downloader recovery. Available Sources replacement remains manual by Jared.
 
 ## 2026-10-13 — Complete legacy documentation current-state audit
 

@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-13 — Homepage Platform layout
+**Documentation updated:** 2026-10-13 — Retire downloader remnants
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -14,6 +14,10 @@ Record substantive changes to this document in the change log as part of the sam
 ## 1. Purpose and Scope
 
 ### Current qBittorrent and Filesync automation state — 2026-10-13
+
+### Downloader-remnant retirement — 2026-10-13
+
+The obsolete Arcane read-only bind of `/home/downloaders/docker` was removed before the empty `/home/downloaders` tree was deleted. Arcane Compose rendered successfully afterward, Arcane remained `running healthy`, and its HTTPS endpoint returned `200`. This cleanup did not alter the active Library qBittorrent/Prowlarr automation or qBittorrent's enabled safety guard.
 
 ### Current Homepage Platform layout — 2026-10-13
 
@@ -185,7 +189,7 @@ At the pre-migration baseline, all containers used Docker `json-file` logging an
 
 Arcane has no notification providers configured.
 
-Arcane's active container mounts the Downloaders-owned canonical project root `/home/downloaders/docker` directly. `followProjectSymlinks=true` remains configured, but JAR-85 verified that Arcane's current database does not reference the former `/home/infra/docker/downloads` discovery path; that inactive symlink was retired. Historical project-state records that name it remain historical evidence. Docker independently verifies qBittorrentVPN running with `wg0` up; any stale Arcane project metadata is not runtime authority. Arcane does not manage Palworld under `/home/game/docker`, so Arcane updates do not overlap Palworld's updater.
+JAR-85's active Arcane container mounted the Downloaders-owned canonical project root `/home/downloaders/docker` directly. `followProjectSymlinks=true` remains configured, but JAR-85 verified that Arcane's current database does not reference the former `/home/infra/docker/downloads` discovery path; that inactive symlink was retired. The Downloader bind and source tree were removed on 2026-10-13. Historical project-state records that name either path remain historical evidence. Docker independently verifies qBittorrentVPN running with `wg0` up; any stale Arcane project metadata is not runtime authority. Arcane does not manage Palworld under `/home/game/docker`, so Arcane updates do not overlap Palworld's updater.
 
 Read-only/final JAR-21 inspection of `/var/lib/docker/volumes/arcane_arcane-data/_data/arcane.db` verifies the Prowlarr/qBittorrentVPN rows are reconciled to the Downloads symlink paths. Unrelated stale historical Smart Hub/Smarthome records remain technical debt. Arcane also previously recorded registry pull retry and rate-limit failures.
 
@@ -293,7 +297,7 @@ This section refers to the retired Linux Mint bare-metal host and must not be us
 
 ## 10. Preserved Pre-Migration Service-Identity and NAS Maintenance
 
-At the final pre-migration baseline, Media was **UID `127`, primary GID `5000`**; Jellyfin, Radarr, and Sonarr used `127:5000`, while Gamarr used `995:5001`. JAR-21 moved Prowlarr and qBittorrentVPN to the then-named `downloads` identity `901:5005` under `/home/downloads/docker`, with torrent data at `/mnt/nas-downloads/torrents`. **Current VM naming is `downloaders` with `/home/downloaders` and `/mnt/nas-downloaders`; numeric identity `901:5005` is unchanged.**
+At the final pre-migration baseline, Media was **UID `127`, primary GID `5000`**; Jellyfin, Radarr, and Sonarr used `127:5000`, while Gamarr used `995:5001`. JAR-21 moved Prowlarr and qBittorrentVPN to the then-named `downloads` identity `901:5005` under `/home/downloads/docker`, with torrent data at `/mnt/nas-downloads/torrents`. **The later VM-era name was `downloaders` with `/home/downloaders` and `/mnt/nas-downloaders`, preserving numeric identity `901:5005`; that identity and home are now retired.**
 
 The pre-migration NAS Media root was `988:5000` mode `2770`, and the final library tree was the authoritative Media application data. JAR-21 moved active torrent data to Downloads GID `5005`. Those numeric ownership rules remain relevant to reconstruction, but current host paths use the VM-era `downloaders` naming. Use numeric ownership when diagnosing NFS; Rotom's displayed `fwupd-refresh` name for numeric `988` does not identify the real NAS account.
 
