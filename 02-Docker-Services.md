@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; the current runtime baseline is the 2026-10-14 inventory in section 1A  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Add Fran as a Rotom and PVE administrator  
+**Documentation updated:** 2026-10-14 — Standardize backup system display names
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -270,7 +270,7 @@ The chat confirms the apex URL works and records the user's selected title and d
 
 ### JAR-69/JAR-70 backup schedule cards — 2026-09-28/29
 
-Homepage's top-level **Backup Schedule** section appears immediately above **Rotom Monitoring** and contains exactly these custom-API cards in order: **Rotom VM Backup Schedule**, **Rotom Restic Backup Schedule**, and **PVE Restic Backup Schedule**. JAR-70 renamed the former **Rotom Backup Schedule** card only; its guest Restic endpoint remains `http://192.168.1.69:8787/backup-status`. The PVE cards use the LAN-only, read-only endpoints **Rotom VM Backup Schedule** at `http://192.168.1.68:8789/rotom-vm-backup-status` and **PVE Restic Backup Schedule** at `http://192.168.1.68:8789/pve-restic-backup-status`. Each preserves `mdi-backup-restore`, a 60-second refresh, and mappings for Schedule, Last Result, Next Run, and Last Run. The current persistent Homepage presentation layer colors that mapped `Last Result` green for `success` and red for `failed`/`failure`; this does not change Custom API behavior or the backing backup services. Homepage's `settings.yaml` layout map lists **Backup Schedule** first with `style: row` and `columns: 3`, which renders the section at the top as one row of three equal cards. JAR-70's configuration diffs changed only the section placement/order, guest-card label, and that layout entry; Rotom Monitoring's non-backup cards, all endpoints, custom API behavior, Compose project, Glances, backup controls/schedules/retention/repositories/storage, VZDump configuration, and recovery points remained unchanged. Homepage hot reload, Compose validation, API/status checks, and the apex HTTPS check passed.
+Homepage's top-level **Backup Schedule** section appears immediately above **Rotom Monitoring** and contains these custom-API cards in order: **Rotom VM Backup**, **Rotom Restic**, and **PVE Restic**. Their endpoints remain `http://192.168.1.69:8787/backup-status`, `http://192.168.1.68:8789/rotom-vm-backup-status`, and `http://192.168.1.68:8789/pve-restic-backup-status`, respectively. Each preserves `mdi-backup-restore`, a 60-second refresh, and mappings for Schedule, Last Result, Next Run, and Last Run. The presentation layer colors that mapped `Last Result` green for `success` and red for `failed`/`failure`; this does not change Custom API behavior or backup execution. Homepage's `settings.yaml` layout map lists **Backup Schedule** first with `style: row` and `columns: 3`, which renders the section at the top as one row of three equal cards. VZDump remains the technical name for the Rotom VM Backup mechanism. On 2026-10-14, Homepage rendered the exact three official labels after the display-only YAML update and remained healthy.
 
 
 ### Glances backup-mount removal — September 18 update
@@ -577,7 +577,7 @@ No additional Docker service is promoted to current state by this restructure. A
 
 ## 13. Outstanding / Needs Verification
 
-The VM-era backup baseline is no longer a Docker gap. The 2026-10-14 audit found 22 guest snapshots, latest automatic snapshot `9494979d` from 2026-10-13, and a successful `restic check`. Earlier points including `8efea294` and `f666d63c` remain dated evidence. Full guest data-read and restore verification remain outstanding; `/mnt` remains outside the guest Restic source set.
+The VM-era backup baseline is no longer a Docker gap. The 2026-10-14 audit found 22 Rotom Restic snapshots, latest automatic snapshot `9494979d` from 2026-10-13, and a successful `restic check`. Earlier points including `8efea294` and `f666d63c` remain dated evidence. Full Rotom Restic data-read and restore verification remain outstanding; `/mnt` remains outside the Rotom Restic source set.
 
 - **Intentional:** Fran is not recreated, and her historical backup sudoers rule is not installed.
 - **Needs Verification — live Libraries-NFS loss:** startup/recreation fail-closed behavior and the Libraries guard are documented, but application behavior during sudden loss of the active Libraries NFS payload while qBittorrent is already running has not been exercised. Read-only inspection can confirm the guard definition; actual loss behavior requires a separately planned non-destructive maintenance test and must not be inferred.

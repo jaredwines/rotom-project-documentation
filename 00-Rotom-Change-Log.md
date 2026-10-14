@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-14 — Add Fran as a Rotom and PVE administrator  
+**Documentation updated:** 2026-10-14 — Standardize backup system display names
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-14 — Standardize backup system display names
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.** No backup execution logic, script, unit, timer, schedule, retention, repository, NAS storage, credential, or recovery behavior was changed.
+- **Changes:** Standardized current-state presentation terminology as **Rotom Restic** (guest file/application-data backup), **PVE Restic** (PVE host-configuration backup), and **Rotom VM Backup** (whole-VM backup). Updated only the three Homepage card labels to those exact names. Retained **VZDump** for the technical Proxmox mechanism, commands, VMA archives, verifiers, and identifiers. Historical records retain their original terminology as evidence. The legacy documentation has no current `Rotom-Architecture.md` or other current non-numbered Available Source.
+- **Evidence:** Read-only Rotom checks on 2026-10-14 found `rotom-restic-backup.timer` and `rotom-weekly-maintenance.timer` active/enabled; guest, PVE Restic, and Rotom VM Backup status APIs each reported active/enabled schedules with successful 2026-10-14 runs. The guest Restic NFS mount was present. Homepage rendered the exact three official labels after its display-only YAML update, remained `running healthy`, and Rotom had zero failed systemd units.
+- **Outstanding:** PVE remains Jared-executed: inspect the host's backup-status implementation and job presentation for any remaining superseded user-facing labels before treating host-side terminology as fully reverified. Available Sources synchronization remains manual by Jared.
 
 ## 2026-10-14 — Add Fran as a Rotom and PVE administrator
 

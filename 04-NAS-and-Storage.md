@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Complete legacy documentation editorial and consistency audit  
+**Documentation updated:** 2026-10-14 — Standardize backup system display names
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -23,7 +23,7 @@ Both PVE backup-specific NAS filesystems were mounted read/write over NFSv3: `PV
 
 Paperless media is authoritative at `/mnt/nas-libraries/paperless`, a dedicated child of the current Libraries NFSv3 mount. It is owned by `127:5000`, mode `2770`, and is the Paperless web container's sole media bind through a non-creating Compose bind. The restored target contains five files / 384,771 bytes; its SHA-256 manifest matches the protected recovery source. The former Documents export refused a temporary mount from Rotom, so no bypass or NAS-side mutation was performed; the retained local recovery media was copied instead. The original recovery set remains preserved.
 
-The full Libraries mount, including Paperless media, remains outside guest Restic's `/mnt` scope. Its effective NAS snapshot schedule, retention, and isolated restore are **Needs Verification**. Do not recursively retag unrelated NAS content; the Paperless subtree is the only NAS path created for this restoration.
+The full Libraries mount, including Paperless media, remains outside Rotom Restic's `/mnt` scope. Its effective NAS snapshot schedule, retention, and isolated restore are **Needs Verification**. Do not recursively retag unrelated NAS content; the Paperless subtree is the only NAS path created for this restoration.
 
 ### Current JAR-96 Library storage — 2026-10-13
 
@@ -69,13 +69,13 @@ The Rotom guest storage contract is five NFS systemd automounts: Game Servers, S
 
 ### NAS protection classification — JAR-47
 
-UniFi Drive snapshot settings are historical evidence, not a current verified policy. The supplied Media settings evidence records a **daily 12:00 AM UNAS-local** schedule with a **16-snapshot** limit. Current authoritative Libraries data is NAS-resident and outside guest Restic because `/mnt` is excluded; its effective snapshot schedule/retention and isolated restore outcome are **Needs Verification**. The same applies to any future authoritative NAS data. `Game_Servers` and `Smart_Home` are current mounted boundaries, but their application state remains VM-local. The NAS-side Customapps export was empty when last mounted but is no longer a Rotom guest boundary. Snapshot retention, where enabled, is local rollback protection on the same UNAS appliance, not off-site protection.
+UniFi Drive snapshot settings are historical evidence, not a current verified policy. The supplied Media settings evidence records a **daily 12:00 AM UNAS-local** schedule with a **16-snapshot** limit. Current authoritative Libraries data is NAS-resident and outside Rotom Restic because `/mnt` is excluded; its effective snapshot schedule/retention and isolated restore outcome are **Needs Verification**. The same applies to any future authoritative NAS data. `Game_Servers` and `Smart_Home` are current mounted boundaries, but their application state remains VM-local. The NAS-side Customapps export was empty when last mounted but is no longer a Rotom guest boundary. Snapshot retention, where enabled, is local rollback protection on the same UNAS appliance, not off-site protection.
 
 ### Historical JAR-91 Documents Paperless media authority — 2026-10-05
 
 The existing NFSv3 `Documents/.data` export at `/mnt/nas-documents` was mounted read/write with 3.5 TiB free. Only its `paperless/` child was created. It is `900:5004`, mode `2770`; the five migrated regular files and their directories are also `900:5004`. Paperless has the sole write bind, `/mnt/nas-documents/paperless -> /usr/src/paperless/media`; Compose uses `create_host_path: false`. The root remains `988:5004` mode `2770`; no broad share ownership rewrite occurred.
 
-At this historical checkpoint the prior VM-local media tree and root-only rollback copy at `/srv/rotom/backup-staging/documents/jar91-20261005-220500/` were retained. `/srv/rotom/backup-staging` was absent on 2026-10-14, so neither is a current fast local rollback path. Guest Restic excludes `/mnt`, and current Paperless media is under Libraries; NAS-side snapshot/recovery protection remains required.
+At this historical checkpoint the prior VM-local media tree and root-only rollback copy at `/srv/rotom/backup-staging/documents/jar91-20261005-220500/` were retained. `/srv/rotom/backup-staging` was absent on 2026-10-14, so neither is a current fast local rollback path. Rotom Restic excludes `/mnt`, and current Paperless media is under Libraries; NAS-side snapshot/recovery protection remains required.
 
 ### PVE host-config Restic storage
 
@@ -120,7 +120,7 @@ The importer and Igir were retired on 2026-10-05, together with the inbox and th
 
 ### Current Game Servers and Smart Home drive mounts — 2026-10-13
 
-The current fstab-backed systemd automounts are `Game_Servers/.data -> /mnt/nas-game-servers` and `Smart_Home/.data -> /mnt/nas-smart-home`. Rotom successfully read-only preflight-mounted each exact source, then traversed each live NFSv3 `sec=sys` automount after activation. Both are empty service boundaries: Game Servers is `988:5001` mode `2770`, and Smart Home is `988:5003` mode `2770`. There are no current home NAS shortcuts. Temporary create/remove checks verified new descendants as `game-servers:game-servers` (`995:5001`) and `smart-home:smart-home` (`126:5003`), with inherited setgid directories. The old guest-side `Gameserver/.data -> /mnt/nas-gameserver` and `Smarthome/.data -> /mnt/nas-smarthome` contracts, mountpoints, and shortcuts are retired; no NAS-side data migration, snapshot change, or deletion was performed. Palworld worlds and Smart Home application state remain VM-local, and guest Restic excludes `/mnt`.
+The current fstab-backed systemd automounts are `Game_Servers/.data -> /mnt/nas-game-servers` and `Smart_Home/.data -> /mnt/nas-smart-home`. Rotom successfully read-only preflight-mounted each exact source, then traversed each live NFSv3 `sec=sys` automount after activation. Both are empty service boundaries: Game Servers is `988:5001` mode `2770`, and Smart Home is `988:5003` mode `2770`. There are no current home NAS shortcuts. Temporary create/remove checks verified new descendants as `game-servers:game-servers` (`995:5001`) and `smart-home:smart-home` (`126:5003`), with inherited setgid directories. The old guest-side `Gameserver/.data -> /mnt/nas-gameserver` and `Smarthome/.data -> /mnt/nas-smarthome` contracts, mountpoints, and shortcuts are retired; no NAS-side data migration, snapshot change, or deletion was performed. Palworld worlds and Smart Home application state remain VM-local, and Rotom Restic excludes `/mnt`.
 
 ### Historical JAR-88 Gameserver drive and mount — 2026-10-01
 
@@ -808,7 +808,7 @@ The Media NFS source/export and `/mnt/nas-media` automount remain intentionally 
 
 The separate Documents NFS source/export and `/mnt/nas-documents` path also remain unchanged. Its root contains only `paperless/` and was retagged from group `5004` to `5000` (`988:5000`, mode `2770`); the exact Paperless media subtree was retagged from `900:5004` to `127:5000`. This was the least supported scope after NFSv3 rejected POSIX ACL mutation and a `127:5000` process with supplementary `5004` remained denied by server-managed groups. No audiovisual/game/qBittorrent data was retagged or granted a Documents bind.
 
-Current storage and backup automation are documented above; this section retains unresolved checks only. Historical JAR-31/JAR-32/JAR-33 commissioning states do not override later JAR-47/JAR-88 evidence. `/mnt` remains outside the guest Restic source scope.
+Current storage and backup automation are documented above; this section retains unresolved checks only. Historical JAR-31/JAR-32/JAR-33 commissioning states do not override later JAR-47/JAR-88 evidence. `/mnt` remains outside the Rotom Restic source scope.
 
 - **Needs Verification — UNAS metadata persistence:** recheck service-share root metadata after a future UNAS/UniFi Drive restart/update, especially Downloader `988:5005`, Media `988:5000`, Gameserver `988:5001`, current Restic share `Rotom_Restic_Backup` at `988:988` mode `0700`, and current service GIDs `5002`–`5008`. Resolve read-only with `findmnt` and `stat` from Rotom plus UNAS-side export/share inspection after the event.
 - **Needs Verification — live Libraries-NFS loss:** fail-closed recreation and the Libraries guard are documented, but sudden loss of the active Libraries payload while qBittorrent is already running is untested. Read-only inspection can verify the guard definition; actual runtime behavior requires a separately planned non-destructive maintenance test.

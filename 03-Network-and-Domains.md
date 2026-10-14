@@ -101,7 +101,7 @@ Three empty external local bridge networks now reserve v2 cross-stack roles: `ro
 
 ### Evidence provenance
 
-Last updated: 2026-09-27 (Proxmox host-config Restic NFS boundary added; JAR-66/JAR-33 VZDump boundary, JAR-32 guest Restic cutover, and JAR-31 application networking/reboot acceptance retained; pre-migration sections remain historical evidence)
+Last updated: 2026-10-14 (Rotom Restic, PVE Restic, and Rotom VM Backup display terminology standardized; technical VZDump references and pre-migration evidence retained)
 Project: **Rotom-Home-Server**
 
 This document records Rotom's networking state using three read-only host audits collected on 2026-09-14:
