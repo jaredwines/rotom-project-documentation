@@ -15,7 +15,7 @@ Record substantive changes to this document in the change log as part of the sam
 
 ### Current JAR-96 Library mount contract — 2026-10-13
 
-Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Nginx Proxy Manager were recreated with Library binds from `/mnt/nas-libraries`; no active container bind uses `/mnt/nas-library` or `/mnt/nas-media`. qBittorrent keeps `/mnt/nas-libraries/torrents` at `/media/torrents` and the read-only, non-creating sentinel bind at its unchanged container path. NPM's internal game-library alias and Homepage's Library storage metric also use the new host mount. qBittorrent `wg0` and all affected local HTTP checks passed after recreation. The retired local `/mnt/nas-media` directory is absent; historical Media-bind records below are not current Compose guidance.
+Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Nginx Proxy Manager were recreated with Library binds from `/mnt/nas-libraries`; no active container bind uses `/mnt/nas-library` or `/mnt/nas-media`. qBittorrent keeps `/mnt/nas-libraries/torrents` at `/media/torrents` and the read-only, non-creating sentinel bind at its unchanged container path. NPM's internal game-library alias and Homepage's Library storage metric also use the new host mount. qBittorrent `wg0` and all affected local HTTP checks passed after recreation. After its reboot bind-startup race, NPM was restored and added to the targeted NAS recovery helper; public Homepage HTTPS then returned `200`. The retired local `/mnt/nas-media` directory is absent; historical Media-bind records below are not current Compose guidance.
 
 ### Current local-domain alignment — 2026-10-13
 

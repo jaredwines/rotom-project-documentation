@@ -19,7 +19,7 @@ Record substantive changes to this document in the change log as part of the sam
 
 ### Current JAR-96 Library automation contract — 2026-10-13
 
-`rotom-nas-docker-recovery` now verifies `/mnt/nas-libraries` and its `library/` directory before considering the Library containers. The enabled `rotom-qbittorrent-media-guard.timer` verifies `/mnt/nas-libraries/torrents` and `.rotom-qbt-media-ready/`, and stops a running qBittorrentVPN if either safety condition is absent. qBittorrent's sentinel bind remains non-creating; a local fallback directory is not an accepted mount condition. The prior `/mnt/nas-library` guest contract is retired, while its NAS source data remains retained.
+`rotom-nas-docker-recovery` now verifies `/mnt/nas-libraries` and its `library/` directory before considering the Library containers. It conditionally recovers Nginx Proxy Manager too, but only when its recorded Docker error matches the existing NAS/mount startup-failure signature; running or intentionally stopped services remain untouched. The enabled `rotom-qbittorrent-media-guard.timer` verifies `/mnt/nas-libraries/torrents` and `.rotom-qbt-media-ready/`, and stops a running qBittorrentVPN if either safety condition is absent. qBittorrent's sentinel bind remains non-creating; a local fallback directory is not an accepted mount condition. The prior `/mnt/nas-library` guest contract is retired, while its NAS source data remains retained.
 
 ### Current local-domain alignment — 2026-10-13
 
