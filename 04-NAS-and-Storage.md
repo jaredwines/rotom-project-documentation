@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Record Jared-confirmed recovery verification
+**Documentation updated:** 2026-10-14 — Capture current PVE VM-backup storage configuration
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -17,7 +17,7 @@ Record substantive changes to this document in the change log as part of the sam
 
 The PVE host's active storage set is `local`, `local-lvm`, and `nas-rotom-vm-backup`. The root filesystem had about 57 GiB free; the LVM-thin pool was 46.25% allocated, and VM 100's 100 GiB logical disk was 63.11% allocated. This supersedes older capacity percentages only as a dated observation, not as a fixed threshold. The host has no ZFS pool.
 
-Both PVE backup-specific NAS filesystems were mounted read/write over NFSv3: `PVE_Restic_Backup/.data -> /mnt/nas-pve-restic-backup` and `Rotom_VM_Backup/.data -> /mnt/pve/nas-rotom-vm-backup`. The NAS reported roughly 3.5 TiB free. `showmount` listed seven exports with the expected `.68`/`.69` client restrictions. The collection attempted unsupported `pvesm config`, so the exact current `/etc/pve/storage.cfg` text was not captured; the active storage list, mounts, backup job, and successful repository checks independently confirm the operational endpoints. Exact storage stanza options remain **Needs Verification**.
+Both PVE backup-specific NAS filesystems were mounted read/write over NFSv3: `PVE_Restic_Backup/.data -> /mnt/nas-pve-restic-backup` and `Rotom_VM_Backup/.data -> /mnt/pve/nas-rotom-vm-backup`. The NAS reported roughly 3.5 TiB free. `showmount` listed seven exports with the expected `.68`/`.69` client restrictions. Jared's supplied 2026-10-14 `/etc/pve/storage.cfg` output confirms the active `nas-rotom-vm-backup` stanza is NFS server `192.168.1.70`, export `/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Rotom_VM_Backup/.data`, path `/mnt/pve/nas-rotom-vm-backup`, and `content backup`; no additional stanza options are present.
 
 ### Current Paperless Libraries media storage — 2026-10-13
 
@@ -90,6 +90,7 @@ At this historical checkpoint the prior VM-local media tree and root-only rollba
 - NAS share/export: `Rotom_VM_Backup/.data`, authorized to PVE `192.168.1.68`.
 - PVE storage ID: `nas-rotom-vm-backup`.
 - Mount: `/mnt/pve/nas-rotom-vm-backup`; PVE-managed NFS, `content backup`.
+- Active PVE configuration: NFS server `192.168.1.70`; export `/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Rotom_VM_Backup/.data`; no additional storage options configured.
 - The earlier fully verified 2026-09-28 baseline archive is historical evidence and was absent from the 2026-10-05 storage list. That list contained eight current unprotected VMID `100` archives: six scheduled `05:00` archives from 2026-09-30 through 2026-10-05, a separately listed 2026-09-29 archive, and manual `vzdump-qemu-100-2026_10_05-22_47_06.vma.zst` (`56,432,423,998` bytes). The manual service logged successful completion. The listing confirms availability, schedule output, and normal retention participation; it does not claim new zstd or full `vma verify` checks for the current archive set.
 
 ### Historical guest storage and post-reboot acceptance

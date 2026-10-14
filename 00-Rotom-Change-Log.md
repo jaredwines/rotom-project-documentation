@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-14 — Capture current PVE VM-backup storage configuration
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `04-NAS-and-Storage.md`.
+- **Status:** **Documentation only / Verified.** No PVE configuration change was made.
+- **Changes:** Closed the exact PVE storage-stanza gap for Rotom VM Backup. The active `nas-rotom-vm-backup` storage is an NFS definition for `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Rotom_VM_Backup/.data`, mounted at `/mnt/pve/nas-rotom-vm-backup`, with `content backup` only.
+- **Evidence:** Jared-executed read-only `/etc/pve/storage.cfg` output supplied in this chat.
+- **Outstanding:** The PVE boot excerpt shows normal NIC link-up and recurring iGPU passthrough option-ROM warnings, but does not establish a cause for the historical whole-host reset. The direct-LAN/PVE-firewall policy decision remains open. Available Sources synchronization remains manual by Jared.
+
 ## 2026-10-14 — Verify Rotom account locks and active Library routes
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `03-Network-and-Domains.md`, `07-Users-and-Permissions.md`.
