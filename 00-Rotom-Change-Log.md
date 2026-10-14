@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-13 — Move Game Servers and Smart Home to renamed NAS Drives
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Replaced Rotom's `Gameserver/.data -> /mnt/nas-gameserver` and `Smarthome/.data -> /mnt/nas-smarthome` guest contracts with fstab-backed systemd automounts for `Game_Servers/.data -> /mnt/nas-game-servers` and `Smart_Home/.data -> /mnt/nas-smart-home`. Replaced the matching `game-servers` and `smart-home` home shortcuts and removed the former empty local mountpoints and shortcuts. No container, Compose, application-state, backup-policy, or NAS-side data migration was performed.
+- **Evidence:** 2026-10-13 read-only temporary NFS preflights and final live traversal both mounted the exact `Game_Servers/.data` and `Smart_Home/.data` sources as NFSv3 `sec=sys`; their automount units were active and systemd reported no failed units. Final Docker inspection found no running bind using either former path.
+- **Outstanding:** Available Sources replacement remains manual by Jared. The retired NAS drive contents/retention were not inspected or removed.
+
 ## 2026-10-13 — Rename Library local identity and roots to Libraries
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.

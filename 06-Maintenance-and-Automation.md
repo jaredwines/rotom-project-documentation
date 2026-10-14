@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-13 — Remove stale Homepage Uptime Kuma card and rename Libraries section
+**Documentation updated:** 2026-10-13 — Move Game Servers and Smart Home to renamed NAS Drives
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -23,7 +23,7 @@ Record substantive changes to this document in the change log as part of the sam
 
 ### Current local-domain alignment — 2026-10-13
 
-Current automation and Compose references must use `/home/hosted-websites` and `/srv/rotom/{stacks,appdata}/hosted-websites` for websites (`hosted-websites` `902:5004`), and `/home/game-servers` and `/srv/rotom/{stacks,appdata,secrets}/game-servers` for Palworld (`game-servers` `995:5001`). The guest `/mnt/nas-web` automount is retired; `/mnt/nas-gameserver` remains. Older `web`/`gameserver` statements in dated maintenance evidence are not current operating instructions.
+Current automation and Compose references must use `/home/hosted-websites` and `/srv/rotom/{stacks,appdata}/hosted-websites` for websites (`hosted-websites` `902:5004`), and `/home/game-servers` and `/srv/rotom/{stacks,appdata,secrets}/game-servers` for Palworld (`game-servers` `995:5001`). The guest `/mnt/nas-web` automount is retired; the current Game Servers automount is `/mnt/nas-game-servers` from `Game_Servers/.data`, with `/home/game-servers/nas-game-servers` as its shortcut. Smart Home's boundary is `/mnt/nas-smart-home` from `Smart_Home/.data`, with `/home/smart-home/nas-smart-home` as its shortcut. Older `web`/`gameserver` statements in dated maintenance evidence are not current operating instructions.
 
 ### Current qBittorrent and Filesync automation state — 2026-10-13
 
@@ -146,7 +146,7 @@ The NAS backup service is a root oneshot service. It requires /mnt/nas-rotom-bac
 
 The backup status API service is enabled and active. It restarts on failure and starts after networking, but has no explicit NAS mount dependency.
 
-The current fstab-backed NAS paths keep their automount model. JAR-88 established `/mnt/nas-gameserver` as the active Gameserver contract and retired the active guest `/mnt/nas-game` mount; original Game data remains on UNAS for rollback. The retired `/mnt/nas-downloads`, Apps, Auth, and Customapps boundaries are absent. JAR-86 retired the final bindfs view; Downloader and Media recovery checks remain independent.
+The current fstab-backed NAS paths keep their automount model. The active Game Servers contract is `/mnt/nas-game-servers -> Game_Servers/.data`, superseding JAR-88's `/mnt/nas-gameserver -> Gameserver/.data`; the active Smart Home contract is `/mnt/nas-smart-home -> Smart_Home/.data`, superseding `/mnt/nas-smarthome -> Smarthome/.data`. Original Game data remains on UNAS for rollback. The retired `/mnt/nas-downloads`, Apps, Auth, and Customapps boundaries are absent. JAR-86 retired the final bindfs view; Downloader and Media recovery checks remain independent.
 
 At this preserved pre-JAR-96 baseline, qBittorrent used a service-specific Media safety guard rather than a global Docker→NAS systemd dependency. Its payload was `/mnt/nas-media/torrents`, and the Media marker bind used `create_host_path: false`. The current Library guard/payload contract is stated in the JAR-96 overlay above; `/mnt/nas-media` is absent.
 

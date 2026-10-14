@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Rename the Library local identity and roots to Libraries
+**Documentation updated:** 2026-10-13 — Move Game Servers and Smart Home to renamed NAS Drives
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -104,7 +104,11 @@ The browser-upload bridge was retired on 2026-10-05. It no longer writes to the 
 
 The importer and Igir were retired on 2026-10-05, together with the inbox and their local state. Existing qBittorrent payloads remain in place; the separate review directory and RomM library are preserved.
 
-### JAR-88 Gameserver drive and mount — 2026-10-01
+### Current Game Servers and Smart Home drive mounts — 2026-10-13
+
+The current fstab-backed systemd automounts are `Game_Servers/.data -> /mnt/nas-game-servers` and `Smart_Home/.data -> /mnt/nas-smart-home`. Rotom successfully read-only preflight-mounted each exact source, then traversed each live NFSv3 `sec=sys` automount after activation. `/home/game-servers/nas-game-servers` and `/home/smart-home/nas-smart-home` point to the corresponding canonical mountpoints. The old guest-side `Gameserver/.data -> /mnt/nas-gameserver` and `Smarthome/.data -> /mnt/nas-smarthome` contracts, mountpoints, and shortcuts are retired; no NAS-side data migration, ownership change, snapshot change, or deletion was performed. Palworld worlds and Smart Home application state remain VM-local, and guest Restic excludes `/mnt`.
+
+### Historical JAR-88 Gameserver drive and mount — 2026-10-01
 
 `Gameserver/.data` is the current NFSv3 export authorized to Rotom and mounted at canonical `/mnt/nas-gameserver` through the fstab/systemd-automount pattern. Its root is numeric `988:5001`, mode `2770`; `gameserver` (`995:5001`) passed write/traverse and unrelated service identities were denied traversal. Six retained Game files copied to Gameserver with matching SHA-256 manifests. Original `Game/.data` remains unchanged on UNAS but is no longer mounted on Rotom; it is rollback data, not an active service contract. Palworld worlds remain VM-local.
 
