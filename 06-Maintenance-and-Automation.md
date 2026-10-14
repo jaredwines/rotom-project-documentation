@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-13 — Retire local Media mountpoint remnant
+**Documentation updated:** 2026-10-13 — Remove stale Homepage Uptime Kuma card and rename Libraries section
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -33,7 +33,7 @@ The obsolete Arcane read-only bind of `/home/downloaders/docker` was removed bef
 
 ### Current Homepage Platform layout — 2026-10-13
 
-Homepage now calls its management section **Platform** and places Rotom Docs there; the former Documents section/layout key is absent. Homepage was recreated after the YAML-only change and remained healthy with local-host and public HTTPS `200` responses. This corrects the JAR-95 current mapping wording: the service mapping is retired, while the stale card remains. **Needs Verification:** its live Platform configuration still contains a stale Uptime Kuma card/site monitor even though JAR-95 retired the container and NPM route. The card alone does not re-enable monitoring or alerting; remove it or document its intentional retention separately.
+Homepage now calls its management section **Platform** and places Rotom Docs there; the former Documents section/layout key is absent. The stale Uptime Kuma card and its `siteMonitor` were removed, completing the Homepage presentation cleanup for the JAR-95-retired service without re-enabling monitoring or alerting. The former **Library** service section and matching layout key are now **Libraries**. Homepage Compose validation passed; it was `running healthy`; its API contained no Uptime Kuma entry; and local-host and public HTTPS checks returned `200`.
 
 ### JAR-95 monitoring and alerting retirement — 2026-10-13
 

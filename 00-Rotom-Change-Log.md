@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-13 — Retire local Media mountpoint remnant
+**Documentation updated:** 2026-10-13 — Remove stale Homepage Uptime Kuma card and rename Libraries section
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-13 — Finalize Homepage Uptime Kuma retirement presentation
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Removed the stale Uptime Kuma card and its `siteMonitor` from Homepage's Platform section, completing the presentation cleanup for the already-retired service. Renamed the Homepage service section and matching layout key from **Library** to **Libraries**. Timestamped rollback copies of the affected live YAML files were retained.
+- **Evidence:** 2026-10-13 live YAML/API inspection found no Uptime Kuma card or `uptime.rotom.casa` monitor after the change and showed the **Libraries** key in both services and layout YAML. Homepage Compose validation passed; the container was `running healthy`; local-host and public HTTPS checks returned `200`.
+- **Outstanding:** Available Sources replacement remains manual by Jared.
 
 ## 2026-10-13 — Retire local Media mountpoint remnant
 

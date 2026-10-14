@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Retire local Media mountpoint remnant
+**Documentation updated:** 2026-10-13 — Remove stale Homepage Uptime Kuma card and rename Libraries section
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -44,9 +44,7 @@ The retired `downloader` account remains absent. Its former empty `/home/downloa
 
 ### Current Homepage Platform layout — 2026-10-13
 
-Homepage now places Rotom Docs in **Platform**, alongside Nginx Proxy Manager, Arcane, and PVE; the former **Documents** section and its layout key are absent. The former **Rotom Management** section/key is renamed **Platform**. This corrects the JAR-95 current wording about a Homepage mapping: the retired service mapping is absent, while the stale card remains as described below. Homepage was recreated and is healthy; local-host and public HTTPS probes returned `200`.
-
-**Needs Verification — stale Uptime Kuma card:** the live Platform YAML/API still contains an Uptime Kuma card with its historical `siteMonitor`, although JAR-95 retirement evidence establishes no Uptime Kuma container or NPM route. The card is not proof of an active service; remove it or record an intentional retention decision separately.
+Homepage now places Rotom Docs in **Platform**, alongside Nginx Proxy Manager, Arcane, and PVE; the former **Documents** section and its layout key are absent. The former **Rotom Management** section/key is renamed **Platform**. The stale Uptime Kuma card and its historical `siteMonitor` were removed, completing the Homepage presentation cleanup for JAR-95's retired service. The former **Library** service section and matching layout key are renamed **Libraries**. Homepage is `running healthy`; its API contains no Uptime Kuma entry, and local-host and public HTTPS probes returned `200`.
 
 ### JAR-95 monitoring and alerting retirement — 2026-10-13
 
