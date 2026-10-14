@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-10-14 — Complete legacy documentation editorial and consistency audit  
+**Documentation updated:** 2026-10-14 — Add Fran as a Rotom and PVE administrator  
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -15,7 +15,9 @@ Record substantive changes to this document in the change log as part of the sam
 
 ### Current identity and Smart Home ownership audit — 2026-10-14
 
-Live NSS data confirms `platform 997:5002`, `libraries 127:5000`, `hosted-websites 902:5004`, `game-servers 995:5001`, `smart-home 126:5003`, `jared 1000:1000`, and `desktopcmd 1001:1001`. Jared is the sole listed `sudo` member; the Docker group has no listed members. Service-account lock state could not be read without privileged account access and remains **Needs Verification** rather than inferred from login shells.
+Live NSS data now confirms `platform 997:5002`, `libraries 127:5000`, `hosted-websites 902:5004`, `game-servers 995:5001`, `smart-home 126:5003`, `jared 1000:1000`, `desktopcmd 1001:1001`, and human administrator `fran 1002:1002`. Rotom Fran belongs to `sudo`, `users`, and Docker GID `989`; she is the Docker group's sole listed member. Service identities retain only their primary service groups. Service-account lock state could not be read without privileged account access and remains **Needs Verification** rather than inferred from login shells; the shell-configuration work did not run an unlock or password-setting command for them.
+
+Fran and the selected service identities use `/usr/bin/zsh` with Oh My Zsh. `desktopcmd` changed from `/bin/bash` to `/usr/bin/zsh` but remains a non-human account without sudo, Docker, SSH keys, service-group, or NAS-specific access. Existing non-Oh-My-Zsh service `.zshrc` files were backed up before replacement. Fran's prompt and the selected account prompts were exercised successfully; direct local inspection reconfirmed the account shells and group boundaries.
 
 The Smart Home stack directories are root-owned, but both live Compose files are owned by `smart-home:smart-home`. On 2026-10-14 Jared confirmed the cross-domain Game Servers grants were unintended, so only the named `game-servers:rw-` Home Assistant and `game-servers:rwx` Homebridge ACL entries were removed. Home Assistant remains `smart-home:smart-home` mode `0660`; Homebridge remains `smart-home:smart-home` mode `0670`; Jared retains read-only/read-traverse named access. Negative access tests confirmed `game-servers` cannot write either file, positive tests confirmed `smart-home` can read/write both, and Compose validation passed.
 
@@ -29,10 +31,10 @@ This is the canonical detailed owner of Rotom account identity and permission fa
 
 ### Evidence provenance
 
-**Documentation updated:** 2026-10-14 — Complete legacy documentation editorial and consistency audit  
+**Documentation updated:** 2026-10-14 — Add Fran as a Rotom and PVE administrator  
 
 **Baseline method:** read-only inspection of the live host configuration, Docker metadata, systemd unit files, sudo policy, SSH metadata, filesystem modes, ACLs, NFS mount metadata, and non-mutating access tests. No passwords, password hashes, key contents, tokens, or private-key material were read or recorded.  
-**Update scope:** JAR-29 restored the historical ten storage-facing identities and JAR-30 established the package-created Docker privilege boundary. Later migrations retired or renamed several of those identities. The current table in section 2 is authoritative; earlier full-account and NAS-shortcut tables are historical reconstruction evidence. Fran remains unrecreated and her backup sudoers rule remains deferred. Administrative Mac key-only access remains verified; no key contents are recorded.
+**Update scope:** JAR-29 restored the historical ten storage-facing identities and JAR-30 established the package-created Docker privilege boundary. Later migrations retired or renamed several of those identities. The current table in section 2 is authoritative; earlier full-account and NAS-shortcut tables are historical reconstruction evidence. Fran is now recreated independently on Rotom (`1002:1002`) and PVE (`1001:1001`) as a human administrator. Administrative Mac key-only access remains verified only for Jared; Fran SSH is intentionally deferred and no key contents are recorded.
 
 ## 2. Current Identity and Access Model
 
@@ -50,12 +52,13 @@ JAR-94 above supersedes the `infra`, `documents`, `downloader`, and `filesync` p
 
 **Current Auth retirement — 2026-09-29:** The unused `auth` account/group (`905:5009`), default-profile `/home/auth`, `nas-auth` shortcut, and Auth NAS boundary were retired after no process, workload, Docker mount, or operational configuration consumer was found. Historical snapshots may contain this identity; do not recreate it by default.
 
-Guest service-account identities and Docker-group policy remain unchanged. Docker group is package-created GID `989` with no members; administrative Docker use remains `sudo docker`. No permission broadening was introduced.
+Guest service-account identities remain unchanged. Docker group is package-created GID `989`; Fran is now its sole member and therefore has root-equivalent Docker control in addition to full sudo. Jared and all service identities remain outside Docker, so their established `sudo docker` or no-Docker boundaries are unchanged.
 
 | Layer/account | Verified current state |
 |---|---|
-| PVE host | hostname `pve`; routine administration as Linux user `jared` (UID/GID `1000:1000`, groups `sudo` and `users`); canonical Mac aliases `pve` / `pve.rotom.casa`; key `~/.ssh/id_ed25519_pve`; PVE identity `jared@pam` has propagated `Administrator` access at `/`; matching root-authorized key removed; root retained for emergency recovery |
+| PVE host | `jared` (`1000:1000`) and `fran` (`1001:1001`) are human administrators with `sudo`, `users`, `systemd-journal`, and enabled matching PAM identities holding propagated `Administrator` access at `/`. Canonical Mac aliases and `~/.ssh/id_ed25519_pve` still use Jared; Fran SSH is deferred. Root remains emergency recovery. |
 | Debian VM `jared` | UID/GID `1000:1000`; supplementary `sudo`; key-only Mac login via `~/.ssh/id_ed25519_rotom` |
+| Debian VM `fran` | UID/GID `1002:1002`; supplementary `sudo`, `users`, and root-equivalent Docker GID `989`; `/home/fran` mode `0700`; `/usr/bin/zsh` with Oh My Zsh; SSH, legacy documentation/GitHub/Codex entry point, and named documentation ACL not established |
 | libraries | `127:5000`, `/home/libraries`; Jellyfin/Radarr/Sonarr/Prowlarr/RomM/qBittorrentVPN/Paperless. Paperless media is `/mnt/nas-libraries/paperless`. |
 | game-servers | `995:5001`, `/home/game-servers`; Palworld Jared and Fran are deliberately non-running (`created`); JDownloader, Igir, qBittorrent importer, and browser-upload bridge were retired on 2026-10-05; Gamarr retired |
 | platform | `997:5002`, `/home/platform`; Arcane/DDNS/Homepage/Glances/NPM/Rotom Docs |
@@ -64,8 +67,8 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 | downloader | **Retired**; account, former home, and Arcane compatibility bind are absent |
 | hosted-websites | `902:5004`, `/home/hosted-websites`; Aloha active; Jared Wines undeployed |
 | filesync | **Retired**; historical `903:5007` / Syncthing record only |
-| desktopcmd | `1001:1001`, locked non-human account with `/home/desktopcmd` mode `0700`; Remote Desktop Commander only; no sudo, SSH authorized keys, Docker/socket, service-group, or NAS-specific access |
-| Docker group | GID `989`, no members |
+| desktopcmd | `1001:1001`, locked non-human account with `/home/desktopcmd` mode `0700`; `/usr/bin/zsh` with Oh My Zsh; Remote Desktop Commander only; no sudo, SSH authorized keys, Docker/socket, service-group, or NAS-specific access |
+| Docker group | GID `989`, sole listed member `fran` |
 
 ### Current `/srv/rotom` Jared access — 2026-10-10
 
@@ -85,11 +88,11 @@ The JDownloader, Igir, qBittorrent importer, and browser-upload service identiti
 
 ### Current PVE backup privilege boundary
 
-PVE host-config Restic is root-operated. `/usr/local/sbin/pve-restic-backup` is the privileged worker; root-owned `/usr/local/bin/backup-restic-to-nas` re-executes through `sudo` when a non-root user invokes it, so Jared can start the existing root workflow through normal sudo authentication without direct access to the worker or its protected credential. `/etc/restic/nas-password` remains protected and its contents are never documented. The repository is `/mnt/nas-pve-restic-backup/pve-restic-backup` and staging is `/var/backups/pve-restic-recovery`. Whole-VM manual backup likewise uses root-owned `/usr/local/bin/backup-rotom-vm-to-nas`, which re-executes through `sudo` for non-root invocation, plus `rotom-vm-vzdump-manual.service` and `/usr/local/sbin/rotom-vm-vzdump-manual`. Jared is a PVE member of `systemd-journal`, allowing direct read-only service-log access such as `journalctl -fu rotom-vm-vzdump-manual.service`; this does not grant permission to alter services.
+PVE host-config Restic is root-operated. `/usr/local/sbin/pve-restic-backup` is the privileged worker; root-owned `/usr/local/bin/backup-restic-to-nas` re-executes through `sudo` when a non-root user invokes it, so Jared or Fran can start the existing root workflow through normal sudo authentication without direct access to the worker or its protected credential. `/etc/restic/nas-password` remains protected and its contents are never documented. The repository is `/mnt/nas-pve-restic-backup/pve-restic-backup` and staging is `/var/backups/pve-restic-recovery`. Whole-VM manual backup likewise uses root-owned `/usr/local/bin/backup-rotom-vm-to-nas`, which re-executes through `sudo` for non-root invocation, plus `rotom-vm-vzdump-manual.service` and `/usr/local/sbin/rotom-vm-vzdump-manual`. Jared and Fran are PVE members of `systemd-journal`, allowing direct read-only service-log access such as `journalctl -fu rotom-vm-vzdump-manual.service`; this group does not itself grant permission to alter services.
 
 ### Current administrative public-key access
 
-The Mac SSH config maps `pve` / `pve.rotom.casa` to `192.168.1.68` as `jared` using `~/.ssh/id_ed25519_pve`, `IdentitiesOnly yes`, `AddKeysToAgent yes`, and `UseKeychain yes`. Supplied output verified PVE Jared's `sudo` membership, enabled `jared@pam` identity, propagated `Administrator` ACL at `/`, and successful `sudo pveversion`; Jared confirmed both aliases now use this account. The matching public key was removed from PVE root. The old `proxmox` / `proxmox.rotom.casa` SSH aliases and old `~/.ssh/id_ed25519_proxmox{,.pub}` filenames remain absent. PVE `/etc/hosts` likewise contains only the canonical `pve.rotom.casa pve` names for `.68`. Password-auth policy was not changed.
+The Mac SSH config maps `pve` / `pve.rotom.casa` to `192.168.1.68` as `jared` using `~/.ssh/id_ed25519_pve`, `IdentitiesOnly yes`, `AddKeysToAgent yes`, and `UseKeychain yes`. Supplied output verified PVE Jared's `sudo` membership, enabled `jared@pam` identity, propagated `Administrator` ACL at `/`, and successful `sudo pveversion`; Jared confirmed both aliases now use this account. The matching public key was removed from PVE root. Fran's enabled `fran@pam` identity now has the same propagated `Administrator` ACL, but `/home/fran/.ssh` was verified absent and her SSH-key authentication is deferred. The old `proxmox` / `proxmox.rotom.casa` SSH aliases and old `~/.ssh/id_ed25519_proxmox{,.pub}` filenames remain absent. PVE `/etc/hosts` likewise contains only the canonical `pve.rotom.casa pve` names for `.68`. Password-auth policy was not changed.
 
 ### UniFi appliance administration — 2026-09-29
 
@@ -99,7 +102,7 @@ The Rotom VM continues to use `rotom` / `rotom.casa`, user `jared`, and `~/.ssh/
 
 ### Current legacy documentation / GitHub / Codex access — 2026-09-28
 
-Historical `getfacl -p /home/infra` output showed the former Infra-home traversal model before the Platform rename. The current checkout and service home are under `/home/platform`; current root ACL behavior is summarized in section 1. Fran is not currently recreated and no current Fran ACL is established.
+Historical `getfacl -p /home/infra` output showed the former Infra-home traversal model before the Platform rename. The current checkout and service home are under `/home/platform`; current root ACL behavior is summarized in section 1. Fran is now recreated, but no separate current Fran documentation ACL, legacy documentation checkout, GitHub identity, or Codex entry point is established.
 
 The current legacy documentation Git checkout is `/home/platform/documentation/rotom-runbook`; the former `/home/infra/documentation/retired-helper` path is historical. Jared owns the Platform documentation tree and uses the guarded `retired-helper` workflow for the checkout. The verified current path is `jared:jared` mode `0755`; `/home/platform` remains the private parent boundary for unrelated local accounts.
 
@@ -418,7 +421,7 @@ The human-facing `/usr/local/bin/backup-restic-to-nas` launcher is `root:root` m
 
 ## 3. Preserved Pre-Migration Operational and Follow-up Findings
 
-1. **Pre-migration:** Docker was the main cross-service privilege bypass because all named service accounts were Docker-group members. That historical GID `984` membership is not current authority; the current VM last verified Docker group GID `989` with no members.
+1. **Pre-migration:** Docker was the main cross-service privilege bypass because all named service accounts were Docker-group members. That historical GID `984` membership is not current authority. JAR-30 later verified an empty package-created GID `989`; the 2026-10-14 current overlay supersedes that checkpoint with Fran as its sole member.
 2. JAR-6 implemented Infra through Auth storage GIDs `5002`–`5009` and verified intended-account versus unrelated-account NFS behavior for each new share.
 3. **Current:** Restic backup storage remains access-protected at mounted NAS metadata `988:988` mode `0700`; JAR-32 moved the active mount to `/mnt/nas-rotom-restic-backup` without broadening ordinary-user access. The 2026-09-27 audit refreshed the mounted metadata but did not isolate the underlying local directory while fully unmounted.
 4. SSH password/public-key policy and the existing sudo/docker privilege model were not changed by JAR-6.
@@ -436,7 +439,8 @@ Current non-socket exception fields are Home Assistant's host networking, privil
 
 ## 4. Outstanding / Needs Verification
 
-- **Intentional:** Fran is not yet recreated; her historical exact-command backup sudoers rule remains deferred.
+- **Intentional:** Fran SSH-key authentication remains deferred on Rotom and PVE. No separate Rotom documentation ACL, legacy documentation/GitHub identity, or Codex entry point is established for her. The historical exact-command backup sudoers fragment remains absent; Fran's current full sudo access makes it unnecessary for authorization, but no manual backup run was performed in this change.
+- **Needs Verification — account acceptance:** Fran's PVE PAM identity and effective Administrator permissions are verified, but direct browser login was not supplied. Rotom Docker membership is verified from NSS, but no direct `docker ps` execution as Fran was captured. Remote Desktop Commander service health was not rechecked after `desktopcmd` changed from Bash to Zsh.
 - **Needs Verification — UNAS identity persistence:** service-share root metadata persistence across a future UNAS/UniFi Drive restart/update has not been observed. Resolve after such an event with read-only `findmnt`/`stat` checks from Rotom and UNAS-side share/export inspection.
 - **Historical by design:** backup/containerd objects may retain old primary GIDs; do not normalize them recursively without a specific verified need.
 - **Needs Verification — credential-rotation record:** VPN credential rotation after prior chat exposure is not established by the legacy documentation. Do not print, compare, or read credential values to prove this. Resolve through provider/account rotation history or administrator records; there is no safe host-only metadata check that proves a secret was rotated.

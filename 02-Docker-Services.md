@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; the current runtime baseline is the 2026-10-14 inventory in section 1A  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Complete legacy documentation editorial and consistency audit  
+**Documentation updated:** 2026-10-14 — Add Fran as a Rotom and PVE administrator  
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -102,7 +102,7 @@ The active deployment roots for Nginx Proxy Manager, Homepage, Arcane, Glances, 
 
 Syncthing's module and state are Platform-owned but its container continues as `903:5007` and keeps `/mnt/nas-filesync:/filesync`. The old `infra` and `filesync` v2 stack/state directories were removed after the moves; the unused `homepage/compose.yaml.orig` file was removed. Homepage now has a Platform section for NPM, Arcane, PVE, Uptime Kuma, Syncthing, and Rotom Docs. PVE has no monitor; the remaining Homepage groupings, including Library and hosted sites, are unchanged.
 
-The Proxmox VE host `pve` remains hypervisor-only; the application Docker runtime is inside the Debian `rotom` VM. Current runtime foundation remains Docker Engine `29.8.1`, containerd `2.3.6`, Docker Compose `v5.5.1`, local Docker root `/var/lib/docker`, and package-created Docker group GID `989` with no members.
+The Proxmox VE host `pve` remains hypervisor-only; the application Docker runtime is inside the Debian `rotom` VM. Current runtime foundation remains Docker Engine `29.8.1`, containerd `2.3.6`, Docker Compose `v5.5.1`, and local Docker root `/var/lib/docker`. Package-created Docker group GID `989` now has one human member, Fran, whose Docker access is intentionally root-equivalent; Jared and all service identities remain outside the group.
 
 JAR-34 created the initially empty v2 declarative namespace at `/srv/rotom`. Subsequent Phase D tickets populated the current domain modules and state described below; the original empty-reservation state is historical. `/srv/rotom` is a local Git repository for only `stacks/`, `scripts/`, and support files; `.gitignore` excludes `appdata/`, `secrets/`, `backup-staging/`, databases, logs, caches, generated state, and environment files.
 
@@ -504,7 +504,7 @@ This dated table preserves the then-current guest identity/storage relationships
 
 Current application definitions use the per-domain `/srv/rotom/stacks` modules described above. JAR-86 retired the unused `/mnt/nas-downloads-media-ro` compatibility view and its recovery-helper branch; `/mnt/nas-downloaders` and its sentinel remain as the retained Downloader boundary, while qBittorrent's payload and guard are Media-only. JAR-88 replaced the active Game guest mount with Gameserver.
 
-The current `docker` group should be re-read before future privilege changes. JAR-30 GID `989` with no members is the last explicit verification; JAR-31 application restoration does not by itself demonstrate group membership changes.
+The current `docker` group should be re-read before future privilege changes. The 2026-10-14 explicit verification supersedes the JAR-30/JAR-31 empty-group checkpoint: GID `989` now lists only human administrator Fran. No service identity was added.
 
 ## 8. Historical Consolidated Verification — 2026-09-19
 

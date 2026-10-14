@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-14 — Complete legacy documentation editorial and consistency audit  
+**Documentation updated:** 2026-10-14 — Add Fran as a Rotom and PVE administrator  
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-14 — Add Fran as a Rotom and PVE administrator
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.** Documentation updated from direct Rotom inspection and Jared-executed PVE output.
+- **Changes:** Recreated Fran as a normal interactive Rotom administrator (`1002:1002`) with Zsh, Oh My Zsh, full `sudo`, `users`, and root-equivalent Docker-group access. Installed Oh My Zsh for the selected Rotom identities and changed `desktopcmd` from Bash to Zsh without unlocking it or adding privileges. Created PVE Linux/PAM administrator Fran (`1001:1001`), granted full sudo plus `systemd-journal`, added enabled `fran@pam` with propagated `Administrator` access at `/`, and installed Oh My Zsh. Existing Jared access and emergency root recovery remain unchanged.
+- **Evidence:** Final Rotom NSS/group inspection showed Fran in `sudo`, `users`, and Docker GID `989`; `desktopcmd` and the five current service identities use `/usr/bin/zsh`, and their selected Oh My Zsh configurations were observed or confirmed by supplied shell tests. Jared-executed PVE verification showed Fran's password-set Linux account, private `0700` home, unrestricted sudo policy, `systemd-journal` membership, enabled PAM identity, propagated root Administrator ACL, effective Proxmox permissions, working Oh My Zsh, and successful journal read. No credential or key content was recorded.
+- **Outstanding:** Fran's SSH public-key authentication is intentionally deferred on both Rotom and PVE; PVE `/home/fran/.ssh` was verified absent. Direct PVE web-login acceptance and a direct Rotom `docker ps` test as Fran were not supplied, although the corresponding effective ACL and group membership are verified. Remote Desktop Commander service health was not rechecked after changing `desktopcmd`'s shell. Fran has no separate current Rotom documentation ACL, GitHub identity, or Codex entry point recorded. Available Sources replacement remains manual by Jared.
 
 ## 2026-10-14 — Complete legacy documentation editorial and consistency audit
 

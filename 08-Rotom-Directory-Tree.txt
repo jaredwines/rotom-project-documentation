@@ -8,17 +8,29 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-10-14; complete legacy documentation editorial and consistency audit.
+# Documentation revised: 2026-10-14; add Fran as a Rotom and PVE administrator.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the legacy documentation.
 #
-# CURRENT TOPOLOGY — RECONCILED 2026-10-13
+# CURRENT TOPOLOGY — RECONCILED THROUGH 2026-10-14
 # The explicit 2026-10-13 overlays immediately below are the current supported topology.
 # The large tree beginning later in this file is a preserved pre-migration/restoration
 # capture unless a path is explicitly reaffirmed by an overlay. It must not be used to
 # recreate retired identities, mounts, or service roots. The final 2026-10-13 fstab and
 # removal verification establishes five current guest NFS automount contracts; recheck
 # live activation read-only with findmnt and systemctl when troubleshooting.
+# - 2026-10-14 current administrator/shell overlay: Rotom `fran` is `1002:1002`,
+#   home `/home/fran` mode 0700, shell `/usr/bin/zsh`, and supplementary `sudo`,
+#   `users`, and root-equivalent Docker GID 989; she is Docker's sole listed member.
+#   Oh My Zsh is configured for Fran plus `desktopcmd`, `game-servers`,
+#   `hosted-websites`, `libraries`, `platform`, and `smart-home`; prior service
+#   `.zshrc` files were backed up before replacement. `desktopcmd` changed from Bash
+#   to Zsh but remains locked and retains its no-sudo/no-Docker/no-SSH service boundary.
+#   PVE `fran` is independently `1001:1001`, home `/home/fran` mode 0700, Zsh/Oh My
+#   Zsh, and member of `sudo`, `users`, and `systemd-journal`; enabled `fran@pam` has
+#   propagated Administrator access at `/`. PVE Fran journal access passed, while
+#   `/home/fran/.ssh` was absent and SSH setup remains deferred. Direct web-login
+#   acceptance was not supplied.
 #
 # 2026-10-14 live reconciliation:
 # - PVE is Proxmox VE 9.2.0 with pve-manager 9.2.21 and kernel 7.0.14-19-pve.
@@ -60,7 +72,7 @@
 # - JAR-93: Platform is the active shared-service domain. Active Compose modules for Nginx Proxy Manager, Homepage, Arcane, Glances, Uptime Kuma, Cloudflare DDNS, Rotom Docs, and Syncthing are below `/srv/rotom/stacks/platform`; their applicable local state and secrets are below `/srv/rotom/appdata/platform` and `/srv/rotom/secrets/platform`. Syncthing retains `filesync` `903:5007` and its `/mnt/nas-filesync` bind; its enabled legacy-named systemd unit now uses the Platform working directory. The former `/srv/rotom/{stacks,appdata,secrets}/infra`, `/srv/rotom/{stacks,appdata}/filesync`, and unused Homepage compose backup are absent. `/home/infra`, the `infra` identity, legacy documentation checkout, NAS path, URLs, networks, and published ports remain in place. Restic's NPM SQLite staging input and the root alert worker's protected-input paths follow Platform; snapshot `02c9c4e7` is the verified pre-migration recovery point.
 # - Physical NUC runs Proxmox VE as `pve` / `pve.rotom.casa` at 192.168.1.68. `nic0` is Intel I219-V/e1000e MAC 1c:69:7a:0e:f2:f7; WOL `g`; previously documented TSO/GSO mitigation retained.
 # - PVE `pvedaemon` and `pveproxy` are enabled. NPM proxy host `pve.rotom.casa` forwards HTTPS to the PVE UI at `192.168.1.68:8006`, with certificate ID `24`, forced TLS, WebSocket upgrade, and access-list ID `1`; Homepage links to it under `Platform` without a monitor.
-# - Canonical Mac PVE SSH: aliases `pve` / `pve.rotom.casa` -> 192.168.1.68 Jared using ~/.ssh/id_ed25519_pve. PVE Jared has sudo plus `jared@pam` Administrator access; the matching root-authorized key was removed, while root remains emergency recovery. Old `proxmox*` aliases/key filenames are absent. PVE /etc/hosts contains canonical `192.168.1.68 pve.rotom.casa pve`.
+# - Canonical Mac PVE SSH: aliases `pve` / `pve.rotom.casa` -> 192.168.1.68 Jared using ~/.ssh/id_ed25519_pve. PVE Jared and Fran have sudo, `systemd-journal`, and matching PAM identities with propagated Administrator access at `/`; only Jared has the verified SSH path. The matching Jared root-authorized key was removed, Fran SSH is deferred, and root remains emergency recovery. Old `proxmox*` aliases/key filenames are absent. PVE /etc/hosts contains canonical `192.168.1.68 pve.rotom.casa pve`.
 # - PVE monitoring: /usr/local/sbin/pve-cpu-temp-api + /etc/systemd/system/pve-cpu-temp-api.service; 192.168.1.68:8788; Homepage label `PVE CPU Temperature`. Backup status: /usr/local/sbin/pve-backup-status-api + /etc/systemd/system/pve-backup-status-api.service; LAN-only 192.168.1.68:8789; Homepage PVE Restic and Rotom VM schedule cards.
 # - VMID 100 `rotom`: q35/OVMF, x86-64-v2-AES, 8 vCPU, 12 GiB RAM, 100 GiB; onboot=1; optional JAR-49 host attachment `hostpci0: 0000:00:02.0,pcie=1` exposes the NUC Iris Plus 655 as guest `01:00.0` / `/dev/dri/renderD128`; guest rotom.casa at reserved 192.168.1.69, MAC BC:24:11:97:10:47. Removing hostpci0 preserves the portable baseline.
 # - Docker: the unused private JDownloader module, Media ROM inbox, Igir, qBittorrent importer, and browser-upload bridge were retired on 2026-10-05. The 2026-10-14 audit found 22 container objects: 20 running and the two intentionally stopped Palworld containers. Gamarr remains retired/absent.
