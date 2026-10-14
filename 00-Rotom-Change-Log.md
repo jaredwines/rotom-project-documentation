@@ -69,7 +69,7 @@ Keep future entries brief: the change log should point to the detailed documents
 - **Status:** **Implemented / Verified.**
 - **Changes:** Replaced the active `/mnt/nas-library` contract backed by `Library/.data` with the fstab-backed `/mnt/nas-libraries` contract backed by `Libraries/.data`. Provisioned only the empty target export root for Library `127:5000`, copied all source data and metadata without delete flags, performed a writer-stopped final sync, and recreated the affected Library, NPM, and Homepage workloads. Retired the old guest mount, home symlink, and temporary probe; old NAS source data/export remains intact for separately authorized cleanup.
 - **Evidence:** The initial transfer and final no-change dry run covered 5,929 entries and 205,137,536,813 bytes. Live Docker inspection found all affected binds on `/mnt/nas-libraries`; qBittorrent `wg0`, its fail-closed sentinel guard, local qBittorrent `200`, Arr/Jellyfin expected redirects, Homepage `200`, and zero failed units all passed. The controlled VM reboot completed; the new boot restored the NFS mount, Docker, all affected containers, qBittorrent `wg0`, and the local qBittorrent/Homepage checks. No new backup/snapshot was created at Jared's explicit direction.
-- **Outstanding:** Authenticated application download/import/seeding workflow remains untested. Available Sources replacement remains manual by Jared.
+- **Outstanding:** Available Sources replacement remains manual by Jared.
 
 ## 2026-10-13 — Align Hosted Websites and Game Servers local domains
 
