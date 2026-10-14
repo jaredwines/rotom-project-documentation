@@ -23,7 +23,7 @@ The PVE backup-status API reported both schedules successfully and the two NFS b
 
 ### Current guest backup observation — 2026-10-14
 
-`rotom-restic-backup.timer` is enabled and active with the documented `03:00` schedule plus up to ten minutes randomized delay. The read-only status API reports the 2026-10-13 03:01 PDT scheduled run as `success` and the next run for 2026-10-14. This verifies scheduler-reported job completion only; it does not establish a new snapshot ID, repository integrity check, or restore proof. The latest independently documented recovery-point ID remains the earlier verified record until privileged Restic inspection is supplied.
+`rotom-restic-backup.timer` is enabled and active with the documented `03:00` schedule plus up to ten minutes randomized delay. Privileged inspection found 22 snapshots in repository `799babb2`; the latest is automatic snapshot `9494979d` from 2026-10-13 03:01 PDT, covering the documented guest source roots at approximately 20.086 GiB. `restic check` loaded all indexes, checked packs plus 22 snapshot trees/blobs, and found no errors. This closes the repository-structure verification gap, but it is not `restic check --read-data` or a restore rehearsal.
 
 The VM-local `/srv/rotom/backup-staging` root is absent. Every named local artifact beneath it is historical unless a later live path check re-establishes its presence. Restic-contained copies and historical checksums remain recovery evidence, but they are not proof of a current fast local rollback copy. Authoritative Libraries/Paperless NAS payload remains outside guest Restic and its effective snapshot/restore path remains **Needs Verification**.
 

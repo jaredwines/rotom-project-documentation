@@ -32,9 +32,14 @@
 #   exposure and the iGPU option-ROM warning require owner-reviewed maintenance.
 # - /srv/rotom/backup-staging is absent; paths formerly documented beneath it are
 #   historical unless a fresh live check proves they were recreated.
-# - /srv/rotom/stacks/smart-home/{home-assistant,homebridge}/compose.yaml are owned
-#   by smart-home:smart-home and carry named game-servers write-class ACLs. This is
-#   a documented security/ownership discrepancy pending owner confirmation.
+# - /srv/rotom/stacks/smart-home/{home-assistant,homebridge}/compose.yaml remain
+#   smart-home:smart-home modes 0660/0670. Owner-confirmed unintended game-servers
+#   write ACLs were removed; Jared access and Smart Home read/write were preserved.
+# - Privileged Docker inventory: 22 objects, 20 running, two intentionally stopped
+#   Palworld containers, three volumes, nineteen networks, and zero restart counts.
+#   The retired Syncthing image and several untagged images remain pending review.
+# - Guest Restic repo 799babb2 has 22 snapshots; latest 9494979d from 2026-10-13.
+#   `restic check` passed; full read-data verification/restore remain outstanding.
 # - the five current NFS filesystems were mounted read/write during the audit.
 # - 2026-10-13 Game Servers / Smart Home NAS-drive alignment: the fstab-backed NFSv3 `Game_Servers/.data -> /mnt/nas-game-servers` and `Smart_Home/.data -> /mnt/nas-smart-home` automounts are current and live-traversal verified. Their roots are empty `988:5001` and `988:5003` setgid service boundaries; create/remove checks verified descendants as `game-servers:game-servers` and `smart-home:smart-home`. There are no current home NAS shortcuts. The former `Gameserver/.data -> /mnt/nas-gameserver` and `Smarthome/.data -> /mnt/nas-smarthome` guest contracts, mountpoints, and shortcuts are retired. No live container used either old path; Palworld worlds and Smart Home state remain VM-local, and no NAS data migration or backup-policy change was made.
 # - 2026-10-13 Media mountpoint retirement: `/mnt/nas-media` is absent. Its guest fstab/automount and active configuration dependencies had already been retired; its only remaining local `library/games` directories were empty and removed with guarded `rmdir`. The sole active Library guest contract is `/mnt/nas-libraries`. NAS-side Media export/data was not inspected or changed; older Media paths below are historical evidence only.
