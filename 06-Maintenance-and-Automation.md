@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-13 — Complete Available Sources legacy documentation consistency audit
+**Documentation updated:** 2026-10-13 — Live NAS boundary and ownership reconciliation
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -23,7 +23,7 @@ Record substantive changes to this document in the change log as part of the sam
 
 ### Current local-domain alignment — 2026-10-13
 
-Current automation and Compose references must use `/home/hosted-websites` and `/srv/rotom/{stacks,appdata}/hosted-websites` for websites (`hosted-websites` `902:5004`), and `/home/game-servers` and `/srv/rotom/{stacks,appdata,secrets}/game-servers` for Palworld (`game-servers` `995:5001`). The guest `/mnt/nas-web` automount is retired; the current Game Servers automount is `/mnt/nas-game-servers` from `Game_Servers/.data`, with `/home/game-servers/nas-game-servers` as its shortcut. Smart Home's boundary is `/mnt/nas-smart-home` from `Smart_Home/.data`, with `/home/smart-home/nas-smart-home` as its shortcut. Older `web`/`gameserver` statements in dated maintenance evidence are not current operating instructions.
+Current automation and Compose references must use `/home/hosted-websites` and `/srv/rotom/{stacks,appdata}/hosted-websites` for websites (`hosted-websites` `902:5004`), `/home/game-servers` and `/srv/rotom/{stacks,appdata,secrets}/game-servers` for Palworld (`game-servers` `995:5001`), and `/home/smart-home` plus `/srv/rotom/{stacks,appdata}/smart-home` for Smart Home (`smart-home` `126:5003`). The guest `/mnt/nas-web` automount is retired; the current service-boundary automounts are `/mnt/nas-game-servers` from `Game_Servers/.data`, `/mnt/nas-hosted-websites` from `Hosted_Websites/.data`, and `/mnt/nas-smart-home` from `Smart_Home/.data`. No current home NAS shortcuts exist. Older `web`/`gameserver`/`smarthome` statements in dated maintenance evidence are not current operating instructions.
 
 ### Current qBittorrent and Filesync automation state — 2026-10-13
 

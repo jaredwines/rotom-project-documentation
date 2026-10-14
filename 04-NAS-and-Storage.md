@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Complete Available Sources legacy documentation consistency audit
+**Documentation updated:** 2026-10-13 — Live NAS boundary and ownership reconciliation
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -17,15 +17,17 @@ Record substantive changes to this document in the change log as part of the sam
 
 The local service account and convenience shortcut for this mount are `libraries` (`127:5000`) and `/home/libraries/nas-libraries -> /mnt/nas-libraries`. This local naming does not change the NAS-side mount source or the internal `library/` data directory.
 
-`/mnt/nas-libraries` is the sole active Library NFSv3 contract, sourced from `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Libraries/.data` with `defaults,_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s`. Its mounted root is `988:5000` mode `2771`; `library/` is `977:5000` mode `2775`, `torrents/` is `0:5000` mode `2775`, and `.rotom-qbt-media-ready/` is `901:5000` mode `2750`.
+`/mnt/nas-libraries` is the sole active Library NFSv3 contract, sourced from `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Libraries/.data` with `defaults,_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s`. Its mounted root remains NAS-owned `988:5000` mode `2771`. On 2026-10-13 every existing descendant was normalized to `libraries:libraries` (`127:5000`) and every directory retains setgid; a post-change scan found 5,159 such descendants. The active Library containers create as `127:5000`, and a disposable create/remove check confirmed the same future ownership.
 
 The old `/mnt/nas-library` contract for `Library/.data` is retired locally, including its fstab entry and Library home symlink. Its NAS data/export is intentionally retained. A non-destructive `rsync -aHAX --numeric-ids` initial copy followed by a writer-stopped final sync converged at 5,929 entries / 205,137,536,813 bytes; the final dry run had no changes. The generated automount was proven from an unmounted state by reading the NAS-resident sentinel, after which all affected containers were restored. A controlled VM reboot then restored the new mount and affected Docker workloads. No backup/snapshot was created at Jared's explicit direction.
 
 `/mnt/nas-media` is also **retired locally and absent**. Its fstab/automount and active service dependencies had already been removed; after inspection confirmed only empty local `library/games` descendants, the remaining mountpoint tree was removed with guarded `rmdir`. NAS-side Media export/data was not inspected or altered. Do not recreate it as a fallback path: `/mnt/nas-libraries` is the sole active Library contract.
 
-### Current guest Web-mount retirement — 2026-10-13
+### Current Hosted Websites boundary and legacy Web-mount retirement — 2026-10-13
 
-`/mnt/nas-web` is **retired on Rotom**: its guest fstab entry, systemd automount, local mountpoint, and former Hosted Websites home symlink are absent. This does not establish removal of the NAS Web export or its data; neither was inspected or changed. Website services use only the local `/srv/rotom/{stacks,appdata}/hosted-websites` roots. The current Game Servers contract is `/mnt/nas-game-servers`, sourced from `Game_Servers/.data`; `/mnt/nas-gameserver` and its former shortcut are retired.
+`/mnt/nas-web` is **retired on Rotom**: its guest fstab entry, systemd automount, local mountpoint, and former Hosted Websites home symlink are absent. This does not establish removal of the NAS Web export or its data; neither was inspected or changed. Website services use only the local `/srv/rotom/{stacks,appdata}/hosted-websites` roots.
+
+The separate active service boundary is `Hosted_Websites/.data -> /mnt/nas-hosted-websites`, using the standard fstab/systemd NFSv3 automount options. Its root is `988:5004` mode `2770`, it was empty at final inspection, and no active or stopped container binds it. A temporary `hosted-websites` create/remove check produced `902:5004` descendants with directory setgid. The current Game Servers contract is `/mnt/nas-game-servers`, sourced from `Game_Servers/.data`; `/mnt/nas-gameserver` and its former shortcut are retired.
 
 ### Historical JAR-94 Library service storage — 2026-10-13
 
@@ -106,7 +108,7 @@ The importer and Igir were retired on 2026-10-05, together with the inbox and th
 
 ### Current Game Servers and Smart Home drive mounts — 2026-10-13
 
-The current fstab-backed systemd automounts are `Game_Servers/.data -> /mnt/nas-game-servers` and `Smart_Home/.data -> /mnt/nas-smart-home`. Rotom successfully read-only preflight-mounted each exact source, then traversed each live NFSv3 `sec=sys` automount after activation. `/home/game-servers/nas-game-servers` and `/home/smart-home/nas-smart-home` point to the corresponding canonical mountpoints. The old guest-side `Gameserver/.data -> /mnt/nas-gameserver` and `Smarthome/.data -> /mnt/nas-smarthome` contracts, mountpoints, and shortcuts are retired; no NAS-side data migration, ownership change, snapshot change, or deletion was performed. Palworld worlds and Smart Home application state remain VM-local, and guest Restic excludes `/mnt`.
+The current fstab-backed systemd automounts are `Game_Servers/.data -> /mnt/nas-game-servers` and `Smart_Home/.data -> /mnt/nas-smart-home`. Rotom successfully read-only preflight-mounted each exact source, then traversed each live NFSv3 `sec=sys` automount after activation. Both are empty service boundaries: Game Servers is `988:5001` mode `2770`, and Smart Home is `988:5003` mode `2770`. There are no current home NAS shortcuts. Temporary create/remove checks verified new descendants as `game-servers:game-servers` (`995:5001`) and `smart-home:smart-home` (`126:5003`), with inherited setgid directories. The old guest-side `Gameserver/.data -> /mnt/nas-gameserver` and `Smarthome/.data -> /mnt/nas-smarthome` contracts, mountpoints, and shortcuts are retired; no NAS-side data migration, snapshot change, or deletion was performed. Palworld worlds and Smart Home application state remain VM-local, and guest Restic excludes `/mnt`.
 
 ### Historical JAR-88 Gameserver drive and mount — 2026-10-01
 

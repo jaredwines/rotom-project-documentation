@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer. A 2026-10-10 live inventory recorded 24 container objects, all running; it is historical point-in-time evidence and predates the 2026-10-13 deliberate Palworld stopped state and Uptime Kuma retirement.
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Complete Available Sources legacy documentation consistency audit
+**Documentation updated:** 2026-10-13 — Live NAS boundary and ownership reconciliation
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -27,11 +27,15 @@ The active website Compose/appdata roots are `/srv/rotom/{stacks,appdata}/hosted
 
 The active Palworld Compose/appdata/secrets roots are `/srv/rotom/{stacks,appdata,secrets}/game-servers`, owned by `game-servers` `995:5001`; old `gameserver` paths are historical. Jared and Fran were recreated **without starting** and are deliberately non-running (`created`). Their labels and binds resolve only to the new local roots; no world data or NAS Gameserver content was changed.
 
+### Current Smart Home local identity — 2026-10-13
+
+The active Smart Home identity is `smart-home` (`126:5003`), with home `/home/smart-home`, root-administered Compose modules under `/srv/rotom/stacks/smart-home`, and mutable state under `/srv/rotom/appdata/smart-home`. `smarthome` is absent from NSS and the current local-root layout. No active or stopped container binds `/mnt/nas-smart-home`; that empty NFS boundary remains separate from Home Assistant and Homebridge's VM-local state.
+
 This inventory is based on the uploaded `rotom-docker-containers.txt` (container names, images, statuses, and ports) and `rotom-compose-locations.txt` (Compose file paths), with verified Docker inspection and status updates from the conversation incorporated on 2026-09-14. The original table statuses are recorded observations rather than continuously live values; later dated verification sections incorporate fresh Docker state and health checks where they were explicitly captured. The original source files do not specify a capture timestamp.
 
 ### Documentation-audit reconciliation — 2026-10-13
 
-The current deployment paths are the plural `libraries`, `platform`, `hosted-websites`, `game-servers`, and `smarthome` roots described in the current overlays. Older entries that call singular `library`, `infra`, `web`, `gameserver`, `/mnt/nas-library`, or `/mnt/nas-media` current are historical migration/recovery evidence. The legacy documentation contains no post-2026-10-13 complete `docker ps -a` capture; treat the exact current object count as **Needs Verification** and resolve it read-only with `docker ps -a` and `docker inspect` of the named workloads.
+The current deployment paths are the plural `libraries`, `platform`, `hosted-websites`, `game-servers`, and `smart-home` roots described in the current overlays. Older entries that call singular `library`, `infra`, `web`, `gameserver`, `smarthome`, `/mnt/nas-library`, or `/mnt/nas-media` current are historical migration/recovery evidence. The legacy documentation contains no post-2026-10-13 complete `docker ps -a` capture; treat the exact current object count as **Needs Verification** and resolve it read-only with `docker ps -a` and `docker inspect` of the named workloads.
 
 ### Evidence provenance
 

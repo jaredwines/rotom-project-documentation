@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-10-13 — Complete Available Sources legacy documentation consistency audit
+**Documentation updated:** 2026-10-13 — Live NAS boundary and ownership reconciliation
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -30,7 +30,7 @@ This is the canonical detailed owner of Rotom account identity and permission fa
 
 Their requested service homes and active local application trees were retired, together with the four local NFS contracts. The remaining empty `/srv/rotom/appdata/documents` and `/srv/rotom/secrets/documents` directories were removed on 2026-10-13 after no active reference was found. `/home/downloaders` later reappeared as an empty root-owned `0755` directory containing only empty `docker/`; it had no associated account and Arcane's active Compose file retained it as a read-only compatibility bind. Both the bind and home were removed on 2026-10-13; this did not restore or alter a Downloader service. Auth remains retired as recorded below.
 
-**Current identity state — 2026-10-13:** The active Libraries service account is `libraries` (`127:5000`), preserving the former Library numeric identity. Its home is `/home/libraries`, with active local paths under `/srv/rotom/{stacks,appdata,secrets}/libraries`; `library` is absent from NSS. The active Palworld service account is `game-servers` (`995:5001`), preserving the former Game numeric identity; `game` and `gameserver` are absent from NSS. Its home is `/home/game-servers`, and active local paths are under `/srv/rotom/{stacks,appdata,secrets}/game-servers`. The active website account is `hosted-websites` (`902:5004`), with home `/home/hosted-websites` and local website paths under `/srv/rotom/{stacks,appdata}/hosted-websites`; `web` is absent from NSS. The former Documents primary GID `5004` was reassigned only after that retired account/group was absent. `downloader` is absent; `901:5005` is historical identity evidence only. No Docker-group change was performed.
+**Current identity state — 2026-10-13:** The active Libraries service account is `libraries` (`127:5000`), preserving the former Library numeric identity. Its home is `/home/libraries`, with active local paths under `/srv/rotom/{stacks,appdata,secrets}/libraries`; `library` is absent from NSS. The active Palworld service account is `game-servers` (`995:5001`), preserving the former Game numeric identity; `game` and `gameserver` are absent from NSS. Its home is `/home/game-servers`, and active local paths are under `/srv/rotom/{stacks,appdata,secrets}/game-servers`. The active website account is `hosted-websites` (`902:5004`), with home `/home/hosted-websites` and local website paths under `/srv/rotom/{stacks,appdata}/hosted-websites`; `web` is absent from NSS. The active Smart Home account is `smart-home` (`126:5003`), with home `/home/smart-home`, Compose roots under `/srv/rotom/stacks/smart-home`, and mutable state under `/srv/rotom/appdata/smart-home`; `smarthome` is absent from NSS. The former Documents primary GID `5004` was reassigned only after that retired account/group was absent. `downloader` is absent; `901:5005` is historical identity evidence only. No Docker-group change was performed.
 
 JAR-94 above supersedes the `infra`, `documents`, `downloader`, and `filesync` portions of this dated account inventory; the paragraph is retained as historical evidence.
 
@@ -47,7 +47,7 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 | libraries | `127:5000`, `/home/libraries`; Jellyfin/Radarr/Sonarr/Prowlarr/RomM/qBittorrentVPN. Paperless is absent. |
 | game-servers | `995:5001`, `/home/game-servers`; Palworld Jared and Fran are deliberately non-running (`created`); JDownloader, Igir, qBittorrent importer, and browser-upload bridge were retired on 2026-10-05; Gamarr retired |
 | platform | `997:5002`, `/home/platform`; Arcane/DDNS/Homepage/Glances/NPM/Rotom Docs |
-| smarthome | `126:5003`, `/home/smarthome`; Home Assistant/Homebridge |
+| smart-home | `126:5003`, `/home/smart-home`; Home Assistant/Homebridge |
 | documents | **Retired**; historical `900:5004` / `/home/documents` record only; numeric GID `5004` is now Hosted Websites |
 | downloader | **Retired**; account, former home, and Arcane compatibility bind are absent |
 | hosted-websites | `902:5004`, `/home/hosted-websites`; Aloha active; Jared Wines undeployed |

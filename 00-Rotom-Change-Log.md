@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-13 — Reconcile live NAS service boundaries and ownership
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Normalized every descendant of `/mnt/nas-libraries` to `libraries:libraries` (`127:5000`) and retained setgid on each directory. Verified the empty `/mnt/nas-game-servers`, `/mnt/nas-hosted-websites`, and `/mnt/nas-smart-home` boundaries create descendants as their respective `game-servers`, `hosted-websites`, and `smart-home` identities. Corrected the current-state layer to reflect the live `Hosted_Websites/.data` automount, the live `smart-home` identity/local roots, and the absence of the previously documented home NAS shortcuts. The retired `/mnt/nas-web` contract remains retired.
+- **Evidence:** 2026-10-13 live `getent`, `stat`, fstab, NFS mount, Docker-mount, ownership, setgid, and service-account disposable-create checks. Libraries scan found 5,159 descendants, all `127:5000`; the three other shares were empty after their test objects were removed. qBittorrent local HTTP returned `200`; NPM returned its expected local `301` after the brief Libraries service stop/start.
+- **Outstanding:** Guest Restic excludes `/mnt`; effective NAS snapshot/recovery policy remains Needs Verification. The live changes revealed a prior legacy documentation/live-state discrepancy; this entry corrects the supported current-state layer. Available Sources replacement remains manual by Jared.
+
 ## 2026-10-13 — Complete Available Sources legacy documentation consistency audit
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
