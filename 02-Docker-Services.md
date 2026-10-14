@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; a 2026-10-10 live Docker inventory recorded 24 container objects, all running. The prior detailed 2026-10-01 snapshot (25 container objects / 24 running) predates the 2026-10-05 retirement of JDownloader and related ROM-ingestion components and is historical.
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Align Hosted Websites and Game Servers local domains
+**Documentation updated:** 2026-10-13 — Retire local Media mountpoint remnant
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -15,7 +15,7 @@ Record substantive changes to this document in the change log as part of the sam
 
 ### Current JAR-96 Library mount contract — 2026-10-13
 
-Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Nginx Proxy Manager were recreated with Library binds from `/mnt/nas-libraries`; no active container bind uses `/mnt/nas-library`. qBittorrent keeps `/mnt/nas-libraries/torrents` at `/media/torrents` and the read-only, non-creating sentinel bind at its unchanged container path. NPM's internal game-library alias and Homepage's Library storage metric also use the new host mount. qBittorrent `wg0` and all affected local HTTP checks passed after recreation.
+Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Nginx Proxy Manager were recreated with Library binds from `/mnt/nas-libraries`; no active container bind uses `/mnt/nas-library` or `/mnt/nas-media`. qBittorrent keeps `/mnt/nas-libraries/torrents` at `/media/torrents` and the read-only, non-creating sentinel bind at its unchanged container path. NPM's internal game-library alias and Homepage's Library storage metric also use the new host mount. qBittorrent `wg0` and all affected local HTTP checks passed after recreation. The retired local `/mnt/nas-media` directory is absent; historical Media-bind records below are not current Compose guidance.
 
 ### Current local-domain alignment — 2026-10-13
 
@@ -461,11 +461,11 @@ JAR-6 added **no Docker integration** for the eight new service NAS shares. No r
 - Published mappings include both IPv4 and IPv6 bindings for most mapped services. Glances shows an IPv4 loopback binding only. These listings do not establish firewall rules, router forwarding, or external reachability.
 - The original container/path inventories alone do not establish volumes, networks, environment variables, dependencies, VPN behavior, or reverse-proxy routing. Later evidence adds the media identity settings and mounts above; use 03 and 04 for separately audited network and storage details. Full current Compose contents still need inspection before editing any service.
 
-### Service groups and NAS mounts — current guest state through JAR-88
+### Historical service groups and NAS mounts — through JAR-88
 
 JAR-94 above supersedes the `infra`, `documents`, `downloader`, and `filesync` rows and the retired NAS contracts below; those rows remain dated identity/storage evidence.
 
-Production workloads are restored under the current service-account layout. The table below describes current guest identity/storage relationships; historical Docker-group membership is not implied.
+This dated table preserves the then-current guest identity/storage relationships; it is superseded by the JAR-96 and current-identity overlays above.
 
 | Service account | Current guest UID:GID | Current guest NAS mount | Current Docker/application use |
 |---|---:|---|---|

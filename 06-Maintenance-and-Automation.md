@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-13 — Align Hosted Websites and Game Servers local domains
+**Documentation updated:** 2026-10-13 — Retire local Media mountpoint remnant
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -12,6 +12,10 @@
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
 
 ## 1. Purpose and Scope
+
+### Current Media-mount retirement — 2026-10-13
+
+`/mnt/nas-media` is absent after removal of its verified-empty retired local directory tree. No active automation, safety guard, Homepage metric, or Compose bind may use it; those active Library dependencies use `/mnt/nas-libraries`. Earlier Media-mount automation records remain historical evidence only.
 
 ### Current JAR-96 Library automation contract — 2026-10-13
 
@@ -144,7 +148,7 @@ The backup status API service is enabled and active. It restarts on failure and 
 
 The current fstab-backed NAS paths keep their automount model. JAR-88 established `/mnt/nas-gameserver` as the active Gameserver contract and retired the active guest `/mnt/nas-game` mount; original Game data remains on UNAS for rollback. The retired `/mnt/nas-downloads`, Apps, Auth, and Customapps boundaries are absent. JAR-86 retired the final bindfs view; Downloader and Media recovery checks remain independent.
 
-qBittorrent uses a service-specific Media safety guard rather than a global Docker→NAS systemd dependency. Its active payload is `/mnt/nas-media/torrents`, and the Media marker bind uses `create_host_path: false`, preventing local-directory fallback on recreation. The retained Downloader sentinel belongs to the broader recovery boundary, not to the current qBittorrent payload/guard contract. Sudden live Media-NFS loss remains untested.
+At this preserved pre-JAR-96 baseline, qBittorrent used a service-specific Media safety guard rather than a global Docker→NAS systemd dependency. Its payload was `/mnt/nas-media/torrents`, and the Media marker bind used `create_host_path: false`. The current Library guard/payload contract is stated in the JAR-96 overlay above; `/mnt/nas-media` is absent.
 
 No rc.local hook exists. The at scheduler is not installed. No per-user crontabs were found. The only observed user timer was launchpadlib-cache-clean for jared.
 

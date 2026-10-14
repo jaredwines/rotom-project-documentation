@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-13 — Align Hosted Websites and Game Servers local domains
+**Documentation updated:** 2026-10-13 — Retire local Media mountpoint remnant
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-13 — Retire local Media mountpoint remnant
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Removed the retired guest-local `/mnt/nas-media` directory after confirming that its fstab/systemd contract and active Compose references were already absent. The empty local `library/games` descendants were removed with guarded `rmdir`; the active Library contract remains `/mnt/nas-libraries`. Historical Media path records remain dated evidence and are not instructions to recreate the mount.
+- **Evidence:** 2026-10-13 final inspection found `/mnt/nas-media` absent, no active fstab or systemd match, and `/mnt/nas-libraries` mounted from NAS `Libraries/.data`. Pre-removal inspection found only empty local directories and no active configuration reference.
+- **Outstanding:** NAS-side Media export/data was not inspected or changed. Available Sources replacement remains manual by Jared.
 
 ## 2026-10-13 — JAR-96 Library-to-Libraries NAS cutover
 

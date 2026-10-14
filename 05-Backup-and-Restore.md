@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Restic backup architecture, scope, retention, verification, restore evidence, and recovery boundaries  
 **Recovery scope:** pre-migration Rotom plus current Proxmox/VM foundation  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Align Hosted Websites and Game Servers recovery paths
+**Documentation updated:** 2026-10-13 — Retire local Media mountpoint remnant
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -12,6 +12,10 @@
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
 
 ## 1. Purpose and Scope
+
+### Current Media-mount retirement — 2026-10-13
+
+The retired guest-local `/mnt/nas-media` tree is absent. It was not a backup source, and its removal does not delete or verify NAS-side Media data. Current Library recovery and storage work must use `/mnt/nas-libraries`; earlier `/mnt/nas-media` recovery references are historical unless explicitly labelled otherwise.
 
 ### Current recovery-path alignment — 2026-10-13
 

@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Align Hosted Websites and Game Servers local domains
+**Documentation updated:** 2026-10-13 — Retire local Media mountpoint remnant
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -23,6 +23,10 @@ Purpose: front-page index and quick-reference architecture summary.
 The active Library contract is `/mnt/nas-libraries`, backed by NAS `Libraries/.data` through the established fstab/systemd automount convention. The former `/mnt/nas-library` guest mount, its `/home/library/nas-library` symlink, and every active host-side dependency are retired; `/home/library/nas-libraries -> /mnt/nas-libraries` is the current shortcut. Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Nginx Proxy Manager bind the new path; Homepage monitors it. qBittorrent retains its loopback-only UI, WireGuard isolation, non-creating sentinel bind, and enabled fail-closed guard.
 
 The initial plus writer-stopped final rsync converged at 5,929 entries / 205,137,536,813 bytes with no deletes and a final dry run with no changes. The generated automount was then proven from an unmounted state using the NAS-resident sentinel before the affected containers were restored. A controlled VM reboot subsequently restored the new NFS mount, Docker, all affected containers, qBittorrent `wg0`, and local qBittorrent/Homepage checks. Jared confirmed the authenticated download/import/seeding workflow works after cutover. The NAS `Library/.data` source/export and data remain retained for separately authorized deletion; no new backup or snapshot was created at Jared's explicit direction.
+
+### Retired local Media mountpoint — 2026-10-13
+
+`/mnt/nas-media` is absent. Its earlier guest fstab/automount and active Compose dependencies had already been retired; its remaining empty local `library/games` directory tree was removed with guarded `rmdir`. The current and sole Library guest contract is `/mnt/nas-libraries`; this removal does not establish any NAS-side Media export or data deletion.
 
 ### Hosted Websites / Game Servers local-domain alignment — 2026-10-13
 
@@ -50,13 +54,13 @@ Uptime Kuma is retired: its Platform stack/appdata, Docker container and image, 
 
 The previous active `pve-alerting` claim is a live-state discrepancy corrected by JAR-95 retirement evidence: PVE has no active alert worker, unit/timer, script, or cron job. The PVE CPU-temperature and backup-status APIs remain unrelated active monitoring/status services and are not part of this retirement. This entry supersedes unqualified current JAR-73/JAR-94 alert/Uptime statements below, which remain dated historical evidence. It does not assert that a public status page existed.
 
-### JAR-94 Media-to-Library NAS cutover — 2026-10-13
+### Historical JAR-94 Media-to-Library NAS cutover — 2026-10-13
 
 The active media contract is `/mnt/nas-library`, backed by `Library/.data`; `/mnt/nas-media` is no longer an active guest mount or configuration contract. Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Nginx Proxy Manager use Library binds. qBittorrent's Library sentinel/guard is fail-closed and its reversible missing-sentinel recreation test passed. Media export data remains retained for rollback. The user accepted the authenticated application workflow after cutover.
 
 Older sections bearing JAR-94 refer to a different historical workload-retirement task; they do not describe this NAS cutover.
 
-### Current Library restoration and Filesync cleanup — 2026-10-13
+### Historical pre-JAR-96 Library restoration and Filesync cleanup — 2026-10-13
 
 qBittorrentVPN and Prowlarr are active again as Library (`127:5000`) services at `/srv/rotom/stacks/library/{qbittorrentvpn,prowlarr}`, with state under matching `/srv/rotom/appdata/library` paths. qBittorrent uses only Library torrent/sentinel paths; WireGuard is active and its CSRF-protected UI is loopback-only at `127.0.0.1:8080`, served by NPM. Prowlarr retains `9696`, `rotom-arr`, `rotom-proxy`, and its NPM route. Paperless remains absent: `/mnt/nas-library/paperless` must be NAS-provisioned as `127:5000` mode `2770` before its fail-closed media bind can be deployed. Syncthing remains retired; its active Homepage File Sync section/card and empty local Filesync secret directory are removed. Its retained NPM proxy record was not changed.
 
@@ -76,7 +80,7 @@ The active shared-service deployment domain is **Platform**. Nginx Proxy Manager
 
 Homepage groups NPM, Arcane, PVE, Uptime Kuma, Syncthing, and Rotom Docs under **Platform**. PVE deliberately remains without a site monitor. Library, monitoring, Smart Home, hosted websites, and their existing access behavior are unchanged.
 
-### JAR-92 current Library-domain state — 2026-10-13
+### Historical JAR-92 Library-domain state — 2026-10-13
 
 JAR-94 above supersedes the Paperless, Prowlarr, and qBittorrentVPN portions of this dated section; the remaining Library history is retained as evidence.
 

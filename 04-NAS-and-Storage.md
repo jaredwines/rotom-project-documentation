@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Retire guest Web NFS contract
+**Documentation updated:** 2026-10-13 — Retire local Media mountpoint remnant
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -19,19 +19,21 @@ Record substantive changes to this document in the change log as part of the sam
 
 The old `/mnt/nas-library` contract for `Library/.data` is retired locally, including its fstab entry and Library home symlink. Its NAS data/export is intentionally retained. A non-destructive `rsync -aHAX --numeric-ids` initial copy followed by a writer-stopped final sync converged at 5,929 entries / 205,137,536,813 bytes; the final dry run had no changes. The generated automount was proven from an unmounted state by reading the NAS-resident sentinel, after which all affected containers were restored. A controlled VM reboot then restored the new mount and affected Docker workloads. No backup/snapshot was created at Jared's explicit direction.
 
+`/mnt/nas-media` is also **retired locally and absent**. Its fstab/automount and active service dependencies had already been removed; after inspection confirmed only empty local `library/games` descendants, the remaining mountpoint tree was removed with guarded `rmdir`. NAS-side Media export/data was not inspected or altered. Do not recreate it as a fallback path: `/mnt/nas-libraries` is the sole active Library contract.
+
 ### Current guest Web-mount retirement — 2026-10-13
 
 `/mnt/nas-web` is **retired on Rotom**: its guest fstab entry, systemd automount, local mountpoint, and former Hosted Websites home symlink are absent. This does not establish removal of the NAS Web export or its data; neither was inspected or changed. Website services use only the local `/srv/rotom/{stacks,appdata}/hosted-websites` roots. The separate `/mnt/nas-gameserver` NFS contract remains active and its retained home symlink is now `/home/game-servers/nas-gameserver`.
 
-### Current Library service storage — 2026-10-13
+### Historical JAR-94 Library service storage — 2026-10-13
 
 JAR-94 migrated the active media contract from `/mnt/nas-media` to the `Library/.data` export at `/mnt/nas-library`. Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Nginx Proxy Manager bind only Library paths. The Library root is `988:5000` mode `2770`; `library/` is `977:5000` mode `2775`, `torrents/` is `0:5000` mode `2775`, and the qBittorrent sentinel is `901:5000` mode `2750`. qBittorrent uses the Library torrent/sentinel paths with non-creating binds, and its 15-second guard checks the Library NFS mount and sentinel.
 
 The Media export and data were retained unchanged as rollback material, but its guest fstab contract and NFS mount are retired. The final convergence found zero differences across 5,929 entries / 205,137,536,813 bytes; the user accepted the authenticated workflow validation. Earlier legacy documentation sections labelled JAR-94 describe a different retired-workload task and are historical identifier-collision evidence, not this cutover.
 
-### JAR-94 retired local NFS contracts — 2026-10-13
+### Historical JAR-94 retired local NFS contracts — 2026-10-13
 
-The local `/mnt/nas-infra`, `/mnt/nas-documents`, `/mnt/nas-downloaders`, and `/mnt/nas-filesync` fstab/systemd-automount contracts and mountpoints are retired. Their NAS exports and data were deliberately left outside the scope of this guest cleanup. The active guest NFS contracts are `/mnt/nas-media`, `/mnt/nas-gameserver`, `/mnt/nas-smarthome`, `/mnt/nas-web`, `/mnt/nas-rotom-restic-backup`, `/mnt/nas-shared-drive`, and `/mnt/nas-library`; no inference about NAS-side deletion follows from local retirement.
+The local `/mnt/nas-infra`, `/mnt/nas-documents`, `/mnt/nas-downloaders`, and `/mnt/nas-filesync` fstab/systemd-automount contracts and mountpoints are retired. This dated JAR-94 record predates the later retirement of `/mnt/nas-media`, `/mnt/nas-web`, and `/mnt/nas-library`; their NAS exports and data were deliberately left outside the scope of guest cleanup. The current contracts are stated in the JAR-96 overlay above.
 
 This document records the current Phase B storage architecture and preserves the pre-migration Rotom storage contracts needed for restoration. It covers current Proxmox/VM local storage plus the historical UniFi NAS exports, mount options, `/mnt/nas-*` contracts, automount behavior, permissions, Docker binds, media/game paths, hardlink behavior, and service dependencies that later tickets must restore deliberately.
 
