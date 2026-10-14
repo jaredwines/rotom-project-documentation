@@ -27,9 +27,12 @@
 # - PVE backup NFS paths are mounted read/write. Host-config Restic has ten snapshots
 #   and passed restic check; eight current VM archives exist. Latest archive zstd
 #   integrity passed, but an explicit full VMA-verifier result remains unrecorded.
-# - PVE operational follow-up: both enterprise and no-subscription repositories appear
-#   enabled; /etc/aliases.db is missing; two packages are pending; CPU vulnerability
-#   exposure and the iGPU option-ROM warning require owner-reviewed maintenance.
+# - PVE uses effective PVE/CEPH no-subscription sources; no enterprise source is enabled.
+#   Postfix now identifies as pve.rotom.casa and has a generated /etc/aliases.db; its
+#   eleven deferred messages remain because direct external TCP 25 delivery is blocked
+#   and no relay is configured. Rollback: /var/backups/pve-postfix-repair-20261014-013424.
+# - A clean simulated update proposes six upgrades plus signed kernel 7.0.14-23, with
+#   no removals; CPU exposure and the iGPU warning still need owner-reviewed maintenance.
 # - /srv/rotom/backup-staging is absent; paths formerly documented beneath it are
 #   historical unless a fresh live check proves they were recreated.
 # - /srv/rotom/stacks/smart-home/{home-assistant,homebridge}/compose.yaml remain
