@@ -271,9 +271,9 @@
 #     rotom-restic-backup/     repository 799babb2; latest explicitly verified snapshot 8efea294 (2026-10-05 21:45 PDT) after NPM staging repair. f666d63c and its 21/21 check are historical evidence; the first timer-triggered run after repair remains Needs Verification.
 #     rotom-linux-home-server-backup-restore-kit/  copied legacy restore documentation from old share; not a self-contained recovery bundle
 #   nas-rotom-backup/         RETIRED NFS path; unmounted/no active backup config reference; inert local directory may remain; old NAS share retained rollback-only
-#   nas-shared-drive/  NFSv3 Shared_Drive/.data; root 988:988 mode 0770
+#   nas-shared-drive/  RETIRED local guest mount contract; NAS Shared_Drive data was not altered
 # - Current downloader correction: live fstab/generated unit/findmnt/showmount all use Downloader/.data. The distinct empty `Downloads` NAS drive and `/mnt/nas-downloads` guest contract were retired 2026-09-29; historical `Downloads/.data` records below remain dated evidence.
-# - Current post-JAR-88 guest topology has eleven canonical NFS paths using the fstab/systemd automount pattern. Historical twelve- and fifteen-mount counts below are dated checkpoints. The Restic member is nas-rotom-restic-backup rather than nas-rotom-backup.
+# - Current 2026-10-13 guest topology has five canonical NFS paths using the fstab/systemd automount pattern: nas-game-servers, nas-smart-home, nas-rotom-restic-backup, nas-libraries, and nas-hosted-websites. The Shared Drive guest contract is retired; its NAS data and JAR-25 image remain untouched. Historical eleven-, twelve-, and fifteen-mount counts below are dated checkpoints. The Restic member is nas-rotom-restic-backup rather than nas-rotom-backup.
 # - JAR-31 reboot: first NAS recovery invocation failed at Media readiness; systemd retry about 30s later succeeded and recovered qBittorrentVPN, Radarr, Sonarr, Gamarr, Jellyfin. JAR-77 later retired Gamarr and removed its recovery-worker branch.
 #
 # CURRENT DOCKER BRIDGE MAP — JAR-31 FINAL REBOOT

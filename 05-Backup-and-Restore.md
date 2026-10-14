@@ -17,6 +17,10 @@ Record substantive changes to this document in the change log as part of the sam
 
 The retired guest-local `/mnt/nas-media` tree is absent. It was not a backup source, and its removal does not delete or verify NAS-side Media data. Current Library recovery and storage work must use `/mnt/nas-libraries`; earlier `/mnt/nas-media` recovery references are historical unless explicitly labelled otherwise.
 
+### Current Shared Drive mount retirement — 2026-10-13
+
+Rotom no longer mounts the NAS Shared Drive at `/mnt/nas-shared-drive`; the guest fstab/systemd contract and empty local mountpoint were removed. This does not alter the NAS-resident JAR-25 raw NVMe recovery image or its historical verification evidence. Any future access to, retention change for, or restoration from that image requires a separately authorized NAS access path.
+
 ### Current recovery-path alignment — 2026-10-13
 
 Current local recovery paths use `hosted-websites` (`902:5004`) at `/home/hosted-websites` and `/srv/rotom/{stacks,appdata}/hosted-websites`, `game-servers` (`995:5001`) at `/home/game-servers` and `/srv/rotom/{stacks,appdata,secrets}/game-servers`, and `smart-home` (`126:5003`) at `/home/smart-home` and `/srv/rotom/{stacks,appdata}/smart-home`. Palworld worlds remain VM-local; their containers are deliberately non-running after a no-start recreation and their verified file counts are Jared 301 / Fran 212. `/mnt/nas-web` is retired only as a guest mount; the separate empty `Hosted_Websites/.data -> /mnt/nas-hosted-websites` boundary is current. Earlier `web`, `gameserver`, and `smarthome` recovery paths below are historical unless explicitly updated.

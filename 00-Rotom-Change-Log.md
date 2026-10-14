@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-13 — Retire local Shared Drive mount contract
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Retired Rotom's guest-side `Shared_Drive/.data -> /mnt/nas-shared-drive` contract by stopping its generated systemd units, removing its sole `/etc/fstab` entry, and removing the empty local mountpoint. The NAS Shared Drive and its JAR-25 bare-metal recovery image were deliberately not inspected, modified, or deleted.
+- **Evidence:** 2026-10-13 final local checks found no fstab reference, mounted filesystem, generated mount/automount unit, or local `/mnt/nas-shared-drive` directory. The five remaining guest fstab NFS contracts are Game Servers, Smart Home, Rotom Restic Backup, Libraries, and Hosted Websites.
+- **Outstanding:** The retained NAS Shared Drive, including the JAR-25 image, now has no Rotom guest mount path; access or retention changes require separate authorization. Available Sources replacement remains manual by Jared.
+
 ## 2026-10-13 — Reconcile live NAS service boundaries and ownership
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.

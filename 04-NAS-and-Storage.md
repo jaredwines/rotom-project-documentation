@@ -47,13 +47,13 @@ This document records the current Phase B storage architecture and preserves the
 **Document:** `04-NAS-and-Storage.md`  
 **Baseline evidence:** 2026-09-14 22:46 PDT; read-only update 2026-09-15  
 **Documentation updated:** 2026-10-13 — Complete Available Sources audit; current mount contracts reconciled to the JAR-96 and renamed-drive overlays.
-**Status:** The former ten-automount count is historical. The current guest count is **Needs Verification** because the legacy documentation records several 2026-10-13 retirements/renames without a final complete unit listing. Resolve it read-only with `findmnt` and `systemctl list-units --type=automount` on Rotom. Guest `Rotom_Restic_Backup` remains documented as unchanged. PVE backup exports remain `PVE_Restic_Backup` for host-config Restic and `Rotom_VM_Backup` for whole-VM VZDump at their canonical PVE paths.
+**Status:** The former ten-automount count is historical. The 2026-10-13 local fstab/final-removal verification establishes five current guest NFS automount contracts: Game Servers, Smart Home, Rotom Restic Backup, Libraries, and Hosted Websites. Guest `Rotom_Restic_Backup` remains documented as unchanged. PVE backup exports remain `PVE_Restic_Backup` for host-config Restic and `Rotom_VM_Backup` for whole-VM VZDump at their canonical PVE paths.
 
 The original audit was read-only. It did not recursively enumerate the NAS, modify mounts or permissions, restart containers, inspect secrets, traverse Restic repository internals, or create a hardlink test file. Later user-supplied checks, completed media GID changes, and the 2026-09-18 backup-share access-protection deployment are recorded below; they are separate from that audit. Unchanged capacity, mount, and systemd observations retain their original evidence dates.
 
 ## 2. Current Storage State — 2026-09-29 JAR-47 final recovery policy
 
-The Rotom guest storage contract is ten NFS systemd automounts: eight service boundaries plus guest Restic and Shared Drive. JAR-86 retired the final bindfs compatibility view, JAR-88 replaced the active Game mount with Gameserver, and the unused Customapps guest contract was retired on 2026-10-12. PVE has only backup-specific NAS mounts and does not host the guest application shares.
+The Rotom guest storage contract is five NFS systemd automounts: Game Servers, Smart Home, Rotom Restic Backup, Libraries, and Hosted Websites. The guest Shared Drive contract was retired on 2026-10-13; its NAS data, including the JAR-25 recovery image, was not changed. JAR-86 retired the final bindfs compatibility view, JAR-88 replaced the active Game mount with Gameserver, and the unused Customapps guest contract was retired on 2026-10-12. PVE has only backup-specific NAS mounts and does not host the guest application shares.
 
 ### NAS protection classification — JAR-47
 

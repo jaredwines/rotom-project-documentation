@@ -40,6 +40,10 @@ The initial plus writer-stopped final rsync converged at 5,929 entries / 205,137
 
 `/mnt/nas-media` is absent. Its earlier guest fstab/automount and active Compose dependencies had already been retired; its remaining empty local `library/games` directory tree was removed with guarded `rmdir`. The current and sole Library guest contract is `/mnt/nas-libraries`; this removal does not establish any NAS-side Media export or data deletion.
 
+### Retired local Shared Drive mountpoint — 2026-10-13
+
+The guest-side `Shared_Drive/.data -> /mnt/nas-shared-drive` fstab/systemd-automount contract and its empty local mountpoint are retired. The NAS Shared Drive was not inspected, altered, or deleted; it retains the JAR-25 bare-metal recovery image as historical recovery material, but Rotom no longer has a guest mount path to it.
+
 ### Hosted Websites / Game Servers local-domain alignment — 2026-10-13
 
 **Hosted Websites** is the current website service identity: `hosted-websites` (`902:5004`), home `/home/hosted-websites`, and local Compose/appdata roots `/srv/rotom/{stacks,appdata}/hosted-websites`. Aloha Millworks was recreated from those roots and its public HTTPS endpoint returned `200`; Jared Wines remains intentionally undeployed. The old guest-side Web NFS contract is **retired**: its fstab entry, automount, local `/mnt/nas-web` mountpoint, and former home symlink are absent. The separate current `Hosted_Websites/.data -> /mnt/nas-hosted-websites` NFSv3 automount is an empty service boundary (`988:5004`, mode `2770`), not an active website bind.
@@ -240,7 +244,7 @@ The adopted access policy keeps `jared` outside the media group. Administer medi
 | `/mnt/nas-filesync` | Filesync service share; root `988:5007` mode `2770`; Syncthing's sole payload boundary, currently without a production folder/payload |
 | `/mnt/nas-rotom-restic-backup` | NFSv3 `Rotom_Restic_Backup/.data`; mounted share root `988:988` mode `0700`; canonical repository `/mnt/nas-rotom-restic-backup/rotom-restic-backup`; current verified recovery point `8efea294`; `rotom-restic-backup.timer` enabled/active |
 | `/mnt/nas-pve-restic-backup` *(PVE host only)* | NFSv3 `PVE_Restic_Backup/.data`; systemd automount from PVE `/etc/fstab`; canonical repository `/mnt/nas-pve-restic-backup/pve-restic-backup` (repo ID `8ca0218c645dc2968c2b21d67dbda3840794d8bc9c157c0515a85af30eb3d0e3`); staging `/var/backups/pve-restic-recovery`; current snapshot `35d4b0c2`; `pve-restic-backup.timer` enabled/active for `04:00` |
-| `/mnt/nas-shared-drive` | NFSv3 Shared Drive; contains JAR-25 raw NVMe rollback image; outside host Restic because `/mnt` is excluded |
+| NAS Shared Drive (no current guest mount) | Retains the JAR-25 raw NVMe rollback image; outside guest Restic and not accessible through a current Rotom guest mount contract |
 | `/srv/rotom/stacks` | Current declarative Compose modules for migrated Infra, Media, Downloader, Gameserver, Smarthome, Documents, Web, and Filesync workloads |
 | `/srv/rotom/appdata` | Current VM-local mutable application state, separated by domain; protected by guest Restic `/srv` scope |
 | `/home/infra/docker/nginx-proxy-manager` | Retained NPM rollback tree only; active NPM is under `/srv/rotom` |
@@ -251,7 +255,7 @@ The adopted access policy keeps `jared` outside the media group. Administer medi
 | `/var/lib/docker/volumes` | Current Docker named-volume store; includes restored `arcane_arcane-data` |
 | `/var/backups/system-info` | Active backup staging/recovery inventory path; all three required SQLite sources remain part of the normal backup path; application-aware recovery was verified by JAR-47 |
 
-The current guest contract contains **ten** fstab/systemd NFS automounts: eight service boundaries plus guest Restic and Shared Drive. JAR-88 replaced the active Game mount with Gameserver; the separate Downloads, Apps, Auth, and Customapps guest boundaries and both bindfs compatibility views are retired. The PVE-only `/mnt/nas-pve-restic-backup` automount is an additional host backup path and is not part of the guest count. The former `/mnt/nas-rotom-backup` export is likewise no longer active; the old NAS `Rotom_Home_Server_Backup` share remains rollback-only. Historical twelve- and fifteen-mount checkpoints below remain dated evidence rather than current inventory.
+The current guest contract contains **five** fstab/systemd NFS automounts: Game Servers, Smart Home, Rotom Restic Backup, Libraries, and Hosted Websites. The guest Shared Drive contract is retired; its NAS data remains untouched. The separate Downloads, Apps, Auth, Customapps, Media, Web, and former singular Library guest boundaries and both bindfs compatibility views are retired. The PVE-only `/mnt/nas-pve-restic-backup` automount is an additional host backup path and is not part of the guest count. The former `/mnt/nas-rotom-backup` export is likewise no longer active; the old NAS `Rotom_Home_Server_Backup` share remains rollback-only. Historical twelve- and fifteen-mount checkpoints below remain dated evidence rather than current inventory.
 
 Historical JAR-21/JAR-29 records name `/mnt/nas-downloads` and/or `Downloads/.data`; those remain historical recovery evidence. Current live fstab, generated mount unit, active NFS source, and `showmount` identify `/mnt/nas-downloaders -> Downloader/.data`. The distinct empty `Downloads` drive and `/mnt/nas-downloads` guest contract were retired on 2026-09-29 after a mounted zero-byte inspection and no-reference scan; they must not be confused with the active singular `Downloader/.data` share.
 
@@ -277,7 +281,7 @@ The final snapshot explicitly contains both preservation audit trees (`/home/jar
 
 ### JAR-25 bare-metal rollback baseline — 2026-09-25
 
-JAR-25 completed the preservation-phase whole-disk rollback gate without changing the installed OS, partition table, Docker Compose definitions, LAN identity, service UID/GID model, or NAS export definitions. Read-only identification fixed the source as `/dev/nvme0n1`, Samsung SSD 970 EVO Plus 250GB, serial `S59BNM0R702702E`, exact size `250059350016` bytes. The destination is the physically separate UNAS Shared Drive mounted at `/mnt/nas-shared-drive`.
+JAR-25 completed the preservation-phase whole-disk rollback gate without changing the installed OS, partition table, Docker Compose definitions, LAN identity, service UID/GID model, or NAS export definitions. Read-only identification fixed the source as `/dev/nvme0n1`, Samsung SSD 970 EVO Plus 250GB, serial `S59BNM0R702702E`, exact size `250059350016` bytes. At acquisition, the destination was the physically separate UNAS Shared Drive mounted at `/mnt/nas-shared-drive`; that guest mount contract was retired on 2026-10-13 without changing NAS data.
 
 The final raw image is `/mnt/nas-shared-drive/rotom-bare-metal/jar-25-2026-09-25/rotom-nvme-live-pre-proxmox-2026-09-25.img`. Its logical size exactly matches the source disk (`250059350016` bytes); acquisition-stream and complete stored-image reread hashes both equal `b62b2c8210bb2a6446abc29c5767c7d8531f547dfd2ec3f0259dbee8d74c5e90`. Stored-image partition inspection exposed the EFI System Partition and Linux filesystem partition, and restore instructions were written alongside the image. The JAR-24 final Restic snapshot and JAR-23 critical artifacts were reverified before acquisition.
 
