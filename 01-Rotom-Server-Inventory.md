@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Remove stale Homepage Uptime Kuma card and rename Libraries section
+**Documentation updated:** 2026-10-13 — Rename the Library local identity and roots to Libraries
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -18,9 +18,13 @@ Purpose: front-page index and quick-reference architecture summary.
 
 ## 2. Current Rotom Summary
 
+### Current Libraries local identity — 2026-10-13
+
+The active local Linux identity is `libraries` (`127:5000`), with home `/home/libraries` and active Compose, mutable-state, and protected-input roots under `/srv/rotom/{stacks,appdata,secrets}/libraries`. `library` and the matching singular local roots are absent. This local rename does not rename NAS data: `/mnt/nas-libraries` and its internal `library/` content directory remain the active storage contract. The eight affected Library containers were recreated against the plural local roots and verified running; qBittorrent `wg0`, expected local HTTP responses, and zero failed systemd units were confirmed. A transient singular appdata tree produced during the initial recreation is retained reversibly at `/srv/rotom/backup-staging/libraries-rename-transient-20261013` pending separately authorized removal.
+
 ### JAR-96 Library-to-Libraries NAS cutover — 2026-10-13
 
-The active Library contract is `/mnt/nas-libraries`, backed by NAS `Libraries/.data` through the established fstab/systemd automount convention. The former `/mnt/nas-library` guest mount, its `/home/library/nas-library` symlink, and every active host-side dependency are retired; `/home/library/nas-libraries -> /mnt/nas-libraries` is the current shortcut. Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Nginx Proxy Manager bind the new path; Homepage monitors it. The targeted NAS recovery helper covers NPM's bind-startup failure state as well as the Library workloads. qBittorrent retains its loopback-only UI, WireGuard isolation, non-creating sentinel bind, and enabled fail-closed guard.
+The active Library contract is `/mnt/nas-libraries`, backed by NAS `Libraries/.data` through the established fstab/systemd automount convention. The former `/mnt/nas-library` guest mount, its former singular-home `nas-library` symlink, and every active host-side dependency are retired; `/home/libraries/nas-libraries -> /mnt/nas-libraries` is the current shortcut. Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Nginx Proxy Manager bind the new path; Homepage monitors it. The targeted NAS recovery helper covers NPM's bind-startup failure state as well as the Library workloads. qBittorrent retains its loopback-only UI, WireGuard isolation, non-creating sentinel bind, and enabled fail-closed guard.
 
 The initial plus writer-stopped final rsync converged at 5,929 entries / 205,137,536,813 bytes with no deletes and a final dry run with no changes. The generated automount was then proven from an unmounted state using the NAS-resident sentinel before the affected containers were restored. A controlled VM reboot subsequently restored the new NFS mount, Docker, all affected containers, qBittorrent `wg0`, and local qBittorrent/Homepage checks. Jared confirmed the authenticated download/import/seeding workflow works after cutover. The NAS `Library/.data` source/export and data remain retained for separately authorized deletion; no new backup or snapshot was created at Jared's explicit direction.
 

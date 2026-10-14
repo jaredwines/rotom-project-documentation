@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Retire local Media mountpoint remnant
+**Documentation updated:** 2026-10-13 — Rename the Library local identity and roots to Libraries
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -14,6 +14,8 @@ Record substantive changes to this document in the change log as part of the sam
 ## 1. Purpose and Scope
 
 ### Current JAR-96 Library storage — 2026-10-13
+
+The local service account and convenience shortcut for this mount are `libraries` (`127:5000`) and `/home/libraries/nas-libraries -> /mnt/nas-libraries`. This local naming does not change the NAS-side mount source or the internal `library/` data directory.
 
 `/mnt/nas-libraries` is the sole active Library NFSv3 contract, sourced from `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Libraries/.data` with `defaults,_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s`. Its mounted root is `988:5000` mode `2771`; `library/` is `977:5000` mode `2775`, `torrents/` is `0:5000` mode `2775`, and `.rotom-qbt-media-ready/` is `901:5000` mode `2750`.
 

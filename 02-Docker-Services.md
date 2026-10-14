@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; a 2026-10-10 live Docker inventory recorded 24 container objects, all running. The prior detailed 2026-10-01 snapshot (25 container objects / 24 running) predates the 2026-10-05 retirement of JDownloader and related ROM-ingestion components and is historical.
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Remove stale Homepage Uptime Kuma card and rename Libraries section
+**Documentation updated:** 2026-10-13 — Rename the Library local identity and roots to Libraries
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -12,6 +12,10 @@
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
 
 ## 1. Purpose and Scope
+
+### Current Libraries local Compose roots — 2026-10-13
+
+The active local Library Compose, appdata, and secrets roots are `/srv/rotom/{stacks,appdata,secrets}/libraries`; the `libraries` Linux identity retains `127:5000`. Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Prowlarr were recreated from those roots and their live container mounts use plural appdata paths. The singular local roots and account are absent. This does not alter `/mnt/nas-libraries` or its internal `library/` media directory. The singular appdata tree Docker created during the initial rename recreation was retained reversibly under `/srv/rotom/backup-staging/libraries-rename-transient-20261013`, not used by active containers.
 
 ### Current JAR-96 Library mount contract — 2026-10-13
 

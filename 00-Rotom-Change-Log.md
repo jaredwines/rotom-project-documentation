@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-13 — Remove stale Homepage Uptime Kuma card and rename Libraries section
+**Documentation updated:** 2026-10-13 — Rename the Library local identity and roots to Libraries
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-13 — Rename Library local identity and roots to Libraries
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Renamed the local Linux account and group `library` to `libraries`, retaining UID:GID `127:5000`, and moved its home to `/home/libraries`. Renamed the active local Compose, mutable-state, and protected-input roots to `/srv/rotom/{stacks,appdata,secrets}/libraries`; updated the affected Compose binds and recreated Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Prowlarr. The NAS mount `/mnt/nas-libraries` and its internal `library/` data directory were intentionally unchanged. A transient singular appdata tree created during the first recreation was moved to `/srv/rotom/backup-staging/libraries-rename-transient-20261013` for reversible review rather than deleted.
+- **Evidence:** 2026-10-13 final inspection confirmed `libraries:x:127:5000::/home/libraries:/usr/bin/zsh`, the former account/group and all four singular local roots absent, active Compose paths free of singular local-root references, and all eight affected containers running with plural appdata mounts. Jellyfin/Radarr/Sonarr/Prowlarr returned `302`; qBittorrent returned `200` with `wg0` at `10.2.0.2/32`; RomM and its database were running (database healthy); and systemd had no failed units.
+- **Outstanding:** Available Sources replacement remains manual by Jared. Review and remove the retained transient staging tree only with separate authorization after confirming it is no longer needed.
 
 ## 2026-10-13 — Finalize Homepage Uptime Kuma retirement presentation
 
