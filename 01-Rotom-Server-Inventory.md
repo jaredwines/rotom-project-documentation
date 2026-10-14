@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Live NAS boundary and ownership reconciliation
+**Documentation updated:** 2026-10-13 — Restore Paperless in Libraries with NAS-resident media
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -21,6 +21,12 @@ Purpose: front-page index and quick-reference architecture summary.
 This audit confirms that the 2026-10-13 overlays at the start of this section are the supported current-state layer. Later undated-looking summaries and earlier JAR checkpoint tables are retained for evidence but are **Historical** wherever they name `infra`, `library`, `gameserver`, `web`, `/mnt/nas-media`, `/mnt/nas-library`, `/mnt/nas-gameserver`, Uptime Kuma, Paperless, Syncthing, or running Palworld containers as current. Do not use those older passages as operating instructions. A fresh read-only inventory of guest NFS automount units is still required before asserting their current count; resolve it with `findmnt` plus `systemctl list-units --type=automount` on Rotom.
 
 ## 2. Current Rotom Summary
+
+### Current Paperless Libraries deployment — 2026-10-13
+
+Paperless is active again as a Libraries (`127:5000`) workload with PostgreSQL and Valkey. Its Compose, VM-local application state, and protected inputs are under `/srv/rotom/{stacks,appdata,secrets}/libraries/paperless`; `/mnt/nas-libraries/paperless` is the sole authoritative media bind. That fresh NAS subtree is `127:5000`, mode `2770`; Compose uses a non-creating bind so a missing target fails closed rather than creating local media. The protected retained recovery set supplied the existing instance and five media files; its SHA-256 manifest matches the new NAS target, and the recovery source remains intact. The retired Documents NFS export refused a temporary mount, so no direct NAS-source migration was attempted.
+
+Paperless, its database, and its broker are running; the Paperless health check passed. Its loopback service and retained `paperless.rotom.casa` NPM route returned the expected login `302`. Homepage's existing Libraries card is consequently current. The NAS recovery helper now requires the Paperless media directory before it conditionally recovers Paperless after a qualifying startup mount failure. Guest Restic includes the VM-local state but excludes the authoritative NAS media; Libraries snapshot/restore coverage and authenticated Paperless acceptance remain Needs Verification.
 
 ### Current Game Servers and Smart Home NAS contracts — 2026-10-13
 

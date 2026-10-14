@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-13 — Complete Available Sources legacy documentation consistency audit
+**Documentation updated:** 2026-10-13 — Restore Paperless in Libraries with NAS-resident media
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-13 — Restore Paperless in Libraries with NAS-resident media
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Restored Paperless, PostgreSQL, and Valkey as Libraries (`127:5000`) workloads from the protected retained recovery set. The active Compose, appdata, and protected-input roots are now under `/srv/rotom/{stacks,appdata,secrets}/libraries/paperless`; its sole media bind is the new `/mnt/nas-libraries/paperless` subtree. The subtree is `127:5000`, mode `2770`, and is a non-creating Compose bind. The existing NPM route and Homepage Libraries card are now live. The NAS recovery helper validates the Paperless directory and conditionally recovers the Paperless container after a qualifying NAS startup failure. The recovered source set remains intact.
+- **Evidence:** The retired Documents NFS export refused the temporary mount, so no bypass was attempted. The retained recovery media (five files / 384,771 bytes) was copied to Libraries with matching SHA-256 manifests. Compose rendered successfully; Paperless became healthy; loopback `127.0.0.1:8000` and `paperless.rotom.casa` each returned the expected `302` login redirect; Libraries could read the restored original and write the target directory; the recovery helper completed successfully with zero failed systemd units.
+- **Outstanding:** Guest Restic protects the restored VM-local Paperless state but still excludes `/mnt`; effective Libraries NAS snapshot/restore protection remains Needs Verification. Perform authenticated upload/OCR/original-download acceptance and a separately planned isolated NAS recovery test before treating those outcomes as verified. Available Sources replacement remains manual by Jared.
 
 ## 2026-10-13 — Retire local Shared Drive mount contract
 

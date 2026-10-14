@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-13 — Live NAS boundary and ownership reconciliation
+**Documentation updated:** 2026-10-13 — Restore Paperless in Libraries with NAS-resident media
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -12,6 +12,10 @@
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
 
 ## 1. Purpose and Scope
+
+### Current Paperless NAS recovery coverage — 2026-10-13
+
+`rotom-nas-docker-recovery` now validates `/mnt/nas-libraries/paperless` after confirming the Libraries NFS mount and before attempting Paperless recovery. Its existing selective behavior is retained: it leaves running containers unchanged and starts Paperless only when the container has an `unless-stopped`/`always` policy and a recorded NAS/mount startup-failure signature. The helper's normal execution completed successfully with Paperless already running, and no systemd units were failed. This replaces historical helper descriptions that name the retired Documents/Paperless media contract.
 
 ### Current Media-mount retirement — 2026-10-13
 
@@ -43,7 +47,7 @@ JAR-95 retirement evidence also corrects the prior active `pve-alerting` claim a
 
 qBittorrentVPN is active again. Its enabled Library guard and NAS recovery helper passed their Library checks after cutover; the guard protects only the Library payload/sentinel contract and failed closed when the sentinel was temporarily absent. The root alert monitor and recovery helper use Library paths. Syncthing remains absent, with no Filesync unit, stack, appdata, or secret directory; Homepage no longer presents File Sync/Syncthing. The retained Syncthing NPM proxy record is outside this automation change.
 
-### JAR-94 current retired-workload automation debt — 2026-10-13
+### Historical JAR-94 retired-workload automation debt — 2026-10-13
 
 The active NAS recovery helper now validates only Media, but it still calls `recover_container qbittorrentvpn` even though qBittorrentVPN is retired and absent. The enabled qBittorrent media guard and root alert worker also retain non-operative qBittorrent checks. Syncthing and Paperless branches were removed with their retired local dependencies; the former Filesync systemd unit is absent. Treat the remaining qBittorrent references as cleanup debt, not runtime evidence, until a separate targeted automation cleanup is authorized and verified.
 

@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Complete Available Sources legacy documentation consistency audit
+**Documentation updated:** 2026-10-13 — Restore Paperless in Libraries with NAS-resident media
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -13,9 +13,13 @@ Record substantive changes to this document in the change log as part of the sam
 
 ## 1. Purpose and Scope
 
+### Current Paperless route — 2026-10-13
+
+Paperless is active from the Libraries deployment and listens only at `127.0.0.1:8000`. The retained NPM proxy record for `paperless.rotom.casa` is now operational again: both a loopback request and an SNI request through NPM returned the expected `302` login redirect. Its database and broker remain private on the Paperless Docker network; the web service also joins `rotom-proxy`. Historical statements that Paperless is absent or that its retained route has no upstream are superseded by this overlay.
+
 ### Current Library routes — 2026-10-13
 
-The supported current Library-facing routes are qBittorrentVPN through loopback-only `127.0.0.1:8080` and NPM host `14`, plus Prowlarr through NPM host `18`; their recorded responses were `200` and `302` respectively. RomM retains its established NPM route and the internal-only game-library alias now uses the active `/mnt/nas-libraries` bind. Paperless is absent, so its retained proxy record is not an operational route. Route details not rechecked after the Libraries rename are **Needs Verification**; resolve them with read-only NPM configuration inspection and local/SNI probes.
+The supported current Library-facing routes are qBittorrentVPN through loopback-only `127.0.0.1:8080` and NPM host `14`, plus Prowlarr through NPM host `18`; their recorded responses were `200` and `302` respectively. RomM retains its established NPM route and the internal-only game-library alias now uses the active `/mnt/nas-libraries` bind. Paperless now uses loopback-only `127.0.0.1:8000` and its retained NPM route returned the expected `302`; see the current Paperless route overlay. Route details not rechecked after the Libraries rename remain **Needs Verification**.
 
 ### Current Homepage Platform presentation — 2026-10-13
 
@@ -25,7 +29,7 @@ Homepage's former **Rotom Management** section is now **Platform**, with Rotom D
 
 The Uptime Kuma NPM route and Homepage mapping are retired; no Uptime Kuma listener or Docker service remains. This is not evidence of a public status page, and JAR-95 makes no claim that one existed. Homepage itself remains healthy: local `Host: rotom.casa` and public HTTPS checks returned `200`. The PVE HTTPS UI route plus the read-only PVE CPU-temperature (`8788`) and backup-status (`8789`) services remain unrelated and were not changed.
 
-qBittorrentVPN is active with a loopback-only `127.0.0.1:8080` listener; NPM proxy host `14` serves `qBittorrent.rotom.casa` and returned `200`. Prowlarr is active on `9696`; NPM proxy host `18` returned its expected `302`. Paperless remains absent; its retained NPM host is not evidence of an active service. The retained Syncthing NPM record was not changed when the absent service's Homepage presentation was removed.
+qBittorrentVPN is active with a loopback-only `127.0.0.1:8080` listener; NPM proxy host `14` serves `qBittorrent.rotom.casa` and returned `200`. Prowlarr is active on `9696`; NPM proxy host `18` returned its expected `302`. Paperless is active again through its loopback `8000` listener and retained NPM host; this paragraph's former absence statement is superseded by the current Paperless route overlay. The retained Syncthing NPM record was not changed when the absent service's Homepage presentation was removed.
 
 The current overlays above are authoritative for the Platform and Library service set. Older route and upstream statements below are retained as dated evidence and must not be read as proof that retired Syncthing or Paperless services remain active.
 

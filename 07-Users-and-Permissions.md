@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-10-13 — Live NAS boundary and ownership reconciliation
+**Documentation updated:** 2026-10-13 — Restore Paperless in Libraries with NAS-resident media
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -12,6 +12,10 @@
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
 
 ## 1. Purpose and Scope
+
+### Current Paperless Libraries identity — 2026-10-13
+
+Paperless application processes use the current `libraries` identity, UID:GID `127:5000`; the retired `documents` account was not recreated. Its newly created authoritative media subtree, `/mnt/nas-libraries/paperless`, is `127:5000`, mode `2770`. VM-local mutable state under `/srv/rotom/appdata/libraries/paperless` uses the required service/image ownership for each component, while Paperless web data, exports, and consume paths are reconciled to `127:5000`. Protected environment inputs remain root-owned under `/srv/rotom/secrets/libraries/paperless`; values are intentionally not recorded. Historical Documents ownership records remain recovery evidence only.
 
 This is the canonical detailed owner of Rotom account identity and permission facts. Other documents may repeat a UID/GID or access consequence only as context and should refer back here for the complete account model.
 
@@ -44,7 +48,7 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 |---|---|
 | PVE host | hostname `pve`; routine administration as Linux user `jared` (UID/GID `1000:1000`, groups `sudo` and `users`); canonical Mac aliases `pve` / `pve.rotom.casa`; key `~/.ssh/id_ed25519_pve`; PVE identity `jared@pam` has propagated `Administrator` access at `/`; matching root-authorized key removed; root retained for emergency recovery |
 | Debian VM `jared` | UID/GID `1000:1000`; supplementary `sudo`; key-only Mac login via `~/.ssh/id_ed25519_rotom` |
-| libraries | `127:5000`, `/home/libraries`; Jellyfin/Radarr/Sonarr/Prowlarr/RomM/qBittorrentVPN. Paperless is absent. |
+| libraries | `127:5000`, `/home/libraries`; Jellyfin/Radarr/Sonarr/Prowlarr/RomM/qBittorrentVPN/Paperless. Paperless media is `/mnt/nas-libraries/paperless`. |
 | game-servers | `995:5001`, `/home/game-servers`; Palworld Jared and Fran are deliberately non-running (`created`); JDownloader, Igir, qBittorrent importer, and browser-upload bridge were retired on 2026-10-05; Gamarr retired |
 | platform | `997:5002`, `/home/platform`; Arcane/DDNS/Homepage/Glances/NPM/Rotom Docs |
 | smart-home | `126:5003`, `/home/smart-home`; Home Assistant/Homebridge |
@@ -386,7 +390,7 @@ The former `media` user/group is `library`, retaining `127:5000`, a locked passw
 
 Paperless uses `USERMAP_UID=127` and `USERMAP_GID=5000`; its live web, consumer, scheduler, and worker processes run as Library. The Documents NFS export remains a distinct document boundary, but its root is `988:5000` mode `2770` and its sole Paperless subtree is `127:5000`; no other Documents export content was present or changed. POSIX ACL mutation is unsupported by this NFSv3 export, and a supplementary Documents-GID test was denied, so this exact ownership migration is the supported least-scope access design. Database/broker state retains image ownership and remains VM-local.
 
-Before JAR-92, Paperless's Compose web service used `USERMAP_UID=900` and `USERMAP_GID=5004`, and its live workers ran as `documents`. This preserved JAR-91 evidence is superseded by the Library mapping immediately above; the NAS bind path itself remains `/mnt/nas-documents/paperless -> /usr/src/paperless/media`.
+Before JAR-92, Paperless's Compose web service used `USERMAP_UID=900` and `USERMAP_GID=5004`, and its live workers ran as `documents`. This preserved JAR-91 evidence is superseded by the current Libraries mapping and `/mnt/nas-libraries/paperless -> /usr/src/paperless/media` bind.
 
 The historical JAR-91 Downloads assertion is superseded: qBittorrent runs as Library and uses only the retained Media payload/guard. The Downloader share has no qBittorrent payload or recovery-helper role.
 

@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer. A 2026-10-10 live inventory recorded 24 container objects, all running; it is historical point-in-time evidence and predates the 2026-10-13 deliberate Palworld stopped state and Uptime Kuma retirement.
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Live NAS boundary and ownership reconciliation
+**Documentation updated:** 2026-10-13 — Restore Paperless in Libraries with NAS-resident media
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -12,6 +12,12 @@
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
 
 ## 1. Purpose and Scope
+
+### Current Paperless Libraries Compose deployment — 2026-10-13
+
+Paperless, `paperless-db` (PostgreSQL 18), and `paperless-broker` (Valkey 9) are active from `/srv/rotom/stacks/libraries/paperless/compose.yaml`. The restored non-media state is VM-local at `/srv/rotom/appdata/libraries/paperless/{broker,database,data,export,consume}`; protected environment inputs are root-owned below `/srv/rotom/secrets/libraries/paperless`. The web container maps processes to Libraries `127:5000`, publishes only `127.0.0.1:8000`, and joins `rotom-proxy`; database and broker have no host ports.
+
+The sole media bind is `/mnt/nas-libraries/paperless -> /usr/src/paperless/media`. It uses `create_host_path: false`; the target is `127:5000`, mode `2770`. Five restored media files total 384,771 bytes and their SHA-256 manifest matches the retained recovery copy. Compose rendering succeeded, all three containers run, and Paperless is healthy. Historical Documents/Paperless paths below are recovery evidence, not active Compose guidance.
 
 ### Current Libraries local Compose roots — 2026-10-13
 
@@ -414,7 +420,7 @@ A harmless local PDF import completed OCR, title search, original retrieval, and
 
 ### Historical JAR-91 Paperless media NAS cutover — 2026-10-05 (superseded by JAR-92)
 
-At the JAR-91 checkpoint, Paperless media became authoritative at `/mnt/nas-documents/paperless`, mounted in the web service at `/usr/src/paperless/media`. The Compose definition uses long bind syntax with `create_host_path: false`, so an absent Documents NFS mount cannot become an empty local media directory. Its then-current `USERMAP_UID=900`/`USERMAP_GID=5004` and `900:5004` ownership are superseded by JAR-92's Library `127:5000` mapping; the fail-closed bind path remains current.
+At the JAR-91 checkpoint, Paperless media became authoritative at `/mnt/nas-documents/paperless`, mounted in the web service at `/usr/src/paperless/media`. The Compose definition used long bind syntax with `create_host_path: false`, so an absent Documents NFS mount could not become an empty local media directory. Its then-current `USERMAP_UID=900`/`USERMAP_GID=5004` and `900:5004` ownership are superseded by the current Libraries `127:5000` deployment; the fail-closed behavior remains current at `/mnt/nas-libraries/paperless`.
 
 PostgreSQL, Valkey, Paperless data/configuration/search state, consume, exports, and secrets remain VM-local at their existing Documents paths. NPM routing is unchanged. The five-file, 384,771-byte media transfer matched SHA-256 manifests before and after cutover; Paperless recreated healthy and the local/public routes returned the expected login redirect. A root-protected local rollback copy is `/srv/rotom/backup-staging/documents/jar91-20261005-220500/`, and the original local media tree remains retained pending acceptance.
 

@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Live NAS boundary and ownership reconciliation
+**Documentation updated:** 2026-10-13 — Restore Paperless in Libraries with NAS-resident media
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -12,6 +12,12 @@
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
 
 ## 1. Purpose and Scope
+
+### Current Paperless Libraries media storage — 2026-10-13
+
+Paperless media is authoritative at `/mnt/nas-libraries/paperless`, a dedicated child of the current Libraries NFSv3 mount. It is owned by `127:5000`, mode `2770`, and is the Paperless web container's sole media bind through a non-creating Compose bind. The restored target contains five files / 384,771 bytes; its SHA-256 manifest matches the protected recovery source. The former Documents export refused a temporary mount from Rotom, so no bypass or NAS-side mutation was performed; the retained local recovery media was copied instead. The original recovery set remains preserved.
+
+The full Libraries mount, including Paperless media, remains outside guest Restic's `/mnt` scope. Its effective NAS snapshot schedule, retention, and isolated restore are **Needs Verification**. Do not recursively retag unrelated NAS content; the Paperless subtree is the only NAS path created for this restoration.
 
 ### Current JAR-96 Library storage — 2026-10-13
 
@@ -800,7 +806,7 @@ Current storage and backup automation are documented above; this section retains
 
 - **Needs Verification — UNAS metadata persistence:** recheck service-share root metadata after a future UNAS/UniFi Drive restart/update, especially Downloader `988:5005`, Media `988:5000`, Gameserver `988:5001`, current Restic share `Rotom_Restic_Backup` at `988:988` mode `0700`, and current service GIDs `5002`–`5008`. Resolve read-only with `findmnt` and `stat` from Rotom plus UNAS-side export/share inspection after the event.
 - **Needs Verification — live Media-NFS loss:** fail-closed recreation and the Media guard are documented, but sudden loss of the active Media payload while qBittorrent is already running is untested. Read-only inspection can verify the guard definition; actual runtime behavior requires a separately planned non-destructive maintenance test.
-- **Needs Verification — Documents Paperless recovery:** Paperless media is live on `/mnt/nas-documents/paperless` under Library numeric ownership. Jared explicitly waived the JAR-92 isolated UNAS snapshot-restore acceptance check; effective Documents snapshot schedule/retention, an isolated snapshot restore, planned automount/reconnect behavior, and authenticated browser upload/OCR/original-download acceptance remain untested. Retain the JAR-92 rollback copies until these checks are accepted.
+- **Needs Verification — Libraries Paperless recovery:** Paperless media is live on `/mnt/nas-libraries/paperless` under Libraries `127:5000` ownership. The retired Documents export refused a temporary Rotom mount and was not changed. Effective Libraries snapshot schedule/retention, an isolated snapshot restore, planned automount/reconnect behavior, and authenticated browser upload/OCR/original-download acceptance remain untested. Retain the protected recovery source until those checks are accepted.
 
 **Retired/historical:** do not recreate the old `Downloads/.data` export merely because it appears below. Current fstab/mount/showmount evidence uses `Downloader/.data`; `Downloads/.data` is retained only as dated recovery context.
 
