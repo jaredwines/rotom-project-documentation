@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Correct official backup system display names
+**Documentation updated:** 2026-10-14 — Record Jared-confirmed recovery verification
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -15,6 +15,10 @@ This document is the front-page architecture/index for Rotom. It summarizes the 
 Purpose: front-page index and quick-reference architecture summary.
 
 **legacy documentation state labels:** **Current** means the latest supported recorded state; **Historical** preserves dated evidence that may no longer apply; **Retired** means intentionally no longer active; **Proposed** is not implemented; **Needs Verification** means the legacy documentation lacks enough current evidence and should not be treated as settled.
+
+### Jared-confirmed recovery follow-up closure — 2026-10-14
+
+Jared confirmed completion and verification of the current Rotom Restic full-data-read plus restore rehearsal, current Rotom VM Backup VMA verification or disposable restore, Libraries/Paperless NAS snapshot retention plus isolated restore, NAS metadata persistence after a NAS/UniFi Drive event, controlled live Libraries-NFS-loss behavior, end-to-end Wake-on-LAN, and VPN credential rotation. Detailed transcripts and identifiers were not supplied in this chat; retain historical test evidence below as history, but do not present these items as current gaps.
 
 ### How to use the legacy documentation
 
@@ -367,13 +371,13 @@ A read-only audit after the 02:20 PDT reboot refreshed the then-current Phase B 
 JAR-31 compatibility/application restoration and the JAR-33 virtualization baseline are complete. The remaining items are either intentional commissioning decisions or facts that still need current evidence:
 
 - **Intentional / separate from the portable baseline:** Fran is now recreated as a full Rotom/PVE administrator, but SSH-key authentication remains deferred and her historical exact-command guest backup sudoers rule remains absent because full sudo already authorizes the workflow. The reboot-capable weekly updater script is present but its cron schedule is absent; broader JAR-47/off-site failure-domain recovery work remains unfinished even though Rotom Restic Backup, PVE Restic Backup, and Rotom VM Backup schedules are now active. JAR-49 commissioned an optional host-specific Intel iGPU attachment; removal of `hostpci0` returns the independently portable VM baseline.
-- **Needs Verification — NAS metadata persistence:** service-share root UID/GID/mode persistence across a future NAS/UniFi Drive restart/update has not been observed. Resolve after such an event with read-only `stat`/`findmnt` checks from Rotom plus NAS export inspection; do not change ownership merely to make the result match documentation.
-- **Verified — recurring Rotom Restic Backup and PVE Restic Backup execution:** by 2026-10-14 the guest repository contained 22 snapshots with latest `9494979d`, and the PVE repository contained ten snapshots with latest `b3fd0c23`; both repository checks passed. Full guest `--read-data` verification and restore rehearsal remain outstanding.
-- **Verified — native PVE VZDump scheduler execution:** the 2026-10-05 archive list contains six `05:00` archives from 2026-09-30 through 2026-10-05, confirming the final-name `rotom-vm-daily` job is producing retained archives. This listing does not independently verify each archive's compression or VMA payload.
+- **Verified by Jared confirmation — NAS metadata persistence:** service-share root UID/GID/mode persistence was observed after a NAS/UniFi Drive event; detailed `stat`/`findmnt` and NAS export output was not supplied in this chat.
+- **Verified — recurring Rotom Restic Backup and PVE Restic Backup execution:** by 2026-10-14 the guest repository contained 22 snapshots with latest `9494979d`, and the PVE repository contained ten snapshots with latest `b3fd0c23`; both repository checks passed. Jared subsequently confirmed current guest `--read-data` verification and restore rehearsal.
+- **Verified — native PVE VZDump scheduler execution:** the 2026-10-05 archive list contains six `05:00` archives from 2026-09-30 through 2026-10-05, confirming the final-name `rotom-vm-daily` job is producing retained archives. Jared subsequently confirmed current VMA verification or disposable-restore acceptance.
 - **Retention observation:** the current storage listing contains eight unprotected VMID `100` archives under the configured `7 daily / 4 weekly / 6 monthly` policy. Archive availability is current only as of the listing; select and verify a recovery point at incident time.
-- **Needs Verification — end-to-end Wake-on-LAN trigger:** Proxmox `nic0` WOL capability, persistent `wol g` configuration, PCI wake enablement, and post-power-cycle retention are verified, but the supplied transcript does not capture a magic-packet sender invocation or otherwise prove WOL caused the NUC to power on.
+- **Verified by Jared confirmation — end-to-end Wake-on-LAN trigger:** the controlled magic-packet wake test completed; detailed sender output was not supplied in this chat.
 - **Needs Verification — prior Proxmox resets:** the ConBee II remains intentionally disconnected and the legacy documentation does not isolate one causal explanation for the earlier resets. Read-only logs can narrow evidence (`journalctl`, Proxmox task/system logs), but a single cause should not be claimed without new evidence.
-- **Recovery/operations follow-up:** a full Palworld disaster-recovery rehearsal, Rotom Restic Backup data-read/restore test, current Rotom VM Backup VZDump `vma verify` or restore rehearsal, certificate-renewal observation, and final public-exposure review remain unperformed or incompletely evidenced. The retired JAR-73 alerting layer no longer requires an alert-delivery test.
+- **Recovery/operations follow-up:** a full Palworld disaster-recovery rehearsal, certificate-renewal observation, and final public-exposure review remain unperformed or incompletely evidenced. Jared confirmed the Rotom Restic Backup data-read/restore and current Rotom VM Backup VZDump verification or restore. The retired JAR-73 alerting layer no longer requires an alert-delivery test.
 
 ## 10. legacy documentation set Model
 

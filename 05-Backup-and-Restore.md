@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Restic backup architecture, scope, retention, verification, restore evidence, and recovery boundaries  
 **Recovery scope:** pre-migration Rotom plus current Proxmox/VM foundation  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Correct official backup system display names
+**Documentation updated:** 2026-10-14 — Record Jared-confirmed recovery verification
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -17,21 +17,21 @@ Record substantive changes to this document in the change log as part of the sam
 
 PVE Restic Backup remains scheduled daily at `04:00`. Its 2026-10-13 run completed successfully; the repository contained ten snapshots at audit time, with latest short ID `b3fd0c23`, and `restic check` completed without errors. Repository identity and protected credential handling are unchanged.
 
-Rotom VM Backup uses the native `rotom-vm-daily` Proxmox VZDump job, configured for VMID 100 at `05:00`, snapshot mode, zstd compression, `repeat-missed=0`, and retention of seven daily, four weekly, and six monthly archives. Eight current VM archives were present, including the latest 2026-10-13 archive at approximately 36.3 GB compressed. A full decompression test passed and reported 64,872,503,296 bytes of uncompressed data. The transcript then piped the stream into `vma verify`, but did not capture an explicit verifier result or pipeline component statuses; treat full VMA structural verification as **Needs Verification**, not as a recorded pass. VM 100 had no Proxmox snapshots; that does not affect the independent VZDump archives.
+Rotom VM Backup uses the native `rotom-vm-daily` Proxmox VZDump job, configured for VMID 100 at `05:00`, snapshot mode, zstd compression, `repeat-missed=0`, and retention of seven daily, four weekly, and six monthly archives. Eight current VM archives were present, including the latest 2026-10-13 archive at approximately 36.3 GB compressed. A full decompression test passed and reported 64,872,503,296 bytes of uncompressed data. Jared subsequently confirmed current VMA verification or a disposable restore was completed successfully; the selected archive and transcript were not supplied in this chat. VM 100 had no Proxmox snapshots; that does not affect the independent VZDump archives.
 
 The PVE backup-status API reported both schedules successfully and the two NFS backup paths were mounted read/write. This is strong current backup evidence, but it does not replace a restore rehearsal. The earlier disposable-VM restore remains the latest recorded whole-VM restore proof.
 
 ### Current guest backup observation — 2026-10-14
 
-`rotom-restic-backup.timer` is enabled and active with the documented `03:00` schedule plus up to ten minutes randomized delay. Privileged inspection found 22 snapshots in repository `799babb2`; the latest is automatic snapshot `9494979d` from 2026-10-13 03:01 PDT, covering the documented guest source roots at approximately 20.086 GiB. `restic check` loaded all indexes, checked packs plus 22 snapshot trees/blobs, and found no errors. This closes the repository-structure verification gap, but it is not `restic check --read-data` or a restore rehearsal.
+`rotom-restic-backup.timer` is enabled and active with the documented `03:00` schedule plus up to ten minutes randomized delay. Privileged inspection found 22 snapshots in repository `799babb2`; the latest is automatic snapshot `9494979d` from 2026-10-13 03:01 PDT, covering the documented guest source roots at approximately 20.086 GiB. `restic check` loaded all indexes, checked packs plus 22 snapshot trees/blobs, and found no errors. Jared subsequently confirmed the current full data-read verification and restore rehearsal completed successfully; the selected snapshot and transcript were not supplied in this chat.
 
-The VM-local `/srv/rotom/backup-staging` root is absent. Every named local artifact beneath it is historical unless a later live path check re-establishes its presence. Restic-contained copies and historical checksums remain recovery evidence, but they are not proof of a current fast local rollback copy. Authoritative Libraries/Paperless NAS payload remains outside Rotom Restic Backup and its effective snapshot/restore path remains **Needs Verification**.
+The VM-local `/srv/rotom/backup-staging` root is absent. Every named local artifact beneath it is historical unless a later live path check re-establishes its presence. Restic-contained copies and historical checksums remain recovery evidence, but they are not proof of a current fast local rollback copy. Authoritative Libraries/Paperless NAS payload remains outside Rotom Restic Backup; Jared confirmed its snapshot/restore path has been verified, without supplying the detailed NAS-side transcript in this chat.
 
 ### Current Paperless Libraries recovery state — 2026-10-13
 
 Paperless was restored from the protected retained recovery set into Libraries paths: VM-local state and protected inputs are now below `/srv/rotom/{appdata,secrets}/libraries/paperless`, while authoritative media is `/mnt/nas-libraries/paperless`. The recovered source set remains intact. The five media files (384,771 bytes) were copied to the new NAS target with a matching SHA-256 manifest. The retired Documents export refused a temporary mount, so no source-side NAS mutation or permission bypass occurred.
 
-Rotom Restic Backup includes `/srv`, and the 2026-10-13 automatic snapshot followed the Paperless restoration; verify the required paths inside the selected snapshot before relying on it for recovery. Rotom Restic Backup continues to exclude `/mnt`, so Paperless media depends on Libraries NAS protection. The effective snapshot schedule/retention and an isolated recovery of the Libraries Paperless subtree are **Needs Verification**. The restoration itself did not trigger a new backup, retention, prune, or restore run.
+Rotom Restic Backup includes `/srv`, and the 2026-10-13 automatic snapshot followed the Paperless restoration; verify the required paths inside the selected snapshot before relying on it for recovery. Rotom Restic Backup continues to exclude `/mnt`, so Paperless media depends on Libraries NAS protection. Jared confirmed the effective snapshot retention and an isolated recovery of the Libraries Paperless subtree were verified; detailed NAS-side evidence was not supplied in this chat. The restoration itself did not trigger a new backup, retention, prune, or restore run.
 
 ### Current Media-mount retirement — 2026-10-13
 
@@ -69,11 +69,11 @@ This document is the canonical detailed owner for Rotom recovery state plus the 
 
 ## 2. Current Recovery State
 
-Current recovery is layered: application-aware artifacts, Rotom Restic Backup, PVE Restic Backup, Rotom VM Backup using Proxmox VZDump, NAS protection for authoritative Libraries data, plus preserved pre-migration recovery evidence. The effective Libraries snapshot/restore policy remains **Needs Verification**.
+Current recovery is layered: application-aware artifacts, Rotom Restic Backup, PVE Restic Backup, Rotom VM Backup using Proxmox VZDump, NAS protection for authoritative Libraries data, plus preserved pre-migration recovery evidence. Jared confirmed the effective Libraries snapshot/restore policy is verified; exact policy detail was not supplied in this chat.
 
 ### Current recovery evidence boundary — 2026-10-14
 
-The 2026-10-14 audit verified recurring Rotom Restic Backup and PVE Restic Backup snapshots and passed both repository-structure checks. It also found eight current Rotom VM Backup VZDump archives and proved full zstd decompression of the newest archive. These results do not prove a Rotom Restic Backup data-read/restore, a current VMA structural verification, or a NAS snapshot restore. Revalidate the exact recovery point selected during an incident before relying on it.
+The 2026-10-14 audit verified recurring Rotom Restic Backup and PVE Restic Backup snapshots and passed both repository-structure checks. It also found eight current Rotom VM Backup VZDump archives and proved full zstd decompression of the newest archive. Jared subsequently confirmed a current Rotom Restic data-read/restore, VMA verification or disposable restore, and NAS snapshot restore. Revalidate the exact recovery point selected during an incident before relying on it.
 
 ### Current Rotom VM Backup schedule
 

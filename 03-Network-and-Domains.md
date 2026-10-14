@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Add Fran as a Rotom and PVE administrator  
+**Documentation updated:** 2026-10-14 — Record Jared-confirmed recovery verification
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -918,9 +918,9 @@ Current VM reservation and local-DNS identity are already verified: `192.168.1.6
 
 A read-only UniFi/controller inspection of the `.68`, `.69`, and `.70` clients plus firewall/NAT/port-forward configuration would resolve these items. Host-side `ip route`, resolver queries, and listener checks can reconfirm client state but cannot prove router configuration.
 
-### Wake-on-LAN end-to-end trigger — Needs Verification
+### Wake-on-LAN end-to-end trigger — Verified by Jared confirmation
 
-Host-side WOL is current and persistent: Proxmox `nic0` supports magic-packet wake, reports `Wake-on: g`, PCI wake is enabled, and `/etc/network/interfaces` reasserts `wol g` on interface bring-up. A complete physical power-off/return cycle also preserved the setting and restored VMID 100 plus the full Rotom runtime. The supplied evidence does not include the client-side magic-packet transmission, however, so it cannot establish that WOL caused that power-on. Resolve with one future controlled power-off where the sender invocation is captured before the NUC returns.
+Host-side WOL is current and persistent: Proxmox `nic0` supports magic-packet wake, reports `Wake-on: g`, PCI wake is enabled, and `/etc/network/interfaces` reasserts `wol g` on interface bring-up. Jared confirmed the end-to-end controlled wake test completed successfully. The sender transcript was not retained in this chat.
 
 ### Legacy NPM records — Needs Verification
 
@@ -934,9 +934,9 @@ The Debian VM currently has **no UFW installation** per JAR-31; the broad UFW ru
 
 The 2026-09-27 read-only audit refreshed Rotom listeners and Docker-published ports, so the host-side portion is verified current. UniFi WAN forwarding/firewall/NAT policy remains unverified and must still be inspected separately before drawing conclusions about Internet exposure.
 
-### qBittorrent live Libraries-NFS-loss behavior — Needs Verification
+### qBittorrent live Libraries-NFS-loss behavior — Verified by Jared confirmation
 
-Fail-closed recreation and the current Libraries guard are documented. The legacy documentation does not establish what an already-running qBittorrent container does if the active Libraries NFS payload disappears after startup. A purely read-only check cannot reproduce that failure mode. Resolve only through a separately planned non-destructive maintenance test, not by inference.
+Fail-closed recreation and the current Libraries guard are documented. Jared confirmed the separately planned non-disruptive test of an already-running qBittorrent container during Libraries-NFS loss completed successfully. Detailed runtime observations were not supplied in this chat.
 
 ### Resolved or intentional states — not gaps
 

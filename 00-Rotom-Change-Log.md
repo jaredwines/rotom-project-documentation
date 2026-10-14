@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-14 — Record Jared-confirmed recovery verification
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Documentation only / Verified by Jared confirmation.** No new live test or configuration change was performed in this chat.
+- **Changes:** Jared confirmed that the current Rotom Restic full-data-read and restore rehearsal, current Rotom VM Backup VMA verification or disposable restore, Libraries/Paperless NAS snapshot retention and isolated restore, post-NAS-restart metadata observation, planned live Libraries-NFS-loss test, end-to-end Wake-on-LAN test, and VPN credential rotation were all completed and verified. The listed checks are no longer current verification gaps.
+- **Evidence:** Jared's explicit confirmation in this chat. Detailed command transcripts, selected recovery-point identifiers, and test artifacts were not supplied here; this entry deliberately does not invent them.
+- **Outstanding:** The separate owner decision on direct LAN exposure/PVE firewall, PVE-only configuration details, direct PVE browser-login acceptance for Fran, certificate-renewal observation, and PVE hardware/maintenance follow-up remain as documented. Available Sources synchronization remains manual by Jared.
+
 ## 2026-10-14 — Verify Rotom operational follow-up gaps
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `02-Docker-Services.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`.

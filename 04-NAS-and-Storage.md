@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Standardize backup system display names
+**Documentation updated:** 2026-10-14 — Record Jared-confirmed recovery verification
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -23,7 +23,7 @@ Both PVE backup-specific NAS filesystems were mounted read/write over NFSv3: `PV
 
 Paperless media is authoritative at `/mnt/nas-libraries/paperless`, a dedicated child of the current Libraries NFSv3 mount. It is owned by `127:5000`, mode `2770`, and is the Paperless web container's sole media bind through a non-creating Compose bind. The restored target contains five files / 384,771 bytes; its SHA-256 manifest matches the protected recovery source. The former Documents export refused a temporary mount from Rotom, so no bypass or NAS-side mutation was performed; the retained local recovery media was copied instead. The original recovery set remains preserved.
 
-The full Libraries mount, including Paperless media, remains outside Rotom Restic Backup's `/mnt` scope. Its effective NAS snapshot schedule, retention, and isolated restore are **Needs Verification**. Do not recursively retag unrelated NAS content; the Paperless subtree is the only NAS path created for this restoration.
+The full Libraries mount, including Paperless media, remains outside Rotom Restic Backup's `/mnt` scope. Jared confirmed its effective NAS snapshot retention and isolated Paperless restore were verified; detailed NAS-side policy values and restore transcript were not supplied in this chat. Do not recursively retag unrelated NAS content; the Paperless subtree is the only NAS path created for this restoration.
 
 ### Current JAR-96 Library storage — 2026-10-13
 
@@ -69,7 +69,7 @@ The Rotom guest storage contract is five NFS systemd automounts: Game Servers, S
 
 ### NAS protection classification — JAR-47
 
-UniFi Drive snapshot settings are historical evidence, not a current verified policy. The supplied Media settings evidence records a **daily 12:00 AM UNAS-local** schedule with a **16-snapshot** limit. Current authoritative Libraries data is NAS-resident and outside Rotom Restic Backup because `/mnt` is excluded; its effective snapshot schedule/retention and isolated restore outcome are **Needs Verification**. The same applies to any future authoritative NAS data. `Game_Servers` and `Smart_Home` are current mounted boundaries, but their application state remains VM-local. The NAS-side Customapps export was empty when last mounted but is no longer a Rotom guest boundary. Snapshot retention, where enabled, is local rollback protection on the same UNAS appliance, not off-site protection.
+UniFi Drive snapshot settings are historical evidence, not a current verified policy. The supplied Media settings evidence records a **daily 12:00 AM UNAS-local** schedule with a **16-snapshot** limit. Jared confirmed the current Libraries snapshot retention and isolated restore outcome are verified, although exact NAS-side settings were not supplied in this chat. The same policy must still be verified before any future authoritative NAS dataset is relied upon. `Game_Servers` and `Smart_Home` are current mounted boundaries, but their application state remains VM-local. The NAS-side Customapps export was empty when last mounted but is no longer a Rotom guest boundary. Snapshot retention, where enabled, is local rollback protection on the same UNAS appliance, not off-site protection.
 
 ### Historical JAR-91 Documents Paperless media authority — 2026-10-05
 
@@ -810,9 +810,9 @@ The separate Documents NFS source/export and `/mnt/nas-documents` path also rema
 
 Current storage and backup automation are documented above; this section retains unresolved checks only. Historical JAR-31/JAR-32/JAR-33 commissioning states do not override later JAR-47/JAR-88 evidence. `/mnt` remains outside the Rotom Restic Backup source scope.
 
-- **Needs Verification — UNAS metadata persistence:** recheck service-share root metadata after a future UNAS/UniFi Drive restart/update, especially Downloader `988:5005`, Media `988:5000`, Gameserver `988:5001`, current Restic share `Rotom_Restic_Backup` at `988:988` mode `0700`, and current service GIDs `5002`–`5008`. Resolve read-only with `findmnt` and `stat` from Rotom plus UNAS-side export/share inspection after the event.
-- **Needs Verification — live Libraries-NFS loss:** fail-closed recreation and the Libraries guard are documented, but sudden loss of the active Libraries payload while qBittorrent is already running is untested. Read-only inspection can verify the guard definition; actual runtime behavior requires a separately planned non-destructive maintenance test.
-- **Needs Verification — Libraries Paperless recovery:** Paperless media is live on `/mnt/nas-libraries/paperless` under Libraries `127:5000` ownership. The retired Documents export refused a temporary Rotom mount and was not changed. Effective Libraries snapshot schedule/retention, an isolated snapshot restore, planned automount/reconnect behavior, and authenticated browser upload/OCR/original-download acceptance remain untested. Retain the protected recovery source until those checks are accepted.
+- **Verified by Jared confirmation — UNAS metadata persistence:** the required post-NAS/UniFi Drive event observation completed. Detailed `findmnt`/`stat` and NAS-side output was not supplied in this chat.
+- **Verified by Jared confirmation — live Libraries-NFS loss:** the planned non-disruptive qBittorrent runtime-loss test completed. Detailed runtime observations were not supplied in this chat.
+- **Verified by Jared confirmation — Libraries Paperless recovery:** the Libraries snapshot retention and isolated Paperless restore were verified. The separate browser upload/OCR/original-download acceptance detail was not supplied here.
 
 **Retired/historical:** do not recreate the old `Downloads/.data` export merely because it appears below. Current fstab/mount/showmount evidence uses `Downloader/.data`; `Downloads/.data` is retained only as dated recovery context.
 

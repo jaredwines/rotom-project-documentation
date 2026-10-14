@@ -8,7 +8,7 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-10-14; correct official backup system display names.
+# Documentation revised: 2026-10-14; record Jared-confirmed recovery verification.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the legacy documentation.
 #
@@ -55,7 +55,8 @@
 #   Palworld containers, three volumes, nineteen networks, and zero restart counts.
 #   The retired Syncthing image and several untagged images remain pending review.
 # - Rotom Restic Backup repo 799babb2 has 22 snapshots; latest 9494979d from 2026-10-13.
-#   `restic check` passed; full read-data verification/restore remain outstanding.
+#   `restic check` passed; Jared subsequently confirmed current full data-read and restore
+#   verification, without supplying selected-snapshot or transcript detail in this chat.
 # - the five current NFS filesystems were mounted read/write during the audit.
 # - 2026-10-13 Game Servers / Smart Home NAS-drive alignment: the fstab-backed NFSv3 `Game_Servers/.data -> /mnt/nas-game-servers` and `Smart_Home/.data -> /mnt/nas-smart-home` automounts are current and live-traversal verified. Their roots are empty `988:5001` and `988:5003` setgid service boundaries; create/remove checks verified descendants as `game-servers:game-servers` and `smart-home:smart-home`. There are no current home NAS shortcuts. The former `Gameserver/.data -> /mnt/nas-gameserver` and `Smarthome/.data -> /mnt/nas-smarthome` guest contracts, mountpoints, and shortcuts are retired. No live container used either old path; Palworld worlds and Smart Home state remain VM-local, and no NAS data migration or backup-policy change was made.
 # - 2026-10-13 Media mountpoint retirement: `/mnt/nas-media` is absent. Its guest fstab/automount and active configuration dependencies had already been retired; its only remaining local `library/games` directories were empty and removed with guarded `rmdir`. The sole active Library guest contract is `/mnt/nas-libraries`. NAS-side Media export/data was not inspected or changed; older Media paths below are historical evidence only.
@@ -312,7 +313,7 @@
 #   nas-web/           NFSv3 Web/.data; root 988:5006 mode 2770
 #   nas-filesync/      NFSv3 Filesync/.data; root 988:5007 mode 2770
 #   nas-rotom-restic-backup/  NFSv3 Rotom_Restic_Backup/.data; mounted root freshly verified 988:988 mode 0700; underlying local directory mode not isolated while fully unmounted in the live audit
-#     rotom-restic-backup/     repository 799babb2; 22 snapshots on 2026-10-14, latest automatic short ID 9494979d; restic check passed. Full data-read and restore verification remain outstanding.
+#     rotom-restic-backup/     repository 799babb2; 22 snapshots on 2026-10-14, latest automatic short ID 9494979d; restic check passed. Jared subsequently confirmed current full data-read and restore verification; detailed evidence was not supplied in this chat.
 #     rotom-linux-home-server-backup-restore-kit/  copied legacy restore documentation from old share; not a self-contained recovery bundle
 #   nas-rotom-backup/         RETIRED NFS path; unmounted/no active backup config reference; inert local directory may remain; old NAS share retained rollback-only
 #   nas-shared-drive/  RETIRED local guest mount contract; NAS Shared_Drive data was not altered

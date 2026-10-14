@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-14 — Verify recovery controls and Desktop Commander health
+**Documentation updated:** 2026-10-14 — Record Jared-confirmed recovery verification
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -539,14 +539,14 @@ The Homebridge container-name typo was corrected on 2026-09-19 from `homebrige` 
 
 Phase B virtualization is accepted, Rotom Restic Backup automation has been recommissioned under its unchanged technical identifiers, PVE Restic Backup is commissioned at `04:00`, and Rotom VM Backup using native Proxmox VZDump remains scheduled. Remaining maintenance/automation items are deliberately separated by state:
 
-- **Verified — unattended Restic resumed:** the 2026-10-14 audit found 22 guest snapshots with automatic snapshot `9494979d` from 2026-10-13 and a successful repository check. Full `--read-data` verification and restore rehearsal remain outstanding.
+- **Verified — Rotom Restic Backup recovery:** Jared confirmed a current full `--read-data` verification and restore rehearsal completed; detailed transcript and selected snapshot were not supplied in this chat.
 - **Verified — unattended PVE Restic Backup resumed:** the 2026-10-14 audit found ten snapshots with latest `b3fd0c23`; the 2026-10-13 scheduled run and repository check passed. Snapshot `35d4b0c2` remains historical JAR-68 evidence.
-- **Verified — scheduler-triggered VZDump runs:** the 2026-10-14 PVE listing contained eight VMID `100` archives through 2026-10-13, confirming that `rotom-vm-daily` continues to produce retained archives. The newest archive passed full zstd decompression; explicit VMA verification was not captured.
+- **Verified — scheduler-triggered VZDump runs and current recovery validation:** the 2026-10-14 PVE listing contained eight VMID `100` archives through 2026-10-13, confirming that `rotom-vm-daily` continues to produce retained archives. Jared confirmed current VMA verification or a disposable restore completed successfully; detailed PVE output was not supplied in this chat.
 - **Retention observation:** eight unprotected VMID `100` archives were listed under normal `7 daily / 4 weekly / 6 monthly` retention. Archive availability changes with retention; select and verify a recovery point at incident time.
 - **Intentional / commissioning decision:** `/usr/local/sbin/weekly-linux-update` exists, but `/etc/cron.d/weekly-linux-update` is absent. Decide separately whether to restore the historical Sunday 04:00 schedule.
 - **Intentional:** Fran is now recreated with full sudo on Rotom and PVE. Her historical exact-command guest backup sudoers fragment remains absent and is unnecessary for authorization; no manual backup run was performed during account setup. SSH-key access remains deferred.
-- **Needs Verification — live Libraries-NFS loss:** the current Libraries guard is documented, but an already-running qBittorrent session's behavior during sudden loss of the Libraries payload mount has not been exercised. Read-only inspection can confirm the guard definition; actual behavior requires a separately planned non-destructive maintenance test.
-- **Needs Verification — end-to-end WOL trigger:** persistent host-side WOL configuration and post-power-cycle recovery are verified, but the transcript does not capture a magic-packet sender invocation; one controlled off-state wake with the sender command/output captured is still required to prove the NUC actually powers on from WOL.
+- **Verified by Jared confirmation — live Libraries-NFS loss:** the planned non-disruptive qBittorrent runtime-loss test completed; detailed observations were not supplied in this chat.
+- **Verified by Jared confirmation — end-to-end WOL trigger:** the controlled magic-packet wake test completed; sender output was not supplied in this chat.
 - **Needs Verification / separate stability track:** continue the Proxmox/ConBee/iGPU follow-up. Do not infer a single earlier-reset cause from the current legacy documentation.
 
 ## 17. Proposed Improvements

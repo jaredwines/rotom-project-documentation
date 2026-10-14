@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-10-14 — Verify Fran Docker access and Desktop Commander health
+**Documentation updated:** 2026-10-14 — Record Jared-confirmed recovery verification
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -443,10 +443,10 @@ Current non-socket exception fields are Home Assistant's host networking, privil
 
 - **Intentional:** Fran SSH-key authentication remains deferred on Rotom and PVE. No separate Rotom documentation ACL, legacy documentation/GitHub identity, or Codex entry point is established for her. The historical exact-command backup sudoers fragment remains absent; Fran's current full sudo access makes it unnecessary for authorization, but no manual backup run was performed in this change.
 - **Needs Verification — account acceptance:** Fran's PVE PAM identity and effective Administrator permissions are verified, but direct browser login was not supplied. Rotom direct Docker access and Remote Desktop Commander health were both verified on 2026-10-14.
-- **Needs Verification — UNAS identity persistence:** service-share root metadata persistence across a future UNAS/UniFi Drive restart/update has not been observed. Resolve after such an event with read-only `findmnt`/`stat` checks from Rotom and UNAS-side share/export inspection.
+- **Verified by Jared confirmation — UNAS identity persistence:** required service-share metadata persistence was observed after a NAS/UniFi Drive event; detailed output was not supplied in this chat.
 - **Historical by design:** backup/containerd objects may retain old primary GIDs; do not normalize them recursively without a specific verified need.
-- **Needs Verification — credential-rotation record:** VPN credential rotation after prior chat exposure is not established by the legacy documentation. Do not print, compare, or read credential values to prove this. Resolve through provider/account rotation history or administrator records; there is no safe host-only metadata check that proves a secret was rotated.
-- **Needs Verification — live Libraries-NFS loss:** fail-closed recreation and the current Libraries guard are documented, but a running qBittorrent session's behavior during sudden loss of the active Libraries payload mount has not been exercised. Read-only inspection can confirm the guard definition; actual behavior requires a separately planned non-destructive maintenance test.
+- **Verified by Jared confirmation — credential rotation:** VPN credential rotation was completed and verified through the appropriate provider/administrator record. No credential values are recorded.
+- **Verified by Jared confirmation — live Libraries-NFS loss:** the planned non-disruptive running-workload test completed; detailed observations were not supplied in this chat.
 
 ## 5. Preserved Pre-Migration Consolidated Verification — through 2026-09-21
 
