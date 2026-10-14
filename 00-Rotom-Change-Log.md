@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-14 — Verify Rotom account locks and active Library routes
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `03-Network-and-Domains.md`, `07-Users-and-Permissions.md`.
+- **Status:** **Documentation only / Verified.** No live configuration, privilege, proxy, or application change was made.
+- **Changes:** Closed the remaining Rotom-side service-account lock-state and post-Libraries route-detail gaps.
+- **Evidence:** Privileged read-only `passwd -S` showed `L` (locked) for `platform`, `libraries`, `hosted-websites`, `game-servers`, `smart-home`, and `desktopcmd`. Local NPM/SNI probes returned `200` for qBittorrent and RomM and expected login `302` responses for Paperless and Prowlarr. Docker confirmed loopback-only publishing for qBittorrent, RomM, and Paperless; Prowlarr remains LAN-published on `9696` and its NPM route returned the expected redirect.
+- **Outstanding:** PVE-only storage/stability checks and the owner decision on the direct-LAN/PVE-firewall exposure policy remain. Available Sources synchronization remains manual by Jared.
+
 ## 2026-10-14 — Record additional Jared-confirmed operational verification
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`.

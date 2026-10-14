@@ -37,7 +37,7 @@ Paperless is active from the Libraries deployment and listens only at `127.0.0.1
 
 ### Current Library routes — 2026-10-13
 
-The supported current Library-facing routes are qBittorrentVPN through loopback-only `127.0.0.1:8080` and NPM host `14`, plus Prowlarr through NPM host `18`; their recorded responses were `200` and `302` respectively. RomM retains its established NPM route and the internal-only game-library alias now uses the active `/mnt/nas-libraries` bind. Paperless now uses loopback-only `127.0.0.1:8000` and its retained NPM route returned the expected `302`; see the current Paperless route overlay. Route details not rechecked after the Libraries rename remain **Needs Verification**.
+The supported current Library-facing routes are qBittorrentVPN through loopback-only `127.0.0.1:8080` and NPM host `14`, plus Prowlarr through NPM host `18`; 2026-10-14 local NPM/SNI probes returned `200` and `302` respectively. RomM retains its established loopback-only route and returned `200`; the internal-only game-library alias uses the active `/mnt/nas-libraries` bind. Paperless remains loopback-only at `127.0.0.1:8000` and returned the expected login `302` through NPM. Prowlarr remains LAN-published at `9696`; its NPM route is operational but direct LAN exposure remains subject to the current exposure-policy decision.
 
 ### Current Homepage Platform presentation — 2026-10-13
 
