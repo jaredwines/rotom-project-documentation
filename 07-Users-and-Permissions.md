@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-10-14 — Correct official backup system display names
+**Documentation updated:** 2026-10-14 — Verify Fran Docker access and Desktop Commander health
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -18,6 +18,8 @@ Record substantive changes to this document in the change log as part of the sam
 Live NSS data now confirms `platform 997:5002`, `libraries 127:5000`, `hosted-websites 902:5004`, `game-servers 995:5001`, `smart-home 126:5003`, `jared 1000:1000`, `desktopcmd 1001:1001`, and human administrator `fran 1002:1002`. Rotom Fran belongs to `sudo`, `users`, and Docker GID `989`; she is the Docker group's sole listed member. Service identities retain only their primary service groups. Service-account lock state could not be read without privileged account access and remains **Needs Verification** rather than inferred from login shells; the shell-configuration work did not run an unlock or password-setting command for them.
 
 Fran and the selected service identities use `/usr/bin/zsh` with Oh My Zsh. `desktopcmd` changed from `/bin/bash` to `/usr/bin/zsh` but remains a non-human account without sudo, Docker, SSH keys, service-group, or NAS-specific access. Existing non-Oh-My-Zsh service `.zshrc` files were backed up before replacement. Fran's prompt and the selected account prompts were exercised successfully; direct local inspection reconfirmed the account shells and group boundaries.
+
+A read-only 2026-10-14 follow-up executed `docker ps` directly as Fran and listed the 20 running containers, confirming the documented Docker-group access works in practice. `desktop-commander.service` was enabled and active/running after the `desktopcmd` shell change. These checks do not alter Fran's root-equivalent Docker boundary or `desktopcmd`'s intentionally restricted account policy.
 
 The Smart Home stack directories are root-owned, but both live Compose files are owned by `smart-home:smart-home`. On 2026-10-14 Jared confirmed the cross-domain Game Servers grants were unintended, so only the named `game-servers:rw-` Home Assistant and `game-servers:rwx` Homebridge ACL entries were removed. Home Assistant remains `smart-home:smart-home` mode `0660`; Homebridge remains `smart-home:smart-home` mode `0670`; Jared retains read-only/read-traverse named access. Negative access tests confirmed `game-servers` cannot write either file, positive tests confirmed `smart-home` can read/write both, and Compose validation passed.
 
@@ -440,7 +442,7 @@ Current non-socket exception fields are Home Assistant's host networking, privil
 ## 4. Outstanding / Needs Verification
 
 - **Intentional:** Fran SSH-key authentication remains deferred on Rotom and PVE. No separate Rotom documentation ACL, legacy documentation/GitHub identity, or Codex entry point is established for her. The historical exact-command backup sudoers fragment remains absent; Fran's current full sudo access makes it unnecessary for authorization, but no manual backup run was performed in this change.
-- **Needs Verification — account acceptance:** Fran's PVE PAM identity and effective Administrator permissions are verified, but direct browser login was not supplied. Rotom Docker membership is verified from NSS, but no direct `docker ps` execution as Fran was captured. Remote Desktop Commander service health was not rechecked after `desktopcmd` changed from Bash to Zsh.
+- **Needs Verification — account acceptance:** Fran's PVE PAM identity and effective Administrator permissions are verified, but direct browser login was not supplied. Rotom direct Docker access and Remote Desktop Commander health were both verified on 2026-10-14.
 - **Needs Verification — UNAS identity persistence:** service-share root metadata persistence across a future UNAS/UniFi Drive restart/update has not been observed. Resolve after such an event with read-only `findmnt`/`stat` checks from Rotom and UNAS-side share/export inspection.
 - **Historical by design:** backup/containerd objects may retain old primary GIDs; do not normalize them recursively without a specific verified need.
 - **Needs Verification — credential-rotation record:** VPN credential rotation after prior chat exposure is not established by the legacy documentation. Do not print, compare, or read credential values to prove this. Resolve through provider/account rotation history or administrator records; there is no safe host-only metadata check that proves a secret was rotated.

@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-14 — Add Fran as a Rotom and PVE administrator  
+**Documentation updated:** 2026-10-14 — Verify recovery controls and Desktop Commander health
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -27,7 +27,9 @@ The iGPU passthrough path continues to log an unreadable/invalid option-ROM warn
 
 The guest reported zero failed systemd units. `rotom-restic-backup.timer`, `rotom-weekly-maintenance.timer`, and the 15-second `rotom-qbittorrent-media-guard.timer` are enabled and active. The weekly timer's canonical live name is `rotom-weekly-maintenance.timer`; `weekly-host-maintenance.timer` is not an installed unit. The Restic status API reports the latest scheduled run successful, subject to the recovery-evidence limitation in document 05.
 
-`rotom-nas-docker-recovery.service` remains enabled and uses `/usr/local/sbin/rotom-nas-docker-recovery`; the qBittorrent guard unit describes and checks the current Library mount contract. Exact helper branch behavior was not re-read under root access in this audit, so older Media/Documents/Filesync scope descriptions remain historical and the current executable's complete recovery target list remains **Needs Verification**.
+`rotom-nas-docker-recovery.service` remains enabled and uses `/usr/local/sbin/rotom-nas-docker-recovery`; the qBittorrent guard unit describes and checks the current Library mount contract. A later read-only 2026-10-14 script inspection confirms the helper validates the Libraries NFS mount and required `library/` and `paperless/` directories, then conditionally recovers qBittorrentVPN, Radarr, Sonarr, Jellyfin, RomM, Paperless, and Nginx Proxy Manager only when the stopped container has an eligible restart policy and a recorded NAS/mount startup-failure signature. Running and intentionally stopped containers are left unchanged. Older Media/Documents/Filesync scope descriptions remain historical.
+
+`desktop-commander.service` was also rechecked after `desktopcmd` changed to Zsh: it is enabled and active/running. This confirms service continuity only; it does not change the account's intentionally limited privilege boundary.
 
 ### Current Paperless NAS recovery coverage — 2026-10-13
 

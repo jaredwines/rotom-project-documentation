@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-14 — Verify Rotom operational follow-up gaps
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `02-Docker-Services.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`.
+- **Status:** **Documentation only / Verified.** No live configuration, backup behavior, persistent data, network exposure, or account privilege was changed.
+- **Changes:** Closed the Rotom-side verification gaps for Fran's effective Docker access, Remote Desktop Commander health after the `desktopcmd` shell change, and the current NAS recovery helper target list. The remaining running-workload Libraries-NFS-loss test is intentionally still unperformed.
+- **Evidence:** Read-only 2026-10-14 inspection found Fran's direct `docker ps` succeeded and listed all 20 running containers; `desktop-commander.service` was enabled and active/running; and `/usr/local/sbin/rotom-nas-docker-recovery` was inspected without recording secret material. It validates the Libraries NFS mount plus `library/` and `paperless/`, then conditionally recovers only qBittorrentVPN, Radarr, Sonarr, Jellyfin, RomM, Paperless, and Nginx Proxy Manager after a matching NAS/mount startup failure. The guest continued to report zero failed units, five mounted read/write NFSv3 filesystems, and zero Docker restart counts.
+- **Outstanding:** Direct PVE browser-login acceptance, Fran SSH-key setup (intentionally deferred), full backup restore/data-read verification, PVE-only configuration checks, NAS snapshot/recovery verification, owner decisions on direct LAN exposure, and a separately planned non-disruptive Libraries-NFS-loss test remain open. Available Sources synchronization remains manual by Jared.
+
 ## 2026-10-14 — Correct official backup system display names
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.

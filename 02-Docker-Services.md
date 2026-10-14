@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; the current runtime baseline is the 2026-10-14 inventory in section 1A  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Correct official backup system display names
+**Documentation updated:** 2026-10-14 — Verify current Docker recovery-helper scope
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -59,6 +59,8 @@ Services are grouped by the Linux account directory containing their active Comp
 ### Current runtime evidence boundary — 2026-10-14
 
 Read-only Compose, process, listener, NPM-route, and HTTP evidence confirms the current Platform, Libraries, Smart Home, Hosted Websites, Paperless, and intentionally stopped Palworld topology described by the newest overlays. Privileged 2026-10-14 Docker inspection found 22 container objects: 20 running and the two stopped Palworld containers, with three volumes, nineteen networks, and restart count zero for every object. The active stack tree contains 19 Compose files: two Game Servers, two Hosted Websites, seven Libraries modules, seven Platform modules, and two Smart Home modules; Paperless and RomM each define their documented database/broker companions. Jared Wines remains intentionally undeployed.
+
+A later same-day read-only follow-up again found 20 running containers with zero restart counts. The current NAS recovery helper was inspected: after validating `/mnt/nas-libraries` plus its required `library/` and `paperless/` directories, it conditionally recovers only qBittorrentVPN, Radarr, Sonarr, Jellyfin, RomM, Paperless, and Nginx Proxy Manager when a stopped container has an eligible restart policy and a recorded NAS/mount startup-failure signature. It leaves already-running containers and intentionally stopped containers unchanged.
 
 Jared Palworld exited `143` after SIGTERM. Fran Palworld exited `137`, but Docker reported `OOMKilled=false`; daemon evidence shows an explicit stop request followed by the roughly 30-second stop wait, consistent with a forced kill after timeout rather than a crash. Both remain intentionally stopped. The retired Syncthing image and several untagged images remain present; no container uses the Syncthing image, and no image/volume/network cleanup was performed.
 
