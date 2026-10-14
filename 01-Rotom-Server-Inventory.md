@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Restore Paperless in Libraries with NAS-resident media
+**Documentation updated:** 2026-10-13 — Persist Homepage backup-result color indicators
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -72,7 +72,7 @@ The retired `downloader` account remains absent. Its former empty `/home/downloa
 
 ### Current Homepage Platform layout — 2026-10-13
 
-Homepage now places Rotom Docs in **Platform**, alongside Nginx Proxy Manager, Arcane, and PVE; the former **Documents** section and its layout key are absent. The former **Rotom Management** section/key is renamed **Platform**. The stale Uptime Kuma card and its historical `siteMonitor` were removed, completing the Homepage presentation cleanup for JAR-95's retired service. The former **Library** service section and matching layout key are renamed **Libraries**. Homepage is `running healthy`; its API contains no Uptime Kuma entry, and local-host and public HTTPS probes returned `200`.
+Homepage now places Rotom Docs in **Platform**, alongside Nginx Proxy Manager, Arcane, and PVE; the former **Documents** section and its layout key are absent. The former **Rotom Management** section/key is renamed **Platform**. The stale Uptime Kuma card and its historical `siteMonitor` were removed, completing the Homepage presentation cleanup for JAR-95's retired service. The former **Library** service section and matching layout key are renamed **Libraries**. The persistent Homepage `custom.js`/`custom.css` configuration colors the three Backup Schedule **Last Result** values green for `success` and red for `failed`/`failure`; it does not alter the schedules or their status APIs. Homepage is `running healthy`; its API contains no Uptime Kuma entry, and local-host and public HTTPS probes returned `200`.
 
 ### JAR-95 monitoring and alerting retirement — 2026-10-13
 
@@ -156,7 +156,7 @@ The following table is a mixed-date checkpoint, not a replacement for the 2026-1
 | Whole-VM backup | NAS `Rotom_VM_Backup/.data`; PVE storage `nas-rotom-vm-backup`; mount `/mnt/pve/nas-rotom-vm-backup`; launcher `backup-rotom-vm-to-nas`; service/worker `rotom-vm-vzdump-manual*`; job `rotom-vm-daily` enabled at `05:00`, `repeat-missed=0`, retention `7 daily / 4 weekly / 6 monthly` |
 | JAR-57 portable restore | `vzdump-qemu-100-2026_09_28-19_28_32.vma.zst` restored to disposable VMID `101` on temporary NFS-backed test storage; q35/OVMF/`x86-64-v2-AES`, no host attachments, distinct MAC, and `link_down=1` booted to a Debian 13 console login. VM, storage definition, and empty test directory were then removed. Guest-agent and deeper in-guest validation are deferred to JAR-50. |
 | Current whole-VM archives observed — 2026-10-05 | Eight current unprotected VMID `100` archives were listed: six `05:00` scheduler-produced archives from 2026-09-30 through 2026-10-05, a separately listed 2026-09-29 archive, and manual `2026_10_05-22_47_06`; see document 05 for exact names and sizes. This proves current archive availability and scheduler output, not fresh zstd/VMA integrity verification. The earlier archive used for the isolated restore is historical and was absent from this listing. |
-| PVE monitoring | CPU: `/usr/local/sbin/pve-cpu-temp-api`; `pve-cpu-temp-api.service`; endpoint `192.168.1.68:8788`; Homepage label `PVE CPU Temperature`. Backup schedules: `/usr/local/sbin/pve-backup-status-api`; `pve-backup-status-api.service`; LAN-only `192.168.1.68:8789`; Homepage `Backup Schedule` section orders Rotom VM, guest Rotom Restic, then PVE Restic cards |
+| PVE monitoring | CPU: `/usr/local/sbin/pve-cpu-temp-api`; `pve-cpu-temp-api.service`; endpoint `192.168.1.68:8788`; Homepage label `PVE CPU Temperature`. Backup schedules: `/usr/local/sbin/pve-backup-status-api`; `pve-backup-status-api.service`; LAN-only `192.168.1.68:8789`; Homepage `Backup Schedule` section orders Rotom VM, guest Rotom Restic, then PVE Restic cards, with `Last Result` green for `success` and red for `failed`/`failure` |
 | Final JAR-68 acceptance | Physical reboot proven; PVE core services active; VM100 autostart passed; final PVE and Rotom post-reboot checks passed; zero failed PVE and Rotom systemd units at acceptance |
 
 ## 3. Historical JAR-31 Workload Ownership

@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-13 — Persist Homepage backup-result color indicators
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Added a presentation-only Homepage customization in the persistent `/srv/rotom/appdata/platform/homepage/config` bind. Its `custom.js` marks only the three Backup Schedule **Last Result** blocks according to their refreshed custom-API value, and `custom.css` renders `success` green and `failed`/`failure` red. Backup schedules, status endpoints, retention, repositories, and backup data were not changed. Timestamped pre-change copies of both custom files remain beside the active files for rollback.
+- **Evidence:** Homepage v2.5.0 is `running healthy`; Compose rendering and `node --check` of the active custom JavaScript passed; local and public Homepage checks returned `200`; all three status endpoints reported `last_result: success`; and the active configuration was verified as the persistent `/app/config` bind. Jared confirmed the visible behavior works.
+- **Outstanding:** Available Sources replacement remains manual by Jared.
+
 ## 2026-10-13 — Restore Paperless in Libraries with NAS-resident media
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
