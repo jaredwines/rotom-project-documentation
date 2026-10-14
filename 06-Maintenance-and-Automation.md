@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-14 — Record Jared-confirmed recovery verification
+**Documentation updated:** 2026-10-14 — Record additional Jared-confirmed operational verification
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -288,7 +288,7 @@ Homepage's `Rotom Monitoring` section uses Glances v4 through Docker DNS on `rot
 
 Homepage retains active HTTPS/internal site monitors for Nginx Proxy Manager, Arcane, Home Assistant, Homebridge, and Uptime Kuma; backup-status and PVE temperature/backup-status cards remain read-only. Its Compose `extra_hosts` mappings resolve each monitored internal hostname, including `uptime.rotom.casa`, to `192.168.1.69` and avoid reliance on transient container DNS resolution. JAR-73 adds the Uptime Kuma link under Rotom Management and a deliberately small alerting layer: `/usr/local/sbin/rotom-alerting` runs each minute via `rotom-alerting.timer`, sources protected Infra secrets, sends Rotom/Pushover alerts only on state transitions, checks Restic/PVE backup-status APIs, Media NFS with a three-minute grace, root-disk thresholds, and the qBittorrent guard. The PVE counterpart runs each minute as `pve-alerting.timer` for an independent heartbeat and PVE root-disk thresholds. Healthchecks monitors external Rotom, PVE, and monitoring heartbeats at 3-minute period plus 2-minute grace, with Pushover integration. For planned work, run `sudo rotom-alerting maintenance {rotom|pve|monitoring|all} MINUTES`; it pauses selected Healthchecks checks with manual-resume protection, suppresses local notifications, and automatically resumes at expiry.
 
-Nginx Proxy Manager checks certificate renewal hourly for certificates expiring within 30 days. A direct TLS inspection verified the currently served `*.rotom.casa`/`rotom.casa` Let's Encrypt certificate is valid from 2026-09-11 through 2026-12-10. No recent renewal error was found; a real future renewal event has not yet been observed.
+Nginx Proxy Manager checks certificate renewal hourly for certificates expiring within 30 days. A direct TLS inspection verified the currently served `*.rotom.casa`/`rotom.casa` Let's Encrypt certificate is valid from 2026-09-11 through 2026-12-10. Jared subsequently confirmed a successful renewal event was observed; detailed certificate/renewal output was not supplied in this chat.
 
 Cloudflare DDNS checks every minute and at container startup. Its inspected record was already current. It has no Docker health check.
 

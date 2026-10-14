@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Restic backup architecture, scope, retention, verification, restore evidence, and recovery boundaries  
 **Recovery scope:** pre-migration Rotom plus current Proxmox/VM foundation  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Record Jared-confirmed recovery verification
+**Documentation updated:** 2026-10-14 — Record additional Jared-confirmed operational verification
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -475,7 +475,7 @@ World identifiers are `DB40338954B844C28CEA21471A392F98` for Jared and `396F5898
 
 Both server trees also contained application-created archives under their respective `backups` directories. The newest archives inspected during the migration passed `gzip -t` and contained each world `Level.sav` plus player saves. These application backups were retained. Snapshot `0d64ab6d` explicitly contains both then-current world `Level.sav` paths under `/home/game`. Historical Restic snapshots from before the rename legitimately contain `/home/game-server/...`; snapshots created before the 2026-09-19 GID migration may also preserve GID `985`. Do not rewrite or manually reorganize repository contents to change historical paths or metadata. Final JAR-24 snapshot `fbe1838e` includes both pre-migration Palworld trees and both exact world `Level.sav` paths; the JAR-24 representative restore recovered both world saves successfully. Earlier `f0d51eaa` restore evidence remains historical. JAR-88 later moved the active domain to `/srv/rotom/appdata/gameserver` under account `gameserver`; the `/home/game` records in this subsection remain recovery evidence only.
 
-The Compose files at that checkpoint used `.:/palworld`, so the home move did not require a bind-path edit inside Compose. Post-migration Docker metadata verified both Compose working directories and config-file paths under `/home/game`, and both containers returned `running` / `healthy`. Restic did not stop or pause these servers during ordinary backups. A representative isolated Restic restore successfully recovered both `Level.sav` files, but a full end-to-end Palworld server/world recovery rehearsal has not been performed. Preserve both live saves and application-created archives; never initialize a replacement world over an existing save tree.
+The Compose files at that checkpoint used `.:/palworld`, so the home move did not require a bind-path edit inside Compose. Post-migration Docker metadata verified both Compose working directories and config-file paths under `/home/game`, and both containers returned `running` / `healthy`. Restic did not stop or pause these servers during ordinary backups. A representative isolated Restic restore successfully recovered both `Level.sav` files, and Jared subsequently confirmed a full isolated end-to-end Palworld server/world recovery rehearsal. Detailed test evidence was not supplied in this chat. Preserve both live saves and application-created archives; never initialize a replacement world over an existing save tree.
 
 ## 8. Preserved Pre-Migration Scheduled Execution
 

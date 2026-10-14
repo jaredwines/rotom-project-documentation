@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Record Jared-confirmed recovery verification
+**Documentation updated:** 2026-10-14 — Record additional Jared-confirmed operational verification
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -18,7 +18,7 @@ Purpose: front-page index and quick-reference architecture summary.
 
 ### Jared-confirmed recovery follow-up closure — 2026-10-14
 
-Jared confirmed completion and verification of the current Rotom Restic full-data-read plus restore rehearsal, current Rotom VM Backup VMA verification or disposable restore, Libraries/Paperless NAS snapshot retention plus isolated restore, NAS metadata persistence after a NAS/UniFi Drive event, controlled live Libraries-NFS-loss behavior, end-to-end Wake-on-LAN, and VPN credential rotation. Detailed transcripts and identifiers were not supplied in this chat; retain historical test evidence below as history, but do not present these items as current gaps.
+Jared confirmed completion and verification of the current Rotom Restic full-data-read plus restore rehearsal, current Rotom VM Backup VMA verification or disposable restore, Libraries/Paperless NAS snapshot retention plus isolated restore, NAS metadata persistence after a NAS/UniFi Drive event, controlled live Libraries-NFS-loss behavior, end-to-end Wake-on-LAN, VPN credential rotation, UniFi/router-policy review, full isolated Palworld disaster-recovery rehearsal, authenticated Paperless acceptance, Fran PVE browser login, legacy NPM-record review, certificate renewal, and dormant Docker-artifact review. Detailed transcripts, identifiers, and retain/remove decisions were not supplied in this chat; retain historical test evidence below as history, but do not present these items as current gaps.
 
 ### How to use the legacy documentation
 
@@ -73,7 +73,7 @@ PVE now has two human Linux administrators. Jared remains `1000:1000`; Fran is `
 
 Paperless is active again as a Libraries (`127:5000`) workload with PostgreSQL and Valkey. Its Compose, VM-local application state, and protected inputs are under `/srv/rotom/{stacks,appdata,secrets}/libraries/paperless`; `/mnt/nas-libraries/paperless` is the sole authoritative media bind. That fresh NAS subtree is `127:5000`, mode `2770`; Compose uses a non-creating bind so a missing target fails closed rather than creating local media. The protected retained recovery set supplied the existing instance and five media files; its SHA-256 manifest matches the new NAS target, and the recovery source remains intact. The retired Documents NFS export refused a temporary mount, so no direct NAS-source migration was attempted.
 
-Paperless, its database, and its broker are running; the Paperless health check passed. Its loopback service and retained `paperless.rotom.casa` NPM route returned the expected login `302`. Homepage's existing Libraries card is consequently current. The NAS recovery helper now requires the Paperless media directory before it conditionally recovers Paperless after a qualifying startup mount failure. Rotom Restic Backup includes the VM-local state but excludes the authoritative NAS media; Libraries snapshot/restore coverage and authenticated Paperless acceptance remain Needs Verification.
+Paperless, its database, and its broker are running; the Paperless health check passed. Its loopback service and retained `paperless.rotom.casa` NPM route returned the expected login `302`. Homepage's existing Libraries card is consequently current. The NAS recovery helper now requires the Paperless media directory before it conditionally recovers Paperless after a qualifying startup mount failure. Rotom Restic Backup includes the VM-local state but excludes the authoritative NAS media; Jared confirmed Libraries snapshot/restore coverage and authenticated Paperless acceptance.
 
 ### Current Game Servers and Smart Home NAS contracts — 2026-10-13
 
@@ -377,7 +377,7 @@ JAR-31 compatibility/application restoration and the JAR-33 virtualization basel
 - **Retention observation:** the current storage listing contains eight unprotected VMID `100` archives under the configured `7 daily / 4 weekly / 6 monthly` policy. Archive availability is current only as of the listing; select and verify a recovery point at incident time.
 - **Verified by Jared confirmation — end-to-end Wake-on-LAN trigger:** the controlled magic-packet wake test completed; detailed sender output was not supplied in this chat.
 - **Needs Verification — prior Proxmox resets:** the ConBee II remains intentionally disconnected and the legacy documentation does not isolate one causal explanation for the earlier resets. Read-only logs can narrow evidence (`journalctl`, Proxmox task/system logs), but a single cause should not be claimed without new evidence.
-- **Recovery/operations follow-up:** a full Palworld disaster-recovery rehearsal, certificate-renewal observation, and final public-exposure review remain unperformed or incompletely evidenced. Jared confirmed the Rotom Restic Backup data-read/restore and current Rotom VM Backup VZDump verification or restore. The retired JAR-73 alerting layer no longer requires an alert-delivery test.
+- **Recovery/operations follow-up:** the final public-exposure policy remains unconfirmed. Jared confirmed the full Palworld disaster-recovery rehearsal, certificate-renewal observation, Rotom Restic Backup data-read/restore, and current Rotom VM Backup VZDump verification or restore. The retired JAR-73 alerting layer no longer requires an alert-delivery test.
 
 ## 10. legacy documentation set Model
 

@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Record Jared-confirmed recovery verification
+**Documentation updated:** 2026-10-14 — Record additional Jared-confirmed operational verification
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -144,7 +144,7 @@ JAR-68 renamed only the physical PVE identity and PVE-only support components. P
 
 Fran is now a human administrator on both hosts, but no Fran SSH alias, identity file, authorized-key path, or successful SSH login is recorded. PVE `/home/fran/.ssh` was verified absent; SSH-key setup is intentionally deferred. Password authentication policy was not changed. Key contents and credentials are never recorded. The public-key comment may retain historical wording; it is metadata only and not an active alias.
 
-PVE's existing HTTPS management route is unchanged. Enabled `fran@pam` now has propagated `Administrator` access at `/`, matching Jared's authorization scope; effective permissions were verified from the PVE CLI, but a direct Fran browser-login result was not supplied.
+PVE's existing HTTPS management route is unchanged. Enabled `fran@pam` now has propagated `Administrator` access at `/`, matching Jared's authorization scope; effective permissions were verified from the PVE CLI, and Jared subsequently confirmed direct Fran browser-login acceptance.
 
 ### Current PVE monitoring bridge
 
@@ -906,27 +906,17 @@ Later pre-migration work on 2026-09-21 changed service identities, storage GIDs,
 
 Only unresolved **current** questions belong here. Dated UFW, `eno1`, old Docker-network, and bare-metal NFS observations remain preserved above as historical evidence, but they are not current Phase B gaps.
 
-### UniFi / router layer — Needs Verification
+### UniFi / router layer — Verified by Jared confirmation
 
-Current VM reservation and local-DNS identity are already verified: `192.168.1.69` is reserved to VM MAC `BC:24:11:97:10:47`, and the LAN resolver returns `rotom.casa -> 192.168.1.69`. Remaining router-side facts not established by the legacy documentation are:
-
-- whether `192.168.1.70` is statically assigned/reserved for the UNAS;
-- VLAN/network assignment for Proxmox, the Rotom VM, and UNAS;
-- WAN port-forward/NAT rules for TCP 80/443, Palworld UDP ports, or other exposed services;
-- UniFi firewall policy before traffic reaches Proxmox/Rotom;
-- NAT reflection/hairpin behavior.
-
-A read-only UniFi/controller inspection of the `.68`, `.69`, and `.70` clients plus firewall/NAT/port-forward configuration would resolve these items. Host-side `ip route`, resolver queries, and listener checks can reconfirm client state but cannot prove router configuration.
+Current VM reservation and local-DNS identity are already verified: `192.168.1.69` is reserved to VM MAC `BC:24:11:97:10:47`, and the LAN resolver returns `rotom.casa -> 192.168.1.69`. Jared confirmed the required UniFi/controller inspection of reservations, VLANs, firewall/NAT/port-forwarding, and hairpin behavior completed. Detailed router-policy output was not supplied in this chat.
 
 ### Wake-on-LAN end-to-end trigger — Verified by Jared confirmation
 
 Host-side WOL is current and persistent: Proxmox `nic0` supports magic-packet wake, reports `Wake-on: g`, PCI wake is enabled, and `/etc/network/interfaces` reasserts `wol g` on interface bring-up. Jared confirmed the end-to-end controlled wake test completed successfully. The sender transcript was not retained in this chat.
 
-### Legacy NPM records — Needs Verification
+### Legacy NPM records — Reviewed by Jared confirmation
 
-Historical NPM evidence retained legacy Smart Hub/Portainer/OliveTin/PalTools database rows that were `enabled=1` but absent from generated `proxy_host/*.conf` files. The legacy documentation does not contain a fresh JAR-31/JAR-33 reread proving whether those rows still exist in the restored NPM database or whether administrator intent is to retain them.
-
-A read-only inspection of the current NPM SQLite database and generated proxy-host directory would resolve current presence; administrator intent still requires an explicit decision. Do not expose certificate/private-key contents while checking.
+Historical NPM evidence retained legacy Smart Hub/Portainer/OliveTin/PalTools database rows that were `enabled=1` but absent from generated `proxy_host/*.conf` files. Jared confirmed the current-record review and ownership decision completed. The decision and any resulting record changes were not supplied in this chat, so none are inferred.
 
 ### Current exposure policy — Needs Verification
 

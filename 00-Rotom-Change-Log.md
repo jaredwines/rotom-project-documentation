@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-14 — Record additional Jared-confirmed operational verification
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`.
+- **Status:** **Documentation only / Verified by Jared confirmation.** No new live test, cleanup, or configuration change was performed in this chat.
+- **Changes:** Jared confirmed completion of the UniFi/router-policy review, full isolated Palworld disaster-recovery rehearsal, authenticated Paperless acceptance, Fran PVE browser login, legacy NPM-record review, certificate-renewal observation, and dormant Docker-artifact review. These are no longer current operational gaps. The results of the legacy-NPM and artifact-retention decisions were not supplied, so this update does not infer record or artifact deletion.
+- **Evidence:** Jared's explicit confirmation in this chat; detailed command output, browser evidence, test artifacts, and decisions were not supplied.
+- **Outstanding:** Direct-LAN/PVE-firewall policy confirmation, exact PVE storage stanza capture, service-account lock-state inspection, and PVE stability/hardware follow-up remain documented separately. Available Sources synchronization remains manual by Jared.
+
 ## 2026-10-14 — Record Jared-confirmed recovery verification
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
