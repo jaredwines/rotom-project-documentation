@@ -13,6 +13,10 @@ Record substantive changes to this document in the change log as part of the sam
 
 ## 1. Purpose and Scope
 
+### Current JAR-96 Library automation contract — 2026-10-13
+
+`rotom-nas-docker-recovery` now verifies `/mnt/nas-libraries` and its `library/` directory before considering the Library containers. The enabled `rotom-qbittorrent-media-guard.timer` verifies `/mnt/nas-libraries/torrents` and `.rotom-qbt-media-ready/`, and stops a running qBittorrentVPN if either safety condition is absent. qBittorrent's sentinel bind remains non-creating; a local fallback directory is not an accepted mount condition. The prior `/mnt/nas-library` guest contract is retired, while its NAS source data remains retained.
+
 ### Current local-domain alignment — 2026-10-13
 
 Current automation and Compose references must use `/home/hosted-websites` and `/srv/rotom/{stacks,appdata}/hosted-websites` for websites (`hosted-websites` `902:5004`), and `/home/game-servers` and `/srv/rotom/{stacks,appdata,secrets}/game-servers` for Palworld (`game-servers` `995:5001`). The guest `/mnt/nas-web` automount is retired; `/mnt/nas-gameserver` remains. Older `web`/`gameserver` statements in dated maintenance evidence are not current operating instructions.

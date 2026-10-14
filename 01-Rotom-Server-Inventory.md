@@ -18,6 +18,12 @@ Purpose: front-page index and quick-reference architecture summary.
 
 ## 2. Current Rotom Summary
 
+### JAR-96 Library-to-Libraries NAS cutover — 2026-10-13
+
+The active Library contract is `/mnt/nas-libraries`, backed by NAS `Libraries/.data` through the established fstab/systemd automount convention. The former `/mnt/nas-library` guest mount, its `/home/library/nas-library` symlink, and every active host-side dependency are retired; `/home/library/nas-libraries -> /mnt/nas-libraries` is the current shortcut. Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Nginx Proxy Manager bind the new path; Homepage monitors it. qBittorrent retains its loopback-only UI, WireGuard isolation, non-creating sentinel bind, and enabled fail-closed guard.
+
+The initial plus writer-stopped final rsync converged at 5,929 entries / 205,137,536,813 bytes with no deletes and a final dry run with no changes. The generated automount was then proven from an unmounted state using the NAS-resident sentinel before the affected containers were restored. The NAS `Library/.data` source/export and data remain retained for separately authorized deletion; no new backup or snapshot was created at Jared's explicit direction. A full reboot and authenticated download/import/seeding workflow remain outstanding.
+
 ### Hosted Websites / Game Servers local-domain alignment — 2026-10-13
 
 **Hosted Websites** is the current website service identity: `hosted-websites` (`902:5004`), home `/home/hosted-websites`, and local Compose/appdata roots `/srv/rotom/{stacks,appdata}/hosted-websites`. Aloha Millworks was recreated from those roots and its public HTTPS endpoint returned `200`; Jared Wines remains intentionally undeployed. The guest-side Web NFS contract is **retired**: its fstab entry, automount, local `/mnt/nas-web` mountpoint, and former home symlink were removed. No NAS-side Web export or data was inspected, altered, or deleted.

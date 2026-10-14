@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-13 — JAR-96 Library-to-Libraries NAS cutover
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Replaced the active `/mnt/nas-library` contract backed by `Library/.data` with the fstab-backed `/mnt/nas-libraries` contract backed by `Libraries/.data`. Provisioned only the empty target export root for Library `127:5000`, copied all source data and metadata without delete flags, performed a writer-stopped final sync, and recreated the affected Library, NPM, and Homepage workloads. Retired the old guest mount, home symlink, and temporary probe; old NAS source data/export remains intact for separately authorized cleanup.
+- **Evidence:** The initial transfer and final no-change dry run covered 5,929 entries and 205,137,536,813 bytes. Live Docker inspection found all affected binds on `/mnt/nas-libraries`; qBittorrent `wg0`, its fail-closed sentinel guard, local qBittorrent `200`, Arr/Jellyfin expected redirects, Homepage `200`, and zero failed units all passed. No new backup/snapshot was created at Jared's explicit direction.
+- **Outstanding:** A full VM reboot and authenticated application download/import/seeding workflow remain untested by this cutover. The generated automount was separately proven from an unmounted state. Available Sources replacement remains manual by Jared.
+
 ## 2026-10-13 — Align Hosted Websites and Game Servers local domains
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.

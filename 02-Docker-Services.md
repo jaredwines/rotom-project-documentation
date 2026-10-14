@@ -13,6 +13,10 @@ Record substantive changes to this document in the change log as part of the sam
 
 ## 1. Purpose and Scope
 
+### Current JAR-96 Library mount contract — 2026-10-13
+
+Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Nginx Proxy Manager were recreated with Library binds from `/mnt/nas-libraries`; no active container bind uses `/mnt/nas-library`. qBittorrent keeps `/mnt/nas-libraries/torrents` at `/media/torrents` and the read-only, non-creating sentinel bind at its unchanged container path. NPM's internal game-library alias and Homepage's Library storage metric also use the new host mount. qBittorrent `wg0` and all affected local HTTP checks passed after recreation.
+
 ### Current local-domain alignment — 2026-10-13
 
 The active website Compose/appdata roots are `/srv/rotom/{stacks,appdata}/hosted-websites`, owned by `hosted-websites` `902:5004`; old `web` paths are historical. Aloha Millworks was recreated from the new roots and public HTTPS returned `200`; Jared Wines remains undeployed. The guest `/mnt/nas-web` contract is retired locally and is not an application bind.

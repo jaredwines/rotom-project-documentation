@@ -13,6 +13,12 @@ Record substantive changes to this document in the change log as part of the sam
 
 ## 1. Purpose and Scope
 
+### Current JAR-96 Library storage — 2026-10-13
+
+`/mnt/nas-libraries` is the sole active Library NFSv3 contract, sourced from `192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Libraries/.data` with `defaults,_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s`. Its mounted root is `988:5000` mode `2771`; `library/` is `977:5000` mode `2775`, `torrents/` is `0:5000` mode `2775`, and `.rotom-qbt-media-ready/` is `901:5000` mode `2750`.
+
+The old `/mnt/nas-library` contract for `Library/.data` is retired locally, including its fstab entry and Library home symlink. Its NAS data/export is intentionally retained. A non-destructive `rsync -aHAX --numeric-ids` initial copy followed by a writer-stopped final sync converged at 5,929 entries / 205,137,536,813 bytes; the final dry run had no changes. The generated automount was proven from an unmounted state by reading the NAS-resident sentinel, after which all affected containers were restored. No backup/snapshot was created at Jared's explicit direction. A full reboot remains outstanding.
+
 ### Current guest Web-mount retirement — 2026-10-13
 
 `/mnt/nas-web` is **retired on Rotom**: its guest fstab entry, systemd automount, local mountpoint, and former Hosted Websites home symlink are absent. This does not establish removal of the NAS Web export or its data; neither was inspected or changed. Website services use only the local `/srv/rotom/{stacks,appdata}/hosted-websites` roots. The separate `/mnt/nas-gameserver` NFS contract remains active and its retained home symlink is now `/home/game-servers/nas-gameserver`.
