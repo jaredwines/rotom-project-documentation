@@ -101,7 +101,7 @@ Three empty external local bridge networks now reserve v2 cross-stack roles: `ro
 
 ### Evidence provenance
 
-Last updated: 2026-10-14 (Rotom Restic, PVE Restic, and Rotom VM Backup display terminology standardized; technical VZDump references and pre-migration evidence retained)
+Last updated: 2026-10-14 (Rotom Restic Backup, PVE Restic Backup, and Rotom VM Backup display terminology standardized; technical VZDump references and pre-migration evidence retained)
 Project: **Rotom-Home-Server**
 
 This document records Rotom's networking state using three read-only host audits collected on 2026-09-14:

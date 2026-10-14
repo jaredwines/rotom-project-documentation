@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-10-14 — Standardize backup system display names
+**Documentation updated:** 2026-10-14 — Correct official backup system display names
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -88,7 +88,7 @@ The JDownloader, Igir, qBittorrent importer, and browser-upload service identiti
 
 ### Current PVE backup privilege boundary
 
-PVE Restic is root-operated. `/usr/local/sbin/pve-restic-backup` is the privileged worker; root-owned `/usr/local/bin/backup-restic-to-nas` re-executes through `sudo` when a non-root user invokes it, so Jared or Fran can start the existing root workflow through normal sudo authentication without direct access to the worker or its protected credential. `/etc/restic/nas-password` remains protected and its contents are never documented. The repository is `/mnt/nas-pve-restic-backup/pve-restic-backup` and staging is `/var/backups/pve-restic-recovery`. Rotom VM Backup uses the root-owned `/usr/local/bin/backup-rotom-vm-to-nas`, which re-executes through `sudo` for non-root invocation, plus `rotom-vm-vzdump-manual.service` and `/usr/local/sbin/rotom-vm-vzdump-manual`; VZDump remains the technical mechanism. Jared and Fran are PVE members of `systemd-journal`, allowing direct read-only service-log access such as `journalctl -fu rotom-vm-vzdump-manual.service`; this group does not itself grant permission to alter services.
+PVE Restic Backup is root-operated. `/usr/local/sbin/pve-restic-backup` is the privileged worker; root-owned `/usr/local/bin/backup-restic-to-nas` re-executes through `sudo` when a non-root user invokes it, so Jared or Fran can start the existing root workflow through normal sudo authentication without direct access to the worker or its protected credential. `/etc/restic/nas-password` remains protected and its contents are never documented. The repository is `/mnt/nas-pve-restic-backup/pve-restic-backup` and staging is `/var/backups/pve-restic-recovery`. Rotom VM Backup uses the root-owned `/usr/local/bin/backup-rotom-vm-to-nas`, which re-executes through `sudo` for non-root invocation, plus `rotom-vm-vzdump-manual.service` and `/usr/local/sbin/rotom-vm-vzdump-manual`; VZDump remains the technical mechanism. Jared and Fran are PVE members of `systemd-journal`, allowing direct read-only service-log access such as `journalctl -fu rotom-vm-vzdump-manual.service`; this group does not itself grant permission to alter services.
 
 ### Current administrative public-key access
 

@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Restic backup architecture, scope, retention, verification, restore evidence, and recovery boundaries  
 **Recovery scope:** pre-migration Rotom plus current Proxmox/VM foundation  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Standardize backup system display names
+**Documentation updated:** 2026-10-14 — Correct official backup system display names
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -15,7 +15,7 @@ Record substantive changes to this document in the change log as part of the sam
 
 ### Current PVE backup verification — 2026-10-14
 
-PVE Restic remains scheduled daily at `04:00`. Its 2026-10-13 run completed successfully; the repository contained ten snapshots at audit time, with latest short ID `b3fd0c23`, and `restic check` completed without errors. Repository identity and protected credential handling are unchanged.
+PVE Restic Backup remains scheduled daily at `04:00`. Its 2026-10-13 run completed successfully; the repository contained ten snapshots at audit time, with latest short ID `b3fd0c23`, and `restic check` completed without errors. Repository identity and protected credential handling are unchanged.
 
 Rotom VM Backup uses the native `rotom-vm-daily` Proxmox VZDump job, configured for VMID 100 at `05:00`, snapshot mode, zstd compression, `repeat-missed=0`, and retention of seven daily, four weekly, and six monthly archives. Eight current VM archives were present, including the latest 2026-10-13 archive at approximately 36.3 GB compressed. A full decompression test passed and reported 64,872,503,296 bytes of uncompressed data. The transcript then piped the stream into `vma verify`, but did not capture an explicit verifier result or pipeline component statuses; treat full VMA structural verification as **Needs Verification**, not as a recorded pass. VM 100 had no Proxmox snapshots; that does not affect the independent VZDump archives.
 
@@ -25,13 +25,13 @@ The PVE backup-status API reported both schedules successfully and the two NFS b
 
 `rotom-restic-backup.timer` is enabled and active with the documented `03:00` schedule plus up to ten minutes randomized delay. Privileged inspection found 22 snapshots in repository `799babb2`; the latest is automatic snapshot `9494979d` from 2026-10-13 03:01 PDT, covering the documented guest source roots at approximately 20.086 GiB. `restic check` loaded all indexes, checked packs plus 22 snapshot trees/blobs, and found no errors. This closes the repository-structure verification gap, but it is not `restic check --read-data` or a restore rehearsal.
 
-The VM-local `/srv/rotom/backup-staging` root is absent. Every named local artifact beneath it is historical unless a later live path check re-establishes its presence. Restic-contained copies and historical checksums remain recovery evidence, but they are not proof of a current fast local rollback copy. Authoritative Libraries/Paperless NAS payload remains outside Rotom Restic and its effective snapshot/restore path remains **Needs Verification**.
+The VM-local `/srv/rotom/backup-staging` root is absent. Every named local artifact beneath it is historical unless a later live path check re-establishes its presence. Restic-contained copies and historical checksums remain recovery evidence, but they are not proof of a current fast local rollback copy. Authoritative Libraries/Paperless NAS payload remains outside Rotom Restic Backup and its effective snapshot/restore path remains **Needs Verification**.
 
 ### Current Paperless Libraries recovery state — 2026-10-13
 
 Paperless was restored from the protected retained recovery set into Libraries paths: VM-local state and protected inputs are now below `/srv/rotom/{appdata,secrets}/libraries/paperless`, while authoritative media is `/mnt/nas-libraries/paperless`. The recovered source set remains intact. The five media files (384,771 bytes) were copied to the new NAS target with a matching SHA-256 manifest. The retired Documents export refused a temporary mount, so no source-side NAS mutation or permission bypass occurred.
 
-Rotom Restic includes `/srv`, and the 2026-10-13 automatic snapshot followed the Paperless restoration; verify the required paths inside the selected snapshot before relying on it for recovery. Rotom Restic continues to exclude `/mnt`, so Paperless media depends on Libraries NAS protection. The effective snapshot schedule/retention and an isolated recovery of the Libraries Paperless subtree are **Needs Verification**. The restoration itself did not trigger a new backup, retention, prune, or restore run.
+Rotom Restic Backup includes `/srv`, and the 2026-10-13 automatic snapshot followed the Paperless restoration; verify the required paths inside the selected snapshot before relying on it for recovery. Rotom Restic Backup continues to exclude `/mnt`, so Paperless media depends on Libraries NAS protection. The effective snapshot schedule/retention and an isolated recovery of the Libraries Paperless subtree are **Needs Verification**. The restoration itself did not trigger a new backup, retention, prune, or restore run.
 
 ### Current Media-mount retirement — 2026-10-13
 
@@ -51,7 +51,7 @@ The unused `/srv/rotom/appdata/documents` and `/srv/rotom/secrets/documents` roo
 
 ### Current Library restoration recovery note — 2026-10-13
 
-qBittorrentVPN and Prowlarr were restored from the retained JAR-84 local archive to their current Library paths. No new Restic snapshot or backup verification was requested or created. Their VM-local `/srv/rotom` state remains within ordinary Rotom Restic scope on a future run; Libraries torrent payloads remain outside that scope. Paperless was subsequently restored to `/srv/rotom/{appdata,secrets}/libraries/paperless` with authoritative media at `/mnt/nas-libraries/paperless`; see the current Paperless Libraries recovery overlay.
+qBittorrentVPN and Prowlarr were restored from the retained JAR-84 local archive to their current Library paths. No new Restic snapshot or backup verification was requested or created. Their VM-local `/srv/rotom` state remains within ordinary Rotom Restic Backup scope on a future run; Libraries torrent payloads remain outside that scope. Paperless was subsequently restored to `/srv/rotom/{appdata,secrets}/libraries/paperless` with authoritative media at `/mnt/nas-libraries/paperless`; see the current Paperless Libraries recovery overlay.
 
 ### JAR-94 targeted Platform recovery — 2026-10-13
 
@@ -59,27 +59,27 @@ Restic snapshot `02c9c4e7` was used for a restricted staged recovery of the shar
 
 ### JAR-93 Platform recovery point — 2026-10-13
 
-Before the Platform migration, a supported Rotom Restic run completed successfully and retained snapshot `02c9c4e7` at `2026-10-13 00:36:25 PDT`; normal retention pruned the temporary same-day snapshot `177e33f0`. The root-owned Restic worker's NPM SQLite staging source now points to `/srv/rotom/appdata/platform/nginx-proxy-manager/data/database.sqlite`. Rotom Restic continues to include `/srv` and exclude `/mnt`; NAS content remains outside this guest backup boundary.
+Before the Platform migration, a supported Rotom Restic Backup run completed successfully and retained snapshot `02c9c4e7` at `2026-10-13 00:36:25 PDT`; normal retention pruned the temporary same-day snapshot `177e33f0`. The root-owned Restic worker's NPM SQLite staging source now points to `/srv/rotom/appdata/platform/nginx-proxy-manager/data/database.sqlite`. Rotom Restic Backup continues to include `/srv` and exclude `/mnt`; NAS content remains outside this guest backup boundary.
 
 ### Historical JAR-92 Paperless recovery limitation — 2026-10-13
 
-Paperless active paths and identity moved to Library, but document media remains on the distinct Documents NFS export and remains outside Rotom Restic's `/mnt` exclusion boundary. Targeted local rollback copies are `/root/jar-92-20261013-precutover` and `/root/jar-92-20261013-paperless-precutover`. Jared explicitly waived the isolated UNAS snapshot-restore acceptance check; do not treat that recovery exercise, planned Documents automount/reconnect behavior, or authenticated browser upload/OCR/original-download checks as verified.
+Paperless active paths and identity moved to Library, but document media remains on the distinct Documents NFS export and remains outside Rotom Restic Backup's `/mnt` exclusion boundary. Targeted local rollback copies are `/root/jar-92-20261013-precutover` and `/root/jar-92-20261013-paperless-precutover`. Jared explicitly waived the isolated UNAS snapshot-restore acceptance check; do not treat that recovery exercise, planned Documents automount/reconnect behavior, or authenticated browser upload/OCR/original-download checks as verified.
 
-This document is the canonical detailed owner for Rotom recovery state plus the preserved pre-migration backup/restore design. It distinguishes Rotom Restic snapshots, PVE Restic snapshots, NAS data protection, representative restore evidence, the JAR-25 whole-disk rollback image, and Rotom VM Backup using Proxmox VZDump; those claims must not be treated as interchangeable.
+This document is the canonical detailed owner for Rotom recovery state plus the preserved pre-migration backup/restore design. It distinguishes Rotom Restic Backup snapshots, PVE Restic Backup snapshots, NAS data protection, representative restore evidence, the JAR-25 whole-disk rollback image, and Rotom VM Backup using Proxmox VZDump; those claims must not be treated as interchangeable.
 
 ## 2. Current Recovery State
 
-Current recovery is layered: application-aware artifacts, Rotom Restic, PVE Restic, Rotom VM Backup using Proxmox VZDump, NAS protection for authoritative Libraries data, plus preserved pre-migration recovery evidence. The effective Libraries snapshot/restore policy remains **Needs Verification**.
+Current recovery is layered: application-aware artifacts, Rotom Restic Backup, PVE Restic Backup, Rotom VM Backup using Proxmox VZDump, NAS protection for authoritative Libraries data, plus preserved pre-migration recovery evidence. The effective Libraries snapshot/restore policy remains **Needs Verification**.
 
 ### Current recovery evidence boundary — 2026-10-14
 
-The 2026-10-14 audit verified recurring Rotom Restic and PVE Restic snapshots and passed both repository-structure checks. It also found eight current Rotom VM Backup VZDump archives and proved full zstd decompression of the newest archive. These results do not prove a Rotom Restic data-read/restore, a current VMA structural verification, or a NAS snapshot restore. Revalidate the exact recovery point selected during an incident before relying on it.
+The 2026-10-14 audit verified recurring Rotom Restic Backup and PVE Restic Backup snapshots and passed both repository-structure checks. It also found eight current Rotom VM Backup VZDump archives and proved full zstd decompression of the newest archive. These results do not prove a Rotom Restic Backup data-read/restore, a current VMA structural verification, or a NAS snapshot restore. Revalidate the exact recovery point selected during an incident before relying on it.
 
 ### Current Rotom VM Backup schedule
 
 Rotom VM Backup uses PVE job `rotom-vm-daily`, enabled for node `pve`, VMID `100`, storage `nas-rotom-vm-backup`, daily `05:00`, snapshot mode, zstd, `repeat-missed=0`, retention `keep-daily=7,keep-weekly=4,keep-monthly=6`, and the scheduled note template `Scheduled Rotom VM backup - {{guestname}} VM {{vmid}} on {{node}}`.
 
-JAR-69 monitoring reads this native job through the PVE LAN-only status endpoint `http://192.168.1.68:8789/rotom-vm-backup-status`; the companion host-config Restic endpoint is `/pve-restic-backup-status`. The API is read-only and is only a Homepage presentation layer; it does not change schedules, retention, repositories, storage, or recovery points.
+JAR-69 monitoring reads this native job through the PVE LAN-only status endpoint `http://192.168.1.68:8789/rotom-vm-backup-status`; the companion PVE Restic Backup endpoint is `/pve-restic-backup-status`. The API is read-only and is only a Homepage presentation layer; it does not change schedules, retention, repositories, storage, or recovery points.
 
 The manual path is `/usr/local/bin/backup-rotom-vm-to-nas` -> `rotom-vm-vzdump-manual.service` -> `/usr/local/sbin/rotom-vm-vzdump-manual`, with non-blocking lock `/run/lock/rotom-vm-vzdump-manual.lock`. The root-owned launcher re-executes through `sudo` when started by a non-root user, preserving the root-only worker and systemd ownership; Jared or Fran can use normal sudo authentication when needed. Systemd owns the long-running VZDump so it survives SSH disconnect. Both administrators can follow it directly with `journalctl -fu rotom-vm-vzdump-manual.service` through PVE `systemd-journal` membership. No manual backup was started as part of Fran's account setup.
 
@@ -110,9 +110,9 @@ Jared accepted the JAR-50 rehearsal using the cumulative evidence from JAR-57's 
 
 No authoritative NAS Media recovery was performed for JAR-50. Jared explicitly waived that criterion; no snapshot was restored or cloned, no test directory was created, and no snapshot policy or production NAS data was changed. This is a closeout limitation, not verification that UNAS Media can be restored end-to-end.
 
-## 2A. Current Rotom Restic Repository and Control Files
+## 2A. Current Rotom Restic Backup Repository and Control Files
 
-Rotom Restic uses unchanged technical identifiers:
+Rotom Restic Backup uses unchanged technical identifiers:
 
 - Repository: `/mnt/nas-rotom-restic-backup/rotom-restic-backup` on NAS `Rotom_Restic_Backup/.data`.
 - Manual launcher: `/usr/local/bin/backup-restic-to-nas`.
@@ -141,13 +141,13 @@ JAR-47 corrected the worker's Home Assistant SQLite staging sources from the ret
 
 Application-aware evidence captured before the run included a Home Assistant native backup, the Paperless supported export staging, a gzip-tested RomM MariaDB export, and stopped-state Palworld SaveGames archives then stored under `/srv/rotom/backup-staging/game/jar47-20260929`. `restic check` passed all 21 snapshots. A restricted non-secret restore of `aedd8e57` recovered 113.427 MiB, verified both Palworld archive checksums, restored the Paperless manifest, and passed `PRAGMA quick_check` on the restored Home Assistant SQLite database; its scratch tree was removed afterwards. The local staging root was absent on 2026-10-14, so recovery now depends on retained snapshot evidence rather than that fast local copy.
 
-For NAS-resident data, UniFi Drive snapshots are recorded as enabled on all drives. Media is verified daily at 12:00 AM UNAS local time with a retention limit of 16 snapshots. `Media/library`, including `library/games`, is authoritative and receives this local rollback protection; `Media/torrents` is transient/reproducible. Paperless media is now authoritative at `/mnt/nas-libraries/paperless`; the earlier Documents path is historical evidence. Guest Restic excludes `/mnt`, so it protects Paperless's VM-local configuration/state and retained local recovery material, but not authoritative NAS media. Confirm the effective Libraries snapshot schedule/retention and complete an isolated restore before treating Paperless snapshot recovery as verified. Snapshots are a separate recovery layer from guest Restic but share the UNAS failure domain and are not off-site protection.
+For NAS-resident data, UniFi Drive snapshots are recorded as enabled on all drives. Media is verified daily at 12:00 AM UNAS local time with a retention limit of 16 snapshots. `Media/library`, including `library/games`, is authoritative and receives this local rollback protection; `Media/torrents` is transient/reproducible. Paperless media is now authoritative at `/mnt/nas-libraries/paperless`; the earlier Documents path is historical evidence. Rotom Restic Backup excludes `/mnt`, so it protects Paperless's VM-local configuration/state and retained local recovery material, but not authoritative NAS media. Confirm the effective Libraries snapshot schedule/retention and complete an isolated restore before treating Paperless snapshot recovery as verified. Snapshots are a separate recovery layer from Rotom Restic Backup but share the UNAS failure domain and are not off-site protection.
 
-JAR-88 supersedes JAR-78's active domain paths: current Palworld Compose definitions are under `/srv/rotom/stacks/game-servers` and authoritative local world/runtime trees under `/srv/rotom/appdata/game-servers`; both remain within the established guest Restic `/srv` source scope. The earlier `gameserver` spelling, JAR-78's `/srv/rotom/.../game` paths, and snapshot `b7b7288b` remain dated recovery evidence. The former local JAR-88 rollback artifacts were retired on 2026-10-05; `/mnt/nas-game-servers` is the active `Game_Servers/.data` boundary, while original Game NAS data is unmounted rollback material and neither NAS path hosts live worlds.
+JAR-88 supersedes JAR-78's active domain paths: current Palworld Compose definitions are under `/srv/rotom/stacks/game-servers` and authoritative local world/runtime trees under `/srv/rotom/appdata/game-servers`; both remain within the established Rotom Restic Backup `/srv` source scope. The earlier `gameserver` spelling, JAR-78's `/srv/rotom/.../game` paths, and snapshot `b7b7288b` remain dated recovery evidence. The former local JAR-88 rollback artifacts were retired on 2026-10-05; `/mnt/nas-game-servers` is the active `Game_Servers/.data` boundary, while original Game NAS data is unmounted rollback material and neither NAS path hosts live worlds.
 
-Current Smart Home Compose definitions are under `/srv/rotom/stacks/smart-home`, with Home Assistant/Homebridge mutable state under `/srv/rotom/appdata/smart-home`; both are covered by the guest Restic `/srv` source scope. Its NAS boundary is `/mnt/nas-smart-home`, backed by `Smart_Home/.data`, and remains outside Restic because `/mnt` is excluded. JAR-51 retired the earlier service-home trees after reference and service verification. Historical JAR-43 backup evidence remains dated; use the 2026-10-14 guest repository audit for current backup status.
+Current Smart Home Compose definitions are under `/srv/rotom/stacks/smart-home`, with Home Assistant/Homebridge mutable state under `/srv/rotom/appdata/smart-home`; both are covered by the Rotom Restic Backup `/srv` source scope. Its NAS boundary is `/mnt/nas-smart-home`, backed by `Smart_Home/.data`, and remains outside Restic because `/mnt` is excluded. JAR-51 retired the earlier service-home trees after reference and service verification. Historical JAR-43 backup evidence remains dated; use the 2026-10-14 guest repository audit for current backup status.
 
-Current Aloha Millworks and retained Jared Wines website content are under `/srv/rotom/appdata/hosted-websites`, with their Compose definitions under `/srv/rotom/stacks/hosted-websites`; these paths are within the established guest Restic `/srv` source scope. Source-to-target state comparisons passed and the timer is active, but no backup, retention, prune, or restore operation or Restic-policy change was made. The prior JAR-45 `web` paths and old `/home/web/docker` project trees are historical evidence; a post-JAR-45 backup/restore exercise remains deferred to JAR-47 or a dedicated recovery task.
+Current Aloha Millworks and retained Jared Wines website content are under `/srv/rotom/appdata/hosted-websites`, with their Compose definitions under `/srv/rotom/stacks/hosted-websites`; these paths are within the established Rotom Restic Backup `/srv` source scope. Source-to-target state comparisons passed and the timer is active, but no backup, retention, prune, or restore operation or Restic-policy change was made. The prior JAR-45 `web` paths and old `/home/web/docker` project trees are historical evidence; a post-JAR-45 backup/restore exercise remains deferred to JAR-47 or a dedicated recovery task.
 
 **Historical pre-deployment note:** JAR-44 defined the Documents domain before Paperless. JAR-8 later deployed Paperless with entirely VM-local state, and JAR-47 repaired the Home Assistant staging path and verified a Paperless export manifest in a restricted restore. JAR-91 supersedes the VM-local-media portion of that state: `/mnt/nas-documents/paperless` is now the authoritative media root.
 
@@ -449,7 +449,7 @@ The modified script passed `bash -n`. All three live databases and all three gen
 
 The installed block uses Python's SQLite online backup API with read-only source connections. It writes temporary `.new` copies, checks them, sets mode `0600`, and replaces the staging destinations. The staging directory uses mode `0700`; the verified files are owned by `root:root`. Failures abort the script before a new Restic backup can proceed through this block.
 
-The table above preserves the earlier hardening evidence. At the JAR-82 checkpoint, NPM's live database was under the Infra appdata path. Later Platform migration moved the current database to `/srv/rotom/appdata/platform/nginx-proxy-manager/data/database.sqlite` and updated the worker source. The 2026-10-14 audit confirms unattended Rotom Restic resumed; latest automatic snapshot was `9494979d` and `restic check` passed.
+The table above preserves the earlier hardening evidence. At the JAR-82 checkpoint, NPM's live database was under the Infra appdata path. Later Platform migration moved the current database to `/srv/rotom/appdata/platform/nginx-proxy-manager/data/database.sqlite` and updated the worker source. The 2026-10-14 audit confirms unattended Rotom Restic Backup resumed; latest automatic snapshot was `9494979d` and `restic check` passed.
 
 Snapshot **`e98243f5` contains all three staging files**, closing the earlier timing gap: snapshot `1a55dd4f` preceded hardening and could not contain them.
 
