@@ -2,9 +2,9 @@
 
 **Documentation set:** legacy documentation set  
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
-**Scope:** Rotom workload layer. A 2026-10-10 live inventory recorded 24 container objects, all running; it is historical point-in-time evidence and predates the 2026-10-13 deliberate Palworld stopped state and Uptime Kuma retirement.
+**Scope:** Rotom workload layer; the current runtime baseline is the 2026-10-14 inventory in section 1A  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Read-only Rotom and PVE audit reconciliation
+**Documentation updated:** 2026-10-14 — Complete legacy documentation editorial and consistency audit  
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -21,7 +21,7 @@ The sole media bind is `/mnt/nas-libraries/paperless -> /usr/src/paperless/media
 
 ### Current Libraries local Compose roots — 2026-10-13
 
-The active local Library Compose, appdata, and secrets roots are `/srv/rotom/{stacks,appdata,secrets}/libraries`; the `libraries` Linux identity retains `127:5000`. Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Prowlarr were recreated from those roots and their live container mounts use plural appdata paths. The singular local roots and account are absent. This does not alter `/mnt/nas-libraries` or its internal `library/` media directory. The singular appdata tree Docker created during the initial rename recreation was retained reversibly under `/srv/rotom/backup-staging/libraries-rename-transient-20261013`, not used by active containers.
+The active local Library Compose, appdata, and secrets roots are `/srv/rotom/{stacks,appdata,secrets}/libraries`; the `libraries` Linux identity retains `127:5000`. Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Prowlarr were recreated from those roots and their live container mounts use plural appdata paths. The singular local roots and account are absent. This does not alter `/mnt/nas-libraries` or its internal `library/` media directory. The transient singular appdata tree created during the rename was later retired; `/srv/rotom/backup-staging` was absent on 2026-10-14.
 
 ### Current JAR-96 Library mount contract — 2026-10-13
 
@@ -41,11 +41,11 @@ This inventory is based on the uploaded `rotom-docker-containers.txt` (container
 
 ### Documentation-audit reconciliation — 2026-10-13
 
-The current deployment paths are the plural `libraries`, `platform`, `hosted-websites`, `game-servers`, and `smart-home` roots described in the current overlays. Older entries that call singular `library`, `infra`, `web`, `gameserver`, `smarthome`, `/mnt/nas-library`, or `/mnt/nas-media` current are historical migration/recovery evidence. The legacy documentation contains no post-2026-10-13 complete `docker ps -a` capture; treat the exact current object count as **Needs Verification** and resolve it read-only with `docker ps -a` and `docker inspect` of the named workloads.
+The current deployment paths are the plural `libraries`, `platform`, `hosted-websites`, `game-servers`, and `smart-home` roots described in the current overlays. Older entries that call singular `library`, `infra`, `web`, `gameserver`, `smarthome`, `/mnt/nas-library`, or `/mnt/nas-media` current are historical migration/recovery evidence. The 2026-10-14 complete inventory found 22 container objects: 20 running and two intentionally stopped Palworld containers. Treat runtime status as time-sensitive and recheck it read-only when troubleshooting.
 
 ### Evidence provenance
 
-Last updated: 2026-10-10 (NAS-backed recovery verification and post-retirement Docker inventory); JAR-31 application restoration/reboot acceptance remains the earlier VM runtime baseline.
+Latest complete runtime inventory: 2026-10-14. Earlier JAR checkpoints remain dated migration and recovery evidence.
 Project: **Rotom-Home-Server**
 
 The 2026-09-16 identity update below uses supplied Rotom/UNAS command output from the historical “Torrent Seeding Explanation” conversation. The 2026-09-18 backup-access work additionally verified the live Homepage/Glances Compose project, removed Glances' backup-share bind, recreated that two-service project, and confirmed both services healthy/running afterward. Later 2026-09-18 supplied output verified the Palworld service-account rename to `game`, home move to `/home/game`, Compose recreation from the new paths, live bind mounts, runtime numeric identity, health, and unchanged world identifiers. Supplied 2026-09-19 output then verified the separate `game` GID migration from `985` to `5001`, both Palworld Compose identities at `995:5001`, healthy recreated containers against the existing data trees, and the dedicated `/mnt/nas-game` NFS commissioning. Later supplied 2026-09-19 migration output verified Prowlarr copied in a stopped state from `/home/media/docker/prowlarr` to the then-current `/home/rotom/docker/prowlarr`, recreated with `PUID=997` / `PGID=986`, running as the then-named `rotom:rotom`; the 2026-09-21 service-account rename subsequently moved that tree to `/home/infra/docker/prowlarr` without changing numeric IDs, preserving port `9696`, `/config` data, indexers, history, Sonarr/Radarr integrations, and reverse-proxy behavior. The same day qBittorrentVPN was migrated from `/home/media/docker/qbittorrentvpn` to the then-current `/home/rotom/docker/qbittorrentvpn`, changed to `PUID=997` / `PGID=5000`; the 2026-09-21 rename subsequently moved that project to `/home/infra/docker/qbittorrentvpn`, given Media/Game torrent-only binds and NAS fail-closed guards, and reverified for VPN/kill-switch behavior. Sonarr/Radarr were recreated with `/mnt/nas-media -> /media`. Gamarr was installed under `/home/game/docker/gamarr` at `995:5001`, port `6767`, with `/mnt/nas-game -> /game`, and the end-to-end Game download/import/hardlink/seeding workflow was accepted by the user.
@@ -54,7 +54,7 @@ Services are grouped by the Linux account directory containing their active Comp
 
 **Port notation:** Entries containing `->` are published host-to-container mappings. Bare ports are listed separately as container-only ports with no host mapping shown. “None shown” means the source PORTS field was blank; it does not establish network mode or lack of connectivity.
 
-## 1A. Current Phase B Docker State
+## 1A. Current Docker Runtime and Deployment State
 
 ### Current runtime evidence boundary — 2026-10-14
 
@@ -84,7 +84,7 @@ The prior JAR-94 heading below records a separate historical workload-retirement
 
 ### Historical pre-Libraries qBittorrentVPN/Prowlarr restoration — 2026-10-13
 
-This restoration used singular `library` roots before the local identity was renamed to `libraries`. The current paths are `/srv/rotom/{stacks,appdata,secrets}/libraries`; the remaining runtime checks are historical evidence. Paperless remains absent; its proposed prerequisite path has not been reverified after JAR-96 and is therefore **Needs Verification**.
+This restoration used singular `library` roots before the local identity was renamed to `libraries`. The current paths are `/srv/rotom/{stacks,appdata,secrets}/libraries`; the remaining runtime checks are historical evidence. At this checkpoint Paperless was absent. The current Paperless deployment is documented in the first current overlay above.
 
 ### Historical JAR-94 Platform recovery and retired workloads — 2026-10-13
 
@@ -430,7 +430,7 @@ A harmless local PDF import completed OCR, title search, original retrieval, and
 
 At the JAR-91 checkpoint, Paperless media became authoritative at `/mnt/nas-documents/paperless`, mounted in the web service at `/usr/src/paperless/media`. The Compose definition used long bind syntax with `create_host_path: false`, so an absent Documents NFS mount could not become an empty local media directory. Its then-current `USERMAP_UID=900`/`USERMAP_GID=5004` and `900:5004` ownership are superseded by the current Libraries `127:5000` deployment; the fail-closed behavior remains current at `/mnt/nas-libraries/paperless`.
 
-PostgreSQL, Valkey, Paperless data/configuration/search state, consume, exports, and secrets remain VM-local at their existing Documents paths. NPM routing is unchanged. The five-file, 384,771-byte media transfer matched SHA-256 manifests before and after cutover; Paperless recreated healthy and the local/public routes returned the expected login redirect. A root-protected local rollback copy is `/srv/rotom/backup-staging/documents/jar91-20261005-220500/`, and the original local media tree remains retained pending acceptance.
+At this historical checkpoint, PostgreSQL, Valkey, Paperless data/configuration/search state, consume, exports, and secrets remained VM-local at their Documents paths. NPM routing was unchanged. The five-file, 384,771-byte media transfer matched SHA-256 manifests before and after cutover; Paperless recreated healthy and the local/public routes returned the expected login redirect. The then-retained rollback path `/srv/rotom/backup-staging/documents/jar91-20261005-220500/` is no longer local because `/srv/rotom/backup-staging` was absent on 2026-10-14.
 
 The authenticated existing-original download, controlled web upload/OCR/search/thumbnail check, NAS automount/reconnect behavior, and isolated NAS snapshot restore are still required acceptance checks. Do not remove the local rollback material or the original local media tree until those checks are accepted.
 
@@ -563,11 +563,11 @@ This runtime quiesce improves application consistency but does not make the imag
 
 ## 10. Historical Verification — 2026-09-15
 
-Read-only Docker checks on 2026-09-15 confirmed 15 running containers and one Created container, `jaredwines.com`. That count/status is historical and was superseded first by the 2026-09-19 consolidated audit and later by JAR-22/JAR-31. Other still-valid 2026-09-15 observations remain historical evidence only; use **Current Phase B Docker State** in section 1A for the current 16-container runtime.
+Read-only Docker checks on 2026-09-15 confirmed 15 running containers and one Created container, `jaredwines.com`. That count/status is historical and was superseded by later audits. Other still-valid 2026-09-15 observations remain historical evidence only; use **Current Docker Runtime and Deployment State** in section 1A for the current runtime.
 
 ## 11. Reconstruction-Critical Information
 
-For current reconstruction, start with **Current Phase B Docker State** (section 1A) and the current guest service-account table in section 7. The dated pre-migration sections remain recovery evidence and must not be replayed blindly where they use historical `downloads`, old network allocations, or pre-VM status text. Preserve each active service's current owning account, Compose path, image, container name, published ports/network mode, persistent binds/volumes, restart behavior, and non-secret environment-variable names.
+For current reconstruction, start with **Current Docker Runtime and Deployment State** (section 1A) and the current guest service-account table in section 7. The dated pre-migration sections remain recovery evidence and must not be replayed blindly where they use historical `downloads`, old network allocations, or pre-VM status text. Preserve each active service's current owning account, Compose path, image, container name, published ports/network mode, persistent binds/volumes, restart behavior, and non-secret environment-variable names.
 
 UID/GID account definitions are canonical in `07-Users-and-Permissions.md`; NAS export/mount semantics are canonical in `04-NAS-and-Storage.md`; full backup policy is canonical in `05-Backup-and-Restore.md`.
 
@@ -577,7 +577,7 @@ No additional Docker service is promoted to current state by this restructure. A
 
 ## 13. Outstanding / Needs Verification
 
-The VM-era backup baseline is no longer a Docker gap. The latest explicitly verified guest recovery snapshot is `8efea294` (2026-10-05 21:45 PDT), created after repair of the active NPM SQLite staging source. The earlier `f666d63c` 2026-09-27 checkpoint and its 21/21 check are historical evidence. Guest Restic automation remains enabled/active, but its first timer-triggered run after the repair is **Needs Verification**; this does not change Docker backup scope, and `/mnt` remains outside the host Restic source set.
+The VM-era backup baseline is no longer a Docker gap. The 2026-10-14 audit found 22 guest snapshots, latest automatic snapshot `9494979d` from 2026-10-13, and a successful `restic check`. Earlier points including `8efea294` and `f666d63c` remain dated evidence. Full guest data-read and restore verification remain outstanding; `/mnt` remains outside the guest Restic source set.
 
 - **Intentional:** Fran is not recreated, and her historical backup sudoers rule is not installed.
 - **Needs Verification — live Libraries-NFS loss:** startup/recreation fail-closed behavior and the Libraries guard are documented, but application behavior during sudden loss of the active Libraries NFS payload while qBittorrent is already running has not been exercised. Read-only inspection can confirm the guard definition; actual loss behavior requires a separately planned non-destructive maintenance test and must not be inferred.

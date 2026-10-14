@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Read-only Rotom and PVE audit reconciliation
+**Documentation updated:** 2026-10-14 — Complete legacy documentation editorial and consistency audit  
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -122,7 +122,9 @@ No passwords, API tokens, private keys, VPN credentials, cookies, or other authe
 
 ---
 
-## 2. Current Phase B Host, VM, and NAS Network Identity — 2026-09-28 JAR-68 final
+## 2. Current Host, VM, and NAS Network Baseline
+
+The 2026-10-14 current audit in section 1 controls where it differs from the JAR-68-era details retained below.
 
 | Layer | Verified current identity |
 |---|---|
@@ -462,7 +464,7 @@ No redirect hosts, stream hosts, or dead hosts were present in the earlier audit
 | `prowlarr.rotom.casa` | HTTP | `192.168.1.69:9696` | enabled | Prowlarr; local and proxied HTTP both remained `302` after the 2026-09-19 migration |
 | `gamarr.rotom.casa` | HTTP | `192.168.1.69:6767` | enabled at the historical audit | Historical Gamarr route; JAR-77 later marked proxy-host ID `19` deleted and removed its generated configuration |
 
-The legacy Smart Hub/Portainer/OliveTin/PalTools rows above remain `enabled=1` in the NPM database, but their IDs are absent from the current generated `/srv/rotom/appdata/infra/nginx-proxy-manager/data/nginx/proxy_host/*.conf` set. Treat those rows as stale/unresolved database records rather than active generated routes until administrator intent is reviewed. Gamarr's route is retired: JAR-77 marked proxy-host ID `19` deleted and its generated configuration is absent; JAR-82 did not re-establish it. JAR-82 verified that the remaining active Rotom/application routes regenerated from the preserved database after cutover.
+The legacy Smart Hub/Portainer/OliveTin/PalTools rows above remain `enabled=1` in the NPM database, but their IDs are absent from the generated proxy-host configuration set under current Platform NPM appdata. Treat those rows as stale/unresolved database records rather than active generated routes until administrator intent is reviewed. Gamarr's route is retired: JAR-77 marked proxy-host ID `19` deleted and its generated configuration is absent; JAR-82 did not re-establish it. JAR-82 verified that the remaining active Rotom/application routes regenerated from the preserved database after cutover.
 
 The database output did not expose a current WebSocket-support field in the selected schema output, so WebSocket behavior is not documented here.
 
@@ -555,7 +557,7 @@ Rotom's current externally observed IPv4 was also `68.8.40.225`. Therefore the C
 
 ### Homepage cutover — September 16, 2026
 
-“Change Homepage URL” supersedes the earlier Homepage hostname in the audit. The canonical URL is `https://rotom.casa`. The retained historical source output, and the current JAR-82 generated configuration at `/srv/rotom/appdata/infra/nginx-proxy-manager/data/nginx/proxy_host/9.conf`, show `server_name rotom.casa;`, so the Homepage proxy no longer includes `homepage.rotom.casa`.
+“Change Homepage URL” supersedes the earlier Homepage hostname in the audit. The canonical URL is `https://rotom.casa`. Historical source output and the later verified generated NPM configuration show `server_name rotom.casa;`, so the Homepage proxy no longer includes `homepage.rotom.casa`. Current NPM appdata is under the Platform domain; the former Infra path is historical.
 
 The supplied command `curl -Ik --resolve rotom.casa:443:127.0.0.1 https://rotom.casa/` returned `HTTP/1.1 200 OK` and `X-Served-By: rotom.casa`. This verifies local TLS routing with the correct SNI and a successful application response; because `-k` skips certificate verification, it does not independently prove certificate trust or external reachability. Testing `https://127.0.0.1` with only an HTTP Host header does not provide the same TLS SNI and previously produced an unrecognized-name error.
 

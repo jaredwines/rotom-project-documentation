@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Read-only Rotom and PVE audit reconciliation
+**Documentation updated:** 2026-10-14 — Complete legacy documentation editorial and consistency audit  
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -58,12 +58,12 @@ This document records the current Phase B storage architecture and preserves the
 **Project:** Rotom-Home-Server  
 **Document:** `04-NAS-and-Storage.md`  
 **Baseline evidence:** 2026-09-14 22:46 PDT; read-only update 2026-09-15  
-**Documentation updated:** 2026-10-13 — Complete Available Sources consistency audit
+**Documentation updated:** 2026-10-14 — Complete legacy documentation editorial and consistency audit  
 **Status:** The former ten-automount count is historical. The 2026-10-13 local fstab/final-removal verification establishes five current guest NFS automount contracts: Game Servers, Smart Home, Rotom Restic Backup, Libraries, and Hosted Websites. Guest `Rotom_Restic_Backup` remains documented as unchanged. PVE backup exports remain `PVE_Restic_Backup` for host-config Restic and `Rotom_VM_Backup` for whole-VM VZDump at their canonical PVE paths.
 
 The original audit was read-only. It did not recursively enumerate the NAS, modify mounts or permissions, restart containers, inspect secrets, traverse Restic repository internals, or create a hardlink test file. Later user-supplied checks, completed media GID changes, and the 2026-09-18 backup-share access-protection deployment are recorded below; they are separate from that audit. Unchanged capacity, mount, and systemd observations retain their original evidence dates.
 
-## 2. Current Storage State — 2026-09-29 JAR-47 final recovery policy
+## 2. Current Storage and Recovery Policy
 
 The Rotom guest storage contract is five NFS systemd automounts: Game Servers, Smart Home, Rotom Restic Backup, Libraries, and Hosted Websites. The guest Shared Drive contract was retired on 2026-10-13; its NAS data, including the JAR-25 recovery image, was not changed. JAR-86 retired the final bindfs compatibility view, JAR-88 replaced the active Game mount with Gameserver, and the unused Customapps guest contract was retired on 2026-10-12. PVE has only backup-specific NAS mounts and does not host the guest application shares.
 
@@ -75,7 +75,7 @@ UniFi Drive snapshot settings are historical evidence, not a current verified po
 
 The existing NFSv3 `Documents/.data` export at `/mnt/nas-documents` was mounted read/write with 3.5 TiB free. Only its `paperless/` child was created. It is `900:5004`, mode `2770`; the five migrated regular files and their directories are also `900:5004`. Paperless has the sole write bind, `/mnt/nas-documents/paperless -> /usr/src/paperless/media`; Compose uses `create_host_path: false`. The root remains `988:5004` mode `2770`; no broad share ownership rewrite occurred.
 
-The prior VM-local media tree is retained, and the root-only local rollback copy is `/srv/rotom/backup-staging/documents/jar91-20261005-220500/`. NAS media is now authoritative; the local copies are rollback material, not a replacement backup policy. Guest Restic excludes `/mnt`, so NAS-side snapshot/recovery protection remains required. The effective Documents snapshot policy and an isolated snapshot restore remain **Needs Verification**.
+At this historical checkpoint the prior VM-local media tree and root-only rollback copy at `/srv/rotom/backup-staging/documents/jar91-20261005-220500/` were retained. `/srv/rotom/backup-staging` was absent on 2026-10-14, so neither is a current fast local rollback path. Guest Restic excludes `/mnt`, and current Paperless media is under Libraries; NAS-side snapshot/recovery protection remains required.
 
 ### PVE host-config Restic storage
 
@@ -92,9 +92,9 @@ The prior VM-local media tree is retained, and the root-only local rollback copy
 - Mount: `/mnt/pve/nas-rotom-vm-backup`; PVE-managed NFS, `content backup`.
 - The earlier fully verified 2026-09-28 baseline archive is historical evidence and was absent from the 2026-10-05 storage list. That list contained eight current unprotected VMID `100` archives: six scheduled `05:00` archives from 2026-09-30 through 2026-10-05, a separately listed 2026-09-29 archive, and manual `vzdump-qemu-100-2026_10_05-22_47_06.vma.zst` (`56,432,423,998` bytes). The manual service logged successful completion. The listing confirms availability, schedule output, and normal retention participation; it does not claim new zstd or full `vma verify` checks for the current archive set.
 
-### Guest storage and post-reboot acceptance
+### Historical guest storage and post-reboot acceptance
 
-The former twelve-mount/two-bindfs layout passed its dated post-reboot verification. Both bindfs views and the Downloads, Apps, and Auth guest boundaries are now retired; JAR-88 replaced Game with Gameserver. `/mnt/nas-downloaders/.rotom-qbt-nas-ready` remains on the retained Downloader boundary, but qBittorrent's active payload and guard are Media-only.
+The former twelve-mount/two-bindfs layout passed its dated post-reboot verification. Both bindfs views and the Downloads, Apps, Auth, Downloader, Media, Web, Filesync, Documents, and other superseded guest boundaries are now retired. The current five-contract guest storage set is defined at the start of this section; this paragraph is historical acceptance evidence only.
 
 ### JAR-79 empty Game torrent-directory retirement — 2026-10-01
 
@@ -682,7 +682,7 @@ A Rotom rebuild must preserve the following storage contract.
 192.168.1.70
 ```
 
-### Media mount — current VM-era contract
+### Historical Media mount — retired current contract
 
 ```text
 Source:     192.168.1.70:/volume/4d6b927b-3d90-4af3-9bd7-be668266998a/.srv/.unifi-drive/Media/.data

@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-14 — Read-only Rotom and PVE audit reconciliation
+**Documentation updated:** 2026-10-14 — Complete legacy documentation editorial and consistency audit  
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-14 — Complete legacy documentation editorial and consistency audit
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Documentation only / Verified.** No live service, container, mount, timer, backup, NAS, network, account, permission, or configuration state was changed.
+- **Changes:** Reviewed the complete nine-file Available Sources set as one operations manual. Added a subject-navigation table to the inventory; replaced its stale current-looking storage table with the five-contract guest storage summary; reconciled current Docker, backup, automation, identity, and directory-tree wording to the latest evidence; relabelled preserved JAR-era sections that could be mistaken for current guidance; removed stale claims that the Libraries rename staging tree, eleven guest automounts, Media-only qBittorrent guard, and first unattended Restic runs were still current; and standardized document update metadata. Historical evidence remains preserved in dated historical sections.
+- **Evidence:** Cross-document review plus a 2026-10-14 read-only Rotom check. The live guest exposed exactly the documented five read/write NFSv3 mounts, 22 Docker objects (20 running and two intentionally stopped Palworld containers), absent `/srv/rotom/backup-staging`, and enabled/active guest Restic, qBittorrent guard, and weekly-maintenance timers. Existing 2026-10-14 legacy documentation evidence remains the source for PVE and repository verification facts.
+- **Outstanding:** No new discrepancy was introduced or silently resolved. Existing Needs Verification items remain in their canonical subject documents, notably Libraries/Paperless NAS snapshot recovery, guest Restic full data-read/restore, current VZDump VMA verification or restore, exact PVE storage stanza options, NAS metadata persistence, public-exposure review, and selected hardware/maintenance follow-ups. Available Sources replacement remains manual by Jared.
 
 ## 2026-10-14 — Read-only Rotom and PVE audit reconciliation
 

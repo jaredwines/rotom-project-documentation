@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-10-14 — Read-only Rotom and PVE audit reconciliation
+**Documentation updated:** 2026-10-14 — Complete legacy documentation editorial and consistency audit  
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -29,12 +29,12 @@ This is the canonical detailed owner of Rotom account identity and permission fa
 
 ### Evidence provenance
 
-**Documentation updated:** 2026-10-13 — Complete Available Sources consistency audit
+**Documentation updated:** 2026-10-14 — Complete legacy documentation editorial and consistency audit  
 
 **Baseline method:** read-only inspection of the live host configuration, Docker metadata, systemd unit files, sudo policy, SSH metadata, filesystem modes, ACLs, NFS mount metadata, and non-mutating access tests. No passwords, password hashes, key contents, tokens, or private-key material were read or recorded.  
 **Update scope:** JAR-29 restored the historical ten storage-facing identities and JAR-30 established the package-created Docker privilege boundary. Later migrations retired or renamed several of those identities. The current table in section 2 is authoritative; earlier full-account and NAS-shortcut tables are historical reconstruction evidence. Fran remains unrecreated and her backup sudoers rule remains deferred. Administrative Mac key-only access remains verified; no key contents are recorded.
 
-## 2. Current Phase B Identity and Access Model — 2026-09-28 JAR-68 final
+## 2. Current Identity and Access Model
 
 ### JAR-94 current Platform identity and retired accounts — 2026-10-13
 
@@ -81,7 +81,7 @@ The `nas-*` entries within service homes are shortcut symlinks to NFS storage. T
 
 ### JAR-87 through JAR-90 ROM-ingestion boundary — retired 2026-10-05
 
-The JDownloader, Igir, qBittorrent importer, and browser-upload service identities and write boundaries are retired. Their dedicated configuration, state, scripts, and credentials are absent. qBittorrent's Media-only sentinel and RomM's read-only library access remain unchanged.
+The JDownloader, Igir, qBittorrent importer, and browser-upload service identities and write boundaries are retired. Their dedicated configuration, state, scripts, and credentials are absent. qBittorrent's current Libraries sentinel and RomM's read-only Libraries access remain in place.
 
 ### Current PVE backup privilege boundary
 
@@ -99,7 +99,7 @@ The Rotom VM continues to use `rotom` / `rotom.casa`, user `jared`, and `~/.ssh/
 
 ### Current legacy documentation / GitHub / Codex access — 2026-09-28
 
-The Debian `acl` package is now installed so `getfacl`/`setfacl` are available. Supplied final `getfacl -p /home/infra` output shows owner/group `infra:infra`, base owner/group access consistent with mode `0750`, named ACL `user:jared:--x`, mask `r-x`, and `other::---`. This gives Jared traversal through the private Infra home without granting directory listing or write access and without adding Jared to the `infra` group. Fran is not currently recreated and no current Fran ACL was established by this task.
+Historical `getfacl -p /home/infra` output showed the former Infra-home traversal model before the Platform rename. The current checkout and service home are under `/home/platform`; current root ACL behavior is summarized in section 1. Fran is not currently recreated and no current Fran ACL is established.
 
 The current legacy documentation Git checkout is `/home/platform/documentation/rotom-runbook`; the former `/home/infra/documentation/retired-helper` path is historical. Jared owns the Platform documentation tree and uses the guarded `retired-helper` workflow for the checkout. The verified current path is `jared:jared` mode `0755`; `/home/platform` remains the private parent boundary for unrelated local accounts.
 
@@ -353,7 +353,7 @@ Runtime mounts create these notable access paths:
 - Glances has a read-only bind of the host root and a read-only Docker socket. Its former read-only `/mnt/nas-rotom-backup` bind was removed on 2026-09-18.
 - Media storage: Sonarr and Radarr read/write `/mnt/nas-media` at `/media` and additionally bind `/mnt/nas-media/torrents` read-only at `/media/torrents`; Jellyfin mounts the library subtree read-only. qBittorrentVPN binds that torrent directory read/write. No Downloader bindfs compatibility view remains in the current topology; Prowlarr has no NAS bind.
 - Home Assistant has read-only access to /run/dbus.
-- Gameserver storage: Palworld uses local `/srv/rotom/appdata/gameserver` data and no NAS world bind. JDownloader, Igir, the qBittorrent importer, and the browser-upload bridge were retired on 2026-10-05, so no current Gameserver ROM-inbox write boundary exists. Original Game NAS content remains rollback material and qBittorrent has no Game/Gameserver payload bind.
+- Game Servers storage: Palworld uses local `/srv/rotom/appdata/game-servers` data and no NAS world bind. JDownloader, Igir, the qBittorrent importer, and the browser-upload bridge were retired on 2026-10-05, so no current ROM-inbox write boundary exists. Original Game NAS content remains rollback material and qBittorrent has no Game Servers payload bind.
 - Cloudflare DDNS receives a read-only secret-file mount. Its contents were not inspected.
 
 
@@ -378,7 +378,7 @@ Numeric IDs are authoritative for NFS. The implemented service-share mapping is:
 | apps | 904 | 5008 | `/mnt/nas-apps` | `988:5008`, `2770` |
 | auth | 905 | 5009 | `/mnt/nas-auth` | `988:5009`, `2770` |
 
-**Current Phase B correction:** Restic now uses `Rotom_Restic_Backup` at `/mnt/nas-rotom-restic-backup`, freshly verified mounted as numeric `988:988` mode `0700`; the underlying local directory was not isolated while fully unmounted in the 2026-09-27 live audit and should not be assigned a definitive current mode without a separate check. The old `Rotom_Home_Server_Backup` share is rollback-only and not mounted/used by Rotom. The surrounding table in this subsection intentionally preserves the pre-migration `downloads` name and `/mnt/nas-downloads` path; current state uses `downloaders` and `/mnt/nas-downloaders` as documented in section 2. The Shared Drive/JAR-25 ownership observations remain historical evidence.
+**Current backup correction:** Restic uses `Rotom_Restic_Backup` at `/mnt/nas-rotom-restic-backup`, verified mounted as numeric `988:988` mode `0700`; the underlying local directory was not isolated while fully unmounted in the 2026-09-27 live audit and should not be assigned a definitive mode without a separate check. The old `Rotom_Home_Server_Backup` share is rollback-only and not mounted/used by Rotom. The surrounding table intentionally preserves pre-migration Downloader names and paths; all Downloader guest contracts are now retired. The Shared Drive/JAR-25 ownership observations remain historical evidence.
 
 #### UNAS Isolated Mode and `--manage-gids`
 
@@ -419,10 +419,10 @@ The human-facing `/usr/local/bin/backup-restic-to-nas` launcher is `root:root` m
 ## 3. Preserved Pre-Migration Operational and Follow-up Findings
 
 1. **Pre-migration:** Docker was the main cross-service privilege bypass because all named service accounts were Docker-group members. That historical GID `984` membership is not current authority; the current VM last verified Docker group GID `989` with no members.
-3. JAR-6 implemented Infra through Auth storage GIDs `5002`–`5009` and verified intended-account versus unrelated-account NFS behavior for each new share.
-4. **Current Phase B:** Restic backup storage remains access-protected at mounted NAS metadata `988:988` mode `0700`; JAR-32 moved the active mount to `/mnt/nas-rotom-restic-backup` without broadening ordinary-user access. The 2026-09-27 audit refreshed the mounted metadata but did not isolate the underlying local directory while fully unmounted.
-5. SSH password/public-key policy and the existing sudo/docker privilege model were not changed by JAR-6.
-6. JAR-21 reconciled Arcane Prowlarr/qBittorrent project paths through the Downloads symlink and enabled `followProjectSymlinks`; unrelated historical Smart Hub/Smarthome records remain technical debt.
+2. JAR-6 implemented Infra through Auth storage GIDs `5002`–`5009` and verified intended-account versus unrelated-account NFS behavior for each new share.
+3. **Current:** Restic backup storage remains access-protected at mounted NAS metadata `988:988` mode `0700`; JAR-32 moved the active mount to `/mnt/nas-rotom-restic-backup` without broadening ordinary-user access. The 2026-09-27 audit refreshed the mounted metadata but did not isolate the underlying local directory while fully unmounted.
+4. SSH password/public-key policy and the existing sudo/docker privilege model were not changed by JAR-6.
+5. JAR-21 reconciled Arcane Prowlarr/qBittorrent project paths through the Downloads symlink and enabled `followProjectSymlinks`; unrelated historical Smart Hub/Smarthome records remain technical debt.
 
 ### 2026-09-27 live identity/access verification
 
@@ -458,7 +458,7 @@ Read-only checks then reconfirmed the named-account IDs, Docker-group membership
 
 ## 7. Reconstruction-Critical Information
 
-- The **Current Phase B Identity and Access Model** table in section 2 is the canonical rebuild reference for current UID/GID, home, and workload ownership. The **Account model** table in section 2A is preserved pre-migration evidence and must not be replayed where names/privileges differ (notably `downloads` and Docker GID `984`).
+- The **Current Identity and Access Model** table in section 2 is the canonical rebuild reference for current UID/GID, home, and workload ownership. The **Account model** table in section 2A is preserved pre-migration evidence and must not be replayed where names or privileges differ.
 - The privileged-group table under **Privileged groups and sudo** is the canonical reference for `sudo`, `docker`, and other named privilege-bearing memberships.
 - Home ownership/modes, documentation ACLs, NAS access behavior, and account-switching policy are preserved in the current as-built sections above.
 - Numeric UID/GID values are authoritative for NFS behavior; names displayed by a different system must not be used to infer ownership.

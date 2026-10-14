@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-14 — Read-only Rotom and PVE audit reconciliation
+**Documentation updated:** 2026-10-14 — Complete legacy documentation editorial and consistency audit  
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -88,7 +88,9 @@ Documentation updated: **2026-10-13** through the complete Available Sources aud
 
 **Audit boundary:** automation statements that predate the 2026-10-13 Libraries and renamed-drive overlays are historical unless reaffirmed in the current overlays. In particular, do not infer an active Uptime Kuma/Rotom/PVE alert worker, Media mount, Syncthing recovery path, or a final guest automount count from older sections. Read-only resolution: inspect the relevant `systemctl` unit/timer state, rendered Compose configuration, and `findmnt` output.
 
-## 2. Current Maintenance and Automation — 2026-09-28 JAR-68 final
+## 2. Current Maintenance and Automation
+
+The newest dated overlays in section 1 and the 2026-10-14 recovery-point summary below control where the preserved JAR-era narrative differs.
 
 JAR-78 retired the unused `rotom-downloads-game-ro.service` and `/mnt/nas-downloads-game-ro` view after confirming no container consumer. JAR-79 then removed qBittorrent's unused Games category and its two empty Downloader directories. JAR-81 retains the Downloader NFS root and sentinel while removing only its obsolete `torrents/` tree. JAR-86 then retired the unused Media bindfs view and removed only its recovery-helper branch, retaining the separate Downloader and Media NFS readiness checks. The later JAR-83 Game-marker contract is historical: JAR-87 made qBittorrent's guard Media-only and JAR-88 removed the active Game guest mount.
 
@@ -127,7 +129,7 @@ JAR-72 reorganized Homepage cards without changing monitoring behavior or any ap
 ### Rotom VM
 
 - Docker/containerd remain enabled. The supplied 2026-10-01 root Docker output is a historical 25-object / 24-running snapshot: it predates the 2026-10-05 retirement of JDownloader and the related ROM-ingestion components. Both Palworld containers were healthy and Syncthing was exited (`0`) at that snapshot; Gamarr was absent. A 2026-10-10 live `docker ps -a` recorded 24 container objects, all running; Paperless and Syncthing were healthy after NAS recovery.
-- `rotom-nas-docker-recovery.service` remains the NAS-backed container recovery helper. Its current scope is Media, Documents, and Filesync consumers; a 2026-10-10 live run remounted the affected shares and recovered Paperless, RomM, and Syncthing. The guest now has eleven NFS automounts; both bindfs views are retired, and qBittorrentVPN's guard is Media-payload-only.
+- `rotom-nas-docker-recovery.service` remains the NAS-backed container recovery helper. Its current scope follows the Libraries/Paperless contract in the section 1 overlays. The guest has five NFS automount contracts; both bindfs views and the Media, Documents, and Filesync guest contracts are retired. qBittorrentVPN's guard uses the Libraries payload/sentinel pair.
 - Guest Restic remains `rotom-restic-backup.service` / `.timer` around `03:00`, with manual `backup-restic-to-nas`; guest naming was intentionally not changed by JAR-68.
 - JAR-47 repaired the v2 Home Assistant SQLite staging path and verified snapshot `aedd8e57`; its restricted restore passed Palworld archive checksums and Home Assistant SQLite integrity. Media uses daily 12:00 AM UNAS-local snapshots with a 16-snapshot limit for authoritative library rollback.
 - JAR-71 Remote Desktop Commander is the native enabled `desktop-commander.service`, running outbound-only as `desktopcmd` with `UMask=0077`, `NoNewPrivileges=true`, and `PrivateTmp=true`. It has no Docker, NAS, proxy, DNS, or inbound-listener dependency; `/home/desktopcmd/workspace` is its only intended writable work area.
@@ -318,11 +320,11 @@ This section refers to the retired Linux Mint bare-metal host and must not be us
 ## 9A. Current NAS/Docker Maintenance State — 2026-09-27 refresh
 
 - Twelve guest fstab entries continue to generate `.automount`/`.mount` units with `_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s`.
-- Current `/mnt/nas-downloaders` uses NAS `Downloader/.data`; the earlier JAR-29/JAR-30 `Downloads/.data` current-state claim is superseded by live fstab/generated-unit/findmnt/showmount evidence.
+- Historical note: `/mnt/nas-downloaders` used NAS `Downloader/.data` after superseding the earlier `Downloads/.data` claim. The Downloader guest contract is now retired.
 - Docker and containerd are enabled/active at boot. Docker runtime remains local; NAS-backed application recovery is handled by the targeted helper rather than a global Docker→NAS dependency.
 - `rotom-nas-docker-recovery.service` is enabled under `multi-user.target`, requires Docker, starts after Docker/network-online, and retries on failure. The JAR-31 reboot proved the retry path: first Media mount attempt failed, the next invocation succeeded and recovered exactly the affected NAS-backed containers.
 - The helper leaves already-running workloads untouched and recovered qBittorrentVPN, Radarr, Sonarr, Gamarr, and Jellyfin after matching their prior NAS mount startup-failure state.
-- The historical two-view state is superseded: the Game view is retired, while the enabled Media view exposes `/mnt/nas-downloaders` read-only but has no current container consumer and is proposed for retirement.
+- Historical note: the two bindfs compatibility views were subsequently retired; neither is a current mount or container dependency.
 - `rotom-restic-backup-status-api.service` is enabled/active on `0.0.0.0:8787`; UFW is not installed in the current guest.
 - Restic automatic execution is commissioned: `rotom-restic-backup.timer` is enabled/active on the daily `03:00` schedule with persistent catch-up and up to ten minutes randomized delay. Weekly update cron remains absent; Fran backup sudoers remains absent.
 - **zsh scripting lesson, reconfirmed during JAR-31 diagnostics:** never use `path` as an interactive zsh loop/scalar variable. It mutates the special array tied to `$PATH` and produced `command not found` for `findmnt`, `systemctl`, `sudo`, and `sed`; setting `PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin`, exporting it, and running `rehash` restored command lookup without any host failure.
@@ -534,12 +536,10 @@ The Homebridge container-name typo was corrected on 2026-09-19 from `homebrige` 
 
 Phase B virtualization is accepted, guest Restic automation has been recommissioned under the normalized names, Proxmox host-config Restic is commissioned at `04:00`, and JAR-67 native Proxmox VZDump scheduling remains active. Remaining maintenance/automation items are deliberately separated by state:
 
-- **Verified / commissioned:** guest `rotom-restic-backup.timer` is enabled/active on the daily `03:00` schedule; JAR-47 snapshot `aedd8e57` completed after v2 application-aware staging, and `restic check` passed 21/21 snapshots.
-- **Needs Verification — first unattended Restic run after repair:** scheduled runs on 2026-10-02 through 2026-10-05 failed before backup because the worker retained the retired NPM SQLite source. The 2026-10-05 one-line source correction passed `bash -n` and a manual service run completed successfully with snapshot `8efea294`; observe the next timer-triggered run before treating unattended execution as re-established.
-- **Verified / commissioned:** PVE host-config Restic manual/service execution, rename, snapshot cleanup, and repository integrity are verified; `pve-restic-backup.timer` is enabled/active for daily `04:00`, and current surviving snapshot is `35d4b0c2`.
-- **Needs Verification — future unattended PVE Restic run:** a future timer-triggered execution under final `pve-restic-backup.timer` may be observed for operational evidence.
-- **Verified — scheduler-triggered VZDump runs:** the 2026-10-05 PVE listing contains six `05:00` VMID `100` archives from 2026-09-30 through 2026-10-05, confirming the final-name `rotom-vm-daily` job produces retained archives. The supplied listing does not independently verify compression or VMA payload integrity for each archive.
-- **Retention observation:** eight current unprotected VMID `100` archives were listed under normal `7 daily / 4 weekly / 6 monthly` retention. Archive availability changes with retention; select and verify a recovery point at incident time.
+- **Verified — unattended Restic resumed:** the 2026-10-14 audit found 22 guest snapshots with automatic snapshot `9494979d` from 2026-10-13 and a successful repository check. Full `--read-data` verification and restore rehearsal remain outstanding.
+- **Verified — unattended PVE Restic resumed:** the 2026-10-14 audit found ten snapshots with latest `b3fd0c23`; the 2026-10-13 scheduled run and repository check passed. Snapshot `35d4b0c2` remains historical JAR-68 evidence.
+- **Verified — scheduler-triggered VZDump runs:** the 2026-10-14 PVE listing contained eight VMID `100` archives through 2026-10-13, confirming that `rotom-vm-daily` continues to produce retained archives. The newest archive passed full zstd decompression; explicit VMA verification was not captured.
+- **Retention observation:** eight unprotected VMID `100` archives were listed under normal `7 daily / 4 weekly / 6 monthly` retention. Archive availability changes with retention; select and verify a recovery point at incident time.
 - **Intentional / commissioning decision:** `/usr/local/sbin/weekly-linux-update` exists, but `/etc/cron.d/weekly-linux-update` is absent. Decide separately whether to restore the historical Sunday 04:00 schedule.
 - **Intentional:** Fran is not recreated; do not install her historical backup sudoers rule until that account is deliberately restored.
 - **Needs Verification — live Libraries-NFS loss:** the current Libraries guard is documented, but an already-running qBittorrent session's behavior during sudden loss of the Libraries payload mount has not been exercised. Read-only inspection can confirm the guard definition; actual behavior requires a separately planned non-destructive maintenance test.

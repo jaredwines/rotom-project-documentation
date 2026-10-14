@@ -2,9 +2,9 @@
 
 **Documentation set:** legacy documentation set  
 **Document role:** Architecture/index starting point and high-level Rotom summary  
-**Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
+**Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Read-only Rotom and PVE audit reconciliation
+**Documentation updated:** 2026-10-14 — Complete legacy documentation editorial and consistency audit  
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -15,6 +15,23 @@ This document is the front-page architecture/index for Rotom. It summarizes the 
 Purpose: front-page index and quick-reference architecture summary.
 
 **legacy documentation state labels:** **Current** means the latest supported recorded state; **Historical** preserves dated evidence that may no longer apply; **Retired** means intentionally no longer active; **Proposed** is not implemented; **Needs Verification** means the legacy documentation lacks enough current evidence and should not be treated as settled.
+
+### How to use the legacy documentation
+
+Start here, then follow the canonical subject document instead of relying on duplicated detail:
+
+| Need | Canonical source |
+|---|---|
+| Documentation governance and dated history | [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md) |
+| Containers, Compose, images, and runtime deployment | [02-Docker-Services.md](02-Docker-Services.md) |
+| Addresses, DNS, ports, proxying, TLS, and exposure | [03-Network-and-Domains.md](03-Network-and-Domains.md) |
+| NAS exports, NFS mounts, storage ownership, and automounts | [04-NAS-and-Storage.md](04-NAS-and-Storage.md) |
+| Backup scope, repositories, verification, and restore | [05-Backup-and-Restore.md](05-Backup-and-Restore.md) |
+| Timers, maintenance, monitoring, and administration workflow | [06-Maintenance-and-Automation.md](06-Maintenance-and-Automation.md) |
+| Accounts, UID/GID contracts, ACLs, sudo, and access policy | [07-Users-and-Permissions.md](07-Users-and-Permissions.md) |
+| Filesystem topology and important paths | [08-Rotom-Directory-Tree.txt](08-Rotom-Directory-Tree.txt) |
+
+Within each subject document, use the newest dated **Current** section first. Use **Historical** and **Preserved Pre-Migration** sections only for provenance, reconstruction, or recovery; do not replay them as current instructions without reconciling them against the current sections and live read-only state.
 
 ### Documentation-audit reconciliation — 2026-10-13
 
@@ -52,7 +69,7 @@ Rotom mounts NAS `Game_Servers/.data` at `/mnt/nas-game-servers` and NAS `Smart_
 
 ### Current Libraries local identity — 2026-10-13
 
-The active local Linux identity is `libraries` (`127:5000`), with home `/home/libraries` and active Compose, mutable-state, and protected-input roots under `/srv/rotom/{stacks,appdata,secrets}/libraries`. `library` and the matching singular local roots are absent. This local rename does not rename NAS data: `/mnt/nas-libraries` and its internal `library/` content directory remain the active storage contract. The eight affected Library containers were recreated against the plural local roots and verified running; qBittorrent `wg0`, expected local HTTP responses, and zero failed systemd units were confirmed. A transient singular appdata tree produced during the initial recreation is retained reversibly at `/srv/rotom/backup-staging/libraries-rename-transient-20261013` pending separately authorized removal.
+The active local Linux identity is `libraries` (`127:5000`), with home `/home/libraries` and active Compose, mutable-state, and protected-input roots under `/srv/rotom/{stacks,appdata,secrets}/libraries`. `library` and the matching singular local roots are absent. This local rename does not rename NAS data: `/mnt/nas-libraries` and its internal `library/` content directory remain the active storage contract. The eight affected Library containers were recreated against the plural local roots and verified running; qBittorrent `wg0`, expected local HTTP responses, and zero failed systemd units were confirmed. The transient singular appdata tree created during the rename was later retired with the reviewed rollback-file cleanup; `/srv/rotom/backup-staging` was absent on 2026-10-14.
 
 ### JAR-96 Library-to-Libraries NAS cutover — 2026-10-13
 
@@ -106,7 +123,7 @@ Older sections bearing JAR-94 refer to a different historical workload-retiremen
 
 ### Historical pre-JAR-96 Library restoration and Filesync cleanup — 2026-10-13
 
-qBittorrentVPN and Prowlarr are active again as Library (`127:5000`) services at `/srv/rotom/stacks/library/{qbittorrentvpn,prowlarr}`, with state under matching `/srv/rotom/appdata/library` paths. qBittorrent uses only Library torrent/sentinel paths; WireGuard is active and its CSRF-protected UI is loopback-only at `127.0.0.1:8080`, served by NPM. Prowlarr retains `9696`, `rotom-arr`, `rotom-proxy`, and its NPM route. Paperless remains absent: `/mnt/nas-library/paperless` must be NAS-provisioned as `127:5000` mode `2770` before its fail-closed media bind can be deployed. Syncthing remains retired; its active Homepage File Sync section/card and empty local Filesync secret directory are removed. Its retained NPM proxy record was not changed.
+At this historical checkpoint, qBittorrentVPN and Prowlarr were active as Library (`127:5000`) services at singular `/srv/rotom/stacks/library` and appdata paths. qBittorrent used only the then-current Library torrent/sentinel paths; WireGuard and the loopback-only UI were verified. Paperless was absent pending NAS provisioning. The current plural paths and active Paperless deployment are defined in the current overlays above; do not use this checkpoint as current deployment guidance. Syncthing remains retired, and its retained NPM proxy record was not changed by that cleanup.
 
 ### Historical JAR-94 Platform recovery and domain retirement — 2026-10-13
 
@@ -130,7 +147,9 @@ JAR-94 above supersedes the Paperless, Prowlarr, and qBittorrentVPN portions of 
 
 The former `media` Linux identity is now `library`, retaining UID:GID `127:5000` and home `/home/library`. Active Library Compose/appdata/secrets roots are `/srv/rotom/{stacks,appdata,secrets}/library`; Jellyfin, Radarr, Sonarr, Prowlarr, RomM, qBittorrentVPN, and Paperless use the applicable Library roots. The NAS export/mount names remain intentionally unchanged: `/mnt/nas-media` remains the Media export holding the audiovisual/game library and qBittorrent payload/guard, while `/mnt/nas-documents` remains the separate Documents export holding Paperless media only. Paperless's export root and sole `paperless/` subtree are `988:5000` and `127:5000` respectively; PostgreSQL, Valkey, configuration, consume, export, secrets, and recovery staging remain VM-local. Homepage presents Library in the prior Media layout position and includes qBittorrent and Paperless exactly once.
 
-The following table is a mixed-date checkpoint, not a replacement for the 2026-10-13 overlays above. Physical-host and backup observations retain their stated evidence dates. Rows naming active Docker services, local roots, NAS mounts, or automount counts are Historical unless independently reaffirmed in a later current overlay.
+### Historical mixed-date system checkpoint
+
+The following table is not a replacement for the current overlays above. Physical-host and backup observations retain their stated evidence dates. Rows naming active Docker services, local roots, NAS mounts, or automount counts are **Historical** unless independently reaffirmed in a later current overlay.
 
 | Item | Verified value |
 |---|---|
@@ -168,7 +187,7 @@ The following table is a mixed-date checkpoint, not a replacement for the 2026-1
 | qBittorrentVPN | Running as Library; fail-closed Media-payload design retained with `/media/torrents` and only `.rotom-qbt-media-ready` bound read-only. The former Downloader payload/sentinel is not used. |
 | Guest NAS | Ten fstab-backed systemd NFS automounts and no bindfs compatibility views. JAR-88 replaced Game with Gameserver; Downloads, Apps, Auth, and Customapps are retired. Automount can fail during early boot before NAS networking is usable. The enabled targeted recovery helper mounts/validates Media, Documents, and Filesync before conditionally recovering only NAS/mount-failed containers in its covered scope. |
 | JAR-47 recovery policy | Final four-layer model: application-aware artifacts, guest Restic, separate PVE VM VZDump, and UNAS local snapshots for authoritative NAS Media. All layers remain on the same UNAS appliance where applicable; snapshots are rollback protection, not off-site protection. |
-| Guest Restic | Canonical repository `/mnt/nas-rotom-restic-backup/rotom-restic-backup`; `rotom-restic-backup*`; snapshot `8efea294` (2026-10-05 21:45 PDT) is the latest verified recovery point after the NPM staging-source repair. Snapshot `3c85d5be` remains the verified JAR-84 recovery point containing the byte-verified legacy-tree archives; retention is 7 daily / 4 weekly / 12 monthly. |
+| Guest Restic | Canonical repository `/mnt/nas-rotom-restic-backup/rotom-restic-backup`; `rotom-restic-backup*`; 22 snapshots were present on 2026-10-14, latest short ID `9494979d`, and `restic check` passed. Snapshot `3c85d5be` remains historical JAR-84 archive evidence; retention is 7 daily / 4 weekly / 12 monthly. |
 | PVE host-config Restic | NAS `PVE_Restic_Backup/.data`; mount `/mnt/nas-pve-restic-backup`; repo `/mnt/nas-pve-restic-backup/pve-restic-backup`; repo ID `8ca0218c645dc2968c2b21d67dbda3840794d8bc9c157c0515a85af30eb3d0e3`; worker/unit/timer `pve-restic-backup*`; staging `/var/backups/pve-restic-recovery`; timer enabled/active daily `04:00`; retention `7 daily / 4 weekly / 12 monthly` |
 | PVE Restic current recovery point — 2026-10-14 | Ten snapshots present; latest short ID `b3fd0c23`, host `pve`, path `/var/backups/pve-restic-recovery`; `restic check` found no errors. Snapshot `35d4b0c2` remains historical JAR-68 evidence. |
 | Whole-VM backup | NAS `Rotom_VM_Backup/.data`; PVE storage `nas-rotom-vm-backup`; mount `/mnt/pve/nas-rotom-vm-backup`; launcher `backup-rotom-vm-to-nas`; service/worker `rotom-vm-vzdump-manual*`; job `rotom-vm-daily` enabled at `05:00`, `repeat-missed=0`, retention `7 daily / 4 weekly / 6 monthly` |
@@ -254,34 +273,23 @@ The adopted access policy keeps `jared` outside the media group. Administer medi
 - LAN DNS resolves rotom.casa services to 192.168.1.69; public DNS resolved the domain to 68.8.40.225.
 - On 2026-09-19 the Homebridge container name was corrected from historical `homebrige` to `homebridge`. Homebridge started successfully after the rename and restored its cached accessories; a whole-home scan found no remaining old-spelling references.
 
-## 5. Storage Summary
+## 5. Current Storage Summary
 
-| Path | Historical JAR-31 role |
-|---|---|
-| `/mnt/nas-media` | NFSv3 `Media/.data`; root `988:5000` mode `2770`; active Jellyfin/Radarr/Sonarr final-library domain |
-| `/mnt/nas-gameserver` | NFSv3 `Gameserver/.data`; root `988:5001` mode `2770`; current Gameserver service boundary. Original `Game/.data` remains NAS-only rollback data and is not guest-mounted. |
-| `/mnt/nas-infra` | Infra service share; root `988:5002` mode `2770`; migrated application state remains VM-local under `/srv/rotom/appdata/infra` |
-| `/mnt/nas-smarthome` | Smarthome service share; root `988:5003` mode `2770`; HA/Homebridge state remains VM-local under `/srv/rotom/appdata/smarthome` |
-| `/mnt/nas-documents` | Documents service share; root `988:5004` mode `2770`; Paperless media is authoritative at `paperless/` as `900:5004`, while non-media application state remains VM-local |
-| `/mnt/nas-downloaders` | NFSv3 **`Downloader/.data`**; root `988:5005` mode `2770`; active writable Downloader boundary retaining its readiness sentinel. Its obsolete `torrents/` tree was retired; JAR-79 found qBittorrentVPN currently sources its payload binds from Media, not this mount. |
-| `/mnt/nas-web` | Web service share; root `988:5006` mode `2770`; website content remains VM-local under `/srv/rotom/appdata/web` |
-| `/mnt/nas-filesync` | Filesync service share; root `988:5007` mode `2770`; Syncthing's sole payload boundary, currently without a production folder/payload |
-| `/mnt/nas-rotom-restic-backup` | NFSv3 `Rotom_Restic_Backup/.data`; mounted share root `988:988` mode `0700`; canonical repository `/mnt/nas-rotom-restic-backup/rotom-restic-backup`; current verified recovery point `8efea294`; `rotom-restic-backup.timer` enabled/active |
-| `/mnt/nas-pve-restic-backup` *(PVE host only)* | NFSv3 `PVE_Restic_Backup/.data`; systemd automount from PVE `/etc/fstab`; canonical repository `/mnt/nas-pve-restic-backup/pve-restic-backup` (repo ID `8ca0218c645dc2968c2b21d67dbda3840794d8bc9c157c0515a85af30eb3d0e3`); staging `/var/backups/pve-restic-recovery`; current snapshot `35d4b0c2`; `pve-restic-backup.timer` enabled/active for `04:00` |
-| NAS Shared Drive (no current guest mount) | Retains the JAR-25 raw NVMe rollback image; outside guest Restic and not accessible through a current Rotom guest mount contract |
-| `/srv/rotom/stacks` | Current declarative Compose modules for migrated Infra, Media, Downloader, Gameserver, Smarthome, Documents, Web, and Filesync workloads |
-| `/srv/rotom/appdata` | Current VM-local mutable application state, separated by domain; protected by guest Restic `/srv` scope |
-| `/home/infra/docker/nginx-proxy-manager` | Retained NPM rollback tree only; active NPM is under `/srv/rotom` |
-| `/home/media/docker/jellyfin` | Retained Jellyfin legacy material only; active Jellyfin is under `/srv/rotom` |
-| `/home/downloaders/docker` | Former Arcane compatibility/discovery mount parent; the home and bind were retired on 2026-10-13 |
-| `/home/web/docker` | Retired legacy website project trees; current Aloha and retained Jared Wines v2 state are under `/srv/rotom` |
-| `/var/lib/docker` | Current Docker runtime root on VM-local ext4; not NFS-backed |
-| `/var/lib/docker/volumes` | Current Docker named-volume store; includes restored `arcane_arcane-data` |
-| `/var/backups/system-info` | Active backup staging/recovery inventory path; all three required SQLite sources remain part of the normal backup path; application-aware recovery was verified by JAR-47 |
+The current Rotom guest contract is exactly five fstab-backed NFSv3 systemd automounts. A read-only check on 2026-10-14 found all five mounted read/write:
 
-The current guest contract contains **five** fstab/systemd NFS automounts: Game Servers, Smart Home, Rotom Restic Backup, Libraries, and Hosted Websites. The guest Shared Drive contract is retired; its NAS data remains untouched. The separate Downloads, Apps, Auth, Customapps, Media, Web, and former singular Library guest boundaries and both bindfs compatibility views are retired. The PVE-only `/mnt/nas-pve-restic-backup` automount is an additional host backup path and is not part of the guest count. The former `/mnt/nas-rotom-backup` export is likewise no longer active; the old NAS `Rotom_Home_Server_Backup` share remains rollback-only. Historical twelve- and fifteen-mount checkpoints below remain dated evidence rather than current inventory.
+| NAS source | Rotom path | Current role |
+|---|---|---|
+| `Game_Servers/.data` | `/mnt/nas-game-servers` | Empty Game Servers service boundary; Palworld state remains VM-local |
+| `Smart_Home/.data` | `/mnt/nas-smart-home` | Empty Smart Home service boundary; Home Assistant and Homebridge state remain VM-local |
+| `Rotom_Restic_Backup/.data` | `/mnt/nas-rotom-restic-backup` | Guest Restic repository root; mounted share metadata `988:988` mode `0700` |
+| `Libraries/.data` | `/mnt/nas-libraries` | Authoritative Libraries data, including Paperless media; root `988:5000` mode `2771` |
+| `Hosted_Websites/.data` | `/mnt/nas-hosted-websites` | Empty Hosted Websites service boundary; website state remains VM-local |
 
-Historical JAR-21/JAR-29 records name `/mnt/nas-downloads` and/or `Downloads/.data`; those remain historical recovery evidence. Current live fstab, generated mount unit, active NFS source, and `showmount` identify `/mnt/nas-downloaders -> Downloader/.data`. The distinct empty `Downloads` drive and `/mnt/nas-downloads` guest contract were retired on 2026-09-29 after a mounted zero-byte inspection and no-reference scan; they must not be confused with the active singular `Downloader/.data` share.
+PVE separately mounts `PVE_Restic_Backup/.data` at `/mnt/nas-pve-restic-backup` for host-configuration Restic and `Rotom_VM_Backup/.data` at `/mnt/pve/nas-rotom-vm-backup` for VZDump. Those PVE paths are not part of the guest count.
+
+Current VM-local application state is under `/srv/rotom/appdata`; declarative Compose modules are under `/srv/rotom/stacks`; Docker runtime data remains under `/var/lib/docker`. Guest Restic includes the applicable VM-local roots and excludes `/mnt`, so authoritative Libraries data requires its own verified NAS protection. The former Downloads, Apps, Auth, Customapps, Media, Web, singular Library, Shared Drive, and other retired guest contracts remain historical recovery evidence in document 04, not current mount guidance.
+
+Historical JAR-21/JAR-29 records name `/mnt/nas-downloads`, `/mnt/nas-downloaders`, `Downloads/.data`, and `Downloader/.data`; those are recovery evidence only. Both Downloader-era guest contracts are retired. The distinct empty `Downloads` drive was deleted after its 2026-09-29 retirement; NAS-side retention of the former singular `Downloader` export/data was not established by this editorial audit.
 
 ### JAR-22 pre-migration audit baseline — 2026-09-22
 
@@ -315,8 +323,8 @@ The image was intentionally taken while Mint's root filesystem remained mounted.
 
 The current recovery design has three independent logical layers on the same UniFi UNAS 2 appliance: guest Restic, PVE host-configuration Restic, and whole-VM VZDump.
 
-- **Guest Restic:** unchanged canonical guest repository `/mnt/nas-rotom-restic-backup/rotom-restic-backup`, manual command `/usr/local/bin/backup-restic-to-nas`, worker `rotom-restic-backup`, timer around `03:00`, retention `7 daily / 4 weekly / 12 monthly`.
-- **PVE host-config Restic:** `PVE_Restic_Backup/.data` -> `/mnt/nas-pve-restic-backup` -> `pve-restic-backup`; repository ID `8ca0218c645dc2968c2b21d67dbda3840794d8bc9c157c0515a85af30eb3d0e3`. Worker `/usr/local/sbin/pve-restic-backup`; service/timer `pve-restic-backup.service` / `.timer`; staging `/var/backups/pve-restic-recovery`; manual launcher `/usr/local/bin/backup-restic-to-nas`, which re-executes through `sudo` for non-root invocation; password path `/etc/restic/nas-password`. Snapshot `35d4b0c2` is the surviving canonical point after deliberate removal of the two pre-rename snapshots; `restic check` passed.
+- **Guest Restic:** canonical repository `/mnt/nas-rotom-restic-backup/rotom-restic-backup`, manual command `/usr/local/bin/backup-restic-to-nas`, worker `rotom-restic-backup`, timer around `03:00`, retention `7 daily / 4 weekly / 12 monthly`. The 2026-10-14 audit found 22 snapshots; latest short ID `9494979d`; `restic check` passed.
+- **PVE host-config Restic:** `PVE_Restic_Backup/.data` -> `/mnt/nas-pve-restic-backup` -> `pve-restic-backup`; repository ID `8ca0218c645dc2968c2b21d67dbda3840794d8bc9c157c0515a85af30eb3d0e3`. Worker `/usr/local/sbin/pve-restic-backup`; service/timer `pve-restic-backup.service` / `.timer`; staging `/var/backups/pve-restic-recovery`; manual launcher `/usr/local/bin/backup-restic-to-nas`, which re-executes through `sudo` for non-root invocation; password path `/etc/restic/nas-password`. The 2026-10-14 audit found ten snapshots; latest short ID `b3fd0c23`; `restic check` passed. Snapshot `35d4b0c2` remains historical JAR-68 evidence.
 - **Whole-VM VZDump:** `Rotom_VM_Backup/.data`, storage `nas-rotom-vm-backup`, mount `/mnt/pve/nas-rotom-vm-backup`; manual launcher `/usr/local/bin/backup-rotom-vm-to-nas`, which re-executes through `sudo` for non-root invocation; oneshot `rotom-vm-vzdump-manual.service`; worker `/usr/local/sbin/rotom-vm-vzdump-manual`; lock `/run/lock/rotom-vm-vzdump-manual.lock`. Automatic job `rotom-vm-daily` is enabled at `05:00`, snapshot + zstd, `repeat-missed=0`, retention `7 daily / 4 weekly / 6 monthly`. A 2026-10-05 list showed eight current unprotected VMID `100` archives, including six `05:00` scheduler-produced archives from 2026-09-30 through 2026-10-05; the manual `2026_10_05-22_47_06` archive also completed successfully. Current listing evidence does not replace the dated zstd/VMA verification evidence for the former 2026-09-28 archive, which is no longer listed. Jared can directly follow this service with `journalctl -fu rotom-vm-vzdump-manual.service` through `systemd-journal` membership.
 - **Maintenance:** PVE CPU bridge uses `pve-cpu-temp-api`; read-only backup schedule bridge uses `pve-backup-status-api` on `192.168.1.68:8789`, serving the PVE Restic and native Rotom VM Homepage cards. The NIC WOL/offload configuration remains as documented. The historical local `backup-proxmox-to-nas.pre-systemd.*` launcher was deliberately removed after final acceptance.
 - **Operational evidence:** physical PVE reboot, VM100 autostart, post-reboot PVE/Rotom acceptance, canonical mount/source checks, qBittorrent VPN state, and zero failed units all passed.
@@ -352,13 +360,12 @@ JAR-31 compatibility/application restoration and the JAR-33 virtualization basel
 
 - **Intentional / separate from the portable baseline:** Fran is not recreated and her historical backup sudoers rule remains absent; the reboot-capable weekly updater script is present but its cron schedule is absent; broader JAR-47/off-site failure-domain recovery work remains unfinished even though guest Restic, Proxmox host-config Restic, and Proxmox whole-VM schedules are now active. JAR-49 commissioned an optional host-specific Intel iGPU attachment; removal of `hostpci0` returns the independently portable VM baseline.
 - **Needs Verification — NAS metadata persistence:** service-share root UID/GID/mode persistence across a future NAS/UniFi Drive restart/update has not been observed. Resolve after such an event with read-only `stat`/`findmnt` checks from Rotom plus NAS export inspection; do not change ownership merely to make the result match documentation.
-- **Needs Verification — first unattended Restic run after repair:** scheduled runs on 2026-10-02 through 2026-10-05 exposed a stale NPM SQLite source and failed before backup. The 2026-10-05 repair and manual service run created verified snapshot `8efea294`; observe the next timer-triggered run before treating unattended execution as re-established.
-- **Needs Verification — first final-name PVE host-config Restic scheduled run:** `pve-restic-backup.timer` is enabled/active for `04:00`; manual/service execution and repository integrity are verified, but a future unattended timer-triggered run under the final name may still be observed as operational evidence.
+- **Verified — recurring guest and PVE Restic execution:** by 2026-10-14 the guest repository contained 22 snapshots with latest `9494979d`, and the PVE repository contained ten snapshots with latest `b3fd0c23`; both repository checks passed. Full guest `--read-data` verification and restore rehearsal remain outstanding.
 - **Verified — native PVE VZDump scheduler execution:** the 2026-10-05 archive list contains six `05:00` archives from 2026-09-30 through 2026-10-05, confirming the final-name `rotom-vm-daily` job is producing retained archives. This listing does not independently verify each archive's compression or VMA payload.
 - **Retention observation:** the current storage listing contains eight unprotected VMID `100` archives under the configured `7 daily / 4 weekly / 6 monthly` policy. Archive availability is current only as of the listing; select and verify a recovery point at incident time.
 - **Needs Verification — end-to-end Wake-on-LAN trigger:** Proxmox `nic0` WOL capability, persistent `wol g` configuration, PCI wake enablement, and post-power-cycle retention are verified, but the supplied transcript does not capture a magic-packet sender invocation or otherwise prove WOL caused the NUC to power on.
 - **Needs Verification — prior Proxmox resets:** the ConBee II remains intentionally disconnected and the legacy documentation does not isolate one causal explanation for the earlier resets. Read-only logs can narrow evidence (`journalctl`, Proxmox task/system logs), but a single cause should not be claimed without new evidence.
-- **Recovery/operations follow-up:** a full Palworld disaster-recovery rehearsal, alert-delivery test, certificate-renewal observation, and final public-exposure review remain unperformed or incompletely evidenced. These are tests/decisions, not contradictory current-state facts.
+- **Recovery/operations follow-up:** a full Palworld disaster-recovery rehearsal, guest Restic data-read/restore test, current VZDump `vma verify` or restore rehearsal, certificate-renewal observation, and final public-exposure review remain unperformed or incompletely evidenced. The retired JAR-73 alerting layer no longer requires an alert-delivery test.
 
 ## 10. legacy documentation set Model
 
