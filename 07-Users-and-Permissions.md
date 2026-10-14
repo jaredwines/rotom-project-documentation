@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-10-13 — Rename the Library local identity and roots to Libraries
+**Documentation updated:** 2026-10-13 — Complete Available Sources legacy documentation consistency audit
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -17,10 +17,10 @@ This is the canonical detailed owner of Rotom account identity and permission fa
 
 ### Evidence provenance
 
-**Documentation updated:** 2026-09-27 — Proxmox host-config Restic root/NFS permission boundary added  
+**Documentation updated:** 2026-10-13 — Complete Available Sources audit; current identity section reconciled to Libraries, Game Servers, Hosted Websites, and Platform.
 
 **Baseline method:** read-only inspection of the live host configuration, Docker metadata, systemd unit files, sudo policy, SSH metadata, filesystem modes, ACLs, NFS mount metadata, and non-mutating access tests. No passwords, password hashes, key contents, tokens, or private-key material were read or recorded.  
-**Update scope:** JAR-29 restored the ten storage-facing identities and JAR-30 established the package-created Docker privilege boundary. JAR-31 restored the application/recovery workload layer under those service identities. A fresh 2026-09-27 post-boot read reconfirmed `docker:x:989:` with no members, all ten service UID:GID/home contracts, and every service-home NAS symlink. Later 2026-09-27 Proxmox host-config Restic commissioning added a root-only host backup implementation, protected credential path, and second Proxmox-only NFS backup export without changing guest/service identities. Fran remains unrecreated and her backup sudoers rule remains deferred. Administrative Mac key-only access remains verified; no key contents are recorded.
+**Update scope:** JAR-29 restored the historical ten storage-facing identities and JAR-30 established the package-created Docker privilege boundary. Later migrations retired or renamed several of those identities. The current table in section 2 is authoritative; earlier full-account and NAS-shortcut tables are historical reconstruction evidence. Fran remains unrecreated and her backup sudoers rule remains deferred. Administrative Mac key-only access remains verified; no key contents are recorded.
 
 ## 2. Current Phase B Identity and Access Model — 2026-09-28 JAR-68 final
 
@@ -44,7 +44,7 @@ Guest service-account identities and Docker-group policy remain unchanged. Docke
 |---|---|
 | PVE host | hostname `pve`; routine administration as Linux user `jared` (UID/GID `1000:1000`, groups `sudo` and `users`); canonical Mac aliases `pve` / `pve.rotom.casa`; key `~/.ssh/id_ed25519_pve`; PVE identity `jared@pam` has propagated `Administrator` access at `/`; matching root-authorized key removed; root retained for emergency recovery |
 | Debian VM `jared` | UID/GID `1000:1000`; supplementary `sudo`; key-only Mac login via `~/.ssh/id_ed25519_rotom` |
-| libraries | `127:5000`, `/home/libraries`; Jellyfin/Radarr/Sonarr/Prowlarr/RomM/qBittorrentVPN/Paperless |
+| libraries | `127:5000`, `/home/libraries`; Jellyfin/Radarr/Sonarr/Prowlarr/RomM/qBittorrentVPN. Paperless is absent. |
 | game-servers | `995:5001`, `/home/game-servers`; Palworld Jared and Fran are deliberately non-running (`created`); JDownloader, Igir, qBittorrent importer, and browser-upload bridge were retired on 2026-10-05; Gamarr retired |
 | platform | `997:5002`, `/home/platform`; Arcane/DDNS/Homepage/Glances/NPM/Rotom Docs |
 | smarthome | `126:5003`, `/home/smarthome`; Home Assistant/Homebridge |

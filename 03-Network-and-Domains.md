@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Remove stale Homepage Uptime Kuma card and rename Libraries section
+**Documentation updated:** 2026-10-13 — Complete Available Sources legacy documentation consistency audit
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -14,6 +14,8 @@ Record substantive changes to this document in the change log as part of the sam
 ## 1. Purpose and Scope
 
 ### Current Library routes — 2026-10-13
+
+The supported current Library-facing routes are qBittorrentVPN through loopback-only `127.0.0.1:8080` and NPM host `14`, plus Prowlarr through NPM host `18`; their recorded responses were `200` and `302` respectively. RomM retains its established NPM route and the internal-only game-library alias now uses the active `/mnt/nas-libraries` bind. Paperless is absent, so its retained proxy record is not an operational route. Route details not rechecked after the Libraries rename are **Needs Verification**; resolve them with read-only NPM configuration inspection and local/SNI probes.
 
 ### Current Homepage Platform presentation — 2026-10-13
 
@@ -25,7 +27,7 @@ The Uptime Kuma NPM route and Homepage mapping are retired; no Uptime Kuma liste
 
 qBittorrentVPN is active with a loopback-only `127.0.0.1:8080` listener; NPM proxy host `14` serves `qBittorrent.rotom.casa` and returned `200`. Prowlarr is active on `9696`; NPM proxy host `18` returned its expected `302`. Paperless remains absent; its retained NPM host is not evidence of an active service. The retained Syncthing NPM record was not changed when the absent service's Homepage presentation was removed.
 
-JAR-94 above is authoritative for the current Platform service set. Older route and upstream statements below are retained as dated evidence and must not be read as proof that retired Syncthing, Paperless, Prowlarr, or qBittorrentVPN services remain active.
+The current overlays above are authoritative for the Platform and Library service set. Older route and upstream statements below are retained as dated evidence and must not be read as proof that retired Syncthing or Paperless services remain active.
 
 ### Historical JAR-94 service-exposure state — 2026-10-13
 
@@ -41,7 +43,7 @@ NPM proxy host `pve.rotom.casa` forwards using **HTTPS** to the PVE host at `192
 
 `rotom-docs` joins `rotom-proxy` but retained host-networked NPM cannot use Docker DNS on that bridge. NPM proxy host 22 therefore routes `docs.rotom.casa` to the loopback-only `127.0.0.1:8082` compatibility listener using existing wildcard certificate ID 24 and forced TLS. The dedicated `Rotom Docs trusted LAN` access list allows only `127.0.0.1` and `192.168.1.0/24`; an untrusted bridge request was denied with HTTP `403`. Local-SNI HTTPS returned `200`, including the rendered directory-tree page. This is an intentionally private administrative route: public Internet access is not expected or required, and no DNS, WAN-forwarding, VLAN, firewall, certificate, or other proxy route was changed.
 
-JAR-75 adds Syncthing as a proxied Filesync management service. Syncthing joins `rotom-proxy`, but the retained host-networked NPM route uses the loopback-only compatibility listener `127.0.0.1:8384`; `8384` is not broadly host-published. NPM routes `syncthing.rotom.casa` to that listener using existing certificate ID `24` and forced TLS; local HTTPS returned `200`. Syncthing's GUI authentication is enabled. The service exposes no separate WAN-published Syncthing transport port through Docker; peer transport remains container networking/explicit future client configuration rather than an inferred router-forwarding rule.
+Historical JAR-75 note: Syncthing was once proxied through loopback `127.0.0.1:8384`. Syncthing is now retired; the retained proxy record was not revalidated and is not an operational route.
 
 ### JAR-8 Paperless route — 2026-09-29
 
@@ -53,7 +55,7 @@ NPM proxy host `26` for `romm-upload.rotom.casa` is deleted/disabled and its gen
 
 RomM joins `rotom-proxy` and its database/broker remain private. Retained host-networked NPM routes `romm.rotom.casa` to the loopback-only `127.0.0.1:8081` compatibility listener using wildcard certificate ID 24; external HTTPS validation passed.
 
-Proxy host `21` additionally defines an internal-only `/library/` location aliased to NPM's read-only `/mnt/nas-media/library/games` bind. It is not a public browseable library route. NPM's container startup identity remains the pre-existing image default root identity; no NPM user/PUID/PGID or Docker-socket change was made for JAR-90.
+Proxy host `21` additionally defines an internal-only `/library/` location aliased to NPM's read-only active Libraries game bind. It is not a public browseable library route. Its exact post-JAR-96 configured source is documented in `02`/`04`; no NPM user/PUID/PGID or Docker-socket change was made for JAR-90.
 
 Paperless web service attaches to `rotom-proxy` and exposes only `127.0.0.1:8000`; PostgreSQL and Valkey stay internal. Retained host-networked NPM routes `paperless.rotom.casa` to that loopback endpoint with existing wildcard certificate ID 24. Local SNI HTTPS returned a login redirect. Although Rotom's own public-IP hairpin path does not reach this route, a 2026-09-29 independent public TLS assessment reached it externally, received the expected `302` login redirect, and followed it to the login page with HTTP `200`.
 
@@ -126,7 +128,7 @@ JAR-69 adds the separate read-only `/usr/local/sbin/pve-backup-status-api` with 
 
 ### Current NAS / NFS connectivity
 
-The Rotom guest currently has ten fstab-backed NFS systemd automounts and no bindfs compatibility views. JAR-88 replaced the active Game guest mount with Gameserver; the separate Downloads, Apps, Auth, and Customapps guest contracts are retired. Two PVE-only backup exports are canonical:
+The former ten-automount count is historical. Multiple guest contracts were retired or renamed on 2026-10-13, and the legacy documentation has no final complete unit listing; the current count is **Needs Verification**. Resolve it read-only with `findmnt` and `systemctl list-units --type=automount` on Rotom. There are no documented active bindfs compatibility views. Two PVE-only backup exports are canonical:
 
 - `PVE_Restic_Backup/.data` -> `/mnt/nas-pve-restic-backup` on `192.168.1.68`; repository subdirectory `pve-restic-backup`.
 - `Rotom_VM_Backup/.data` -> PVE storage `nas-rotom-vm-backup` at `/mnt/pve/nas-rotom-vm-backup`.

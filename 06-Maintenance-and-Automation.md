@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-13 — Move Game Servers and Smart Home to renamed NAS Drives
+**Documentation updated:** 2026-10-13 — Complete Available Sources legacy documentation consistency audit
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -66,7 +66,9 @@ This document is the canonical detailed owner for what Rotom does automatically 
 Host: Rotom
 Evidence date: 2026-09-15, America/Los_Angeles
 Scope: Read-only inspection of systemd, cron, Docker, backups, monitoring, and application automation. No Rotom service, timer, container, backup, or configuration was changed while collecting evidence.
-Documentation updated: **2026-10-10** through NAS-backed recovery verification and the complete Available Sources documentation audit. JAR-34's verified non-migrating `/srv/rotom` foundation, the Git-backed legacy documentation checkout, Proxmox host-config Restic commissioning, JAR-31 application/recovery restoration, and the JAR-30 Docker/containerd/logging baseline remain dated supporting evidence. JAR-34 adds no scheduler or workload automation: its root-owned local Git repository versions only future declarative `stacks/`/`scripts/` content, while mutable `appdata`, secrets, and backup staging are ignored and remain outside that history. Existing application paths, backups, and timers remain unchanged.
+Documentation updated: **2026-10-13** through the complete Available Sources audit. JAR-34's verified non-migrating `/srv/rotom` foundation, the Git-backed legacy documentation checkout, Proxmox host-config Restic commissioning, JAR-31 application/recovery restoration, and the JAR-30 Docker/containerd/logging baseline remain dated supporting evidence. JAR-34 adds no scheduler or workload automation: its root-owned local Git repository versions only future declarative `stacks/`/`scripts/` content, while mutable `appdata`, secrets, and backup staging are ignored and remain outside that history.
+
+**Audit boundary:** automation statements that predate the 2026-10-13 Libraries and renamed-drive overlays are historical unless reaffirmed in the current overlays. In particular, do not infer an active Uptime Kuma/Rotom/PVE alert worker, Media mount, Syncthing recovery path, or a final guest automount count from older sections. Read-only resolution: inspect the relevant `systemctl` unit/timer state, rendered Compose configuration, and `findmnt` output.
 
 ## 2. Current Maintenance and Automation — 2026-09-28 JAR-68 final
 

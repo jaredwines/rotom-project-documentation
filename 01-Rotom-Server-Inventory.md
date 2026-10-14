@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Move Game Servers and Smart Home to renamed NAS Drives
+**Documentation updated:** 2026-10-13 — Complete Available Sources legacy documentation consistency audit
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -15,6 +15,10 @@ This document is the front-page architecture/index for Rotom. It summarizes the 
 Purpose: front-page index and quick-reference architecture summary.
 
 **legacy documentation state labels:** **Current** means the latest supported recorded state; **Historical** preserves dated evidence that may no longer apply; **Retired** means intentionally no longer active; **Proposed** is not implemented; **Needs Verification** means the legacy documentation lacks enough current evidence and should not be treated as settled.
+
+### Documentation-audit reconciliation — 2026-10-13
+
+This audit confirms that the 2026-10-13 overlays at the start of this section are the supported current-state layer. Later undated-looking summaries and earlier JAR checkpoint tables are retained for evidence but are **Historical** wherever they name `infra`, `library`, `gameserver`, `web`, `/mnt/nas-media`, `/mnt/nas-library`, `/mnt/nas-gameserver`, Uptime Kuma, Paperless, Syncthing, or running Palworld containers as current. Do not use those older passages as operating instructions. A fresh read-only inventory of guest NFS automount units is still required before asserting their current count; resolve it with `findmnt` plus `systemctl list-units --type=automount` on Rotom.
 
 ## 2. Current Rotom Summary
 
@@ -62,7 +66,7 @@ The previous active `pve-alerting` claim is a live-state discrepancy corrected b
 
 ### Historical JAR-94 Media-to-Library NAS cutover — 2026-10-13
 
-The active media contract is `/mnt/nas-library`, backed by `Library/.data`; `/mnt/nas-media` is no longer an active guest mount or configuration contract. Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Nginx Proxy Manager use Library binds. qBittorrent's Library sentinel/guard is fail-closed and its reversible missing-sentinel recreation test passed. Media export data remains retained for rollback. The user accepted the authenticated application workflow after cutover.
+At this historical checkpoint, the active Library contract was `/mnt/nas-library`, backed by `Library/.data`; `/mnt/nas-media` was no longer an active guest mount or configuration contract. JAR-96 later replaced that guest contract with `/mnt/nas-libraries` backed by `Libraries/.data`; see the current JAR-96 overlay above. The remaining verification evidence is preserved here, not current path guidance.
 
 Older sections bearing JAR-94 refer to a different historical workload-retirement task; they do not describe this NAS cutover.
 
@@ -92,7 +96,7 @@ JAR-94 above supersedes the Paperless, Prowlarr, and qBittorrentVPN portions of 
 
 The former `media` Linux identity is now `library`, retaining UID:GID `127:5000` and home `/home/library`. Active Library Compose/appdata/secrets roots are `/srv/rotom/{stacks,appdata,secrets}/library`; Jellyfin, Radarr, Sonarr, Prowlarr, RomM, qBittorrentVPN, and Paperless use the applicable Library roots. The NAS export/mount names remain intentionally unchanged: `/mnt/nas-media` remains the Media export holding the audiovisual/game library and qBittorrent payload/guard, while `/mnt/nas-documents` remains the separate Documents export holding Paperless media only. Paperless's export root and sole `paperless/` subtree are `988:5000` and `127:5000` respectively; PostgreSQL, Valkey, configuration, consume, export, secrets, and recovery staging remain VM-local. Homepage presents Library in the prior Media layout position and includes qBittorrent and Paperless exactly once.
 
-The accepted Phase B architecture now uses **PVE** as the product abbreviation and `pve` as the physical Proxmox VE host name. JAR-68 normalized the host identity and all active PVE-only backup/monitoring names, removed temporary `proxmox` SSH/hosts compatibility aliases after successful post-reboot acceptance, and refreshed the whole-VM recovery point. Historical sections preserve the earlier names only as dated evidence.
+The following table is a mixed-date checkpoint, not a replacement for the 2026-10-13 overlays above. Physical-host and backup observations retain their stated evidence dates. Rows naming active Docker services, local roots, NAS mounts, or automount counts are Historical unless independently reaffirmed in a later current overlay.
 
 | Item | Verified value |
 |---|---|

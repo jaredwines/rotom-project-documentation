@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Restic backup architecture, scope, retention, verification, restore evidence, and recovery boundaries  
 **Recovery scope:** pre-migration Rotom plus current Proxmox/VM foundation  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Move Game Servers and Smart Home to renamed NAS Drives
+**Documentation updated:** 2026-10-13 — Complete Available Sources legacy documentation consistency audit
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -46,6 +46,10 @@ This document is the canonical detailed owner for Rotom recovery state plus the 
 ## 2. Current Recovery State — JAR-47 final, 2026-09-29
 
 Current recovery is layered: application-aware artifacts, guest Restic, PVE host-configuration Restic, whole-VM VZDump, UNAS snapshots for authoritative NAS Media, plus preserved pre-migration recovery artifacts. JAR-68 normalized the PVE identity and PVE-only backup names without changing the guest Restic naming.
+
+### Documentation-audit recovery boundary — 2026-10-13
+
+The recovery points and scheduler observations in this document are the latest **recorded** evidence, not proof of a currently successful backup. No post-2026-10-13 backup run, repository check, or NAS snapshot restore was supplied for this audit. Treat the next guest Restic timer run, final-name PVE Restic timer run, NAS snapshot recovery, and any recovery point selected during an incident as **Needs Verification**; use the documented read-only status/log checks before relying on them.
 
 ### Current recurring PVE whole-VM backup schedule
 

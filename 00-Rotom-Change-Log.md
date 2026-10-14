@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-13 — Rename the Library local identity and roots to Libraries
+**Documentation updated:** 2026-10-13 — Complete Available Sources legacy documentation consistency audit
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-13 — Complete Available Sources legacy documentation consistency audit
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Documentation only.** No live Rotom, PVE, Docker, NAS, UniFi, Cloudflare, backup, network, account, or external-service state was changed.
+- **Changes:** Reviewed every current Available Sources member and reconciled the current-state layer to the latest supported 2026-10-13 evidence. Corrected stale summaries that could have treated the pre-JAR-96 Library mount, old Gameserver mount, Media mount, singular local roots, Uptime Kuma/Syncthing/Paperless, or earlier Docker inventory as current. Preserved older path, identity, and recovery records as historical evidence; clarified the directory-tree restoration boundary and reduced repeated stale-current wording.
+- **Evidence:** Complete cross-document documentation audit only. No new live inspection was performed.
+- **Outstanding:** The final current guest NFS automount count, exact post-2026-10-13 Docker object inventory, post-Libraries proxy-route details, next guest/PVE Restic timer runs, and NAS snapshot recovery remain Needs Verification. Resolve each using the read-only checks named in its canonical subject document. Available Sources replacement remains manual by Jared.
 
 ## 2026-10-13 — Move Game Servers and Smart Home to renamed NAS Drives
 

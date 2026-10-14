@@ -2,9 +2,9 @@
 
 **Documentation set:** legacy documentation set  
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
-**Scope:** Rotom workload layer; a 2026-10-10 live Docker inventory recorded 24 container objects, all running. The prior detailed 2026-10-01 snapshot (25 container objects / 24 running) predates the 2026-10-05 retirement of JDownloader and related ROM-ingestion components and is historical.
+**Scope:** Rotom workload layer. A 2026-10-10 live inventory recorded 24 container objects, all running; it is historical point-in-time evidence and predates the 2026-10-13 deliberate Palworld stopped state and Uptime Kuma retirement.
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Rename the Library local identity and roots to Libraries
+**Documentation updated:** 2026-10-13 — Complete Available Sources legacy documentation consistency audit
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -29,6 +29,10 @@ The active Palworld Compose/appdata/secrets roots are `/srv/rotom/{stacks,appdat
 
 This inventory is based on the uploaded `rotom-docker-containers.txt` (container names, images, statuses, and ports) and `rotom-compose-locations.txt` (Compose file paths), with verified Docker inspection and status updates from the conversation incorporated on 2026-09-14. The original table statuses are recorded observations rather than continuously live values; later dated verification sections incorporate fresh Docker state and health checks where they were explicitly captured. The original source files do not specify a capture timestamp.
 
+### Documentation-audit reconciliation — 2026-10-13
+
+The current deployment paths are the plural `libraries`, `platform`, `hosted-websites`, `game-servers`, and `smarthome` roots described in the current overlays. Older entries that call singular `library`, `infra`, `web`, `gameserver`, `/mnt/nas-library`, or `/mnt/nas-media` current are historical migration/recovery evidence. The legacy documentation contains no post-2026-10-13 complete `docker ps -a` capture; treat the exact current object count as **Needs Verification** and resolve it read-only with `docker ps -a` and `docker inspect` of the named workloads.
+
 ### Evidence provenance
 
 Last updated: 2026-10-10 (NAS-backed recovery verification and post-retirement Docker inventory); JAR-31 application restoration/reboot acceptance remains the earlier VM runtime baseline.
@@ -52,17 +56,17 @@ The active Homepage configuration names its management section **Platform**. It 
 
 ### JAR-95 Uptime Kuma retirement — 2026-10-13
 
-Uptime Kuma is retired. No `uptime-kuma` container or image, Platform Compose stack/appdata, NPM route, or Homepage mapping remains. The current Docker inventory instead includes Homepage, NPM, Arcane, Glances, Rotom Docs, Cloudflare DDNS, the Library services, web, Smart Home, and the deliberately stopped Palworld containers; no Uptime Kuma object is present. This supersedes unqualified current Uptime Kuma statements below, which are retained as dated historical evidence. JAR-95 makes no assertion that a public status page existed.
+Uptime Kuma is retired. No `uptime-kuma` container or image, Platform Compose stack/appdata, NPM route, or Homepage mapping remains. The recorded post-retirement set includes Homepage, NPM, Arcane, Glances, Rotom Docs, Cloudflare DDNS, Libraries services, Hosted Websites, Smart Home, and the deliberately stopped Palworld containers; no Uptime Kuma object is present. This is not a complete current inventory. It supersedes unqualified current Uptime Kuma statements below, which are retained as dated historical evidence. JAR-95 makes no assertion that a public status page existed.
 
-### JAR-94 Media-to-Library NAS cutover — 2026-10-13
+### Historical JAR-94 Media-to-Library NAS cutover — 2026-10-13
 
-Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Nginx Proxy Manager were recreated against `/mnt/nas-library`. Their NAS binds are respectively `library`, broad Library plus read-only `torrents`, `library/games`, Library `torrents` plus the non-creating Library sentinel, and `library/games`. All were running after recreation; RomM's database was healthy; local Jellyfin/Radarr/Sonarr responses were `302` and qBittorrent/RomM were `200`. The qBittorrent sentinel-absence recreation test failed closed as designed, then passed after restoration. No active Compose definition references `/mnt/nas-media`.
+At this checkpoint, Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Nginx Proxy Manager were recreated against `/mnt/nas-library`. JAR-96 later moved those live binds to `/mnt/nas-libraries`; this section is retained solely for the cutover evidence.
 
 The prior JAR-94 heading below records a separate historical workload-retirement task and must not be used as current service state.
 
-### Current Library qBittorrentVPN/Prowlarr restoration — 2026-10-13
+### Historical pre-Libraries qBittorrentVPN/Prowlarr restoration — 2026-10-13
 
-`qbittorrentvpn` and `prowlarr` were recreated from the retained JAR-84 archive as Library (`127:5000`) services. Their Compose files are `/srv/rotom/stacks/library/{qbittorrentvpn,prowlarr}/compose.yaml`, with state below matching `/srv/rotom/appdata/library` paths. qBittorrent retains `NET_ADMIN`, WireGuard, Library non-creating torrent/sentinel binds, `rotom-arr`, `rotom-proxy`, and its enabled Library guard; its UI is CSRF-protected and published only at `127.0.0.1:8080` for NPM. Prowlarr retains `9696`, `rotom-arr`, and `rotom-proxy`. Both containers were running; qBittorrent `wg0` was `10.2.0.2/32`, qBittorrent local/NPM returned `200`, and Prowlarr local/NPM returned `302`. Paperless remains unrecreated because `/mnt/nas-library/paperless` is absent.
+This restoration used singular `library` roots before the local identity was renamed to `libraries`. The current paths are `/srv/rotom/{stacks,appdata,secrets}/libraries`; the remaining runtime checks are historical evidence. Paperless remains absent; its proposed prerequisite path has not been reverified after JAR-96 and is therefore **Needs Verification**.
 
 ### Historical JAR-94 Platform recovery and retired workloads — 2026-10-13
 
