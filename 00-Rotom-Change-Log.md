@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-13 — Restore Paperless in Libraries with NAS-resident media
+**Documentation updated:** 2026-10-14 — Read-only Rotom and PVE audit reconciliation
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,22 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-14 — Read-only Rotom and PVE audit reconciliation
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Documentation only / Verified / Needs Verification.** No Rotom, PVE, Docker, NAS, network, backup, account, proxy, DNS, certificate, application, or running-service state was changed.
+- **Changes:** Added dated Rotom guest and PVE host/VM baselines; reconciled the five live guest NFS contracts, current identities, active NPM routes/certificates, direct listener exposure, apex-only LAN DNS override, backup results, absent local backup-staging root, and the Smart Home Compose ownership/ACL discrepancy. Refreshed PVE package, VM, network, storage, firewall, backup, maintenance, and boot-journal evidence; flagged duplicate Proxmox repository definitions, broken local Postfix alias lookup, pending packages, CPU-vulnerability exposure, and the persistent iGPU option-ROM warning. Reclassified stale counts and legacy claims without rewriting historical evidence.
+- **Evidence:** Read-only 2026-10-14 Rotom inspection plus Jared-executed PVE collection completed at `2026-10-14T00:59:21-07:00`. PVE reported version `9.2.0` with `pve-manager 9.2.21`, kernel `7.0.14-19-pve`, zero currently failed units, running VM 100, active backup NFS mounts, eight current VM archives, ten PVE Restic snapshots, a successful 2026-10-13 Restic run, and a clean `restic check`. The latest VM archive passed zstd decompression integrity; the transcript did not expose an explicit VMA-verifier result. Exact guest Docker inventory and root journal review remained unavailable because the Rotom session had no noninteractive sudo authorization.
+- **Outstanding:** Confirm whether the Smart Home cross-domain ACLs, direct LAN application listeners, apex-only split DNS, absent guest backup-staging root, retained deleted NPM rows, disabled PVE firewall, and simultaneous enterprise/no-subscription PVE repository definitions are intentional. Repair and test PVE local notification delivery, apply reviewed PVE updates, assess CPU and iGPU boot warnings, capture exact PVE storage configuration, obtain a privileged fresh guest Docker inventory, verify the latest guest Restic snapshot/repository, prove current Libraries/Paperless NAS recovery, and run an explicitly captured full VMA verification/restore rehearsal. Available Sources replacement remains manual by Jared.
+
+## 2026-10-13 — Complete Available Sources consistency audit
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Documentation only.** No live Rotom, PVE, Docker, NAS, UniFi, Cloudflare, backup, network, account, or external-service state was changed.
+- **Changes:** Reviewed every current Available Sources member and performed a second cross-document consistency pass. Reconciled the supported five-contract guest NFS automount count across the inventory, network, storage, and tree references; relabelled stale Media, JAR-92, and JAR-94 assertions as historical where later 2026-10-13 evidence supersedes them; and aligned current qBittorrent uncertainty with the Libraries path. Historical recovery evidence was preserved.
+- **Evidence:** Documentation-only audit using the existing dated 2026-10-13 fstab, final-removal, Compose, ownership, and recovery evidence already recorded in the legacy documentation. No new live inspection was performed.
+- **Outstanding:** Current Docker object count, route details not rechecked after the Libraries rename, future timer-triggered backup results, effective Libraries NAS snapshot/restore protection, authenticated Paperless acceptance, live Libraries-NFS loss behavior, and router-side policy remain Needs Verification in their canonical documents. Available Sources replacement remains manual by Jared.
 
 ## 2026-10-13 — Persist Homepage backup-result color indicators
 

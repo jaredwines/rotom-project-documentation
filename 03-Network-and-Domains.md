@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Restore Paperless in Libraries with NAS-resident media
+**Documentation updated:** 2026-10-14 — Read-only Rotom and PVE audit reconciliation
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -12,6 +12,24 @@
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
 
 ## 1. Purpose and Scope
+
+### Current PVE network and exposure audit — 2026-10-14
+
+PVE uses `nic0` as the physical Intel I219-V interface and `vmbr0` at `192.168.1.68/24` with gateway `192.168.1.1`; VM 100 attaches through `tap100i0` without a configured VLAN tag or bridge VLAN filtering. The physical link negotiated 1 Gbit/s full duplex, Wake-on-LAN mode `g` is enabled, and the documented TSO/GSO-off mitigation remains effective. PVE reached Rotom (`192.168.1.69`) and the UNAS (`192.168.1.70`) without packet loss during the audit.
+
+The Proxmox firewall reported `Status: disabled/running`; cluster and node rule listings were empty. The PVE web UI on `8006` and read-only monitoring APIs on LAN-bound `8788` and `8789` therefore depend on LAN reachability and their application/access controls rather than an active PVE firewall policy. The NPM route `pve.rotom.casa -> https://192.168.1.68:8006` with access-list ID `1` remains active, but it is not a substitute for host firewall policy. Whether the disabled firewall and direct LAN listeners are intentional **Needs Owner Confirmation**.
+
+### Current route, DNS, listener, and certificate audit — 2026-10-14
+
+The live NPM SQLite database has sixteen undeleted, enabled proxy hosts: `home-assistant.rotom.casa -> 127.0.0.1:8123`, `homebridge.rotom.casa -> 127.0.0.1:8581`, `nginx.rotom.casa -> 127.0.0.1:81`, `arcane.rotom.casa -> 127.0.0.1:3552`, `jaredwines.com -> 127.0.0.1:7777`, `rotom.casa -> 127.0.0.1:3001`, `alohamillworks.com -> 127.0.0.1:7778`, `qBittorrent.rotom.casa -> 127.0.0.1:8080`, `radarr.rotom.casa -> 127.0.0.1:7878`, `sonarr.rotom.casa -> 127.0.0.1:8989`, `jellyfin.rotom.casa -> 127.0.0.1:8096`, `prowlarr.rotom.casa -> 127.0.0.1:9696`, `paperless.rotom.casa -> 127.0.0.1:8000`, `romm.rotom.casa -> 127.0.0.1:8081`, `docs.rotom.casa -> 127.0.0.1:8082`, and `pve.rotom.casa -> 192.168.1.68:8006` over HTTPS. The Docs and PVE routes use access-list ID `1`; the other current routes have no NPM access list. The database retains deleted historical rows for Smart Hub/Portainer/Homebridge legacy naming, Palworld, OliveTin, PalTools, Gamarr, Syncthing, Uptime Kuma, and ROM upload.
+
+Local SNI probes returned expected application responses for all tested active routes: `200` for Rotom, Arcane, Docs, PVE, Homebridge, qBittorrent, RomM, and Aloha; `302` for Jellyfin, Radarr, Sonarr, Prowlarr, and Paperless. Jared Wines returned the expected `502` because its upstream remains intentionally undeployed. The canonical Home Assistant name is `home-assistant.rotom.casa`; the similarly spelled `homeassistant.rotom.casa` is not a configured route.
+
+Certificate ID `24` covers `*.rotom.casa` and `rotom.casa` and expires 2026-12-10 UTC. Certificate ID `16` covers `alohamillworks.com` and expires 2026-11-21 UTC. Certificate ID `14` covers `jaredwines.com` and expires 2026-12-04 UTC. These are dated observations; renewal remains an operational dependency.
+
+The LAN resolver currently overrides only `rotom.casa` to `192.168.1.69`. The tested `*.rotom.casa` service names resolve through the LAN resolver to public `68.8.40.225`, so ordinary LAN access to those names depends on public-IP hairpin/NAT behavior rather than a wildcard local override. Public resolver queries were unavailable from this execution context; the public-IP value above is the answer returned by the LAN resolver.
+
+Current listener inspection shows that NPM is not the only LAN-reachable path. TCP `80`, `81`, and `443` are LAN-wide, as are Homepage `3001`, Arcane `3552`, Aloha `7778`, Jellyfin `8096`, Radarr `7878`, Sonarr `8989`, Prowlarr `9696`, Home Assistant `8123`, Homebridge `8581`, and the backup-status API `8787`. qBittorrent `8080`, RomM `8081`, Paperless `8000`, and Rotom Docs `8082` are loopback-only. The guest has no UFW installation per the current VM baseline; whether the direct LAN exposure is intentional **Needs Owner Confirmation**.
 
 ### Current Paperless route — 2026-10-13
 
@@ -132,7 +150,7 @@ JAR-69 adds the separate read-only `/usr/local/sbin/pve-backup-status-api` with 
 
 ### Current NAS / NFS connectivity
 
-The former ten-automount count is historical. Multiple guest contracts were retired or renamed on 2026-10-13, and the legacy documentation has no final complete unit listing; the current count is **Needs Verification**. Resolve it read-only with `findmnt` and `systemctl list-units --type=automount` on Rotom. There are no documented active bindfs compatibility views. Two PVE-only backup exports are canonical:
+The former ten-automount count is historical. The final 2026-10-13 fstab and removal verification establishes five current guest NFS automount contracts: Game Servers, Smart Home, Rotom Restic Backup, Libraries, and Hosted Websites. There are no documented active bindfs compatibility views. Reconfirm their live activation read-only with `findmnt` and `systemctl list-units --type=automount` on Rotom. Two PVE-only backup exports are canonical:
 
 - `PVE_Restic_Backup/.data` -> `/mnt/nas-pve-restic-backup` on `192.168.1.68`; repository subdirectory `pve-restic-backup`.
 - `Rotom_VM_Backup/.data` -> PVE storage `nas-rotom-vm-backup` at `/mnt/pve/nas-rotom-vm-backup`.
@@ -912,13 +930,13 @@ The Debian VM currently has **no UFW installation** per JAR-31; the broad UFW ru
 
 The 2026-09-27 read-only audit refreshed Rotom listeners and Docker-published ports, so the host-side portion is verified current. UniFi WAN forwarding/firewall/NAT policy remains unverified and must still be inspected separately before drawing conclusions about Internet exposure.
 
-### qBittorrent live Media-NFS-loss behavior — Needs Verification
+### qBittorrent live Libraries-NFS-loss behavior — Needs Verification
 
-Fail-closed recreation and the current Media guard are documented. The legacy documentation does not establish what an already-running qBittorrent container does if the active Media NFS payload disappears after startup. A purely read-only check cannot reproduce that failure mode. Resolve only through a separately planned non-destructive maintenance test, not by inference.
+Fail-closed recreation and the current Libraries guard are documented. The legacy documentation does not establish what an already-running qBittorrent container does if the active Libraries NFS payload disappears after startup. A purely read-only check cannot reproduce that failure mode. Resolve only through a separately planned non-destructive maintenance test, not by inference.
 
 ### Resolved or intentional states — not gaps
 
-- Current `/mnt/nas-downloaders` and `/mnt/nas-media` remain verified service boundaries. JAR-86 retired the final bindfs view, JAR-87 made qBittorrent/ROM payloads Media-only, and JAR-88 replaced the active Game guest mount with `/mnt/nas-gameserver`. Historical boot-recovery observations remain diagnostic evidence only.
+- The retired Downloader and Media guest boundaries must not be used as current service guidance. The supported current qBittorrent/ROM boundary is `/mnt/nas-libraries`; the former Game guest mount was later replaced by `/mnt/nas-game-servers`. Historical boot-recovery observations remain diagnostic evidence only.
 - `jaredwines.com` is intentionally undeployed; its Compose project is retained. Starting it later is an administrative decision, not missing evidence.
 - Historical `jaredwinescom_default`, `olivetin_default`, `portainer_default`, and `palworld_default` network observations are not part of the current JAR-31 bridge map.
 - Homepage backup-status access no longer depends on a guest UFW rule because UFW is not installed in the current VM.

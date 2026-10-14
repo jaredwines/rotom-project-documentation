@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Restic backup architecture, scope, retention, verification, restore evidence, and recovery boundaries  
 **Recovery scope:** pre-migration Rotom plus current Proxmox/VM foundation  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Restore Paperless in Libraries with NAS-resident media
+**Documentation updated:** 2026-10-14 — Read-only Rotom and PVE audit reconciliation
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -12,6 +12,20 @@
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
 
 ## 1. Purpose and Scope
+
+### Current PVE backup verification — 2026-10-14
+
+PVE host-config Restic remains scheduled daily at `04:00`. Its 2026-10-13 run completed successfully; the repository contained ten snapshots at audit time, with latest short ID `b3fd0c23`, and `restic check` completed without errors. Repository identity and protected credential handling are unchanged.
+
+Native job `rotom-vm-daily` remains configured for VMID 100 at `05:00`, snapshot mode, zstd compression, `repeat-missed=0`, and retention of seven daily, four weekly, and six monthly archives. Eight current VM archives were present, including the latest 2026-10-13 archive at approximately 36.3 GB compressed. A full decompression test passed and reported 64,872,503,296 bytes of uncompressed data. The transcript then piped the stream into `vma verify`, but did not capture an explicit verifier result or pipeline component statuses; treat full VMA structural verification as **Needs Verification**, not as a recorded pass. VM 100 had no Proxmox snapshots; that does not affect the independent VZDump archives.
+
+The PVE backup-status API reported both schedules successfully and the two NFS backup paths were mounted read/write. This is strong current backup evidence, but it does not replace a restore rehearsal. The earlier disposable-VM restore remains the latest recorded whole-VM restore proof.
+
+### Current guest backup observation — 2026-10-14
+
+`rotom-restic-backup.timer` is enabled and active with the documented `03:00` schedule plus up to ten minutes randomized delay. The read-only status API reports the 2026-10-13 03:01 PDT scheduled run as `success` and the next run for 2026-10-14. This verifies scheduler-reported job completion only; it does not establish a new snapshot ID, repository integrity check, or restore proof. The latest independently documented recovery-point ID remains the earlier verified record until privileged Restic inspection is supplied.
+
+The VM-local `/srv/rotom/backup-staging` root is absent. Every named local artifact beneath it is historical unless a later live path check re-establishes its presence. Restic-contained copies and historical checksums remain recovery evidence, but they are not proof of a current fast local rollback copy. Authoritative Libraries/Paperless NAS payload remains outside guest Restic and its effective snapshot/restore path remains **Needs Verification**.
 
 ### Current Paperless Libraries recovery state — 2026-10-13
 
@@ -37,7 +51,7 @@ The unused `/srv/rotom/appdata/documents` and `/srv/rotom/secrets/documents` roo
 
 ### Current Library restoration recovery note — 2026-10-13
 
-qBittorrentVPN and Prowlarr were restored from the retained JAR-84 local archive to their current Library paths. No new Restic snapshot or backup verification was requested or created. Their VM-local `/srv/rotom` state remains within ordinary guest Restic scope on a future run; Media torrent payloads remain outside that scope. Paperless was subsequently restored to `/srv/rotom/{appdata,secrets}/libraries/paperless` with authoritative media at `/mnt/nas-libraries/paperless`; see the current Paperless Libraries recovery overlay.
+qBittorrentVPN and Prowlarr were restored from the retained JAR-84 local archive to their current Library paths. No new Restic snapshot or backup verification was requested or created. Their VM-local `/srv/rotom` state remains within ordinary guest Restic scope on a future run; Libraries torrent payloads remain outside that scope. Paperless was subsequently restored to `/srv/rotom/{appdata,secrets}/libraries/paperless` with authoritative media at `/mnt/nas-libraries/paperless`; see the current Paperless Libraries recovery overlay.
 
 ### JAR-94 targeted Platform recovery — 2026-10-13
 
@@ -47,7 +61,7 @@ Restic snapshot `02c9c4e7` was used for a restricted staged recovery of the shar
 
 Before the Platform migration, a supported guest Restic run completed successfully and retained snapshot `02c9c4e7` at `2026-10-13 00:36:25 PDT`; normal retention pruned the temporary same-day snapshot `177e33f0`. The root-owned Restic worker's NPM SQLite staging source now points to `/srv/rotom/appdata/platform/nginx-proxy-manager/data/database.sqlite`. Guest Restic continues to include `/srv` and exclude `/mnt`; NAS content remains outside this guest backup boundary.
 
-### JAR-92 Paperless recovery limitation — 2026-10-13
+### Historical JAR-92 Paperless recovery limitation — 2026-10-13
 
 Paperless active paths and identity moved to Library, but document media remains on the distinct Documents NFS export and remains outside guest Restic's `/mnt` exclusion boundary. Targeted local rollback copies are `/root/jar-92-20261013-precutover` and `/root/jar-92-20261013-paperless-precutover`. Jared explicitly waived the isolated UNAS snapshot-restore acceptance check; do not treat that recovery exercise, planned Documents automount/reconnect behavior, or authenticated browser upload/OCR/original-download checks as verified.
 

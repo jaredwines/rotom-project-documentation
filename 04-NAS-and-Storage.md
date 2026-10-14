@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Restore Paperless in Libraries with NAS-resident media
+**Documentation updated:** 2026-10-14 — Read-only Rotom and PVE audit reconciliation
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -12,6 +12,12 @@
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
 
 ## 1. Purpose and Scope
+
+### Current PVE storage audit — 2026-10-14
+
+The PVE host's active storage set is `local`, `local-lvm`, and `nas-rotom-vm-backup`. The root filesystem had about 57 GiB free; the LVM-thin pool was 46.25% allocated, and VM 100's 100 GiB logical disk was 63.11% allocated. This supersedes older capacity percentages only as a dated observation, not as a fixed threshold. The host has no ZFS pool.
+
+Both PVE backup-specific NAS filesystems were mounted read/write over NFSv3: `PVE_Restic_Backup/.data -> /mnt/nas-pve-restic-backup` and `Rotom_VM_Backup/.data -> /mnt/pve/nas-rotom-vm-backup`. The NAS reported roughly 3.5 TiB free. `showmount` listed seven exports with the expected `.68`/`.69` client restrictions. The collection attempted unsupported `pvesm config`, so the exact current `/etc/pve/storage.cfg` text was not captured; the active storage list, mounts, backup job, and successful repository checks independently confirm the operational endpoints. Exact storage stanza options remain **Needs Verification**.
 
 ### Current Paperless Libraries media storage — 2026-10-13
 
@@ -52,7 +58,7 @@ This document records the current Phase B storage architecture and preserves the
 **Project:** Rotom-Home-Server  
 **Document:** `04-NAS-and-Storage.md`  
 **Baseline evidence:** 2026-09-14 22:46 PDT; read-only update 2026-09-15  
-**Documentation updated:** 2026-10-13 — Complete Available Sources audit; current mount contracts reconciled to the JAR-96 and renamed-drive overlays.
+**Documentation updated:** 2026-10-13 — Complete Available Sources consistency audit
 **Status:** The former ten-automount count is historical. The 2026-10-13 local fstab/final-removal verification establishes five current guest NFS automount contracts: Game Servers, Smart Home, Rotom Restic Backup, Libraries, and Hosted Websites. Guest `Rotom_Restic_Backup` remains documented as unchanged. PVE backup exports remain `PVE_Restic_Backup` for host-config Restic and `Rotom_VM_Backup` for whole-VM VZDump at their canonical PVE paths.
 
 The original audit was read-only. It did not recursively enumerate the NAS, modify mounts or permissions, restart containers, inspect secrets, traverse Restic repository internals, or create a hardlink test file. Later user-supplied checks, completed media GID changes, and the 2026-09-18 backup-share access-protection deployment are recorded below; they are separate from that audit. Unchanged capacity, mount, and systemd observations retain their original evidence dates.
@@ -455,9 +461,9 @@ The listing above records the core non-secret JAR-25 evidence files produced by 
 
 ## 9. Preserved Pre-Migration NFS Identity, Ownership, Permissions, and ACLs
 
-### Current media identity and ownership
+### Historical Media identity and ownership
 
-The Media, Game, Backup, and Shared Drive mounts are now all freshly verified as NFSv3 with `sec=sys`. Numeric Unix UID/GID values govern ownership; Rotom translates them into local names for display. The media service now retains UID **127** and uses primary GID **5000**, replacing its former GID 129. The later conversation records the Media NAS group migration to 5000 while preserving existing file-owner UIDs.
+At this historical checkpoint, the Media, Game, Backup, and Shared Drive mounts were verified as NFSv3 with `sec=sys`. Numeric Unix UID/GID values govern ownership; Rotom translates them into local names for display. The media service used UID **127** and primary GID **5000**, replacing its former GID 129. The later conversation records the Media NAS group migration to 5000 while preserving existing file-owner UIDs. Current Libraries ownership is defined in section 2.
 
 Recorded post-change examples:
 
@@ -796,7 +802,7 @@ Service-home symlinks were also freshly verified for all ten service identities,
 
 ## 17. Outstanding / Needs Verification
 
-### JAR-92 Library and Paperless storage state — 2026-10-13
+### Historical JAR-92 Library and Paperless storage state — 2026-10-13
 
 The Media NFS source/export and `/mnt/nas-media` automount remain intentionally unchanged; Library retains `127:5000` access and qBittorrent continues to use only `/mnt/nas-media/torrents` plus `.rotom-qbt-media-ready`. `/mnt/nas-downloaders` contains no qBittorrent payload files and is no longer a qBittorrent recovery-helper dependency.
 
@@ -805,7 +811,7 @@ The separate Documents NFS source/export and `/mnt/nas-documents` path also rema
 Current storage and backup automation are documented above; this section retains unresolved checks only. Historical JAR-31/JAR-32/JAR-33 commissioning states do not override later JAR-47/JAR-88 evidence. `/mnt` remains outside the guest Restic source scope.
 
 - **Needs Verification — UNAS metadata persistence:** recheck service-share root metadata after a future UNAS/UniFi Drive restart/update, especially Downloader `988:5005`, Media `988:5000`, Gameserver `988:5001`, current Restic share `Rotom_Restic_Backup` at `988:988` mode `0700`, and current service GIDs `5002`–`5008`. Resolve read-only with `findmnt` and `stat` from Rotom plus UNAS-side export/share inspection after the event.
-- **Needs Verification — live Media-NFS loss:** fail-closed recreation and the Media guard are documented, but sudden loss of the active Media payload while qBittorrent is already running is untested. Read-only inspection can verify the guard definition; actual runtime behavior requires a separately planned non-destructive maintenance test.
+- **Needs Verification — live Libraries-NFS loss:** fail-closed recreation and the Libraries guard are documented, but sudden loss of the active Libraries payload while qBittorrent is already running is untested. Read-only inspection can verify the guard definition; actual runtime behavior requires a separately planned non-destructive maintenance test.
 - **Needs Verification — Libraries Paperless recovery:** Paperless media is live on `/mnt/nas-libraries/paperless` under Libraries `127:5000` ownership. The retired Documents export refused a temporary Rotom mount and was not changed. Effective Libraries snapshot schedule/retention, an isolated snapshot restore, planned automount/reconnect behavior, and authenticated browser upload/OCR/original-download acceptance remain untested. Retain the protected recovery source until those checks are accepted.
 
 **Retired/historical:** do not recreate the old `Downloads/.data` export merely because it appears below. Current fstab/mount/showmount evidence uses `Downloader/.data`; `Downloads/.data` is retained only as dated recovery context.

@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer. A 2026-10-10 live inventory recorded 24 container objects, all running; it is historical point-in-time evidence and predates the 2026-10-13 deliberate Palworld stopped state and Uptime Kuma retirement.
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-13 — Persist Homepage backup-result color indicators
+**Documentation updated:** 2026-10-14 — Read-only Rotom and PVE audit reconciliation
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -56,6 +56,14 @@ Services are grouped by the Linux account directory containing their active Comp
 
 ## 1A. Current Phase B Docker State
 
+### Current runtime evidence boundary — 2026-10-14
+
+Read-only Compose, process, listener, NPM-route, and HTTP evidence confirms the current Platform, Libraries, Smart Home, Hosted Websites, Paperless, and intentionally stopped Palworld topology described by the newest overlays. The active stack tree contains 19 Compose files: two Game Servers, two Hosted Websites, seven Libraries modules, seven Platform modules, and two Smart Home modules; Paperless and RomM each define their documented database/broker companions. Jared Wines remains intentionally undeployed, and both Palworld modules remain deliberately non-running.
+
+This session could not run privileged Docker CLI inspection because noninteractive sudo was unavailable. Therefore the 2026-10-10 24-object count is historical and no new exact container, image, volume, network attachment, health, or restart-count inventory is claimed. Obtain `sudo docker ps -a` plus targeted non-secret `docker inspect` output before promoting a new count to current state.
+
+The Smart Home stack directories are `root:root`, but the live `home-assistant/compose.yaml` and `homebridge/compose.yaml` files are owned by `smart-home:smart-home`. Their ACLs grant `game-servers` write-class access. This differs from the root-administered ownership model stated elsewhere and is a high-impact **Needs Owner Confirmation** finding; no permission or ownership change was made.
+
 ### Downloader-remnant retirement — 2026-10-13
 
 The retired Downloader compatibility artifacts are absent: `/home/downloaders`, the JAR-84 local Downloader archive/staging directory, and Arcane's read-only bind of the former home. Active Arcane Compose rendered successfully; its live mounts are limited to Platform appdata, Docker socket, Platform secrets, and Platform stacks. Arcane was `running healthy` and its HTTPS endpoint returned `200`. Active Library Prowlarr/qBittorrentVPN services and NAS data were not changed.
@@ -106,7 +114,7 @@ JAR-37 is the accepted Phase C runtime gate. Docker's daemon-wide `json-file` ca
 
 ### Current NAS-backed recovery verification — 2026-10-10
 
-### JAR-92 Library-domain migration — 2026-10-13
+### Historical JAR-92 Library-domain migration — 2026-10-13
 
 JAR-94 above supersedes the Paperless, Prowlarr, and qBittorrentVPN portions of this dated section; the remaining Library history is retained as evidence.
 
@@ -339,9 +347,9 @@ The table below preserves the original Media inventory; its Compose-file column 
 | `radarr` | `lscr.io/linuxserver/radarr:latest` | Running at JAR-84 verification | `0.0.0.0:7878->7878/tcp`, `[::]:7878->7878/tcp` | None shown | `/srv/rotom/stacks/media/radarr/compose.yaml` |
 | `sonarr` | `lscr.io/linuxserver/sonarr:latest` | Running at JAR-84 verification | `0.0.0.0:8989->8989/tcp`, `[::]:8989->8989/tcp` | None shown | `/srv/rotom/stacks/media/sonarr/compose.yaml` |
 
-### Current media identity and NAS access
+### Historical Media identity and NAS access
 
-The Rotom `media` account remains UID **127** and primary GID **5000** (formerly **129**). The three current media-owned services—Jellyfin, Radarr, and Sonarr—retain the established media identity pattern:
+At this historical checkpoint, the Rotom `media` account was UID **127** and primary GID **5000** (formerly **129**). The then-current media-owned services—Jellyfin, Radarr, and Sonarr—used the established media identity pattern:
 
 ```text
 PUID=127
@@ -349,7 +357,7 @@ PGID=5000
 UMASK=002
 ```
 
-Prowlarr and qBittorrentVPN are Downloads-owned services at `901:5005` after JAR-21. Radarr, Sonarr, and Jellyfin remain media-owned at numeric `127:5000`; Jellyfin additionally has GPU-related supplementary groups needed for `/dev/dri` access.
+Prowlarr and qBittorrentVPN were Downloads-owned services at `901:5005` after JAR-21. Radarr, Sonarr, and Jellyfin used numeric `127:5000`; Jellyfin additionally had GPU-related supplementary groups needed for `/dev/dri` access. The current Libraries identity and `/mnt/nas-libraries` contract are defined in the current overlays above.
 
 `/mnt/nas-media` has root ownership `988:5000`, mode `2770`. Existing mixed owner UIDs in the library are preserved. The JAR-21 move to Downloads is historical; JAR-56/JAR-87 subsequently made `/mnt/nas-media/torrents` the active qBittorrent payload, written as UID:GID `901:5000`.
 
@@ -572,7 +580,7 @@ No additional Docker service is promoted to current state by this restructure. A
 The VM-era backup baseline is no longer a Docker gap. The latest explicitly verified guest recovery snapshot is `8efea294` (2026-10-05 21:45 PDT), created after repair of the active NPM SQLite staging source. The earlier `f666d63c` 2026-09-27 checkpoint and its 21/21 check are historical evidence. Guest Restic automation remains enabled/active, but its first timer-triggered run after the repair is **Needs Verification**; this does not change Docker backup scope, and `/mnt` remains outside the host Restic source set.
 
 - **Intentional:** Fran is not recreated, and her historical backup sudoers rule is not installed.
-- **Needs Verification — live Media-NFS loss:** startup/recreation fail-closed behavior and the Media guard are documented, but application behavior during sudden loss of the active Media NFS payload while qBittorrent is already running has not been exercised. Read-only inspection can confirm the guard definition; actual loss behavior requires a separately planned non-destructive maintenance test and must not be inferred.
+- **Needs Verification — live Libraries-NFS loss:** startup/recreation fail-closed behavior and the Libraries guard are documented, but application behavior during sudden loss of the active Libraries NFS payload while qBittorrent is already running has not been exercised. Read-only inspection can confirm the guard definition; actual loss behavior requires a separately planned non-destructive maintenance test and must not be inferred.
 - **Known Arcane metadata drift:** current auto-update/auto-heal settings were freshly verified on 2026-09-27 (document 06). JAR-85 verified an earlier active Arcane container mount of `/home/downloaders/docker`; the former `/home/infra/docker/downloads` discovery symlink was unreferenced by the current Arcane database and retired. The Downloader bind and its empty source were removed on 2026-10-13. Historical Arcane records that name the old symlink remain historical evidence. Its persisted qBittorrentVPN project status may be stale/`unknown`; Docker runtime and WireGuard, not Arcane metadata, are runtime authority.
 
 ## 14. Related Documentation

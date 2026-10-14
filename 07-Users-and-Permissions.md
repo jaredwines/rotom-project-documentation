@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-10-13 — Restore Paperless in Libraries with NAS-resident media
+**Documentation updated:** 2026-10-14 — Read-only Rotom and PVE audit reconciliation
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -12,6 +12,14 @@
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
 
 ## 1. Purpose and Scope
+
+### Current identity and Smart Home ownership audit — 2026-10-14
+
+Live NSS data confirms `platform 997:5002`, `libraries 127:5000`, `hosted-websites 902:5004`, `game-servers 995:5001`, `smart-home 126:5003`, `jared 1000:1000`, and `desktopcmd 1001:1001`. Jared is the sole listed `sudo` member; the Docker group has no listed members. Service-account lock state could not be read without privileged account access and remains **Needs Verification** rather than inferred from login shells.
+
+The Smart Home stack directories are root-owned, but both live Compose files are owned by `smart-home:smart-home`. The Home Assistant file is mode `0660` with a named `game-servers:rw-` ACL; the Homebridge file is mode `0670` with a named `game-servers:rwx` ACL. Jared has read-only/read-traverse named access. The cross-domain Game Servers write grant conflicts with the documented least-privilege/domain-separation model and **Needs Owner Confirmation**. This audit changed no ACL, owner, group, or mode.
+
+`/srv/rotom/backup-staging` is absent, so the earlier ACL observations for that root and its descendants are historical. The current `/srv/rotom`, `/home`, and `/home/platform` roots retain the documented named Jared read/traverse/default ACL pattern.
 
 ### Current Paperless Libraries identity — 2026-10-13
 
@@ -21,7 +29,7 @@ This is the canonical detailed owner of Rotom account identity and permission fa
 
 ### Evidence provenance
 
-**Documentation updated:** 2026-10-13 — Complete Available Sources audit; current identity section reconciled to Libraries, Game Servers, Hosted Websites, and Platform.
+**Documentation updated:** 2026-10-13 — Complete Available Sources consistency audit
 
 **Baseline method:** read-only inspection of the live host configuration, Docker metadata, systemd unit files, sudo policy, SSH metadata, filesystem modes, ACLs, NFS mount metadata, and non-mutating access tests. No passwords, password hashes, key contents, tokens, or private-key material were read or recorded.  
 **Update scope:** JAR-29 restored the historical ten storage-facing identities and JAR-30 established the package-created Docker privilege boundary. Later migrations retired or renamed several of those identities. The current table in section 2 is authoritative; earlier full-account and NAS-shortcut tables are historical reconstruction evidence. Fran remains unrecreated and her backup sudoers rule remains deferred. Administrative Mac key-only access remains verified; no key contents are recorded.
@@ -384,7 +392,7 @@ Jared remains outside these service storage groups for ordinary work. Because th
 
 ### Historical JAR-91 Paperless Documents identity mapping — 2026-10-05 (superseded by JAR-92)
 
-### JAR-92 Library identity and Paperless storage mapping — 2026-10-13
+### Historical JAR-92 Library identity and Paperless storage mapping — 2026-10-13
 
 The former `media` user/group is `library`, retaining `127:5000`, a locked password, and home `/home/library`. The active Library application set includes Jellyfin, Radarr, Sonarr, Prowlarr, RomM, qBittorrentVPN, and Paperless. qBittorrent uses `127:5000` with only its Media payload/guard bind.
 
@@ -432,7 +440,7 @@ Current non-socket exception fields are Home Assistant's host networking, privil
 - **Needs Verification — UNAS identity persistence:** service-share root metadata persistence across a future UNAS/UniFi Drive restart/update has not been observed. Resolve after such an event with read-only `findmnt`/`stat` checks from Rotom and UNAS-side share/export inspection.
 - **Historical by design:** backup/containerd objects may retain old primary GIDs; do not normalize them recursively without a specific verified need.
 - **Needs Verification — credential-rotation record:** VPN credential rotation after prior chat exposure is not established by the legacy documentation. Do not print, compare, or read credential values to prove this. Resolve through provider/account rotation history or administrator records; there is no safe host-only metadata check that proves a secret was rotated.
-- **Needs Verification — live Media-NFS loss:** fail-closed recreation and the current Media guard are documented, but a running qBittorrent session's behavior during sudden loss of the active Media payload mount has not been exercised. Read-only inspection can confirm the guard definition; actual behavior requires a separately planned non-destructive maintenance test.
+- **Needs Verification — live Libraries-NFS loss:** fail-closed recreation and the current Libraries guard are documented, but a running qBittorrent session's behavior during sudden loss of the active Libraries payload mount has not been exercised. Read-only inspection can confirm the guard definition; actual behavior requires a separately planned non-destructive maintenance test.
 
 ## 5. Preserved Pre-Migration Consolidated Verification — through 2026-09-21
 

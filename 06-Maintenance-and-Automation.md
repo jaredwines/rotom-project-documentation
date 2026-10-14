@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-13 — Restore Paperless in Libraries with NAS-resident media
+**Documentation updated:** 2026-10-14 — Read-only Rotom and PVE audit reconciliation
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -12,6 +12,22 @@
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
 
 ## 1. Purpose and Scope
+
+### Current PVE maintenance and risk audit — 2026-10-14
+
+PVE reported zero currently failed units. `pve-cluster`, `pvedaemon`, `pveproxy`, the CPU-temperature API, backup-status API, PVE Restic timer, and weekly maintenance timer were enabled/active as applicable. The weekly maintenance job last succeeded on 2026-10-11. At audit time, `libpve-storage-perl 9.1.13` and `qemu-server 9.2.11` were upgradeable while kernel `7.0` was kept back; this is dated package evidence and requires the normal reviewed maintenance workflow before action.
+
+Both Proxmox enterprise and no-subscription repository definitions appeared enabled. That conflicts with the earlier current-state assertion that the host moved away from enterprise endpoints. Do not delete or rewrite either source solely to make the documentation match: confirm the intended subscription/repository policy, then make a separately authorized smallest change.
+
+The current boot journal repeatedly records Postfix failure to open `/etc/aliases.db`. Local notification delivery may therefore be unreliable, and the recurring errors add log noise; rebuild/validate the aliases database and send a controlled local-delivery test in a separate maintenance action. The journal also retains an early `pve-alerting.service` failure, but no current alert worker/unit/timer/script/cron job exists and `systemctl --failed` is empty, so this is boot-history residue rather than evidence that JAR-95 alerting is active.
+
+The iGPU passthrough path continues to log an unreadable/invalid option-ROM warning at boot while VM 100 remains running with `hostpci0` configured. No current e1000e hang, NFS outage, or disk I/O failure was observed. CPU vulnerability reporting still marks Gather Data Sampling vulnerable and identifies residual SMT-related L1TF/MDS/MMIO exposure; assess firmware, microcode, workload trust, and any performance trade-off before changing mitigations. Sensor output also contains a nonsensical ACPI temperature and JC42 threshold alarms with zeroed limits, while CPU and NVMe temperatures were normal; do not use the bogus readings for automation without sensor-specific validation.
+
+### Current timer and recovery-control audit — 2026-10-14
+
+The guest reported zero failed systemd units. `rotom-restic-backup.timer`, `rotom-weekly-maintenance.timer`, and the 15-second `rotom-qbittorrent-media-guard.timer` are enabled and active. The weekly timer's canonical live name is `rotom-weekly-maintenance.timer`; `weekly-host-maintenance.timer` is not an installed unit. The Restic status API reports the latest scheduled run successful, subject to the recovery-evidence limitation in document 05.
+
+`rotom-nas-docker-recovery.service` remains enabled and uses `/usr/local/sbin/rotom-nas-docker-recovery`; the qBittorrent guard unit describes and checks the current Library mount contract. Exact helper branch behavior was not re-read under root access in this audit, so older Media/Documents/Filesync scope descriptions remain historical and the current executable's complete recovery target list remains **Needs Verification**.
 
 ### Current Paperless NAS recovery coverage — 2026-10-13
 
@@ -28,8 +44,6 @@ Record substantive changes to this document in the change log as part of the sam
 ### Current local-domain alignment — 2026-10-13
 
 Current automation and Compose references must use `/home/hosted-websites` and `/srv/rotom/{stacks,appdata}/hosted-websites` for websites (`hosted-websites` `902:5004`), `/home/game-servers` and `/srv/rotom/{stacks,appdata,secrets}/game-servers` for Palworld (`game-servers` `995:5001`), and `/home/smart-home` plus `/srv/rotom/{stacks,appdata}/smart-home` for Smart Home (`smart-home` `126:5003`). The guest `/mnt/nas-web` automount is retired; the current service-boundary automounts are `/mnt/nas-game-servers` from `Game_Servers/.data`, `/mnt/nas-hosted-websites` from `Hosted_Websites/.data`, and `/mnt/nas-smart-home` from `Smart_Home/.data`. No current home NAS shortcuts exist. Older `web`/`gameserver`/`smarthome` statements in dated maintenance evidence are not current operating instructions.
-
-### Current qBittorrent and Filesync automation state — 2026-10-13
 
 ### Downloader-remnant retirement — 2026-10-13
 
@@ -49,7 +63,7 @@ qBittorrentVPN is active again. Its enabled Library guard and NAS recovery helpe
 
 ### Historical JAR-94 retired-workload automation debt — 2026-10-13
 
-The active NAS recovery helper now validates only Media, but it still calls `recover_container qbittorrentvpn` even though qBittorrentVPN is retired and absent. The enabled qBittorrent media guard and root alert worker also retain non-operative qBittorrent checks. Syncthing and Paperless branches were removed with their retired local dependencies; the former Filesync systemd unit is absent. Treat the remaining qBittorrent references as cleanup debt, not runtime evidence, until a separate targeted automation cleanup is authorized and verified.
+At this historical checkpoint, the active NAS recovery helper validated only Media but still called `recover_container qbittorrentvpn` even though qBittorrentVPN was retired and absent. The enabled qBittorrent media guard and root alert worker also retained non-operative qBittorrent checks. Syncthing and Paperless branches were removed with their retired local dependencies; the former Filesync systemd unit was absent. Treat these records as dated cleanup evidence, not runtime evidence; the current helper and guard are defined in the 2026-10-13 overlays above.
 
 ### JAR-93 Platform operational paths — 2026-10-13
 
@@ -59,7 +73,7 @@ The root-owned Rotom Docs publisher reads the legacy documentation checkout at `
 
 The root-owned alert worker now reads its protected Platform inputs from `/srv/rotom/secrets/platform`. The enabled `filesync-syncthing.service` retains its name but now has `/srv/rotom/stacks/platform/syncthing` as its working directory. It was inactive after a historical NAS dependency failure; the healthy Syncthing container is the current verified runtime, and the unit is no longer failed.
 
-### JAR-92 recovery-helper scope — 2026-10-13
+### Historical JAR-92 recovery-helper scope — 2026-10-13
 
 `rotom-nas-docker-recovery` now validates Media, Documents, and Filesync NFS dependencies before conditionally recovering covered NAS-failed containers. The obsolete Downloader readiness-sentinel check was removed because qBittorrentVPN's active payload and fail-closed guard are Media-only. The helper successfully completed after the Library and Paperless recreations.
 
@@ -122,8 +136,8 @@ JAR-72 reorganized Homepage cards without changing monitoring behavior or any ap
 
 ### Current PVE recovery points
 
-- PVE host-config Restic: surviving canonical snapshot `35d4b0c2`; two pre-rename snapshots deliberately forgotten; repository check PASS.
-- Whole-VM: the 2026-10-05 PVE list contains eight current unprotected VMID `100` archives: six scheduler-produced `05:00` archives from 2026-09-30 through 2026-10-05, a separately listed 2026-09-29 archive, and manual `vzdump-qemu-100-2026_10_05-22_47_06.vma.zst`. The earlier 2026-09-28 archive's zstd/VMA checks remain historical evidence; it was absent from the current list. See document 05 for exact archive names, sizes, and verification limits.
+- PVE host-config Restic: ten snapshots were present on 2026-10-14; latest short ID `b3fd0c23`; the 2026-10-13 run succeeded and repository check passed. The earlier `35d4b0c2` point remains historical JAR-68 evidence.
+- Whole-VM: the 2026-10-14 list contains eight VMID `100` archives through 2026-10-13. The latest archive passed full zstd decompression; an explicit VMA-verifier result was not captured. The earlier disposable-VM restore remains the latest restore proof. See document 05 for verification limits.
 
 The intended staggered cadence remains guest Restic around `03:00`, PVE host-config Restic at `04:00`, and whole-VM PVE backup at `05:00`.
 
@@ -528,7 +542,7 @@ Phase B virtualization is accepted, guest Restic automation has been recommissio
 - **Retention observation:** eight current unprotected VMID `100` archives were listed under normal `7 daily / 4 weekly / 6 monthly` retention. Archive availability changes with retention; select and verify a recovery point at incident time.
 - **Intentional / commissioning decision:** `/usr/local/sbin/weekly-linux-update` exists, but `/etc/cron.d/weekly-linux-update` is absent. Decide separately whether to restore the historical Sunday 04:00 schedule.
 - **Intentional:** Fran is not recreated; do not install her historical backup sudoers rule until that account is deliberately restored.
-- **Needs Verification — live Media-NFS loss:** the current Media guard is documented, but an already-running qBittorrent session's behavior during sudden loss of the Media payload mount has not been exercised. Read-only inspection can confirm the guard definition; actual behavior requires a separately planned non-destructive maintenance test.
+- **Needs Verification — live Libraries-NFS loss:** the current Libraries guard is documented, but an already-running qBittorrent session's behavior during sudden loss of the Libraries payload mount has not been exercised. Read-only inspection can confirm the guard definition; actual behavior requires a separately planned non-destructive maintenance test.
 - **Needs Verification — end-to-end WOL trigger:** persistent host-side WOL configuration and post-power-cycle recovery are verified, but the transcript does not capture a magic-packet sender invocation; one controlled off-state wake with the sender command/output captured is still required to prove the NUC actually powers on from WOL.
 - **Needs Verification / separate stability track:** continue the Proxmox/ConBee/iGPU follow-up. Do not infer a single earlier-reset cause from the current legacy documentation.
 

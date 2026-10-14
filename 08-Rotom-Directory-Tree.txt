@@ -8,7 +8,7 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-10-13; Move Game Servers and Smart Home to renamed NAS Drives.
+# Documentation revised: 2026-10-14; read-only Rotom and PVE audit reconciliation.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the legacy documentation.
 #
@@ -16,8 +16,26 @@
 # The explicit 2026-10-13 overlays immediately below are the current supported topology.
 # The large tree beginning later in this file is a preserved pre-migration/restoration
 # capture unless a path is explicitly reaffirmed by an overlay. It must not be used to
-# recreate retired identities, mounts, or service roots. The complete current automount
-# count remains Needs Verification; resolve it read-only with findmnt and systemctl.
+# recreate retired identities, mounts, or service roots. The final 2026-10-13 fstab and
+# removal verification establishes five current guest NFS automount contracts; recheck
+# live activation read-only with findmnt and systemctl when troubleshooting.
+#
+# 2026-10-14 live reconciliation:
+# - PVE is Proxmox VE 9.2.0 with pve-manager 9.2.21 and kernel 7.0.14-19-pve.
+#   VMID 100 is running with its documented 8-vCPU/12-GiB/100-GiB/iGPU contract;
+#   no VM snapshots were present. PVE firewall status is disabled with empty rules.
+# - PVE backup NFS paths are mounted read/write. Host-config Restic has ten snapshots
+#   and passed restic check; eight current VM archives exist. Latest archive zstd
+#   integrity passed, but an explicit full VMA-verifier result remains unrecorded.
+# - PVE operational follow-up: both enterprise and no-subscription repositories appear
+#   enabled; /etc/aliases.db is missing; two packages are pending; CPU vulnerability
+#   exposure and the iGPU option-ROM warning require owner-reviewed maintenance.
+# - /srv/rotom/backup-staging is absent; paths formerly documented beneath it are
+#   historical unless a fresh live check proves they were recreated.
+# - /srv/rotom/stacks/smart-home/{home-assistant,homebridge}/compose.yaml are owned
+#   by smart-home:smart-home and carry named game-servers write-class ACLs. This is
+#   a documented security/ownership discrepancy pending owner confirmation.
+# - the five current NFS filesystems were mounted read/write during the audit.
 # - 2026-10-13 Game Servers / Smart Home NAS-drive alignment: the fstab-backed NFSv3 `Game_Servers/.data -> /mnt/nas-game-servers` and `Smart_Home/.data -> /mnt/nas-smart-home` automounts are current and live-traversal verified. Their roots are empty `988:5001` and `988:5003` setgid service boundaries; create/remove checks verified descendants as `game-servers:game-servers` and `smart-home:smart-home`. There are no current home NAS shortcuts. The former `Gameserver/.data -> /mnt/nas-gameserver` and `Smarthome/.data -> /mnt/nas-smarthome` guest contracts, mountpoints, and shortcuts are retired. No live container used either old path; Palworld worlds and Smart Home state remain VM-local, and no NAS data migration or backup-policy change was made.
 # - 2026-10-13 Media mountpoint retirement: `/mnt/nas-media` is absent. Its guest fstab/automount and active configuration dependencies had already been retired; its only remaining local `library/games` directories were empty and removed with guarded `rmdir`. The sole active Library guest contract is `/mnt/nas-libraries`. NAS-side Media export/data was not inspected or changed; older Media paths below are historical evidence only.
 # - JAR-96 2026-10-13 Library-to-Libraries cutover: active Library storage is `/mnt/nas-libraries`, NFSv3 `Libraries/.data`, root `988:5000` mode `2771`; `/home/libraries/nas-libraries -> /mnt/nas-libraries`. Every descendant is now `libraries:libraries` (`127:5000`) and all directories retain setgid. Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and NPM bind the new path; Homepage monitors it. qBittorrent retains WireGuard and its non-creating sentinel/guard. The local `/mnt/nas-library` fstab contract, mount, and former singular-home symlink are retired; NAS `Library/.data` data/export is retained. Initial plus final rsync converged at 5,929 entries / 205,137,536,813 bytes with no deletes; a sentinel read from an unmounted state proved the generated automount before containers were restored. NPM's reboot-time bind-start failure is now covered by the scoped NAS recovery helper; restored public Homepage HTTPS returned `200`. Jared confirmed the authenticated workflow works after cutover. No backup/snapshot was created at Jared's explicit direction.
@@ -68,7 +86,9 @@
 # /var/backups/pve-restic-recovery/          canonical reconstruction staging tree
 # /mnt/nas-pve-restic-backup/                NFS PVE_Restic_Backup/.data
 #   pve-restic-backup/                       Restic repo ID 8ca0218c645dc2968c2b21d67dbda3840794d8bc9c157c0515a85af30eb3d0e3
-# - Current snapshot: 35d4b0c2, host pve, path /var/backups/pve-restic-recovery. Pre-rename snapshots 0cf1c62a and 3db28d41 were deliberately forgotten; restic check then passed with no errors.
+# - 2026-10-14 current state: ten snapshots; latest short ID b3fd0c23, host pve,
+#   path /var/backups/pve-restic-recovery; restic check passed. Snapshot 35d4b0c2
+#   remains historical JAR-68 evidence.
 # - Old local mount /mnt/nas-proxmox-restic-backup and old active worker/unit/timer/staging names are absent.
 #
 # PVE WHOLE-VM BACKUP — CURRENT
@@ -78,7 +98,9 @@
 # /run/lock/rotom-vm-vzdump-manual.lock
 # /etc/pve/jobs.cfg  job `rotom-vm-daily`: node pve; VMID 100; storage nas-rotom-vm-backup; 05:00; snapshot; zstd; repeat-missed=0; retention 7 daily / 4 weekly / 6 monthly
 # /mnt/pve/nas-rotom-vm-backup/              PVE-managed NFS Rotom_VM_Backup/.data, content=backup
-#   Current 2026-10-05 listing: eight unprotected VMID 100 archives, six scheduled at 05:00 from 2026-09-30 through 2026-10-05, a separately listed 2026_09_29-20_07_46 archive, plus manual 2026_10_05-22_47_06 (56,432,423,998 bytes); see document 05 for exact archive list/sizes.
+#   Current 2026-10-14 listing: eight VMID 100 archives through 2026-10-13; the
+#   latest is about 36.3 GB compressed and passed full zstd decompression. The
+#   transcript did not expose an explicit VMA-verifier result; see document 05.
 # - The former 2026_09_28-00_09_19 archive had zstd PASS/full VMA verify PASS but is absent from the current list; preserve those checks as historical evidence only. Historical local backup-proxmox-to-nas.pre-systemd.* launcher was deliberately deleted.
 # - Old active storage/job/manual names are absent.
 # - JAR-57 used temporary `jar57-test` directory storage below this mount only to restore archive `vzdump-qemu-100-2026_09_28-19_28_32.vma.zst` as disposable VMID 101. It booted q35/OVMF/x86-64-v2-AES with no host attachment and network link down; the VM, storage definition, and now-empty `jar57-test/images` tree were subsequently removed. This is historical test evidence, not a persistent storage path.
