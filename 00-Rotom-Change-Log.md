@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-15 — Improve legacy documentation navigation and maintenance guidance
+**Documentation updated:** 2026-10-15 — Record post-cleanup Docker and Arcane automation audit
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -69,6 +69,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-15 — Record post-cleanup Docker and Arcane automation audit
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `06-Maintenance-and-Automation.md`.
+- **Status:** **Documentation only / Verified / Needs Verification.** The audit and this legacy documentation update made no Docker, Compose, service, image, volume, network, NAS, mount, application-data, or live configuration change.
+- **Changes:** Recorded the complete read-only Docker audit after container cleanup/recreation. Corrected the current runtime to 23 running containers, 19 networks, two unattached named volumes, 23 images, and containerd `2.4.1`. Documented that the intended 22-workload set is healthy and matches all current Compose hashes, but `jaredwines.com` was also running despite its documented undeployed intent. Corrected Arcane's live automatic-update and auto-heal settings to enabled, scheduled pruning to disabled, and `followProjectSymlinks` to enabled. Recorded Arcane's non-dry-run 10:40 PDT update of Jared Wines, the resulting unreferenced prior Nginx image, the absent retired Syncthing image, and uncertain Arcane Rustic/backup-helper resources. Superseded current-facing statements that Paperless still joins retired `rotom-proxy`; older dated network records remain historical.
+- **Evidence:** Docker Engine/client `29.9.0`, Compose `v5.6.0`, and containerd `2.4.1` were active. All 19 Compose definitions rendered; all 23 objects were running with `unless-stopped`, zero restarts, expected Compose labels/paths/hashes, and healthy configured healthchecks. Documented direct and local-SNI probes returned their expected `200`/`302` responses, while Jared Wines remained `502` because its Compose definition publishes no host port. Docker events and Arcane activity records align on a successful non-dry-run automatic update at 10:40 PDT that replaced `nginx:alpine` and recreated Jared Wines. Arcane's classified boolean settings showed auto-update and auto-heal enabled; its system/volume backup policy and run tables were empty. No secret or complete configuration value was read or recorded.
+- **Outstanding:** Jared Wines' desired deployment state and its original inclusion in the recreation remain **Needs Verification**. Do not remove its container/network, the prior unreferenced Nginx image, `ghcr.io/rustic-rs/rustic:v0.11.2`, `arcane-rustic-cache`, or `arcane-backups` without the additional read-only ownership/dependency checks recorded in documents 02 and 06 and separate cleanup authorization. Three documented NAS automounts were armed but idle and were not activated by this audit. Available Sources replacement remains manual by Jared.
 
 ## 2026-10-15 — Retire Rotom shared Docker networks
 

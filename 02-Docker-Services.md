@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; the current runtime baseline is the 2026-10-15 inventory in section 1A  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Improve navigation and safe-use guidance
+**Documentation updated:** 2026-10-15 — Record post-cleanup Docker and Arcane automation audit
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -23,7 +23,7 @@ Record substantive changes to this document in the change log as part of the sam
 
 ### Current Paperless Libraries Compose deployment — 2026-10-13
 
-Paperless, `paperless-db` (PostgreSQL 18), and `paperless-broker` (Valkey 9) are active from `/srv/rotom/stacks/libraries/paperless/compose.yaml`. The restored non-media state is VM-local at `/srv/rotom/appdata/libraries/paperless/{broker,database,data,export,consume}`; protected environment inputs are root-owned below `/srv/rotom/secrets/libraries/paperless`. The web container maps processes to Libraries `127:5000`, publishes only `127.0.0.1:8000`, and joins `rotom-proxy`; database and broker have no host ports.
+Paperless, `paperless-db` (PostgreSQL 18), and `paperless-broker` (Valkey 9) are active from `/srv/rotom/stacks/libraries/paperless/compose.yaml`. The restored non-media state is VM-local at `/srv/rotom/appdata/libraries/paperless/{broker,database,data,export,consume}`; protected environment inputs are root-owned below `/srv/rotom/secrets/libraries/paperless`. The web container maps processes to Libraries `127:5000`, publishes only `127.0.0.1:8000`, and uses only `paperless_default`; database and broker have no host ports. Its former `rotom-proxy` attachment is retired.
 
 The sole media bind is `/mnt/nas-libraries/paperless -> /usr/src/paperless/media`. It uses `create_host_path: false`; the target is `127:5000`, mode `2770`. Five restored media files total 384,771 bytes and their SHA-256 manifest matches the retained recovery copy. Compose rendering succeeded, all three containers run, and Paperless is healthy. Historical Documents/Paperless paths below are recovery evidence, not active Compose guidance.
 
@@ -37,7 +37,7 @@ Jellyfin, Radarr, Sonarr, RomM, qBittorrentVPN, and Nginx Proxy Manager were rec
 
 ### Current local-domain alignment — 2026-10-13
 
-The active website Compose/appdata roots are `/srv/rotom/{stacks,appdata}/hosted-websites`, owned by `hosted-websites` `902:5004`; old `web` paths are historical. Aloha Millworks was recreated from the new roots and public HTTPS returned `200`; Jared Wines remains undeployed. The guest `/mnt/nas-web` contract is retired locally and is not an application bind.
+The active website Compose/appdata roots are `/srv/rotom/{stacks,appdata}/hosted-websites`, owned by `hosted-websites` `902:5004`; old `web` paths are historical. Aloha Millworks was recreated from the new roots and public HTTPS returned `200`. Jared Wines remained undeployed at this 2026-10-13 checkpoint; the complete 2026-10-15 runtime audit below supersedes that live-state observation. The guest `/mnt/nas-web` contract is retired locally and is not an application bind.
 
 The active Palworld Compose/appdata/secrets roots are `/srv/rotom/{stacks,appdata,secrets}/game-servers`, owned by `game-servers` `995:5001`; old `gameserver` paths are historical. Jared and Fran were running and healthy on 2026-10-15. Their labels and binds resolve only to the new local roots; no world data or NAS Gameserver content was changed by this documentation reconciliation. The reason and intended persistence of the change from the earlier stopped state remain unverified.
 
@@ -63,6 +63,16 @@ Services are grouped by the Linux account directory containing their active Comp
 **Port notation:** Entries containing `->` are published host-to-container mappings. Bare ports are listed separately as container-only ports with no host mapping shown. “None shown” means the source PORTS field was blank; it does not establish network mode or lack of connectivity.
 
 ## 1A. Current Docker Runtime and Deployment State
+
+### Complete post-cleanup runtime audit — 2026-10-15
+
+The final read-only snapshot contained 23 containers, all running, with zero restarts and `restart: unless-stopped`; 19 networks; two named volumes; and 23 images occupying approximately 21 GB. Docker Engine/client are `29.9.0`, Compose is `v5.6.0`, and containerd is `2.4.1`. All 19 Compose definitions under `/srv/rotom/stacks` rendered successfully. Every container is Compose-managed, no one-off container exists, and each live service's Compose file, project, service, and config hash match the current definition. Six configured Docker healthchecks were healthy: Homepage, Arcane, Paperless, RomM database, and both Palworld servers. The remaining images define no Docker healthcheck.
+
+The intended 22-container deployment is complete and functional: documented bind sources exist; Library NAS mounts and modes match Compose; qBittorrentVPN retains `wg0` at `10.2.0.2/32`; all documented unauthenticated local and local-SNI HTTP probes returned their expected `200`/`302` responses; and no intended service is missing, stopped, unhealthy, or dependent on a removed shared bridge. `/mnt/nas-libraries` and `/mnt/nas-rotom-restic-backup` were active NFSv3 read/write mounts. The Game Servers, Smart Home, and Hosted Websites automounts were armed but idle and were deliberately not activated by this read-only audit.
+
+`jaredwines.com` is unexpectedly deployed as the twenty-third container, with `jaredwinescom_default` as the nineteenth network. It has no published port, so NPM's retained `127.0.0.1:7777` upstream still returns `502`. Docker events show Arcane stopped, destroyed, recreated, and started this container at 10:40 PDT while replacing `nginx:alpine`; Arcane recorded the same event as a successful non-dry-run automatic update. The updater left the prior Nginx image untagged and unreferenced. The cause of Jared Wines' original inclusion in the earlier full recreation and its desired deployment state remain **Needs Verification**.
+
+Both named volumes are unattached and report `0B`: `arcane-backups` and `arcane-rustic-cache`. The latter carries Arcane internal volume-helper labels. `ghcr.io/rustic-rs/rustic:v0.11.2` is not referenced by a container, while Arcane's system/volume backup policy and run tables are empty. Removal safety for either volume or the Rustic image is unverified: first confirm Arcane's authenticated backup settings/API and inspect Arcane activity/log evidence around their 04:15 PDT creation. The prior Nginx image likewise requires a final exact-ID ancestor check plus confirmation that no Arcane update/rollback is in flight before any separately authorized cleanup. The untagged RomM, MariaDB, and pinned Rotom Docs images are active container images and are not cleanup candidates. The retired Syncthing image is absent.
 
 ### Shared Docker-network retirement and verified recovery — 2026-10-15
 
@@ -611,7 +621,7 @@ The VM-era backup baseline is no longer a Docker gap. The latest observed automa
 
 - **Intentional:** Fran is recreated with full sudo on Rotom and PVE. Her historical exact-command backup sudoers rule remains absent because full sudo already authorizes the workflow; SSH-key, legacy documentation/GitHub/Codex, and named documentation access remain deferred.
 - **Verified by Jared confirmation — live Libraries-NFS loss:** the planned non-disruptive running-qBittorrent test completed. Detailed runtime observations were not retained; do not infer behavior beyond the confirmed test outcome.
-- **Known Arcane metadata drift:** live 2026-10-15 Arcane settings have automatic updates, auto-heal, and scheduled pruning disabled; `followProjectSymlinks=true` remains enabled (document 06). JAR-85 verified an earlier active Arcane container mount of `/home/downloaders/docker`; the former `/home/infra/docker/downloads` discovery symlink was unreferenced by the current Arcane database and retired. The Downloader bind and its empty source were removed on 2026-10-13. Historical Arcane records that name the old symlink remain historical evidence. Its persisted qBittorrentVPN project status may be stale/`unknown`; Docker runtime and WireGuard, not Arcane metadata, are runtime authority.
+- **Known Arcane automation drift:** live 2026-10-15 Arcane settings have automatic updates and auto-heal enabled, scheduled pruning disabled, and `followProjectSymlinks=true`. A successful non-dry-run automatic update recreated Jared Wines at 10:40 PDT. This supersedes the earlier same-day database reading that reported updates and auto-heal disabled. JAR-85 verified an earlier active Arcane container mount of `/home/downloaders/docker`; the former `/home/infra/docker/downloads` discovery symlink was unreferenced by the current Arcane database and retired. The Downloader bind and its empty source were removed on 2026-10-13. Historical Arcane records that name the old symlink remain historical evidence. Its persisted qBittorrentVPN project status may be stale/`unknown`; Docker runtime and WireGuard, not Arcane metadata, are runtime authority.
 
 ## 14. Related Documentation
 

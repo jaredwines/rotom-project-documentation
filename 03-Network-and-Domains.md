@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Improve navigation and safe-use guidance
+**Documentation updated:** 2026-10-15 — Record post-cleanup Docker and Arcane automation audit
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -20,6 +20,12 @@ Record substantive changes to this document in the change log as part of the sam
 - This file owns network and routing facts; storage ownership, service deployment, backup, and account privileges remain canonical in documents 02 and 04–07.
 
 ## 1. Purpose and Scope
+
+### Post-cleanup Docker network and route audit — 2026-10-15
+
+The final read-only snapshot contained 19 Docker networks: the three Docker built-ins, fifteen intended private project bridges, and unexpected `jaredwinescom_default`. The retired shared bridges `rotom-proxy`, `rotom-arr`, and `rotom-monitoring` remain absent, and no active container or current Compose definition references them. Without the unexpectedly deployed Jared Wines project, the topology is the documented eighteen networks.
+
+All documented listeners and unauthenticated direct/local-SNI route probes returned their expected responses. Jared Wines is running but publishes no host port, so NPM's retained `127.0.0.1:7777` upstream still returns `502`; its runtime presence does not make the route operational. Any older current-facing sentence that says Paperless, RomM, Rotom Docs, Aloha, or another retained workload still joins `rotom-proxy` is superseded by the shared-network retirement and this audit. Historical dated topology remains preserved as history.
 
 ### Current Docker-network and Glances-access state — 2026-10-15
 
@@ -47,7 +53,7 @@ Current listener inspection shows that NPM is not the only LAN-reachable path. T
 
 ### Current Paperless route — 2026-10-13
 
-Paperless is active from the Libraries deployment and listens only at `127.0.0.1:8000`. The retained NPM proxy record for `paperless.rotom.casa` is now operational again: both a loopback request and an SNI request through NPM returned the expected `302` login redirect. Its database and broker remain private on the Paperless Docker network; the web service also joins `rotom-proxy`. Historical statements that Paperless is absent or that its retained route has no upstream are superseded by this overlay.
+Paperless is active from the Libraries deployment and listens only at `127.0.0.1:8000`. The retained NPM proxy record for `paperless.rotom.casa` is operational: both a loopback request and an SNI request through NPM returned the expected `302` login redirect. Its web service, database, and broker use only `paperless_default`; the former `rotom-proxy` attachment is retired. Historical statements that Paperless is absent or that its retained route has no upstream are superseded by this overlay.
 
 ### Current Library routes — 2026-10-13
 

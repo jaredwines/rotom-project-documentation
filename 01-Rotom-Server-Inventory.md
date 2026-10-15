@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Improve navigation and safe-use guidance
+**Documentation updated:** 2026-10-15 — Record post-cleanup Docker and Arcane automation audit
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -52,6 +52,14 @@ Within each subject document, use the newest dated **Current** section first. Us
 This audit confirms that the newest dated overlays at the start of this section are the supported current-state layer. Later undated-looking summaries and earlier JAR checkpoint tables are retained for evidence but are **Historical** wherever they name `infra`, `library`, `gameserver`, `web`, `/mnt/nas-media`, `/mnt/nas-library`, `/mnt/nas-gameserver`, Uptime Kuma, or Syncthing as current, or state a Palworld deployment status not reaffirmed by a newer overlay. Do not use those older passages as operating instructions. The final 2026-10-13 fstab and 2026-10-15 read-only verification establish five current guest NFS automount contracts: Game Servers, Smart Home, Rotom Restic Backup, Libraries, and Hosted Websites. Reconfirm their live activation read-only with `findmnt` plus `systemctl list-units --type=automount` on Rotom when troubleshooting.
 
 ## 2. Current Rotom Summary
+
+### Post-cleanup Docker and Arcane automation audit — 2026-10-15
+
+A complete read-only audit after the Docker cleanup/recreation found 23 container objects, all running with `restart: unless-stopped` and zero restarts; 19 Docker networks; two unattached named volumes; and 23 images. Docker Engine/client remain `29.9.0`, Compose remains `v5.6.0`, and live containerd is `2.4.1`. All 19 Compose definitions rendered successfully, every running service carried the expected Compose project/service/path/config-hash labels, and all live hashes matched their definitions. The intended 22-container service set passed its configured healthchecks, documented local responses, NAS-bind source checks, and qBittorrentVPN `wg0` check. No intended service was missing, stopped, unhealthy, or dependent on a removed Docker network.
+
+`jaredwines.com` is the twenty-third container and contradicts the documented intentionally undeployed state. It has no published host port, so its NPM route still returns the expected unavailable `502`. During the audit Arcane performed a successful non-dry-run automatic update at 10:40 PDT, replaced the `nginx:alpine` image, and recreated Jared Wines. Docker events and Arcane activity records agree on that sequence; the read-only audit did not initiate it. Arcane's live settings classify automatic updates and auto-heal as enabled, scheduled pruning as disabled, and `followProjectSymlinks` as enabled. This supersedes the earlier same-day audit statement that automatic updates and auto-heal were disabled. Jared Wines' desired deployment state and the cause of its original inclusion in the cleanup recreation remain **Needs Verification**.
+
+The former shared bridges remain absent. The additional nineteenth network is `jaredwinescom_default`; without that unexpected project, Docker retains the documented eighteen-network topology. `arcane-backups` and `arcane-rustic-cache` are both unattached and report `0B`; the latter is labeled as an Arcane internal volume-helper resource. Arcane's system/volume backup policy and run tables are empty, but removal safety is unverified. The retired Syncthing image is now absent. The only images not referenced by any container are the prior untagged Nginx image left by the live update and `ghcr.io/rustic-rs/rustic:v0.11.2`; do not remove either solely because it is dangling or unused.
 
 ### Shared Docker-network retirement and recovery — 2026-10-15
 

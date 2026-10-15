@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-15 — Improve navigation and safe-use guidance
+**Documentation updated:** 2026-10-15 — Record post-cleanup Docker and Arcane automation audit
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -20,6 +20,14 @@ Record substantive changes to this document in the change log as part of the sam
 - This file owns operational workflow and automation; backup semantics, service deployment, and privileges remain canonical in documents 05, 02, and 07.
 
 ## 1. Purpose and Scope
+
+### Current Arcane automation drift — 2026-10-15
+
+Read-only inspection of the live Arcane database classifies automatic updates and auto-heal as enabled, scheduled pruning as disabled, and `followProjectSymlinks` as enabled. Arcane activity records show Auto Heal jobs every five minutes and a successful non-dry-run automatic update beginning at 10:40:27 PDT. Docker events align with that activity: Arcane replaced `nginx:alpine`, then stopped, destroyed, recreated, and started `jaredwines.com`. The audit itself issued no mutating Docker or Compose command. This supersedes the earlier same-day statement that automatic updates and auto-heal were disabled.
+
+The update demonstrates that Arcane can mutate current Docker state without a deliberate target-stack maintenance action. Jared Wines was already running before the 10:40 update despite its documented intentionally undeployed state; its desired state and the cause of its original inclusion in the cleanup recreation remain **Needs Verification**. Until separately reviewed, do not rely on Arcane as observation-only and do not assume an intentionally stopped/undeployed Compose definition is excluded from its automation.
+
+Docker records unattached `arcane-backups` and `arcane-rustic-cache` volumes created at 04:15 PDT; both report `0B`, and the cache is labeled as an Arcane internal volume-helper resource. The Rustic helper image is present without a container, while Arcane's system/volume backup policy and run tables contain no records. The names, common creation time, and cache label indicate an Arcane relationship but do not prove the creating action. Removal safety remains unverified. Before any separately authorized cleanup, check Arcane's authenticated backup settings/API, inspect its activity/log records around 04:15, and reconfirm exact image/volume consumers.
 
 ### Current Docker network recovery posture — 2026-10-15
 
@@ -580,8 +588,8 @@ No proposed automation becomes current through this restructure. Future monitori
 These items are retained for risk context; each line states whether it is still current.
 
 1. **Arcane registry history:** a pre-JAR-21 audit found stale Smart Hub/Smarthome records and incorrect Prowlarr/qBittorrent project paths. JAR-21 reconciled the then-active project paths; unrelated stale historical records remain technical debt. The 2026-09-27 database reread is historical and does not establish current project paths or automation settings.
-2. **Arcane update scope:** the 2026-09-27 database audit recorded automatic updates at midnight with no exclusions and auto-heal every 30 seconds with no exclusions, a five-restart limit, and a 30-minute window. The 2026-10-15 live audit supersedes that state: automatic updates and auto-heal were disabled. Recheck Arcane read-only before relying on either behavior.
-3. **Jared Wines:** intentionally undeployed; its Compose file remains `/home/web/docker/jaredwines.com/compose.yaml`. Starting it later is a separate administrative change.
+2. **Arcane update scope:** the 2026-09-27 database audit recorded automatic updates at midnight with no exclusions and auto-heal every 30 seconds with no exclusions, a five-restart limit, and a 30-minute window. An earlier 2026-10-15 reading reported both disabled, but the later complete audit found both enabled, five-minute Auto Heal activity, and a successful non-dry-run automatic update. The newer evidence controls; exact exclusions and intended policy remain **Needs Verification**.
+3. **Jared Wines:** the current Compose file is `/srv/rotom/stacks/hosted-websites/jaredwines.com/compose.yaml`. Although the intended state remained undeployed, the cleanup recreation started it and Arcane automatically recreated it again at 10:40 PDT. It has no published port and its NPM route remains `502`; desired persistence remains **Needs Verification**.
 4. **Sunday updater:** the reboot-capable script is restored, but the current VM has no `/etc/cron.d/weekly-linux-update`; the old Sunday 04:00 schedule is historical and intentionally not recommissioned.
 5. **Docker logging:** the pre-migration host lacked daemon-wide limits; the current VM has daemon-wide `json-file` limits of `10m` × `3`, so the old “most logs unlimited” warning is retired for current state.
 6. **Alerting:** Historical JAR-73 high-signal delivery was verified, but the Rotom and PVE alerting layers were retired by JAR-95; no current alert worker, timer, delivery target, or public status page is documented.
