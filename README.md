@@ -37,10 +37,10 @@ Available Sources defines the legacy documentation membership boundary. Reposito
 
 - Treat dated evidence and explicit state labels as more authoritative than unstated assumptions.
 - Use the current legacy documentation documents for operational reference; do not use older change-log entries as instructions to recreate prior state.
+- Read the canonical maintenance contract in [00 - Rotom Change Log](00-Rotom-Change-Log.md) before preparing an legacy documentation change.
 - Use the guarded `retired-helper` helper for normal repository operations. `retired-helper path` resolves the active checkout.
 - Run the repository's offline `support/tooling/retired-helper lint` validation before synchronization checks. After the matching helper version is installed, `retired-helper lint` is equivalent.
 - From any directory, run `bash "$(retired-helper path)/support/tooling/test-retired-helper-runbooks"` to validate the numbered runbook-first legacy documentation's permanent structure, links, safety labels, and nine-file membership.
-- Read the [contribution guide](support/CONTRIBUTING.md) before preparing a change.
 
 ## Safety
 
@@ -48,4 +48,4 @@ Never commit passwords, tokens, private keys, VPN credentials, cookies, Home Ass
 
 ## Keeping the legacy documentation current
 
-The canonical legacy documentation maintenance contract is [00 - Rotom Change Log](00-Rotom-Change-Log.md). It defines the required evidence standard, consistency review, state labels, dated change-history entries, and the supported publication workflow. This README and the [contribution guide](support/CONTRIBUTING.md) are repository guides and do not replace that contract.
+The canonical legacy documentation maintenance contract is [00 - Rotom Change Log](00-Rotom-Change-Log.md). It defines the required evidence standard, consistency review, state labels, dated change-history entries, and the supported publication workflow. This README is repository navigation and does not replace that contract.

@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; the current runtime baseline is the 2026-10-15 inventory in section 1A  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Runbook-first conversion
+**Documentation updated:** 2026-10-15 — Final acceptance reconciliation
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -56,9 +56,9 @@ Nginx Proxy Manager is shared by all proxied services. Do not restart or recreat
 | Site | Desired-state status | Compose file | Container | Direct check | Proxied check |
 |---|---|---|---|---|---|
 | Aloha Millworks | Supported active site | `/srv/rotom/stacks/hosted-websites/alohamillworks.com/compose.yaml` | `alohamillworks.com` | `http://127.0.0.1:7778/` → `200` | `https://alohamillworks.com/` → `200` |
-| Jared Wines | **Needs Verification** | `/srv/rotom/stacks/hosted-websites/jaredwines.com/compose.yaml` | `jaredwines.com` | No published host port | Current NPM upstream expects port `7777`; `502` remains expected until intent and listener design are resolved |
+| Jared Wines | Supported active site | `/srv/rotom/stacks/hosted-websites/jaredwines.com/compose.yaml` | `jaredwines.com` | `http://127.0.0.1:7777/` → `200` | `https://jaredwines.com/` → `200` |
 
-The live 2026-10-15 audit found `jaredwines.com` running unexpectedly while still publishing no host port. Its runtime presence does not authorize starting, stopping, recreating, exposing, or repairing it.
+The final 2026-10-15 recovery established `jaredwines.com` as intentionally active with loopback-only publication `127.0.0.1:7777:80`. Starting or recreating it is authorized only under the same confirmed-active preflight used for Aloha; changing its content, listener, NPM route, or public exposure remains outside this runbook.
 
 NPM runs host-networked from `/srv/rotom/stacks/platform/nginx-proxy-manager/compose.yaml`. Current routes use host or loopback listeners rather than cross-project Docker DNS.
 
@@ -193,7 +193,7 @@ If `docker compose up -d` created or replaced a container and verification fails
 - **Container running + no direct listener:** compare rendered ports with document 03. Stop if they differ; do not invent a compatibility port.
 - **Direct `200` + local-SNI failure:** inspect NPM; do not recreate the site.
 - **Local-SNI works + public failure:** investigate public DNS, WAN routing, and certificate state under the network reference; the container is not the failing layer.
-- **Jared Wines `502`:** expected under the unresolved current design. Stop and request a deployment-intent decision.
+- **Jared Wines direct or proxied failure:** its supported current result is `200` through loopback, local-SNI, and public HTTPS. Diagnose the container and route layers without changing the loopback-only publication or shared NPM configuration.
 
 ### 11. Evidence to retain
 
@@ -240,7 +240,7 @@ This inventory is based on the uploaded `rotom-docker-containers.txt` (container
 
 ### Documentation-audit reconciliation — 2026-10-13
 
-The current deployment paths are the plural `libraries`, `platform`, `hosted-websites`, `game-servers`, and `smart-home` roots described in the current overlays. Older entries that call singular `library`, `infra`, `web`, `gameserver`, `smarthome`, `/mnt/nas-library`, or `/mnt/nas-media` current are historical migration/recovery evidence. The 2026-10-15 complete inventory found 22 container objects, all running, including both healthy Palworld containers. Treat runtime status as time-sensitive and recheck it read-only when troubleshooting; their present deployment intent remains unverified.
+The current deployment paths are the plural `libraries`, `platform`, `hosted-websites`, `game-servers`, and `smart-home` roots described in the current overlays. Older entries that call singular `library`, `infra`, `web`, `gameserver`, `smarthome`, `/mnt/nas-library`, or `/mnt/nas-media` current are historical migration/recovery evidence. Final 2026-10-15 inspection found 23 container objects, all running, including active Jared Wines and both healthy Palworld containers; it also found 18 networks, two named volumes, and 18 Compose definitions. Treat runtime status as time-sensitive and recheck it read-only when troubleshooting.
 
 ### Evidence provenance
 
@@ -261,9 +261,13 @@ Services are grouped by the Linux account directory containing their active Comp
 
 `jaredwines.com` is active with a read-only site-content bind and loopback-only publication `127.0.0.1:7777:80`. NPM proxy host `8` retains the `127.0.0.1:7777` HTTP upstream and forced TLS. After regenerating its stale active proxy configuration from that record, the loopback, local-SNI TLS, and public HTTPS routes all returned `200` with the expected portfolio page. Homepage's internal container-host mapping for `jaredwines.com` routes its monitor through NPM; it does not alter public DNS or make port `7777` LAN-reachable.
 
+The final live topology contains 23 running containers, 18 Docker networks, two named volumes, and 18 Compose definitions: two Game Servers, two Hosted Websites, seven Libraries modules, five Platform modules, and two Smart Home modules. The reduction from nineteen definitions is the expected result of integrating Glances into the Homepage Compose project and retiring the standalone Glances definition.
+
 This overlay supersedes earlier same-day standalone-Glances, loopback-`61208`, and unavailable-Jared-Wines statements.
 
-### Complete post-cleanup runtime audit — 2026-10-15
+### Historical same-day post-cleanup runtime audit — 2026-10-15
+
+Superseded by **Current Homepage, Glances, and Jared Wines deployment** above. This checkpoint predates the final Jared Wines listener restoration and Homepage/Glances integration.
 
 The final read-only snapshot contained 23 containers, all running, with zero restarts and `restart: unless-stopped`; 19 networks; two named volumes; and 23 images occupying approximately 21 GB. Docker Engine/client are `29.9.0`, Compose is `v5.6.0`, and containerd is `2.4.1`. All 19 Compose definitions under `/srv/rotom/stacks` rendered successfully. Every container is Compose-managed, no one-off container exists, and each live service's Compose file, project, service, and config hash match the current definition. Six configured Docker healthchecks were healthy: Homepage, Arcane, Paperless, RomM database, and both Palworld servers. The remaining images define no Docker healthcheck.
 
@@ -273,7 +277,9 @@ The intended 22-container deployment is complete and functional: documented bind
 
 Both named volumes are unattached and report `0B`: `arcane-backups` and `arcane-rustic-cache`. The latter carries Arcane internal volume-helper labels. `ghcr.io/rustic-rs/rustic:v0.11.2` is not referenced by a container, while Arcane's system/volume backup policy and run tables are empty. Removal safety for either volume or the Rustic image is unverified: first confirm Arcane's authenticated backup settings/API and inspect Arcane activity/log evidence around their 04:15 PDT creation. The prior Nginx image likewise requires a final exact-ID ancestor check plus confirmation that no Arcane update/rollback is in flight before any separately authorized cleanup. The untagged RomM, MariaDB, and pinned Rotom Docs images are active container images and are not cleanup candidates. The retired Syncthing image is absent.
 
-### Shared Docker-network retirement and verified recovery — 2026-10-15
+### Historical same-day shared Docker-network retirement and verified recovery — 2026-10-15
+
+Superseded for current container, network, volume, Compose-count, Jared Wines, and Glances state by the first section 1A overlay above. The shared-network retirement itself remains current.
 
 At Jared's direction, the existing Docker container objects were deleted and all intended deployed stacks were recreated; Jared Wines remains intentionally undeployed. The three former external bridge contracts `rotom-proxy`, `rotom-arr`, and `rotom-monitoring` were removed from all active Compose definitions and then removed from Docker. No active Compose file or running network references any of those names.
 
@@ -281,7 +287,9 @@ NPM remains host-networked and uses the documented host/loopback upstream listen
 
 All 19 active Compose definitions rendered successfully. Final verification found 22 running container objects, 18 Docker networks, one named volume, healthy Homepage/Arcane/Paperless/RomM database/Palworld containers, qBittorrentVPN `wg0`, working local HTTP endpoints, and successful Homepage-to-Glances API access. Root-only pre-change archives are retained at `/root/rotom-proxy-compose-pre-removal-20261015-012109.tar.gz`, `/root/rotom-arr-compose-pre-removal-20261015-013309.tar.gz`, and `/root/rotom-monitoring-pre-removal-20261015-013632.tar.gz`; retention is **Needs Verification**. The previously documented `/srv/rotom/stacks/RUNTIME-POLICY.md` was absent during this work and was not recreated.
 
-### Current runtime evidence boundary — 2026-10-15
+### Historical pre-restoration runtime evidence boundary — 2026-10-15
+
+Superseded by the final section 1A overlay above. Retain this checkpoint only as evidence of the state before Jared Wines was deliberately restored and Glances joined the Homepage Compose project.
 
 Read-only Compose, process, listener, NPM-route, and HTTP evidence confirms the current Platform, Libraries, Smart Home, Hosted Websites, and Paperless topology. Privileged 2026-10-15 Docker inspection found 22 container objects, all running, with one named volume, seventeen networks, and restart count zero for every object. Both Palworld containers were healthy with their expected UDP publications and use `unless-stopped`. Docker inspection dates both starts to 2026-10-14 12:24 PDT while the daemon remained continuously active from the 2026-10-13 boot. The journal records both starts thirty seconds after an operator-run Docker system prune but no explicit start command; do not infer causation or owner intent from that timing. This supersedes the 2026-10-14 stopped-state observation, while intended persistence remains unverified. The active stack tree contains 19 Compose files: two Game Servers, two Hosted Websites, seven Libraries modules, six Platform modules, and two Smart Home modules; Paperless and RomM each define their documented database/broker companions. Jared Wines remains intentionally undeployed.
 
@@ -411,7 +419,7 @@ Homepage's targeted `extra_hosts` mapping resolves `uptime.rotom.casa` to `192.1
 
 **Historical JAR-78 state, superseded by JAR-88:** JAR-78 established `/srv/rotom/{stacks,appdata,secrets}/game`. JAR-88 later renamed those active roots to `gameserver`, preserved both VM-local worlds and UDP mappings, and left original Game material only as rollback evidence.
 
-Docker socket access is exceptional: Arcane has the raw read-write socket for deliberate Docker administration only, with automatic updates and auto-heal disabled; Homepage has the read-only socket for dashboard metadata; Glances has the read-only socket plus its read-only host-root monitoring bind. A read-only socket mount does not prove a read-only Docker API. All other current application containers have no socket. Current deliberate runtime exceptions are Home Assistant (host networking, privileged, read-only D-Bus), Homebridge/Nginx Proxy Manager/Cloudflare DDNS (host networking), qBittorrentVPN (`CAP_NET_ADMIN` for WireGuard), and the stated Arcane/Glances mounts. Phase D workload tickets must rejustify rather than inherit any exception.
+Docker socket access is exceptional: Arcane has the raw read-write socket and currently has automatic updates and auto-heal enabled; Homepage has the read-only socket for dashboard metadata; Glances has the read-only socket plus its read-only host-root monitoring bind. A read-only socket mount does not prove a read-only Docker API. All other current application containers have no socket. Current deliberate runtime exceptions are Home Assistant (host networking, privileged, read-only D-Bus), Homebridge/Nginx Proxy Manager/Cloudflare DDNS (host networking), qBittorrentVPN (`CAP_NET_ADMIN` for WireGuard), and the stated Arcane/Glances mounts. Phase D workload tickets must rejustify rather than inherit any exception.
 
 ### JAR-68 runtime snapshot — 2026-09-28
 

@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-15 — Convert the legacy documentation to a runbook-first reference
+**Documentation updated:** 2026-10-15 — Reconcile final acceptance findings and retire unused contribution guide
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -83,6 +83,22 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-15 — Retire unused repository contribution guide
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`, `README.md`, `support/tooling/retired-helper`, and `support/tooling/test-retired-helper-runbooks`; removed `support/CONTRIBUTING.md`.
+- **Status:** **Documentation only.** No Rotom live configuration changed.
+- **Changes:** Removed the unused repository-facing contribution guide at Jared's direction. Current repository navigation, source-map, lint, and structural-test references now point directly to document 00 as the sole legacy documentation maintenance authority. The numbered legacy documentation membership and maintained runbook-structure test remain unchanged.
+- **Evidence:** Jared confirmed the guide will not be used. Repository-reference scan and validation are required before publication.
+- **Outstanding:** None.
+
+## 2026-10-15 — Reconcile final acceptance findings
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`, and `support/tooling/test-retired-helper-runbooks`.
+- **Status:** **Documentation only / Verified.** No Rotom service, container, mount, timer, backup, account, network, publisher configuration, or persistent data was changed.
+- **Changes:** Reconciled the canonical website runbook and current-state owners to the final active Jared Wines deployment, private Homepage/Glances topology, enabled Arcane automatic-update/auto-heal state, and eighteen-definition Compose topology. Relabelled superseded same-day observations as historical, converted the late-September disaster-recovery gap narrative into an explicit historical record, and added semantic current-state plus local-fragment regression checks.
+- **Evidence:** Read-only acceptance inspection found 23/23 containers running with zero restarts, 18 Docker networks, two named volumes, 18 valid Compose definitions, five read/write NFSv3 mounts, enabled/active guest backup/maintenance/guard timers, successful current guest/PVE backup-status APIs, `200` from Jared Wines loopback/local-SNI/public routes, and private Glances access with no host listener. Arcane's database reported `autoUpdate=true`, `autoHealEnabled=true`, `scheduledPruneEnabled=false`, and `followProjectSymlinks=true`. Local `main`, GitHub `main`, and the Rotom Docs deployment clone all resolved to pre-update revision `8f542c1c4f178d7ae9ca6cfc4ed68ebe0b1a335a`; all nine published sources matched that revision before this update.
+- **Outstanding:** Arcane's exact project exclusions and intended long-term automation policy remain **Needs Verification** and are now stated consistently. Broader off-site/failure-domain recovery policy and an actual JAR-25 bare-metal restoration remain separate documented work, not acceptance contradictions.
 
 ## 2026-10-15 — Convert the legacy documentation to a runbook-first reference
 

@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-10-15 — Runbook-first conversion
+**Documentation updated:** 2026-10-15 — Final acceptance reconciliation
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -129,7 +129,7 @@ Guest service-account identities remain unchanged. Docker group is package-creat
 | smart-home | `126:5003`; NSS home field `/home/smart-home`, physical directory absent; Home Assistant/Homebridge |
 | documents | **Retired**; historical `900:5004` / `/home/documents` record only; numeric GID `5004` is now Hosted Websites |
 | downloader | **Retired**; account, former home, and Arcane compatibility bind are absent |
-| hosted-websites | `902:5004`; NSS home field `/home/hosted-websites`, physical directory absent; Aloha active; Jared Wines undeployed |
+| hosted-websites | `902:5004`; NSS home field `/home/hosted-websites`, physical directory absent; Aloha and Jared Wines active; Jared Wines publishes only `127.0.0.1:7777:80` |
 | filesync | **Retired**; historical `903:5007` / Syncthing record only |
 | desktopcmd | `1001:1001`, locked non-human account with configured home `/opt/desktop-commander` (private base ACL; displayed mode `0750` due Jared read/traverse ACL); `/usr/bin/zsh` with Oh My Zsh; Remote Desktop Commander only; no sudo, SSH authorized keys, Docker/socket, service-group, or NAS-specific access. `/home/desktopcmd` and its former contents are absent. |
 | Docker group | GID `989`, sole listed member `fran` |
@@ -501,7 +501,7 @@ Read-only post-boot checks refreshed all ten service-account UID:GID pairs and c
 
 ### JAR-37 Docker-access exception verification — 2026-09-28
 
-The current Docker-socket audit found exactly three consumers: Arcane has the raw read-write socket as the explicit manual Docker-administration exception; Homepage has a read-only socket for dashboard metadata; and Glances has a read-only socket plus a read-only host-root bind for monitoring. Read-only socket flags do not establish read-only Docker API behavior. No ordinary application container has a Docker socket. Arcane's unattended update and auto-heal controls are disabled; its protected named-volume database has a root-only pre-change rollback copy.
+The current Docker-socket audit found exactly three consumers: Arcane has the raw read-write socket as the explicit Docker-administration exception; Homepage has a read-only socket for dashboard metadata; and Glances has a read-only socket plus a read-only host-root bind for monitoring. Read-only socket flags do not establish read-only Docker API behavior. No ordinary application container has a Docker socket. Arcane's automatic-update and auto-heal controls are enabled, so its socket access permits demonstrated unattended container recreation; exact exclusions and intended policy remain **Needs Verification**. Its protected named-volume database has a root-only pre-change rollback copy.
 
 Current non-socket exception fields are Home Assistant's host networking, privileged mode, and read-only D-Bus bind; Homebridge, Nginx Proxy Manager, and Cloudflare DDNS host networking; and qBittorrentVPN's `CAP_NET_ADMIN` for WireGuard. These are current workload-specific exceptions, not defaults. The Phase D owning ticket must justify and verify every retained or new privileged field.
 

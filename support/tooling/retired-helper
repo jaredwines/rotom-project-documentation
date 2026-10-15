@@ -475,7 +475,6 @@ run_lint() {
         "08-Rotom-Directory-Tree.txt"
         "AGENTS.md"
         "README.md"
-        "support/CONTRIBUTING.md"
     )
 
     require_user

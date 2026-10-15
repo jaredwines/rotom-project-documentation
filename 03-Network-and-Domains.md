@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Runbook-first conversion
+**Documentation updated:** 2026-10-15 — Final acceptance reconciliation
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -85,13 +85,17 @@ Glances no longer has a host listener, including no `127.0.0.1:61208` publicatio
 
 This overlay supersedes earlier same-day unavailable-Jared-Wines and loopback-`61208` observations.
 
-### Post-cleanup Docker network and route audit — 2026-10-15
+### Historical same-day post-cleanup Docker network and route audit — 2026-10-15
+
+Superseded by **Current Jared Wines route and private Glances access** above. This checkpoint predates the final loopback listener and route restoration.
 
 The final read-only snapshot contained 19 Docker networks: the three Docker built-ins, fifteen intended private project bridges, and unexpected `jaredwinescom_default`. The retired shared bridges `rotom-proxy`, `rotom-arr`, and `rotom-monitoring` remain absent, and no active container or current Compose definition references them. Without the unexpectedly deployed Jared Wines project, the topology is the documented eighteen networks.
 
 All documented listeners and unauthenticated direct/local-SNI route probes returned their expected responses. Jared Wines is running but publishes no host port, so NPM's retained `127.0.0.1:7777` upstream still returns `502`; its runtime presence does not make the route operational. Any older current-facing sentence that says Paperless, RomM, Rotom Docs, Aloha, or another retained workload still joins `rotom-proxy` is superseded by the shared-network retirement and this audit. Historical dated topology remains preserved as history.
 
-### Current Docker-network and Glances-access state — 2026-10-15
+### Historical pre-integration Docker-network and Glances-access state — 2026-10-15
+
+Superseded for Glances access by the first overlay in this section. The shared-network retirement remains current, but Glances no longer publishes a host listener and Homepage now reaches it privately as `http://glances:61208`.
 
 The former external Docker bridges `rotom-proxy`, `rotom-arr`, and `rotom-monitoring` are retired: active Compose definitions no longer declare them, no running container attaches to them, and Docker no longer lists them. NPM remains host-networked and all retained NPM routes continue to use their documented host or loopback upstream listeners.
 
@@ -103,7 +107,9 @@ PVE uses `nic0` as the physical Intel I219-V interface and `vmbr0` at `192.168.1
 
 The Proxmox firewall reported `Status: disabled/running`; cluster and node rule listings were empty. The PVE web UI on `8006` and read-only monitoring APIs on LAN-bound `8788` and `8789` therefore depend on LAN reachability and their application/access controls rather than an active PVE firewall policy. The NPM route `pve.rotom.casa -> https://192.168.1.68:8006` with access-list ID `1` remains active, but it is not a substitute for host firewall policy. Jared explicitly accepted this trusted-LAN design on 2026-10-14; no hardening or firewall-project work is planned from that decision.
 
-### Current route, DNS, listener, and certificate audit — 2026-10-14
+### Historical route, DNS, listener, and certificate audit — 2026-10-14
+
+This dated checkpoint predates the 2026-10-15 Jared Wines recovery. Use the first overlay in this document for its current listener and response; the other route, DNS, listener, and certificate observations remain dated evidence unless superseded elsewhere.
 
 The live NPM SQLite database has sixteen undeleted, enabled proxy hosts: `home-assistant.rotom.casa -> 127.0.0.1:8123`, `homebridge.rotom.casa -> 127.0.0.1:8581`, `nginx.rotom.casa -> 127.0.0.1:81`, `arcane.rotom.casa -> 127.0.0.1:3552`, `jaredwines.com -> 127.0.0.1:7777`, `rotom.casa -> 127.0.0.1:3001`, `alohamillworks.com -> 127.0.0.1:7778`, `qBittorrent.rotom.casa -> 127.0.0.1:8080`, `radarr.rotom.casa -> 127.0.0.1:7878`, `sonarr.rotom.casa -> 127.0.0.1:8989`, `jellyfin.rotom.casa -> 127.0.0.1:8096`, `prowlarr.rotom.casa -> 127.0.0.1:9696`, `paperless.rotom.casa -> 127.0.0.1:8000`, `romm.rotom.casa -> 127.0.0.1:8081`, `docs.rotom.casa -> 127.0.0.1:8082`, and `pve.rotom.casa -> 192.168.1.68:8006` over HTTPS. The Docs and PVE routes use access-list ID `1`; the other current routes have no NPM access list. The database retains deleted historical rows for Smart Hub/Portainer/Homebridge legacy naming, Palworld, OliveTin, PalTools, Gamarr, Syncthing, Uptime Kuma, and ROM upload.
 
@@ -1013,7 +1019,7 @@ Fail-closed recreation and the current Libraries guard are documented. Jared con
 ### Resolved or intentional states — not gaps
 
 - The retired Downloader and Media guest boundaries must not be used as current service guidance. The supported current qBittorrent/ROM boundary is `/mnt/nas-libraries`; the former Game guest mount was later replaced by `/mnt/nas-game-servers`. Historical boot-recovery observations remain diagnostic evidence only.
-- `jaredwines.com` is intentionally undeployed; its Compose project is retained. Starting it later is an administrative decision, not missing evidence.
+- `jaredwines.com` is intentionally active behind loopback-only `127.0.0.1:7777` and NPM proxy host `8`; loopback, local-SNI, and public HTTPS return `200`.
 - Historical `jaredwinescom_default`, `olivetin_default`, `portainer_default`, and `palworld_default` network observations are not part of the current JAR-31 bridge map.
 - Homepage backup-status access no longer depends on a guest UFW rule because UFW is not installed in the current VM.
 

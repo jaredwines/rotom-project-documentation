@@ -17,6 +17,16 @@ require_text() {
     grep -Fq -- "$text" "$file" && pass "$1: $text" || fail "$1: missing $text"
 }
 
+reject_text() {
+    local text="$1"
+    shift
+    if grep -Fq -- "$text" "$@"; then
+        fail "obsolete current-state assertion remains: $text"
+    else
+        pass "obsolete current-state assertion absent: $text"
+    fi
+}
+
 for n in 00 01 02 03 04 05 06 07 08; do
     count=$(find "$REPO_ROOT" -maxdepth 1 -type f -name "$n-*" | wc -l)
     [[ "$count" -eq 1 ]] && pass "one numbered source for $n" || fail "expected one numbered source for $n; found $count"
@@ -70,6 +80,20 @@ require_text 06-Maintenance-and-Automation.md "## Investigate a Failed Timer or 
 require_text 07-Users-and-Permissions.md "## Diagnose an Identity, Ownership, or Access Failure"
 require_text 07-Users-and-Permissions.md 'Never use `chmod 777`'
 
+require_text 01-Rotom-Server-Inventory.md "23 running Compose-managed containers, 18 Docker networks, two named volumes, and 18 Compose definitions"
+require_text 02-Docker-Services.md '| Jared Wines | Supported active site |'
+require_text 02-Docker-Services.md "The final live topology contains 23 running containers, 18 Docker networks, two named volumes, and 18 Compose definitions"
+require_text 03-Network-and-Domains.md '`jaredwines.com` is active behind NPM proxy host `8`'
+require_text 03-Network-and-Domains.md 'Glances no longer has a host listener'
+require_text 06-Maintenance-and-Automation.md '`autoUpdate=true`, `autoHealEnabled=true`, `scheduledPruneEnabled=false`, and `followProjectSymlinks=true`'
+require_text 07-Users-and-Permissions.md 'Aloha and Jared Wines active'
+require_text 08-Rotom-Directory-Tree.txt 'Final 2026-10-15 state is 23 running container objects, 18 networks, two named volumes, and 18 Compose definitions.'
+
+reject_text '| Jared Wines | **Needs Verification** |' "$REPO_ROOT"/0[1-8]-*
+reject_text '**Jared Wines `502`:** expected under the unresolved current design.' "$REPO_ROOT"/0[1-8]-*
+reject_text "Arcane's live 2026-10-15 settings have automatic updates, auto-heal, and scheduled pruning disabled" "$REPO_ROOT"/0[1-8]-*
+reject_text '**Current live verification — 2026-10-15:** Arcane automatic updates are disabled' "$REPO_ROOT"/0[1-8]-*
+
 invalid_labels=$(grep -hE '^\*\*(Read-only|Changes Rotom|Credential-sensitive|PVE|Destructive)' \
     "$REPO_ROOT"/0[2-7]-*.md | grep -vFx -e '**Read-only**' \
     -e '**Read-only; may activate an existing automount**' \
@@ -103,7 +127,7 @@ else
 fi
 
 if grep -n -E 'runbooks/|test-runbooks|staged pilot|pilot runbook|pending Available Sources addition|parallel runbook layer' \
-    "$REPO_ROOT"/0[1-8]-* "$REPO_ROOT/README.md" "$REPO_ROOT/support/CONTRIBUTING.md" >/dev/null 2>&1; then
+    "$REPO_ROOT"/0[1-8]-* "$REPO_ROOT/README.md" >/dev/null 2>&1; then
     fail "obsolete pilot-layer wording remains"
 else
     pass "obsolete pilot-layer wording absent"
@@ -117,7 +141,38 @@ while IFS= read -r link; do
 done < <(grep -hoE '\]\([^)]+' "$REPO_ROOT"/0[0-7]-*.md "$REPO_ROOT/README.md" | sort -u)
 pass "local link target scan completed"
 
-for file in "$REPO_ROOT"/*.md "$REPO_ROOT"/support/*.md; do
+while IFS= read -r record; do
+    source=${record%%:*}
+    link=${record#*:}
+    link=${link#](}
+    target=${link%%#*}
+    fragment=${link#*#}
+
+    if [[ -n "$target" ]]; then
+        destination=$(realpath -m "$(dirname "$source")/$target")
+    else
+        destination=$source
+    fi
+
+    matched=0
+    while IFS= read -r heading; do
+        slug=$(printf '%s\n' "$heading" |
+            tr '[:upper:]' '[:lower:]' |
+            sed -E 's/`//g; s/<[^>]*>//g; s/[^[:alnum:] _-]//g; s/[[:space:]]+/-/g; s/^-+//; s/-+$//')
+        if [[ "$slug" == "$fragment" ]]; then
+            matched=1
+            break
+        fi
+    done < <(sed -nE 's/^#{1,6}[[:space:]]+//p' "$destination")
+
+    if (( matched == 0 )); then
+        fail "broken local fragment: ${source#$REPO_ROOT/} -> $link"
+    fi
+done < <(grep -H -oE '\]\([^)]*#[^)]+' \
+    "$REPO_ROOT"/0[0-7]-*.md "$REPO_ROOT/README.md" | sort -u)
+pass "local fragment target scan completed"
+
+for file in "$REPO_ROOT"/*.md; do
     fences=$(grep -c '^```' "$file" || true)
     (( fences % 2 == 0 )) && pass "balanced fences: ${file#$REPO_ROOT/}" || fail "unbalanced fences: ${file#$REPO_ROOT/}"
 done
