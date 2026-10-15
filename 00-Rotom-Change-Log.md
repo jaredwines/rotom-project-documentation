@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-14 — Migrate Remote Desktop Commander to `/opt`
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Migrated the existing native Remote Desktop Commander installation and `desktopcmd` configured home from `/home/desktopcmd` to `/opt/desktop-commander`, retaining UID:GID `1001:1001`, the locked account, Zsh/Oh My Zsh, the installed agent version `0.2.52`, workspace, device-registration state, privacy ACLs, and all service hardening. The original `/home/desktopcmd` tree and a root-owned pre-migration unit copy remain as rollback material; neither was deleted.
+- **Evidence:** A live initial plus stopped-service final `rsync -aHAX --numeric-ids` converged with no differences before cutover. `desktop-commander.service` is enabled and active from the new location with `UMask=0077`, `NoNewPrivileges=true`, and `PrivateTmp=true`; it reconnected using the existing registration. A harmless command through that connection ran as `desktopcmd` and created then removed a workspace test file. The account remains password-locked with no supplementary groups or authorized SSH keys; the listener set and failed-unit list are unchanged. The enabled Rotom Restic Backup configuration includes both `/home` and `/opt`; its scheduled run preceding the migration succeeded, but no additional backup run was triggered.
+- **Outstanding:** Retain `/home/desktopcmd` and the unit rollback copy until Jared explicitly authorizes their retirement. Available Sources synchronization remains manual by Jared.
+
 ## 2026-10-14 — Reconcile current-state audit findings
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
