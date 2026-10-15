@@ -74,7 +74,11 @@ for file in "${runbook_files[@]}"; do
     require_text "$file" "**Canonical references:**"
     require_text "$file" "**Maintenance contract:**"
     require_text "$file" "**Read-only**"
-    require_text "$file" "**Changes Rotom"
+    if grep -Fq -- "**Changes Rotom" "$file"; then
+        pass "$(basename "$file"): state-change label"
+    else
+        fail "$(basename "$file"): missing state-change label"
+    fi
 
     for section in "${required_sections[@]}"; do
         require_text "$file" "$section"
