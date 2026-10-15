@@ -148,8 +148,10 @@
 # - Jared current Rotom legacy documentation checkout: /home/jared/documentation/rotom-runbook.
 # - It is jared:jared mode 0700; clean on main/origin/main and passed guarded
 #   retired-helper path/status/check/pull, including a fresh GitHub fetch.
-# - The clean /home/platform/documentation/rotom-runbook checkout remains
-#   temporary rollback material only; it is not an operational publisher input.
+# - The former clean /home/platform/documentation/rotom-runbook checkout was
+#   removed at Jared's explicit authorization after final clean-tree/dependency verification.
+#   /home/platform and its documentation parent remain intact; rollback is GitHub, Jared's
+#   independent checkout, and the root-owned deployment clone/previous generated output.
 # - Rotom Docs deploys from root-owned /srv/rotom/appdata/platform/rotom-docs/repository,
 #   a public-HTTPS deployment clone. Its publisher validates main/origin/clean/fast-forward
 #   state, builds staged nine-file source/site trees, atomically swaps them, retains one
@@ -158,7 +160,7 @@
 #   served site unchanged.
 # - Fran has private legacy documentation/Codex configuration pointing to her future checkout; the installed
 #   and versioned helper permits jared/fran only. Her own GitHub/Codex authentication and
-#   checkout, plus old-checkout retirement, remain outstanding.
+#   checkout were explicitly waived for JAR-98, not implemented.
 # - Current Mac legacy documentation checkout: /Users/jared/Documents/ChatGPT/rotom-runbook.
 # - Both use origin git@github.com:jaredwines/rotom-runbook.git, branch main, upstream origin/main.
 # - Former Rotom /home/infra/documentation/retired-helper and Mac /Users/jared/Documents/ChatGPT/Rotom-Home-Server paths remain historical evidence only.

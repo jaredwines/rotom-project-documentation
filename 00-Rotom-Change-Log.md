@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-14 — Retire Platform legacy documentation checkout with owner waiver (JAR-98)
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Jared explicitly waived the remaining Fran identity, checkout, and collaborative-sync verification criteria and authorized removal of only `/home/platform/documentation/rotom-runbook`. The clean, current 18 MiB checkout was removed; `/home/platform` and `/home/platform/documentation` remain intact. Recovery now uses the shared GitHub repository, Jared's independent checkout, and the root-owned Rotom Docs deployment clone with retained generated output; no human credential or Platform service data was removed.
+- **Evidence:** Immediately before deletion the checkout passed guarded `retired-helper check`, was clean on `main == origin/main` at `2b3c839`, and active system/publisher references were absent. After removal, Jared's checkout again passed `retired-helper check`; the deployment clone remained clean on `main` at `2b3c839`; Rotom Docs Compose validation and container status passed; local and HTTPS portal checks returned `200`; and the active/enabled Restic timer still covers `/home` and `/srv`.
+- **Outstanding:** Fran's own GitHub/Codex authentication and independent checkout remain waived for this ticket, not implemented. Available Sources synchronization remains manual by Jared.
+
 ## 2026-10-14 — Cut over Rotom Docs to a deployment clone and prepare Fran legacy documentation controls (JAR-98)
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`, `support/tooling/retired-helper`.
