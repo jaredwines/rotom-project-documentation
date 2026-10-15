@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Capture current PVE VM-backup storage configuration
+**Documentation updated:** 2026-10-15 — Correct reconstruction-critical storage guidance
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -673,7 +673,7 @@ Docker itself has no global NAS dependency.
 
 ## 15. Reconstruction-Critical Information
 
-The current eleven-mount, Gameserver, Media-only qBittorrent, and `downloader` identity contracts are authoritative in sections 2 and 17. The dated Game/Downloader material retained below is historical recovery evidence and must be reconciled rather than replayed.
+The current guest storage contract is the five NFSv3 automounts in section 2: Game Servers, Smart Home, Rotom Restic Backup, Libraries, and Hosted Websites. The former eleven-mount, Gameserver, Media-only qBittorrent, and `downloader` contracts below are historical recovery evidence and must not be replayed as current configuration. Section 17 records unresolved or historical material, not reconstruction authority.
 
 A Rotom rebuild must preserve the following storage contract.
 
@@ -728,7 +728,7 @@ Prowlarr:       /home/downloaders/docker/prowlarr/config -> /config RW; no NAS b
 Glances:        no `/mnt/nas-rotom-restic-backup` bind
 ```
 
-The bindfs service names and qBittorrent container-side sentinel path intentionally retain the historical `downloads` spelling for compatibility; their host source is current `/mnt/nas-downloaders`.
+At this historical checkpoint, the bindfs service names and qBittorrent container-side sentinel path retained the `downloads` spelling for compatibility and their host source was `/mnt/nas-downloaders`. That mount and identity are retired; this sentence is not a current reconstruction instruction.
 
 ### Historical numeric identity contract — reconcile with current section 2
 
@@ -746,7 +746,7 @@ Game account: UID 995, primary GID 5001
 Game NAS root: UID 988, GID 5001, mode 2770; game allowed, tested unrelated named accounts denied
 Downloaders torrent subtree: owned/written under Downloaders identity/GID 5005
 Game library directories: UID 995, GID 5001, mode 2775
-Current service accounts/shares: infra 997:5002, smarthome 126:5003, documents 900:5004, downloaders 901:5005, web 902:5006, filesync 903:5007, apps 904:5008, auth 905:5009; each service share root UID 988, matching GID, mode 2770
+Historical service accounts/shares at this checkpoint: infra 997:5002, smarthome 126:5003, documents 900:5004, downloaders 901:5005, web 902:5006, filesync 903:5007, apps 904:5008, auth 905:5009; each then-recorded service share root UID 988, matching GID, mode 2770. Do not recreate these retired identities or shares from this block.
 Backup root: UID 988, GID 988, mode 0700; ordinary named accounts denied, root-run backup retained
 ```
 

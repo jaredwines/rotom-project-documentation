@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-14 — Final JAR-98 closeout verification
+**Documentation updated:** 2026-10-15 — Reconcile legacy documentation consistency audit findings
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-15 — Reconcile legacy documentation consistency audit findings
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Documentation only / Verified / Needs Verification.** No live service, container, mount, timer, backup, NAS, network, account, permission, or configuration state was changed.
+- **Changes:** Reconciled the 2026-10-15 read-only legacy documentation audit with current guest evidence. Corrected unsafe reconstruction pointers for storage and Docker-group privileges; current Docker, Compose, Arcane, Restic, legacy documentation-checkout, service-home, Remote Desktop Commander, and filesystem-tree statements; and malformed historical tree text. Documented two otherwise unrecorded local rollback artifacts without changing them. Preserved superseded facts as dated history rather than rewriting historical entries.
+- **Evidence:** `retired-helper path` resolved Jared's checkout. Read-only guest checks found five current NFSv3 automount contracts; 22 running Docker containers including both healthy Palworld servers; one Docker named volume and seventeen networks; nineteen Compose files split 2 Game Servers / 2 Hosted Websites / 7 Libraries / 6 Platform / 2 Smart Home; Docker Engine `29.9.0` and Compose `v5.6.0`; Arcane auto-update, auto-heal, and scheduled pruning disabled; latest guest automatic Restic snapshot `553e7a39` from 2026-10-14 20:30 PDT; the five service-home directories and `/home/desktopcmd` absent; and Docker GID `989` with Fran as its sole listed member.
+- **Outstanding:** The reason and intended persistence of the now-running Palworld containers were not established; document their observed running state without inferring deployment intent. PVE, UNAS, UniFi, Mac, public-DNS/TLS, authenticated application, and full restore state were outside this guest-level audit. The two documented rollback artifacts require a separate retention decision. Available Sources synchronization remains manual by Jared.
 
 ## 2026-10-14 — Retire unused service-home trees and `/opt/containerd`
 

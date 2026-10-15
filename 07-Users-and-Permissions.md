@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-10-14 — Retire unused service-home trees and `/opt/containerd`
+**Documentation updated:** 2026-10-15 — Correct current home and privilege reconstruction guidance
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -23,7 +23,7 @@ Fran and the selected service identities use `/usr/bin/zsh` with Oh My Zsh. `des
 
 A read-only 2026-10-14 follow-up executed `docker ps` directly as Fran and listed the 20 running containers, confirming the documented Docker-group access works in practice. `desktop-commander.service` was enabled and active/running after the `desktopcmd` shell change. These checks do not alter Fran's root-equivalent Docker boundary or `desktopcmd`'s intentionally restricted account policy.
 
-The existing `desktopcmd` identity was then migrated live from `/home/desktopcmd` to configured home `/opt/desktop-commander` without changing UID:GID `1001:1001`, the locked password state, Zsh/Oh My Zsh configuration, or its sole primary-group membership. The new home preserves the private base ACL and named Jared read/traverse/default ACL, so its displayed mode is `0750`; no base group or other access was granted. Jared subsequently authorized removal of the verified-unused old-home contents; its empty legacy directory remains. No `desktopcmd` sudoers entry or authorized SSH key exists.
+The existing `desktopcmd` identity was then migrated live from `/home/desktopcmd` to configured home `/opt/desktop-commander` without changing UID:GID `1001:1001`, the locked password state, Zsh/Oh My Zsh configuration, or its sole primary-group membership. The new home preserves the private base ACL and named Jared read/traverse/default ACL, so its displayed mode is `0750`; no base group or other access was granted. Jared subsequently authorized removal of the verified-unused old-home contents; the legacy directory itself is now absent. No `desktopcmd` sudoers entry or authorized SSH key exists.
 
 The Smart Home stack directories are root-owned, but both live Compose files are owned by `smart-home:smart-home`. On 2026-10-14 Jared confirmed the cross-domain Game Servers grants were unintended, so only the named `game-servers:rw-` Home Assistant and `game-servers:rwx` Homebridge ACL entries were removed. Home Assistant remains `smart-home:smart-home` mode `0660`; Homebridge remains `smart-home:smart-home` mode `0670`; Jared retains read-only/read-traverse named access. Negative access tests confirmed `game-servers` cannot write either file, positive tests confirmed `smart-home` can read/write both, and Compose validation passed.
 
@@ -44,13 +44,13 @@ This is the canonical detailed owner of Rotom account identity and permission fa
 
 ## 2. Current Identity and Access Model
 
-### JAR-94 current Platform identity and retired accounts — 2026-10-13
+### Historical JAR-94 Platform identity and retired accounts — 2026-10-13
 
-`platform` now owns UID:GID `997:5002` and `/home/platform`, replacing `infra` while preserving the numeric ownership contract for recovered shared-service state. The active legacy documentation checkout moved with the service home to `/home/platform/documentation/rotom-runbook`; Jared's resolver was updated and validated. `infra`, `documents`, `downloader`, and `filesync` accounts/groups are absent.
+At this checkpoint `platform` owned UID:GID `997:5002` and `/home/platform`, replacing `infra` while preserving the numeric ownership contract for recovered shared-service state. The active legacy documentation checkout had moved with the service home to `/home/platform/documentation/rotom-runbook`; JAR-98 and the later service-home cleanup supersede both paths. `infra`, `documents`, `downloader`, and `filesync` accounts/groups were absent.
 
 Their requested service homes and active local application trees were retired, together with the four local NFS contracts. The remaining empty `/srv/rotom/appdata/documents` and `/srv/rotom/secrets/documents` directories were removed on 2026-10-13 after no active reference was found. `/home/downloaders` later reappeared as an empty root-owned `0755` directory containing only empty `docker/`; it had no associated account and Arcane's active Compose file retained it as a read-only compatibility bind. Both the bind and home were removed on 2026-10-13; this did not restore or alter a Downloader service. Auth remains retired as recorded below.
 
-**Current identity state — 2026-10-13:** The active Libraries service account is `libraries` (`127:5000`), preserving the former Library numeric identity. Its home is `/home/libraries`, with active local paths under `/srv/rotom/{stacks,appdata,secrets}/libraries`; `library` is absent from NSS. The active Palworld service account is `game-servers` (`995:5001`), preserving the former Game numeric identity; `game` and `gameserver` are absent from NSS. Its home is `/home/game-servers`, and active local paths are under `/srv/rotom/{stacks,appdata,secrets}/game-servers`. The active website account is `hosted-websites` (`902:5004`), with home `/home/hosted-websites` and local website paths under `/srv/rotom/{stacks,appdata}/hosted-websites`; `web` is absent from NSS. The active Smart Home account is `smart-home` (`126:5003`), with home `/home/smart-home`, Compose roots under `/srv/rotom/stacks/smart-home`, and mutable state under `/srv/rotom/appdata/smart-home`; `smarthome` is absent from NSS. The former Documents primary GID `5004` was reassigned only after that retired account/group was absent. `downloader` is absent; `901:5005` is historical identity evidence only. No Docker-group change was performed.
+**Historical identity state — 2026-10-13, superseded for physical home and runtime status:** The active Libraries service account was `libraries` (`127:5000`), preserving the former Library numeric identity. Its NSS home field was `/home/libraries`, with active local paths under `/srv/rotom/{stacks,appdata,secrets}/libraries`; `library` was absent from NSS. The active Palworld service account was `game-servers` (`995:5001`), preserving the former Game numeric identity; `game` and `gameserver` were absent from NSS. Its NSS home field was `/home/game-servers`, and active local paths were under `/srv/rotom/{stacks,appdata,secrets}/game-servers`. The active website account was `hosted-websites` (`902:5004`), with NSS home field `/home/hosted-websites` and local website paths under `/srv/rotom/{stacks,appdata}/hosted-websites`; `web` was absent from NSS. The active Smart Home account was `smart-home` (`126:5003`), with NSS home field `/home/smart-home`, Compose roots under `/srv/rotom/stacks/smart-home`, and mutable state under `/srv/rotom/appdata/smart-home`; `smarthome` was absent from NSS. The five physical service-home directories were removed on 2026-10-14 while the NSS fields remained. The former Documents primary GID `5004` was reassigned only after that retired account/group was absent. `downloader` is absent; `901:5005` is historical identity evidence only. No Docker-group change was performed.
 
 JAR-94 above supersedes the `infra`, `documents`, `downloader`, and `filesync` portions of this dated account inventory; the paragraph is retained as historical evidence.
 
@@ -65,15 +65,15 @@ Guest service-account identities remain unchanged. Docker group is package-creat
 | PVE host | `jared` (`1000:1000`) and `fran` (`1001:1001`) are human administrators with `sudo`, `users`, `systemd-journal`, and enabled matching PAM identities holding propagated `Administrator` access at `/`. Canonical Mac aliases and `~/.ssh/id_ed25519_pve` still use Jared; Fran SSH is deferred. Root remains emergency recovery. |
 | Debian VM `jared` | UID/GID `1000:1000`; supplementary `sudo`; key-only Mac login via `~/.ssh/id_ed25519_rotom` |
 | Debian VM `fran` | UID/GID `1002:1002`; supplementary `sudo`, `users`, and root-equivalent Docker GID `989`; `/home/fran` mode `0700`; `/usr/bin/zsh` with Oh My Zsh; SSH, legacy documentation/GitHub/Codex entry point, and named documentation ACL not established |
-| libraries | `127:5000`, `/home/libraries`; Jellyfin/Radarr/Sonarr/Prowlarr/RomM/qBittorrentVPN/Paperless. Paperless media is `/mnt/nas-libraries/paperless`. |
-| game-servers | `995:5001`, `/home/game-servers`; Palworld Jared and Fran are deliberately non-running (`created`); JDownloader, Igir, qBittorrent importer, and browser-upload bridge were retired on 2026-10-05; Gamarr retired |
-| platform | `997:5002`, `/home/platform`; Arcane/DDNS/Homepage/Glances/NPM/Rotom Docs |
-| smart-home | `126:5003`, `/home/smart-home`; Home Assistant/Homebridge |
+| libraries | `127:5000`; NSS home field `/home/libraries`, physical directory absent; Jellyfin/Radarr/Sonarr/Prowlarr/RomM/qBittorrentVPN/Paperless. Paperless media is `/mnt/nas-libraries/paperless`. |
+| game-servers | `995:5001`; NSS home field `/home/game-servers`, physical directory absent; Palworld Jared and Fran were running and healthy on 2026-10-15, but the reason and intended persistence remain unverified; JDownloader, Igir, qBittorrent importer, and browser-upload bridge were retired on 2026-10-05; Gamarr retired |
+| platform | `997:5002`; NSS home field `/home/platform`, physical directory absent; Arcane/DDNS/Homepage/Glances/NPM/Rotom Docs |
+| smart-home | `126:5003`; NSS home field `/home/smart-home`, physical directory absent; Home Assistant/Homebridge |
 | documents | **Retired**; historical `900:5004` / `/home/documents` record only; numeric GID `5004` is now Hosted Websites |
 | downloader | **Retired**; account, former home, and Arcane compatibility bind are absent |
-| hosted-websites | `902:5004`, `/home/hosted-websites`; Aloha active; Jared Wines undeployed |
+| hosted-websites | `902:5004`; NSS home field `/home/hosted-websites`, physical directory absent; Aloha active; Jared Wines undeployed |
 | filesync | **Retired**; historical `903:5007` / Syncthing record only |
-| desktopcmd | `1001:1001`, locked non-human account with configured home `/opt/desktop-commander` (private base ACL; displayed mode `0750` due Jared read/traverse ACL); `/usr/bin/zsh` with Oh My Zsh; Remote Desktop Commander only; no sudo, SSH authorized keys, Docker/socket, service-group, or NAS-specific access. `/home/desktopcmd` is an empty retained legacy directory; its former contents were explicitly retired. |
+| desktopcmd | `1001:1001`, locked non-human account with configured home `/opt/desktop-commander` (private base ACL; displayed mode `0750` due Jared read/traverse ACL); `/usr/bin/zsh` with Oh My Zsh; Remote Desktop Commander only; no sudo, SSH authorized keys, Docker/socket, service-group, or NAS-specific access. `/home/desktopcmd` and its former contents are absent. |
 | Docker group | GID `989`, sole listed member `fran` |
 
 ### Current `/srv/rotom` Jared access — 2026-10-10
@@ -473,7 +473,7 @@ Read-only checks then reconfirmed the named-account IDs, Docker-group membership
 ## 7. Reconstruction-Critical Information
 
 - The **Current Identity and Access Model** table in section 2 is the canonical rebuild reference for current UID/GID, home, and workload ownership. The **Account model** table in section 2A is preserved pre-migration evidence and must not be replayed where names or privileges differ.
-- The privileged-group table under **Privileged groups and sudo** is the canonical reference for `sudo`, `docker`, and other named privilege-bearing memberships.
+- The current identity table in section 2 is the canonical reference for `sudo`, `docker`, and other named privilege-bearing memberships. The **Preserved pre-migration privileged groups and sudo** table is historical evidence only and must not be replayed; in particular, do not restore its broad Docker-group membership.
 - Home ownership/modes, documentation ACLs, NAS access behavior, and account-switching policy are preserved in the current as-built sections above.
 - Numeric UID/GID values are authoritative for NFS behavior; names displayed by a different system must not be used to infer ownership.
 
