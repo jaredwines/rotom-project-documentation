@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-15 — Record post-cleanup Docker and Arcane automation audit
+**Documentation updated:** 2026-10-15 — Synchronize the installed legacy documentation validation helpers
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -69,6 +69,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-15 — Synchronize the installed legacy documentation validation helpers
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.** Only the Rotom and Mac `/usr/local/bin/retired-helper` helpers and their documentation were changed; no service, container, mount, backup, NAS, network, permission, storage, or application data was changed.
+- **Changes:** Installed the tracked `support/tooling/retired-helper` over the older Rotom and Mac `/usr/local/bin/retired-helper` copies with their established root ownership and executable mode. Both installed commands now support offline `retired-helper lint`, and `retired-helper check` runs that lint before its GitHub comparison. No persistent rollback copy was added; the prior helper remains recoverable from repository history.
+- **Evidence:** Rotom preflight syntax validation passed and showed that the installed-versus-versioned diff contained only the reviewed lint implementation, `check` integration, and matching help/dispatch updates. After installation, the Rotom copies were 20,999 bytes with SHA-256 `7d987132d76c6fdac970122bd61407fd72185c081b2ba46ca31c6f92c56262dc`; `cmp` returned identical, the installed script passed `bash -n`, `retired-helper lint` passed, and the full `retired-helper check` passed with a clean checkout matching `origin/main`. Jared then fast-forwarded the Mac checkout to `d51aa0e`, installed the tracked helper as `root:wheel` mode `0755`, observed no `cmp` difference, and returned passing `retired-helper lint` plus a full clean-checkout `retired-helper check` matching `origin/main`.
+- **Outstanding:** Available Sources replacement remains manual by Jared.
 
 ## 2026-10-15 — Record post-cleanup Docker and Arcane automation audit
 

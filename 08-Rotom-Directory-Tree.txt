@@ -225,7 +225,7 @@
 #     support/                               repository-only material; not an legacy documentation membership boundary or an Available Sources destination
 #       CONTRIBUTING.md                      contribution guide; defers to document 00 for the canonical maintenance contract
 #       tooling/
-#         retired-helper                                canonical source; versioned copy has lint not yet installed on Mac/Rotom
+#         retired-helper                                canonical source; installed equivalently on Rotom and Mac
 #     00-Rotom-Change-Log.md
 #     01-Rotom-Server-Inventory.md
 #     02-Docker-Services.md
@@ -238,9 +238,10 @@
 # - Repository support commit 152fd74 added AGENTS.md + tooling/retired-helper and was pushed; Rotom fast-forwarded to the same commit. The path is historical; the current tracked helper path is support/tooling/retired-helper.
 # - Historical pre-lint SHA-256 on the then-identical Mac/Rotom installed + repository copies:
 #   42866ab6dbb5c47f996289d751cb26767dc79c756638cbeb9851c9e45fbdbe7b
-# - Installed command set: path, status, check, pull, diff, log [N], commit "message", push, help.
-# - Current versioned source additionally provides lint and runs it from check; use
-#   support/tooling/retired-helper lint until installation synchronization is separately authorized.
+# - Current installed/versioned command set: path, status, check, lint, pull, diff, log [N],
+#   commit "message", push, help. Check runs lint before its GitHub comparison.
+# - Rotom and Mac /usr/local/bin/retired-helper match support/tooling/retired-helper at SHA-256
+#   7d987132d76c6fdac970122bd61407fd72185c081b2ba46ca31c6f92c56262dc.
 # - Resolution: expected current Git working tree first; otherwise ${XDG_CONFIG_HOME:-$HOME/.config}/retired-helper/repository; then validate expected user/repo/remote/branch/upstream/access/core files.
 # /home/jared/.config/retired-helper/                   mode 0700; Jared per-machine retired-helper configuration
 #   repository                               mode 0600; contains /home/jared/documentation/rotom-runbook; no credentials
@@ -251,7 +252,7 @@
 # - The older pre-migration top-level /home/infra/documentation/AGENTS.md + README.md state was not re-inspected in this task; preserve it below only as dated historical evidence.
 #
 # MAC legacy documentation ADMINISTRATION TOOLING — outside Rotom filesystem
-# /usr/local/bin/retired-helper                        installed helper baseline; versioned lint enhancement not yet synchronized
+# /usr/local/bin/retired-helper                        Mac installed helper; lint/check passed after no-difference comparison
 # ~/.config/retired-helper/                            mode 0700
 #   repository                              mode 0600; contains /Users/jared/Documents/ChatGPT/rotom-runbook; no credentials
 # ~/.codex/AGENTS.md                        Mac-global instruction reduced to command-line vim preference
