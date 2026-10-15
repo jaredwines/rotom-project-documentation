@@ -30,8 +30,9 @@
 #   `1001:1001` with Zsh/Oh My Zsh, but its configured home and native service root
 #   are now `/opt/desktop-commander`. The app, runtime, workspace, and sensitive
 #   device-registration state are there; the service is enabled outbound-only with
-#   UMask=0077, NoNewPrivileges=true, and PrivateTmp=true. `/home/desktopcmd` is a
-#   retained unmodified rollback tree, not an active home or service dependency.
+#   UMask=0077, NoNewPrivileges=true, and PrivateTmp=true. After migration acceptance,
+#   Jared authorized retirement of `/home/desktopcmd` contents; its empty directory is
+#   retained only as legacy filesystem evidence, not as an active or rollback path.
 #   PVE `fran` is independently `1001:1001`, home `/home/fran` mode 0700, Zsh/Oh My
 #   Zsh, and member of `sudo`, `users`, and `systemd-journal`; enabled `fran@pam` has
 #   propagated Administrator access at `/`. PVE Fran journal access passed, and Jared
@@ -297,7 +298,7 @@
 #   web/         902:5006  mode 0750  -> nas-web -> /mnt/nas-web
 #     docker/{alohamillworks.com,jaredwines.com}/ JAR-45 legacy rollback trees retired 2026-09-29
 #   filesync/    903:5007  mode 0750  -> nas-filesync -> /mnt/nas-filesync; Syncthing config/database is under /srv/rotom/appdata/filesync
-#   desktopcmd/  1001:1001 mode 0700  JAR-71 pre-migration Remote Desktop Commander source; retained for rollback
+#   desktopcmd/  1001:1001 mode 0700  JAR-71 pre-migration source; contents retired after acceptance, empty directory retained
 #     app/                        pinned @wonderwhy-er/desktop-commander 0.2.52 installation
 #     workspace/                  sole intended writable remote work area; acceptance file mode 0600
 #     .desktop-commander-device/  sensitive pairing state; never record contents

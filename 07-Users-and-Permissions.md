@@ -21,7 +21,7 @@ Fran and the selected service identities use `/usr/bin/zsh` with Oh My Zsh. `des
 
 A read-only 2026-10-14 follow-up executed `docker ps` directly as Fran and listed the 20 running containers, confirming the documented Docker-group access works in practice. `desktop-commander.service` was enabled and active/running after the `desktopcmd` shell change. These checks do not alter Fran's root-equivalent Docker boundary or `desktopcmd`'s intentionally restricted account policy.
 
-The existing `desktopcmd` identity was then migrated live from `/home/desktopcmd` to configured home `/opt/desktop-commander` without changing UID:GID `1001:1001`, the locked password state, Zsh/Oh My Zsh configuration, or its sole primary-group membership. The new home preserves the private base ACL and named Jared read/traverse/default ACL, so its displayed mode is `0750`; no base group or other access was granted. The original `/home/desktopcmd` tree remains retained rollback material. No `desktopcmd` sudoers entry or authorized SSH key exists.
+The existing `desktopcmd` identity was then migrated live from `/home/desktopcmd` to configured home `/opt/desktop-commander` without changing UID:GID `1001:1001`, the locked password state, Zsh/Oh My Zsh configuration, or its sole primary-group membership. The new home preserves the private base ACL and named Jared read/traverse/default ACL, so its displayed mode is `0750`; no base group or other access was granted. Jared subsequently authorized removal of the verified-unused old-home contents; its empty legacy directory remains. No `desktopcmd` sudoers entry or authorized SSH key exists.
 
 The Smart Home stack directories are root-owned, but both live Compose files are owned by `smart-home:smart-home`. On 2026-10-14 Jared confirmed the cross-domain Game Servers grants were unintended, so only the named `game-servers:rw-` Home Assistant and `game-servers:rwx` Homebridge ACL entries were removed. Home Assistant remains `smart-home:smart-home` mode `0660`; Homebridge remains `smart-home:smart-home` mode `0670`; Jared retains read-only/read-traverse named access. Negative access tests confirmed `game-servers` cannot write either file, positive tests confirmed `smart-home` can read/write both, and Compose validation passed.
 
@@ -71,7 +71,7 @@ Guest service-account identities remain unchanged. Docker group is package-creat
 | downloader | **Retired**; account, former home, and Arcane compatibility bind are absent |
 | hosted-websites | `902:5004`, `/home/hosted-websites`; Aloha active; Jared Wines undeployed |
 | filesync | **Retired**; historical `903:5007` / Syncthing record only |
-| desktopcmd | `1001:1001`, locked non-human account with configured home `/opt/desktop-commander` (private base ACL; displayed mode `0750` due Jared read/traverse ACL); `/usr/bin/zsh` with Oh My Zsh; Remote Desktop Commander only; no sudo, SSH authorized keys, Docker/socket, service-group, or NAS-specific access. `/home/desktopcmd` is retained rollback material. |
+| desktopcmd | `1001:1001`, locked non-human account with configured home `/opt/desktop-commander` (private base ACL; displayed mode `0750` due Jared read/traverse ACL); `/usr/bin/zsh` with Oh My Zsh; Remote Desktop Commander only; no sudo, SSH authorized keys, Docker/socket, service-group, or NAS-specific access. `/home/desktopcmd` is an empty retained legacy directory; its former contents were explicitly retired. |
 | Docker group | GID `989`, sole listed member `fran` |
 
 ### Current `/srv/rotom` Jared access — 2026-10-10

@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-14 — Retire Remote Desktop Commander old-home rollback contents
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** At Jared's explicit authorization after successful migration verification, removed the 35,248-entry / 1.6 GiB rollback contents from `/home/desktopcmd`. The empty legacy directory remains `desktopcmd:desktopcmd` mode `0750` under the inherited named Jared read/traverse ACL; it is not the account home or an active service dependency. The separate root-owned pre-migration service-unit copy remains configuration history only and is not a complete rollback path without the removed application tree.
+- **Evidence:** Before deletion, `desktopcmd` was already configured for `/opt/desktop-commander`, the active service executed and worked there, no old-home handles were open, and the active unit contained no old path. Final checks found the old home empty, `desktop-commander.service` enabled and active, and zero failed units.
+- **Outstanding:** Restoring the former `/home/desktopcmd` application state now requires a suitable Rotom Restic Backup recovery point; no local fast rollback copy remains. Available Sources synchronization remains manual by Jared.
+
 ## 2026-10-14 — Migrate Remote Desktop Commander to `/opt`
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
