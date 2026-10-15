@@ -87,10 +87,10 @@ Keep future entries brief: the change log should point to the detailed documents
 ## 2026-10-15 — Retire unused repository contribution guide
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`, `README.md`, `support/tooling/retired-helper`, and `support/tooling/test-retired-helper-runbooks`; removed `support/CONTRIBUTING.md`.
-- **Status:** **Documentation only.** No Rotom live configuration changed.
-- **Changes:** Removed the unused repository-facing contribution guide at Jared's direction. Current repository navigation, source-map, lint, and structural-test references now point directly to document 00 as the sole legacy documentation maintenance authority. The numbered legacy documentation membership and maintained runbook-structure test remain unchanged.
-- **Evidence:** Jared confirmed the guide will not be used. Repository-reference scan and validation are required before publication.
-- **Outstanding:** None.
+- **Status:** **Documentation only / Implemented / Verified.** The only live change was replacing Rotom's installed `retired-helper` helper with the reviewed tracked helper; no service, container, mount, backup, network, account, or application configuration changed.
+- **Changes:** Removed the unused repository-facing contribution guide at Jared's direction. Current repository navigation, source-map, lint, and structural-test references now point directly to document 00 as the sole legacy documentation maintenance authority. Synchronized Rotom's `/usr/local/bin/retired-helper` with the changed tracked helper so its lint no longer requires the removed guide. The numbered legacy documentation membership and maintained runbook-structure test remain unchanged.
+- **Evidence:** Jared confirmed the guide will not be used. Rotom's installed helper is `root:root` mode `0755`, passed syntax validation, and is byte-identical to `support/tooling/retired-helper` at SHA-256 `bd20aaefc733ef25d8f4ba62b33940b7552a2da5d966eaef872a5768ea561fc7`; repository-reference scan and validation passed before publication.
+- **Outstanding:** The Mac installed helper remains at the earlier version until separately synchronized; do not treat it as equivalent to this repository revision.
 
 ## 2026-10-15 — Reconcile final acceptance findings
 

@@ -244,7 +244,7 @@
 #     README.md                              repository landing page; Git support metadata, not an legacy documentation member unless added to Available Sources
 #     support/                               repository-only material; not an legacy documentation membership boundary or an Available Sources destination
 #       tooling/
-#         retired-helper                                canonical source; installed equivalently on Rotom and Mac
+#         retired-helper                                canonical source; installed equivalently on Rotom (Mac sync pending)
 #     00-Rotom-Change-Log.md
 #     01-Rotom-Server-Inventory.md
 #     02-Docker-Services.md
@@ -259,8 +259,9 @@
 #   42866ab6dbb5c47f996289d751cb26767dc79c756638cbeb9851c9e45fbdbe7b
 # - Current installed/versioned command set: path, status, check, lint, pull, diff, log [N],
 #   commit "message", push, help. Check runs lint before its GitHub comparison.
-# - Rotom and Mac /usr/local/bin/retired-helper match support/tooling/retired-helper at SHA-256
-#   7d987132d76c6fdac970122bd61407fd72185c081b2ba46ca31c6f92c56262dc.
+# - Rotom /usr/local/bin/retired-helper matches support/tooling/retired-helper at SHA-256
+#   bd20aaefc733ef25d8f4ba62b33940b7552a2da5d966eaef872a5768ea561fc7;
+#   Mac synchronization is pending.
 # - Resolution: expected current Git working tree first; otherwise ${XDG_CONFIG_HOME:-$HOME/.config}/retired-helper/repository; then validate expected user/repo/remote/branch/upstream/access/core files.
 # /home/jared/.config/retired-helper/                   mode 0700; Jared per-machine retired-helper configuration
 #   repository                               mode 0600; contains /home/jared/documentation/rotom-runbook; no credentials
