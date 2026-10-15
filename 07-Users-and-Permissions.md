@@ -4,12 +4,62 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-10-15 — Improve navigation and safe-use guidance
+**Documentation updated:** 2026-10-15 — Runbook-first conversion
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
+
+## Start by Task or Symptom
+
+- Permission denied, unexpected owner/group/mode/ACL, or service identity mismatch: use [Diagnose an Identity, Ownership, or Access Failure](#diagnose-an-identity-ownership-or-access-failure).
+- NAS-root or NFS permission behavior: establish the mount/export contract in [document 04](04-NAS-and-Storage.md#diagnose-and-recover-a-configured-nas-mount) and interpret numeric identity here.
+- Container process identity: compare Compose/runtime state in [document 02](02-Docker-Services.md#start-by-task-or-symptom).
+
+## Diagnose an Identity, Ownership, or Access Failure
+
+### Outcome, entry conditions, and exclusions
+
+Determine whether denial or unexpected access comes from account identity, primary/supplementary groups, parent traversal, ownership, mode, ACL, sudo policy, Docker privilege, or an NFS numeric-ID contract. Exclude recursive normalization, UID/GID renumbering, broad group additions, sudo expansion, SSH-key work, NAS policy changes, and credential access.
+
+### Risk, canonical inputs, and preflight
+
+Read-only diagnosis is authorized. Ownership, mode, ACL, membership, sudo, SSH, or service-identity changes alter security boundaries and require explicit, scoped authorization plus a current owner contract from this document. Docker-group membership is root-equivalent. On NFS, preserve numeric UID/GID and the documented NAS contract.
+
+**Read-only**
+
+```bash
+id ACCOUNT
+getent passwd ACCOUNT
+getent group GROUP
+namei -l /exact/path
+stat -c '%n %u:%g %a' /exact/path
+getfacl -p /exact/path
+sudo -u ACCOUNT test -r /exact/path
+sudo -u ACCOUNT test -w /exact/path
+sudo -u ACCOUNT test -x /exact/path
+```
+
+Use the exact account and path from the current identity/path reference. The `test` commands produce status, not file content.
+
+### Stop conditions
+
+Stop if the expected owner/identity is not documented, the path is a NAS mount with a source/mount mismatch, the change would be recursive or cross a filesystem boundary, the target contains credentials/private keys, an application deliberately maintains the metadata, or the proposed fix changes UID/GID, sudo, SSH, Docker membership, or an appliance-side policy.
+
+### Smallest targeted action, verification, and recovery
+
+Prefer running service-specific administration as the established service identity rather than broadening membership:
+
+**Changes Rotom**
+
+```bash
+sudo -iu SERVICE_ACCOUNT
+```
+
+Any `chown`, `chmod`, `setfacl`, `usermod`, sudoers, or SSH change must be separately reviewed with an exact non-recursive target and recorded prior metadata. Expected immediate result is only the intended access outcome; unrelated identities must remain unchanged. Re-run `stat`, `getfacl`, positive access as the intended identity, negative access as an unrelated identity where safe, application verification, and `systemctl --failed`. If verification fails, restore the recorded owner/mode/ACL or stop before expanding scope. Never use `chmod 777`.
+
+Retain the exact path, numeric and named identity, parent traversal result, prior/final metadata, positive and negative access results, authorization, and application result without recording protected content. Revalidate after any account, UID/GID, group, ownership, mode, ACL, sudo rule, SSH access, service identity, or privilege-boundary change.
 
 ## Navigation and Authority
 
@@ -495,3 +545,7 @@ The JAR-6 service storage-GID plan is no longer proposed; it is current as-built
 - See `02-Docker-Services.md` for container/runtime deployment context that uses these identities.
 - See `06-Maintenance-and-Automation.md` for routine administration and automation workflows.
 - See `00-Rotom-Change-Log.md` for the canonical legacy documentation maintenance contract and identity-migration history.
+
+## Maintenance and Revalidation Triggers
+
+Follow the canonical [Runbook-First Maintenance Standard](00-Rotom-Change-Log.md#runbook-first-maintenance-standard). Revalidate procedures and current-state reference after any account, UID/GID, group, ownership, mode, ACL, sudo rule, SSH access, service identity, or privilege-boundary change. Recheck affected application and storage owners without duplicating their procedures here.

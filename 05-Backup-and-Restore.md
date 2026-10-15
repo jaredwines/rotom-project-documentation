@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Restic backup architecture, scope, retention, verification, restore evidence, and recovery boundaries  
 **Recovery scope:** pre-migration Rotom plus current Proxmox/VM foundation  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Improve navigation and safe-use guidance
+**Documentation updated:** 2026-10-15 — Runbook-first conversion
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -19,6 +19,195 @@ Record substantive changes to this document in the change log as part of the sam
 - Review **Disaster-Recovery Boundaries and Known Gaps** and **Reconstruction-Critical Information** before relying on a protection domain.
 - This file owns backup and restore claims; storage locations, automation schedules, and privilege boundaries remain canonical in documents 04, 06, and 07.
 
+## Start by Task or Symptom
+
+| Task | Procedure |
+|---|---|
+| Run or verify Rotom Restic Backup | [Run and Verify Rotom Restic Backup](#run-and-verify-rotom-restic-backup) |
+| Investigate a failed scheduled backup | Perform the runbook preflight, then inspect the owning timer/service in [document 06](06-Maintenance-and-Automation.md#investigate-a-failed-timer-or-automation) |
+| Verify repository structure or full pack readability | Use the assurance-level guidance in this document; do not confuse snapshot creation with `restic check` or `restic check --read-data` |
+| Restore data | Select a known recovery point and restore to an isolated restricted staging location before planning live replacement |
+| PVE Restic or Rotom VM VZDump work | Use the PVE sections in this document; all PVE actions are **PVE — Jared executes** |
+
+## Run and Verify Rotom Restic Backup
+
+### 1. Outcome
+
+Create one Rotom Restic host-data snapshot through the installed worker, apply its established `7 daily / 4 weekly / 12 monthly` automatic-snapshot retention and prune policy, and verify that the run completed successfully and produced a current snapshot. Source data and repository internals must not be manually edited.
+
+### 2. Use this runbook when
+
+- an authorized manual Rotom host backup is needed;
+- the scheduled Rotom Restic Backup must be verified;
+- the backup timer or service reports failure;
+- a backup must be checked before maintenance.
+
+Do **not** use this runbook for:
+
+- PVE Restic Backup;
+- Rotom VM VZDump backup;
+- NAS-side snapshots;
+- restoring over live application data;
+- changing include/exclude files, credentials, retention, or repository location;
+- deleting, moving, or reorganizing Restic repository internals.
+
+### 3. Impact and authorization
+
+The backup reads configured Rotom paths, refreshes restricted system-information files under `/var/backups/system-info`, creates transactionally consistent copies of the NPM and Home Assistant SQLite databases, writes a tagged Restic snapshot, then runs `forget --prune` under the installed retention policy. It can use significant disk, CPU, NAS I/O, and time.
+
+The repository password file is `/etc/restic/restic-repository-password`. Never print, copy, paste, hash, or record its contents. Backups may contain credentials, certificates, application data, and personal information; do not expose snapshot contents in routine evidence.
+
+### 4. Canonical current-state inputs
+
+| Item | Current contract |
+|---|---|
+| Manual launcher | `/usr/local/bin/backup-restic-to-nas` |
+| systemd service | `rotom-restic-backup.service` |
+| timer | `rotom-restic-backup.timer`, daily around `03:00` with up to 10 minutes randomized delay |
+| worker | `/usr/local/sbin/rotom-restic-backup` |
+| mount | `/mnt/nas-rotom-restic-backup` |
+| repository | `/mnt/nas-rotom-restic-backup/rotom-restic-backup` |
+| retention | automatic snapshots: 7 daily, 4 weekly, 12 monthly, followed by prune |
+
+Rotom Restic Backup protects configured VM-local host/application state. `/mnt` is excluded; NAS-resident Libraries/Paperless media and the repository itself are separate protection domains.
+
+### 5. Read-only preflight
+
+**Read-only**
+
+```bash
+systemctl is-enabled rotom-restic-backup.timer
+systemctl is-active rotom-restic-backup.timer \
+  rotom-restic-backup.service
+systemctl list-timers rotom-restic-backup.timer --all --no-pager
+systemctl status rotom-restic-backup.service --no-pager
+sudo journalctl -u rotom-restic-backup.service -n 120 --no-pager
+findmnt -M /mnt/nas-rotom-restic-backup -t nfs,nfs4 \
+  -o TARGET,SOURCE,FSTYPE,OPTIONS
+df -h / /var /mnt/nas-rotom-restic-backup
+pgrep -af '(^|/)(restic|rotom-restic-backup)( |$)' || true
+sudo stat -c '%U:%G %a %n' \
+  /usr/local/bin/backup-restic-to-nas \
+  /usr/local/sbin/rotom-restic-backup \
+  /etc/restic/include.txt \
+  /etc/restic/exclude.txt \
+  /etc/restic/restic-repository-password
+```
+
+List snapshot metadata without printing secret contents:
+
+**Read-only**
+
+**Credential-sensitive**
+
+```bash
+sudo env \
+  RESTIC_REPOSITORY=/mnt/nas-rotom-restic-backup/rotom-restic-backup \
+  RESTIC_PASSWORD_FILE=/etc/restic/restic-repository-password \
+  restic snapshots --host rotom --tag automatic --latest 3
+```
+
+Expected result is an enabled/active timer, inactive oneshot service between runs, exact active NFS mount, no concurrent Restic process, protected control files, and readable snapshot metadata.
+
+### 6. Stop conditions
+
+Stop before starting a backup if:
+
+- another Restic process or `rotom-restic-backup.service` is active;
+- the mount is absent, read-only, or from an unexpected source;
+- the repository path or credential-file path differs from the current contract;
+- `/`, `/var`, the NAS, or repository lacks safe working capacity;
+- required SQLite source databases are missing or report integrity problems;
+- include/exclude configuration or worker content differs unexpectedly;
+- the repository reports corruption, an unexplained lock, missing packs, or another writer;
+- the requested task is actually PVE, VZDump, NAS snapshot, or restore work.
+
+Do not use `restic unlock`, `repair`, `forget`, `prune`, or repository-file deletion as an automatic preflight fix.
+
+### 7. Procedure
+
+The canonical interactive launcher executes the protected worker through `sudo`.
+
+**Changes Rotom and protected storage/repository state**
+
+```bash
+/usr/local/bin/backup-restic-to-nas
+```
+
+Keep the session attached until the command exits. A successful run must complete both snapshot creation and the installed retention/prune phase with exit status zero.
+
+For a disconnect-safe manually initiated run, use the existing systemd service instead of wrapping the worker in an ad hoc background process:
+
+**Changes Rotom and protected storage/repository state**
+
+```bash
+sudo systemctl start rotom-restic-backup.service
+```
+
+Use only one launch method for a run. Never start the service while the launcher or another Restic process is active.
+
+### 8. Verification
+
+**Read-only**
+
+```bash
+systemctl status rotom-restic-backup.service --no-pager
+sudo journalctl -u rotom-restic-backup.service -n 160 --no-pager
+findmnt -M /mnt/nas-rotom-restic-backup -t nfs,nfs4 \
+  -o TARGET,SOURCE,FSTYPE,OPTIONS
+sudo env \
+  RESTIC_REPOSITORY=/mnt/nas-rotom-restic-backup/rotom-restic-backup \
+  RESTIC_PASSWORD_FILE=/etc/restic/restic-repository-password \
+  restic snapshots --host rotom --tag automatic --latest 3
+systemctl --failed --no-pager
+```
+
+Success requires:
+
+- the command or service exited successfully;
+- the backup output contains a completed snapshot rather than only a scan;
+- the retention/prune phase completed without error;
+- the newest automatic snapshot timestamp corresponds to the run;
+- the repository remains reachable through the exact NFS mount;
+- no new failed systemd unit or application failure appears.
+
+Snapshot existence proves that Restic committed a snapshot; it does not by itself prove full-pack readability or end-to-end restoration. Use the separately scoped repository-check and isolated-restore procedures in document 05 for those assurance levels.
+
+### 9. Rollback or recovery
+
+A completed backup is not rolled back. Restic retention governs automatic snapshot cleanup. Do not delete a new snapshot merely because the run was manually initiated.
+
+If a run fails before committing a snapshot, source data should remain unchanged. Preserve the error and inspect the repository using supported Restic commands. Do not manually delete files from `data`, `index`, `keys`, `snapshots`, `locks`, or `config`.
+
+If Restic reports a stale lock, first prove that no Restic process and no backup service is active. `restic unlock` changes repository metadata and requires a separately reviewed, explicitly authorized recovery step. Never remove a lock file manually.
+
+### 10. Troubleshooting branches
+
+- **Backup mount absent:** follow the NAS mount runbook for `/mnt/nas-rotom-restic-backup`; do not run the Libraries container helper.
+- **Service already active:** monitor it; do not start a second run.
+- **Required SQLite database missing or invalid:** stop and repair the application/state discrepancy before backup.
+- **Repository locked:** identify the holder. If none exists, prepare a reviewed supported unlock; do not delete lock files.
+- **Snapshot succeeds but prune fails:** treat the run as incomplete, preserve logs, and inspect repository health/capacity before any retry.
+- **No new snapshot:** confirm the exact exit status and full error. Do not infer success from an inactive oneshot service.
+- **Repository check requested:** use document 05; `restic check --read-data` is a long, NAS-intensive operation and is not routine post-run verification.
+- **Restore requested:** select and inspect a recovery point, restore into an isolated restricted staging location, verify it, and only then plan any live replacement.
+
+### 11. Evidence to retain
+
+Record the run time in `America/Los_Angeles`, launch method, mount source, service/command result, newest snapshot short ID and timestamp, retention/prune result, and outstanding errors. Do not record passwords, environment values containing secrets, private application data, or restored file contents.
+
+### 12. Related documentation
+
+- [05-Backup and Restore](05-Backup-and-Restore.md)
+- [04-NAS and Storage](04-NAS-and-Storage.md)
+- [06-Maintenance and Automation](06-Maintenance-and-Automation.md)
+- [NAS mount recovery](04-NAS-and-Storage.md#diagnose-and-recover-a-configured-nas-mount)
+
+### 13. Maintenance notes
+
+Revalidate this runbook whenever the service/timer, launcher, worker, repository, mount, password-file path, include/exclude policy, SQLite staging set, retention, or backup scope changes.
+
+
 ## 1. Purpose and Scope
 
 ### Current PVE backup verification — 2026-10-14
@@ -29,9 +218,9 @@ Rotom VM Backup uses the native `rotom-vm-daily` Proxmox VZDump job, configured 
 
 The PVE backup-status API reported both schedules successfully and the two NFS backup paths were mounted read/write. This is strong current backup evidence, but it does not replace a restore rehearsal. The earlier disposable-VM restore remains the latest recorded whole-VM restore proof.
 
-### Current guest backup observation — 2026-10-14
+### Current guest backup observation — 2026-10-15
 
-`rotom-restic-backup.timer` is enabled and active with the documented `03:00` schedule plus up to ten minutes randomized delay. The latest observed automatic snapshot is `553e7a39` from 2026-10-14 20:30 PDT, covering the documented guest source roots at approximately 20.640 GiB; the service completed successfully. The earlier 2026-10-14 repository inspection found 22 snapshots and a successful `restic check`; its then-latest `9494979d` remains dated evidence. Jared subsequently confirmed the current full data-read verification and restore rehearsal completed successfully; the selected snapshot and transcript were not supplied in this chat.
+`rotom-restic-backup.timer` is enabled and active with the documented `03:00` schedule plus up to ten minutes randomized delay. The latest observed automatic snapshot is `1fd623ca` from 2026-10-15 03:00 PDT, covering the documented guest source roots at approximately 20.282 GiB; the service result and exit status were successful. Earlier observed snapshots `553e7a39` and `9494979d` remain dated evidence, and the earlier repository inspection recorded a successful `restic check`. Jared subsequently confirmed the current full data-read verification and restore rehearsal completed successfully; the selected snapshot and transcript were not supplied in this chat.
 
 On 2026-10-14, Jared changed the Rotom root worker to use the root-only local credential file `/etc/restic/restic-repository-password`; manual post-change snapshot `333c87b3` completed successfully and the timer was re-enabled and active. The VM-local `/srv/rotom/backup-staging` root is absent. Every named local artifact beneath it is historical unless a later live path check re-establishes its presence. Restic-contained copies and historical checksums remain recovery evidence, but they are not proof of a current fast local rollback copy. Authoritative Libraries/Paperless NAS payload remains outside Rotom Restic Backup; Jared confirmed its snapshot/restore path has been verified, without supplying the detailed NAS-side transcript in this chat.
 
@@ -579,7 +768,7 @@ This is the recovery order supported by the audit, with current Rotom paths. It 
 
 1. **Prepare the replacement Linux host.** Establish console/SSH access, networking, correct time, Restic, and Docker/Compose as needed. Keep application services from starting against empty data directories.
 2. **Access the NAS and repository.** Restore the current NFS mount arrangement and confirm the actual NAS export with `findmnt`. Obtain the repository credential through its secure recovery process without displaying it. Do not initialize a new repository over the existing one.
-3. **Choose a recovery point.** List snapshots and select the intended host/date explicitly. The latest observed guest snapshot is automatic snapshot `553e7a39` from 2026-10-14 20:30 PDT; the backup service succeeded, but this audit did not perform a data-read or restore from that snapshot. The earlier `9494979d` point passed `restic check`. `fbe1838e` is the final verified pre-migration recovery point; `5b4ed601` is the first verified VM-era snapshot; `8efea294`, `3c85d5be`, and `f666d63c` remain dated evidence and may have expired under retention. Historical JAR-33 snapshot `74d3b0ca` was removed by normal same-day retention and is unavailable. For whole-VM recovery, verify the current archive set before selecting an image; older recorded names are evidence, not a promise of retention. No snapshot/archive ID is a permanent recommendation—choose the state appropriate to the incident.
+3. **Choose a recovery point.** List snapshots and select the intended host/date explicitly. The latest observed guest snapshot is automatic snapshot `1fd623ca` from 2026-10-15 03:00 PDT; the backup service succeeded, but this audit did not perform a data-read or restore from that snapshot. The earlier `9494979d` point passed `restic check`. `fbe1838e` is the final verified pre-migration recovery point; `5b4ed601` is the first verified VM-era snapshot; `553e7a39`, `8efea294`, `3c85d5be`, and `f666d63c` remain dated evidence and may have expired under retention. Historical JAR-33 snapshot `74d3b0ca` was removed by normal same-day retention and is unavailable. For whole-VM recovery, verify the current archive set before selecting an image; older recorded names are evidence, not a promise of retention. No snapshot/archive ID is a permanent recommendation—choose the state appropriate to the incident.
 4. **Restore into a new restricted staging directory.** Check free space, inspect the selected snapshot's paths, and recover files away from production. Validate staged databases and the required application data before promoting anything.
 5. **Recreate account and storage relationships.** Preserve numeric UID/GID ownership for current `platform`, `libraries`, `game-servers`, `smart-home`, `hosted-websites`, and personal accounts. Older snapshots can contain historical account names including `infra`, `documents`, `downloader`, `filesync`, `media`, `rotom`, `smarthome`, `web-host`, `web`, `gameserver`, `game-server`, `game`, `downloads`, `downloaders`, `apps`, `customapps`, and `auth`; reconcile them deliberately rather than restoring them by default. Retired account/groups and their local paths, including Documents appdata/secrets, must not be recreated unless separately authorized. The current Palworld identity is `game-servers` at `995:5001` with home `/home/game-servers`; active local state is under `/srv/rotom/appdata/game-servers`. Hosted Websites is `hosted-websites` at `902:5004` with home `/home/hosted-websites`; the guest `/mnt/nas-web` contract must not be recreated without separate authorization. Reconcile older GID `129` account records, file groups, and Compose settings with Libraries UID `127` / primary GID `5000` before starting Library workloads. Libraries descendants are intentionally `127:5000`; preserve the historical Paperless Documents export record and do not broaden or recursively retag unrelated NAS data. The current Restic share root presents as numeric `988:988` mode `0700` while mounted; that is NAS-side ownership, not literal `root:root`. Verify root-run repository access and the restored export's identity mapping/options before resuming backups. Re-test intended ordinary-user denial after reconstruction. GID `5001` is the current Game Servers service group and must be restored for `game-servers`; current service storage GIDs are Platform `5002`, Smart Home `5003`, Hosted Websites `5004`, and Libraries `5000`. Avoid broad recursive ownership changes outside the explicitly normalized Libraries share.
 6. **Restore main data and selectively reconcile `/etc`.** Recover relevant `/home`, `/root`, `/opt`, `/srv`, and `/usr/local` data. Review systemd units, fstab, networking, users/groups, and host-specific configuration before applying them. Do not blindly overwrite a fresh host's entire `/etc`.
@@ -678,3 +867,7 @@ No new backup architecture is adopted by this restructure. Future improvements s
 - `04-NAS-and-Storage.md` — canonical backup mount/export and NAS storage boundary.
 - `06-Maintenance-and-Automation.md` — canonical recurring schedule/maintenance context.
 - `07-Users-and-Permissions.md` — canonical manual-access authorization and account privilege model.
+
+## Maintenance and Revalidation Triggers
+
+Follow the canonical [Runbook-First Maintenance Standard](00-Rotom-Change-Log.md#runbook-first-maintenance-standard). Revalidate procedures and current-state reference after any repository, backup scope, include/exclude policy, schedule, launcher, worker, credential path, retention rule, verification level, or restore-process change. Schedule ownership remains in document 06 and mount ownership in document 04; link to them rather than duplicating those procedures.

@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-15 — Verify Libraries automount recovery through a full reboot
+**Documentation updated:** 2026-10-15 — Convert the legacy documentation to a runbook-first reference
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -24,6 +24,20 @@ This file records meaningful changes to legacy documentation set and the server 
 ## Current Documentation Maintenance Rules
 
 This section is the **sole canonical maintenance contract** for legacy documentation set. `01-Rotom-Server-Inventory.md` defines legacy documentation membership and the source map; other legacy documentation files may point here, but they should not duplicate this procedure.
+
+### Runbook-First Maintenance Standard
+
+Every legacy documentation change must identify the canonical document owner for each changed fact or procedure and assess whether the change affects how Rotom is operated, diagnosed, maintained, recovered, or verified. When it does, review and update the affected operational procedure and current-state reference together. Keep operational procedures before detailed reference and historical evidence.
+
+Each supported state-changing procedure must preserve an observable outcome, precise entry conditions, explicit exclusions, authorization and impact, canonical current-state inputs, read-only preflight, stop conditions, the smallest targeted action, expected immediate result, observable verification, rollback or safe-stop recovery, troubleshooting branches, evidence to retain, and revalidation triggers. Command blocks must use the applicable approved label: **Read-only**, **Read-only; may activate an existing automount**, **Changes Rotom**, **Changes Rotom and protected storage/repository state**, **Credential-sensitive**, **PVE — Jared executes**, or **Destructive — explicit approval required**.
+
+Document `01` must be updated whenever a supported task, destination, filename, heading, or canonical owner changes, so a person or Codex can reach the canonical procedure within one or two links. It routes tasks and must not duplicate complete procedures. Do not maintain competing canonical procedures in multiple documents; supporting facts and cross-domain branches must link to the owning document.
+
+Review the affected document's **Maintenance and Revalidation Triggers** whenever current state changes. Update automated tests whenever a supported task, procedure, ownership boundary, or required structure changes. Before publication, run `support/tooling/test-retired-helper-runbooks`, `support/tooling/retired-helper lint`, `git diff --check`, the required semantic ownership/duplication review, and `retired-helper check` at clean Git checkpoints.
+
+> An legacy documentation update is incomplete if it changes how Rotom is operated, diagnosed, maintained, or recovered without also reviewing and updating the affected runbook procedure, task-router entry, revalidation triggers, and automated tests.
+
+Not every factual change requires a new procedure. Create or update a procedure when the change affects how a person or Codex safely operates, diagnoses, maintains, verifies, or recovers Rotom.
 
 Update this log as part of the same task whenever a substantive change is made to any legacy documentation set file. This includes documented configuration changes, corrected findings, new verification results, adopted decisions, proposed architecture, methodology changes, and plans that are completed or withdrawn. A documentation-only update still belongs here; it does not mean the server was changed.
 
@@ -69,6 +83,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-15 — Convert the legacy documentation to a runbook-first reference
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`, `README.md`, `support/CONTRIBUTING.md`, and `support/tooling/test-retired-helper-runbooks`; removed `support/tooling/test-runbooks` and all five files under `runbooks/`.
+- **Status:** **Documentation only / Verified.** Rotom live configuration was not changed. Rotom Docs publication is **pending post-push verification**.
+- **Changes:** Converted the complete nine-file legacy documentation to a task-oriented runbook-first reference while retaining `00`–`08` as the complete Available Sources and publication set. Installed the permanent Runbook-First Maintenance Standard; established canonical ownership boundaries (`02` applications, `03` transport, `04` storage, `05` backup, `06` automation, `07` identities, `01` routing, `00` governance/history, and `08` topology); integrated the Docker website, NAS recovery, and Rotom Restic pilots into their owners; added document-specific revalidation triggers; retired the parallel pilot layer; preserved its authoring rules in `support/CONTRIBUTING.md`; and replaced its test with numbered-legacy documentation structural validation.
+- **Evidence:** Every original major section was inventoried in a temporary preservation matrix and reconciled in place; automated structure/link/fence/secret-pattern checks, legacy documentation lint, shell syntax checks, diff checks, complete semantic ownership review, and safe read-only live checks were performed. Current and historical material remain in the numbered set; historical extraction is intentionally deferred. Available Sources remains exactly `00`–`08`.
+- **Outstanding:** Record the first post-push Rotom Docs publication time, published Git revision, build/container/local/HTTPS results, nine-source confirmation, and unrelated-service impact in this same entry after publication is verified.
 
 ## 2026-10-15 — Restore Jared Wines and privatize Homepage monitoring
 

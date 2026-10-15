@@ -4,12 +4,59 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-15 — Verify Libraries automount recovery through a full reboot
+**Documentation updated:** 2026-10-15 — Runbook-first conversion
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
+
+## Start by Task or Symptom
+
+- Failed timer, missed run, failed oneshot service, or automation drift: use [Investigate a Failed Timer or Automation](#investigate-a-failed-timer-or-automation).
+- Rotom Restic execution or repository behavior: use [document 05](05-Backup-and-Restore.md#start-by-task-or-symptom).
+- NAS recovery-helper behavior: establish storage state in [document 04](04-NAS-and-Storage.md#diagnose-and-recover-a-configured-nas-mount), then use this document for service/timer scheduling.
+- Container lifecycle or health: use [document 02](02-Docker-Services.md#start-by-task-or-symptom).
+
+## Investigate a Failed Timer or Automation
+
+### Outcome, entry conditions, exclusions
+
+Identify whether a supported timer/worker failed because of schedule, dependency, storage, application, or policy state, and retry only the existing owning service when its desired action and safety conditions are established. Exclude new automation, schedule changes, package-policy changes, retention/prune, destructive cleanup, and PVE action not executed by Jared.
+
+### Risk, preflight, and Stop conditions
+
+Inspection is read-only. Starting a service may change Rotom and, for backup workers, protected repository state. Before a retry, identify the exact timer/service pair, last/next trigger, current process state, dependencies, and documented owner. Stop if another run is active, the unit invokes an unreviewed script, required storage or credentials are unavailable, the desired outcome is unclear, or logs show protected-data/repository damage.
+
+**Read-only**
+
+```bash
+systemctl list-timers --all --no-pager
+systemctl --failed --no-pager
+systemctl status UNIT.timer UNIT.service --no-pager
+sudo journalctl -u UNIT.timer -u UNIT.service -n 160 --no-pager
+systemctl cat UNIT.timer UNIT.service
+```
+
+Replace `UNIT` only with the exact documented unit name.
+
+### Smallest targeted action and immediate result
+
+Correct the owning dependency first: document 04 for NFS, document 05 for Restic/repository issues, document 02 for application state, or document 07 for identity/permission state. When current policy clearly supports a retry and no concurrent work exists:
+
+**Changes Rotom**
+
+```bash
+sudo systemctl start UNIT.service
+```
+
+For `rotom-restic-backup.service`, this label is instead **Changes Rotom and protected storage/repository state** and the complete document 05 procedure is mandatory. For any PVE unit, the action is **PVE — Jared executes**.
+
+### Verification, safe stop, branches, and evidence
+
+Verify the exact service result, journal, dependency state, downstream application outcome, next timer trigger, and `systemctl --failed`. Do not repeatedly retry a deterministic failure. A failed oneshot normally needs no rollback; preserve logs, leave the timer policy unchanged, and stop safely. If a partial action changed state, use the owning document's rollback guidance.
+
+Retain the unit name, trigger time, exit result, sanitized journal error, dependency finding, retry authorization, downstream check, and next trigger. Revalidate after any service, timer, schedule, worker, dependency, update process, monitoring behavior, or automation-policy change.
 
 ## Navigation and Authority
 
@@ -612,3 +659,7 @@ The scheduled backup started at 03:01:19 PDT and completed successfully. The rea
 - `02-Docker-Services.md` — canonical Docker service deployment inventory.
 - `07-Users-and-Permissions.md` — canonical account-switching, privilege, and access model.
 - `00-Rotom-Change-Log.md` — documentation and server change history.
+
+## Maintenance and Revalidation Triggers
+
+Follow the canonical [Runbook-First Maintenance Standard](00-Rotom-Change-Log.md#runbook-first-maintenance-standard). Revalidate procedures and current-state reference after any service, timer, schedule, worker, dependency, update process, monitoring behavior, or automation-policy change. Update the owning subject document when automation changes application, network, storage, backup, or identity behavior.

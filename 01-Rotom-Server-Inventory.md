@@ -1,10 +1,10 @@
 # 01 - Rotom Server Inventory
 
 **Documentation set:** legacy documentation set  
-**Document role:** Architecture/index starting point and high-level Rotom summary  
+**Document role:** Task-first starting page, symptom router, architecture overview, and source map
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Restore Jared Wines and privatize Homepage monitoring
+**Documentation updated:** 2026-10-15 — Runbook-first conversion
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -15,6 +15,25 @@ This document is the front-page architecture/index for Rotom. It summarizes the 
 Purpose: front-page index and quick-reference architecture summary.
 
 **legacy documentation state labels:** **Current** means the latest supported recorded state; **Historical** preserves dated evidence that may no longer apply; **Retired** means intentionally no longer active; **Proposed** is not implemented; **Needs Verification** means the legacy documentation lacks enough current evidence and should not be treated as settled.
+
+## Start by Task or Symptom
+
+Procedures answer **what to do**. Current-state reference answers **what exists**. Reconstruction material supports disaster recovery. Historical and retired sections are evidence, not current instructions. Document `00` is the sole maintenance authority.
+
+| Task or symptom | Canonical destination |
+|---|---|
+| Website, container, or application unavailable | [02 — Diagnose and Recover a Container or Docker-Backed Website](02-Docker-Services.md#diagnose-and-recover-a-container-or-docker-backed-website) |
+| Proxy, listener, DNS, TLS, domain, routing, or external-access problem | [03 — Diagnose the Access Path](03-Network-and-Domains.md#diagnose-a-proxy-listener-dns-tls-routing-or-external-access-failure) |
+| NAS path, NFS mount, or storage dependency unavailable | [04 — Diagnose and Recover a Configured NAS Mount](04-NAS-and-Storage.md#diagnose-and-recover-a-configured-nas-mount) |
+| Backup execution, failure, repository verification, or restore | [05 — Backup and Restore Tasks](05-Backup-and-Restore.md#start-by-task-or-symptom) |
+| Timer, scheduled automation, update, or maintenance problem | [06 — Automation and Maintenance Tasks](06-Maintenance-and-Automation.md#start-by-task-or-symptom) |
+| Permission, ownership, user, group, identity, or access problem | [07 — Identity and Access Tasks](07-Users-and-Permissions.md#start-by-task-or-symptom) |
+| Filesystem-path lookup | [08 — Current Topology](08-Rotom-Directory-Tree.txt) |
+| legacy documentation maintenance or publication | [00 — Current Documentation Maintenance Rules](00-Rotom-Change-Log.md#current-documentation-maintenance-rules) |
+
+### Maintaining the Runbook-First Model
+
+Follow the canonical [Runbook-First Maintenance Standard](00-Rotom-Change-Log.md#runbook-first-maintenance-standard). Supported tasks must remain reachable from this router within one or two links. Update this table whenever a procedure, heading, filename, destination, or canonical owner changes. This document routes tasks; it does not duplicate complete procedures.
 
 ### Recommended reading path
 
@@ -83,7 +102,7 @@ Read-only guest inspection found 22 Docker container objects, all running; both 
 
 The five service-account NSS home fields remain configured, but `/home/game-servers`, `/home/hosted-websites`, `/home/libraries`, `/home/platform`, and `/home/smart-home` are physically absent. No current home NAS shortcut exists. `/home/desktopcmd` is also absent; Remote Desktop Commander remains active from `/opt/desktop-commander`. `retired-helper path` resolves Jared's current checkout at `/home/jared/documentation/rotom-runbook`; the retired Platform checkout is absent. Arcane has automatic updates, auto-heal, and scheduled pruning disabled; `followProjectSymlinks=true` remains enabled.
 
-The most recent observed automatic Rotom Restic Backup snapshot is `553e7a39` from 2026-10-14 20:30 PDT, approximately 20.640 GiB. Two inactive local rollback artifacts exist outside the legacy documentation checkout: `/etc/systemd/system/desktop-commander.service.pre-migration-20261014-190925` and `/usr/local/bin/retired-helper.pre-jar98-20261014`. A 2026-10-15 metadata/comparison check confirmed both remain root-owned with their expected non-secret modes and differ from their active counterparts; neither comparison inspected or recorded credential values. Their retention remains **Needs Verification**; their presence does not make either file current configuration.
+The most recent observed automatic Rotom Restic Backup snapshot is `1fd623ca` from 2026-10-15 03:00 PDT, approximately 20.282 GiB; the service result and exit status were successful. Two inactive local rollback artifacts exist outside the legacy documentation checkout: `/etc/systemd/system/desktop-commander.service.pre-migration-20261014-190925` and `/usr/local/bin/retired-helper.pre-jar98-20261014`. A 2026-10-15 metadata/comparison check confirmed both remain root-owned with their expected non-secret modes and differ from their active counterparts; neither comparison inspected or recorded credential values. Their retention remains **Needs Verification**; their presence does not make either file current configuration.
 
 ### Current service-home and containerd cleanup — 2026-10-14
 
@@ -470,20 +489,6 @@ Available Sources determines the complete legacy documentation set membership. T
 ### Current membership
 
 The current Project-backed Available Sources set is exactly the nine-file Core Numbered Reference Set (`00`–`08`) listed above. There are no additional current non-numbered legacy documentation set files. Future files intentionally added to Available Sources become legacy documentation set automatically, regardless of file type or extension; files removed from Available Sources cease to be current members without erasing their historical change-log references.
-
-### Staged pilot runbook layer — pending Available Sources addition
-
-The repository now contains a task-oriented pilot layer under `runbooks/`, but these files are **not yet current legacy documentation members** because Available Sources remains the membership boundary. Jared must manually add all five files together before this section can be promoted into the current source map. Rotom Docs also remains a controlled nine-file build until its publisher input is separately updated and verified.
-
-| Task | Staged repository source |
-|---|---|
-| Runbook task index and safety model | [runbooks/README.md](runbooks/README.md) |
-| Final runbook authoring template | [runbooks/RUNBOOK-TEMPLATE.md](runbooks/RUNBOOK-TEMPLATE.md) |
-| Diagnose or recover a Docker-backed website | [runbooks/Docker-Website-Recovery.md](runbooks/Docker-Website-Recovery.md) |
-| Diagnose or recover a current Rotom NAS mount | [runbooks/NAS-Mount-Recovery.md](runbooks/NAS-Mount-Recovery.md) |
-| Run, verify, or troubleshoot Rotom Restic Backup | [runbooks/Rotom-Restic-Backup.md](runbooks/Rotom-Restic-Backup.md) |
-
-The pilots leave documents `02`–`07` authoritative for current facts. They add procedures, explicit authorization boundaries, read-only preflight, stop conditions, observable verification, rollback/recovery guidance, and evidence requirements without reorganizing the existing reference set or extracting history.
 
 The Mac checkout is recorded at `/Users/jared/Documents/ChatGPT/rotom-runbook`; the Rotom checkout is verified by `retired-helper path` at `/home/jared/documentation/rotom-runbook`. Both use origin `git@github.com:jaredwines/rotom-runbook.git`, branch `main`, and upstream `origin/main`. Historical verification at the former Mac `/Users/jared/Documents/ChatGPT/Rotom-Home-Server`, Rotom `/home/infra/documentation/retired-helper`, and retired Rotom Platform checkout remains dated evidence only. Repository support metadata includes `.gitignore`, root `AGENTS.md` and `README.md`, plus `support/CONTRIBUTING.md` and `support/tooling/retired-helper`; none is part of legacy documentation set unless intentionally added to Available Sources. Root `README.md` provides repository navigation and safety context; the contribution guide supplies concise contribution expectations while deferring legacy documentation maintenance authority to document 00. Rotom and Mac `/usr/local/bin/retired-helper` are now verified equivalent to the canonical `support/tooling/retired-helper`, including offline `lint` and automatic linting from `check`. All forms resolve the expected checkout from the active Git working tree or from `~/.config/retired-helper/repository`; `retired-helper path` exposes the result. The per-machine fallback is recorded as `/Users/jared/Documents/ChatGPT/rotom-runbook` on Mac and verified as `/home/jared/documentation/rotom-runbook` on Rotom. Mac global `~/.codex/AGENTS.md` contains only the editor preference. Rotom `/home/jared/.codex/AGENTS.md` remains the Jared-global machine entry point, contains Rotom live-state/safety guidance, and points to `retired-helper path`, the repository `AGENTS.md`, and document 00. Fresh read-only Codex sessions on both systems verified the intended discovery hierarchy. Under the adopted execution policy, Codex resolves its checkout with `retired-helper path` and uses guarded `retired-helper commit`, `retired-helper check`, and `retired-helper push` only when legacy documentation maintenance is authorized; ChatGPT on Mac remains a replacement-file/ZIP delivery path and does not publish Git changes itself. The older 2026-09-19 statement that top-level `/home/infra/documentation/AGENTS.md` and `README.md` were present remains historical; those legacy top-level files were not re-inspected during this integration task, so their present state remains unverified.
 

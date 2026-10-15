@@ -1,6 +1,6 @@
 # legacy documentation set
 
-This repository is the Git working copy for the **legacy documentation set** (**legacy documentation**): the maintained, evidence-based record of Rotom's architecture, configuration, operations, recovery posture, and material decisions.
+This repository is the Git working copy for the **legacy documentation set** (**legacy documentation**): a nine-file, runbook-first operating manual and evidence-based reference for Rotom.
 
 The legacy documentation describes supported state. It distinguishes **Current**, **Historical**, **Retired**, **Proposed**, and **Needs Verification** information so that plans and old evidence are not mistaken for live configuration.
 
@@ -10,10 +10,10 @@ Begin with [01 - Rotom Server Inventory](01-Rotom-Server-Inventory.md), the arch
 
 Use this reading order for administration or recovery:
 
-1. Start with document 01 to identify the current system boundary and canonical subject owner.
-2. Read the current-state sections near the start of the relevant subject document.
-3. Use reconstruction, recovery, and troubleshooting sections only after reconciling them with the current-state sections and read-only live evidence.
-4. Treat preserved pre-migration and historical sections as evidence, not as current instructions.
+1. Start with document 01 and choose the task or symptom.
+2. Follow its link to the canonical procedure in documents 02–07, or to the path reference in 08.
+3. Read the procedure's current-state inputs, preflight, and stop conditions before taking action.
+4. Treat reconstruction, retired, and historical sections as evidence, not current instructions.
 
 ## Documentation map
 
@@ -22,14 +22,14 @@ The current legacy documentation consists of the Core Numbered Reference Set:
 | Document | Purpose |
 | --- | --- |
 | [00 - Rotom Change Log](00-Rotom-Change-Log.md) | Canonical maintenance contract and material change history |
-| [01 - Rotom Server Inventory](01-Rotom-Server-Inventory.md) | Architecture overview, source map, and starting index |
-| [02 - Docker Services](02-Docker-Services.md) | Service and container configuration |
-| [03 - Network and Domains](03-Network-and-Domains.md) | Network, DNS, proxy, and access topology |
-| [04 - NAS and Storage](04-NAS-and-Storage.md) | NAS mounts, storage boundaries, and data layout |
-| [05 - Backup and Restore](05-Backup-and-Restore.md) | Backup design, recovery material, and restoration evidence |
-| [06 - Maintenance and Automation](06-Maintenance-and-Automation.md) | Recurring maintenance and operational automation |
-| [07 - Users and Permissions](07-Users-and-Permissions.md) | Identities, ownership, and access boundaries |
-| [08 - Rotom Directory Tree](08-Rotom-Directory-Tree.txt) | Recorded filesystem reference tree |
+| [01 - Rotom Server Inventory](01-Rotom-Server-Inventory.md) | Task router, symptom index, architecture overview, and source map |
+| [02 - Docker Services](02-Docker-Services.md) | Container and application operations, recovery, and reference |
+| [03 - Network and Domains](03-Network-and-Domains.md) | Listener, routing, DNS, proxy, TLS, and access operations |
+| [04 - NAS and Storage](04-NAS-and-Storage.md) | NAS/NFS diagnosis, mount recovery, and storage reference |
+| [05 - Backup and Restore](05-Backup-and-Restore.md) | Backup execution, assurance levels, repositories, and restore operations |
+| [06 - Maintenance and Automation](06-Maintenance-and-Automation.md) | Timers, automation, updates, and routine administration |
+| [07 - Users and Permissions](07-Users-and-Permissions.md) | Identity, ownership, permission, privilege, and access operations |
+| [08 - Rotom Directory Tree](08-Rotom-Directory-Tree.txt) | Current filesystem reference with historical paths clearly separated |
 
 Available Sources defines the legacy documentation membership boundary. Repository-support files, including this README, are not legacy documentation members unless intentionally added to Available Sources. The current source map and membership details live in [01 - Rotom Server Inventory](01-Rotom-Server-Inventory.md).
 
@@ -39,19 +39,8 @@ Available Sources defines the legacy documentation membership boundary. Reposito
 - Use the current legacy documentation documents for operational reference; do not use older change-log entries as instructions to recreate prior state.
 - Use the guarded `retired-helper` helper for normal repository operations. `retired-helper path` resolves the active checkout.
 - Run the repository's offline `support/tooling/retired-helper lint` validation before synchronization checks. After the matching helper version is installed, `retired-helper lint` is equivalent.
-- From any directory, run `bash "$(retired-helper path)/support/tooling/test-runbooks"` to validate the three pilot runbooks against the final template's required safety structure.
+- From any directory, run `bash "$(retired-helper path)/support/tooling/test-retired-helper-runbooks"` to validate the numbered runbook-first legacy documentation's permanent structure, links, safety labels, and nine-file membership.
 - Read the [contribution guide](support/CONTRIBUTING.md) before preparing a change.
-
-## Pilot runbooks
-
-The repository contains a staged task-oriented runbook layer under [runbooks/](runbooks/README.md):
-
-- [final runbook template](runbooks/RUNBOOK-TEMPLATE.md);
-- [Docker-backed website diagnosis and recovery](runbooks/Docker-Website-Recovery.md);
-- [NAS mount diagnosis and recovery](runbooks/NAS-Mount-Recovery.md);
-- [Rotom Restic Backup execution and verification](runbooks/Rotom-Restic-Backup.md).
-
-These files are prepared repository sources but do not become current legacy documentation set until Jared manually adds them to Available Sources. Rotom Docs requires a separate publisher/source-list update before it can publish them. Until both steps are complete, the nine-file Core Numbered Reference Set remains the complete current legacy documentation.
 
 ## Safety
 

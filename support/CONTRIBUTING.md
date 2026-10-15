@@ -19,15 +19,31 @@ This repository records verified Rotom state. Before preparing a change, read th
 
 ### Procedural section structure
 
-Use [the final runbook template](../runbooks/RUNBOOK-TEMPLATE.md) for task-oriented operational procedures. Its required design is: observable outcome; precise entry and exclusion conditions; impact and authorization; canonical current-state inputs; read-only preflight; explicit stop conditions; the smallest targeted procedure; observable verification; rollback or safe-stop recovery; troubleshooting branches; evidence requirements; related documentation; and revalidation triggers.
+Use the canonical [Runbook-First Maintenance Standard](../00-Rotom-Change-Log.md#runbook-first-maintenance-standard) for task-oriented operational procedures. A complete procedure includes, in this order where practical:
 
-Command blocks must identify whether they are read-only, change Rotom, require Jared on PVE, are destructive and require explicit approval, or access credential-sensitive paths. A procedure must not make the reader infer desired state, authority, success criteria, or what to do when live state differs.
+1. observable outcome;
+2. precise entry conditions and explicit exclusions;
+3. risk, impact, and authorization;
+4. canonical current-state inputs;
+5. read-only preflight;
+6. explicit stop conditions;
+7. the smallest targeted action and expected immediate result;
+8. observable verification;
+9. rollback or safe-stop recovery;
+10. troubleshooting branches;
+11. evidence to retain;
+12. related canonical documentation; and
+13. maintenance and revalidation triggers.
+
+Use the applicable command-block label exactly: **Read-only**, **Read-only; may activate an existing automount**, **Changes Rotom**, **Changes Rotom and protected storage/repository state**, **Credential-sensitive**, **PVE — Jared executes**, or **Destructive — explicit approval required**. Never include secret values. A procedure must not make the reader infer desired state, authority, success criteria, or what to do when live state differs.
+
+Prefer fail-fast, narrowly scoped commands. A state-changing block must be preceded by enough read-only evidence to resolve the exact target and must be followed by an application-level or system-level observable check. Define what to preserve when the action fails, and do not make destructive cleanup an automatic recovery step.
 
 Keep current-state facts in their canonical subject document. Link to those facts from procedures instead of copying commands, paths, identities, schedules, or configuration details into multiple files. Separate proposed work and historical evidence from supported current procedure.
 
-### Staged history extraction
+### Historical material
 
-Do not extract historical sections from the Core Numbered Reference Set until all destination files can be added to Available Sources manually by Jared in the same coordinated release. An extraction must:
+Keep historical evidence within `00`–`08` while the numbered runbook-first set remains the complete publication set. A future separately authorized extraction must:
 
 1. Inventory every section to be moved and every inbound filename or heading reference.
 2. Define one historical destination per subject area rather than one file per ticket or date.
@@ -38,20 +54,9 @@ Do not extract historical sections from the Core Numbered Reference Set until al
 
 Until that coordinated release is possible, improve navigation and state labels in place. This preserves a complete nine-file legacy documentation and avoids silently dropping historical recovery evidence from Available Sources.
 
-Proposed extraction map for that coordinated release:
+The previously proposed extraction map is intentionally deferred; it is not an active path or publication plan. If extraction is later authorized, derive its destinations from the then-current numbered set and update the publisher, tests, source map, links, and Available Sources as one reviewed change.
 
-| Current source | Proposed historical destination | Initial extraction scope |
-| --- | --- | --- |
-| `01-Rotom-Server-Inventory.md` | `history/01-Server-Inventory-History.md` | Historical ownership, pre-migration architecture, startup/dependency, limitations, and verification-record sections |
-| `02-Docker-Services.md` | `history/02-Docker-Services-History.md` | Retired-domain inventories and historical verification sections; keep current runtime, reconstruction, gaps, and proposals in `02` |
-| `03-Network-and-Domains.md` | `history/03-Network-and-Domains-History.md` | Pre-migration host, interface, routing, DNS, Docker-network, listener, firewall, flow, and verification sections |
-| `04-NAS-and-Storage.md` | `history/04-NAS-and-Storage-History.md` | Preserved pre-migration mounts, ownership, layouts, service relationships, architecture, and verification sections |
-| `05-Backup-and-Restore.md` | `history/05-Backup-and-Restore-History.md` | Final pre-migration baseline, preserved execution/scope/retention material, restore-kit history, and historical verification sections |
-| `06-Maintenance-and-Automation.md` | `history/06-Maintenance-and-Automation-History.md` | Pre-migration and retired automation only; first disentangle the current subsections embedded among historical sections |
-| `07-Users-and-Permissions.md` | `history/07-Users-and-Permissions-History.md` | Preserved pre-migration identity/access models and historical verification sections |
-| `08-Rotom-Directory-Tree.txt` | `history/08-Directory-Tree-History.txt` | Pre-migration restoration targets and captured historical trees; retain current topology and current follow-ups in `08` |
-
-Document 00 remains the canonical chronological log and maintenance contract rather than a subject-history extraction target. Before using these proposed paths, update the Rotom Docs publisher allowlist/build, repository validation, source map, related-document links, and Jared's manual Available Sources set as one reviewed change.
+Document 00 remains the canonical chronological log and maintenance contract rather than a subject-history extraction target.
 
 ## Change history
 
@@ -65,6 +70,7 @@ Do not add a change-history entry solely for an unchanged re-upload, download, p
 - Confirm affected documents and links remain consistent.
 - Confirm no secrets, temporary files, generated packages, or unrelated changes are included.
 - Confirm current instructions do not depend silently on historical paths, users, groups, mounts, networks, storage, backup scopes, or service ownership.
+- Run `bash "$(retired-helper path)/support/tooling/test-retired-helper-runbooks"` and complete a semantic cross-document ownership/duplication review; the shell test cannot prove semantic uniqueness.
 - Check referenced filenames and internal links, and search for stale references before any rename or move.
 - Confirm critical recovery, backup, permissions, NAS, Docker, networking, Home Assistant, website, database, certificate, Restic, and Palworld information was preserved.
 - Use the guarded `retired-helper` workflow: review with `retired-helper diff`, run `support/tooling/retired-helper lint` (or installed `retired-helper lint` only after its version is confirmed current), validate repository synchronization with `retired-helper check`, then use `retired-helper commit` and `retired-helper push` only when the canonical maintenance contract authorizes publication.
