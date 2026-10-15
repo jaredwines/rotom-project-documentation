@@ -8,6 +8,13 @@ The legacy documentation describes supported state. It distinguishes **Current**
 
 Begin with [01 - Rotom Server Inventory](01-Rotom-Server-Inventory.md), the architecture and navigation index. For how the documentation is maintained and for the historical record, see [00 - Rotom Change Log](00-Rotom-Change-Log.md).
 
+Use this reading order for administration or recovery:
+
+1. Start with document 01 to identify the current system boundary and canonical subject owner.
+2. Read the current-state sections near the start of the relevant subject document.
+3. Use reconstruction, recovery, and troubleshooting sections only after reconciling them with the current-state sections and read-only live evidence.
+4. Treat preserved pre-migration and historical sections as evidence, not as current instructions.
+
 ## Documentation map
 
 The current legacy documentation consists of the Core Numbered Reference Set:
@@ -31,6 +38,7 @@ Available Sources defines the legacy documentation membership boundary. Reposito
 - Treat dated evidence and explicit state labels as more authoritative than unstated assumptions.
 - Use the current legacy documentation documents for operational reference; do not use older change-log entries as instructions to recreate prior state.
 - Use the guarded `retired-helper` helper for normal repository operations. `retired-helper path` resolves the active checkout.
+- Run the repository's offline `support/tooling/retired-helper lint` validation before synchronization checks. After the matching helper version is installed, `retired-helper lint` is equivalent.
 - Read the [contribution guide](support/CONTRIBUTING.md) before preparing a change.
 
 ## Safety

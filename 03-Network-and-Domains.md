@@ -4,12 +4,20 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Record additional Jared-confirmed operational verification
+**Documentation updated:** 2026-10-15 — Improve navigation and safe-use guidance
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
+
+## Navigation and Authority
+
+- Start with **1. Purpose and Scope**, **2. Current Host, VM, and NAS Network Baseline**, and **10. Current Nginx Proxy Manager** for supported current-state context.
+- Sections explicitly titled **Pre-Migration**, **Historical**, or **Preserved** are evidence and reconstruction context, not current firewall, DNS, listener, or routing instructions.
+- Use **Reconstruction-Critical Information** only after comparing it with the current sections and read-only live state.
+- Review **Known Gaps / Needs Verification** before treating router, exposure, certificate, or application-path behavior as settled.
+- This file owns network and routing facts; storage ownership, service deployment, backup, and account privileges remain canonical in documents 02 and 04–07.
 
 ## 1. Purpose and Scope
 

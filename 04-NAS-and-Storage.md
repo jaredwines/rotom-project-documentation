@@ -4,12 +4,20 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Correct reconstruction-critical storage guidance
+**Documentation updated:** 2026-10-15 — Improve navigation and safe-use guidance
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
+
+## Navigation and Authority
+
+- Start with **1. Purpose and Scope**, **2. Current Storage and Recovery Policy**, and **3. Current UniFi NAS / NFS Server Contract and Preserved History**.
+- Treat sections explicitly titled **Preserved Pre-Migration** or **Historical** as recovery evidence, not as current mount or ownership instructions.
+- Use **Reconstruction-Critical Information** only after reconciling it with the current five-mount contract, current identity data in document 07, and read-only live evidence.
+- Review **Outstanding / Needs Verification** before changing NAS metadata, exports, automounts, or protection assumptions.
+- This file owns NAS/NFS and storage contracts; backup retention and restore proof are canonical in document 05, while account and ACL policy are canonical in document 07.
 
 ## 1. Purpose and Scope
 

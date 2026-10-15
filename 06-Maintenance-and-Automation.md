@@ -4,12 +4,20 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-15 — Reconcile Arcane automation and legacy documentation paths
+**Documentation updated:** 2026-10-15 — Improve navigation and safe-use guidance
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
+
+## Navigation and Authority
+
+- Start with **2. Current Maintenance and Automation** for active timers, helpers, and routine operating behavior.
+- Use **12. Command-Line Safety, Administration, and Manual Synchronization Workflow** and **13. Codex Documentation Discovery and legacy documentation Git Integration** for administration and legacy documentation workflow.
+- Treat sections explicitly titled **Preserved Pre-Migration**, **Historical**, **Stale**, or **Disruptive** as evidence, not as active scheduling or execution instructions.
+- Review **Outstanding / Needs Verification** before depending on an automation, notification, certificate, or recovery behavior.
+- This file owns operational workflow and automation; backup semantics, service deployment, and privileges remain canonical in documents 05, 02, and 07.
 
 ## 1. Purpose and Scope
 
@@ -100,6 +108,10 @@ Documentation updated: **2026-10-14** through official backup-system display-nam
 
 The newest dated overlays in section 1 and the 2026-10-14 recovery-point summary below control where the preserved JAR-era narrative differs.
 
+### Preserved implementation chronology
+
+The following JAR-era records explain how the current automation evolved. A use of “current” inside a dated record means current at that checkpoint unless a newer section-1 overlay explicitly reaffirms it.
+
 JAR-78 retired the unused `rotom-downloads-game-ro.service` and `/mnt/nas-downloads-game-ro` view after confirming no container consumer. JAR-79 then removed qBittorrent's unused Games category and its two empty Downloader directories. JAR-81 retains the Downloader NFS root and sentinel while removing only its obsolete `torrents/` tree. JAR-86 then retired the unused Media bindfs view and removed only its recovery-helper branch, retaining the separate Downloader and Media NFS readiness checks. The later JAR-83 Game-marker contract is historical: JAR-87 made qBittorrent's guard Media-only and JAR-88 removed the active Game guest mount.
 
 The JAR-87 Igir, JAR-89 qBittorrent importer, and JAR-90 browser-upload bridge were retired on 2026-10-05, together with the Media inbox. Their units, timers, scripts, local state, and upload credential are absent. RomM quick scans remain at minutes 7, 22, 37, and 52; qBittorrentVPN remains independent.
@@ -118,9 +130,9 @@ JAR-38 converted Homepage, Glances, Arcane, and Cloudflare DDNS to independent v
 
 JAR-40 added independent Media v2 modules at local commit `f5f2da4`. The five migrated services retain `unless-stopped`; Gamarr retains its image healthcheck. NPM remains the established host-networked reverse proxy, so the applications retain host compatibility ports while joining their v2 Docker networks. No update automation, backup schedule, download payload, or VPN behavior changed.
 
-`rotom-qbittorrent-media-guard.timer` is enabled and active every 15 seconds, with `/usr/local/sbin/rotom-qbittorrent-media-guard` and its matching systemd service. JAR-87 superseded JAR-83's two-share design: the current guard checks only the Media NFS payload and Media marker, and qBittorrentVPN binds only that marker read-only with `create_host_path: false`. It stops a running qBittorrentVPN when the Media safety pair is invalid; it does not restart the container after recovery.
+At the JAR-87 checkpoint, `rotom-qbittorrent-media-guard.timer` ran every 15 seconds with `/usr/local/sbin/rotom-qbittorrent-media-guard` and its matching systemd service. That checkpoint guard checked only the Media NFS payload and Media marker, and qBittorrentVPN bound only that marker read-only with `create_host_path: false`. It stopped a running qBittorrentVPN when the Media safety pair was invalid and did not restart the container after recovery. The current guard instead uses the Libraries payload/sentinel pair described in section 1.
 
-JAR-72 reorganized Homepage cards without changing monitoring behavior or any application boundary. **Documents**, immediately below **Hosted Websites**, contains Paperless and the private Rotom Docs portal; Docs is intentionally a link/container-status card without an HTTP monitor, so Homepage does not receive a trusted-LAN access-policy exemption. **Media** contains Jellyfin, Radarr, Sonarr, Prowlarr, and RomM; JAR-77 retired the former Gamarr card and force-recreated only Homepage, which returned healthy and `https://rotom.casa` `200`. **Downloader**, immediately above **NAS Storage**, contains qBittorrent. Historical rollback artifacts remain historical evidence.
+At the JAR-72 checkpoint, Homepage card reorganization did not change monitoring behavior or any application boundary. **Documents**, immediately below **Hosted Websites**, contained Paperless and the private Rotom Docs portal; Docs was intentionally a link/container-status card without an HTTP monitor. **Media** contained Jellyfin, Radarr, Sonarr, Prowlarr, and RomM; JAR-77 retired the former Gamarr card and force-recreated only Homepage, which returned healthy and `https://rotom.casa` `200`. **Downloader**, immediately above **NAS Storage**, contained qBittorrent. These section names are historical; the current Homepage layout is defined in the section-1 overlays. Historical rollback artifacts remain historical evidence.
 
 ### PVE host
 
@@ -326,7 +338,7 @@ This verifies persistent host-side WOL configuration and the complete controlled
 
 This section refers to the retired Linux Mint bare-metal host and must not be used as current Proxmox WOL configuration. The wired NIC `eno1` reports `Supports Wake-on: pumbg` and `Wake-on: g`, verifying magic-packet Wake-on-LAN is enabled at the host/NIC level. No scheduled Wake-on-LAN sender or custom WOL script was found. End-to-end delivery while Rotom is off/suspended remains untested.
 
-## 9A. Current NAS/Docker Maintenance State — 2026-09-27 refresh
+## 9A. Historical NAS/Docker Maintenance Checkpoint — 2026-09-27
 
 - Twelve guest fstab entries continue to generate `.automount`/`.mount` units with `_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=30s`.
 - Historical note: `/mnt/nas-downloaders` used NAS `Downloader/.data` after superseding the earlier `Downloads/.data` claim. The Downloader guest contract is now retired.
@@ -342,11 +354,11 @@ This section refers to the retired Linux Mint bare-metal host and must not be us
 
 At the final pre-migration baseline, Media was **UID `127`, primary GID `5000`**; Jellyfin, Radarr, and Sonarr used `127:5000`, while Gamarr used `995:5001`. JAR-21 moved Prowlarr and qBittorrentVPN to the then-named `downloads` identity `901:5005` under `/home/downloads/docker`, with torrent data at `/mnt/nas-downloads/torrents`. **The later VM-era name was `downloaders` with `/home/downloaders` and `/mnt/nas-downloaders`, preserving numeric identity `901:5005`; that identity and home are now retired.**
 
-The pre-migration NAS Media root was `988:5000` mode `2770`, and the final library tree was the authoritative Media application data. JAR-21 moved active torrent data to Downloads GID `5005`. Those numeric ownership rules remain relevant to reconstruction, but current host paths use the VM-era `downloaders` naming. Use numeric ownership when diagnosing NFS; Rotom's displayed `fwupd-refresh` name for numeric `988` does not identify the real NAS account.
+The pre-migration NAS Media root was `988:5000` mode `2770`, and the final library tree was the authoritative Media application data. JAR-21 moved active torrent data to Downloads GID `5005`. Those numeric ownership rules remain relevant to reconstruction. At a later VM-era checkpoint the host used the `downloaders` naming; that identity and its paths are now retired. Use numeric ownership when diagnosing NFS; Rotom's displayed `fwupd-refresh` name for numeric `988` does not identify the real NAS account.
 
-The adopted access model keeps ordinary `jared` access separate from Media: administer Media on the **Rotom VM** by switching with `sudo -iu media`. A 2026-09-19 pre-migration check verified Jared was not a member of Media GID `5000`; no current evidence contradicts that policy. Root, sudo, and privileged Docker access still allow administrators to cross these ordinary account boundaries.
+At the pre-migration checkpoint, the adopted access model kept ordinary `jared` access separate from Media and used `sudo -iu media` for service-account administration. A 2026-09-19 check verified Jared was not a member of Media GID `5000`. The current service identity is `libraries` (`127:5000`), and its physical home is absent; use a neutral working directory with `sudo -u libraries -- ...` for scoped diagnostics rather than relying on an interactive login shell. Root, sudo, and privileged Docker access still allow administrators to cross these ordinary account boundaries.
 
-In the observed UNAS isolated NFS setup, `rpc.mountd --manage-gids` rebuilds supplementary groups from the NAS's UID lookup and retains the request's primary GID. UID `1000` (`jared` on Rotom) maps to UNAS `jwines760`, primary GID `988`, supplementary GID `987`. Client supplementary GID `5000` alone did not permit media access; primary GID `5000` did. Treat `jared` being denied media access as intentional isolation, and test maintenance access using the media account rather than broadening permissions.
+In the observed UNAS isolated NFS setup, `rpc.mountd --manage-gids` rebuilds supplementary groups from the NAS's UID lookup and retains the request's primary GID. UID `1000` (`jared` on Rotom) maps to UNAS `jwines760`, primary GID `988`, supplementary GID `987`. At the pre-migration checkpoint, client supplementary GID `5000` alone did not permit Media access; primary GID `5000` did. Treat `jared` being denied Libraries data access as intentional isolation, and test current maintenance access using the `libraries` identity rather than broadening permissions.
 
 At the pre-migration backup-protection checkpoint, `/mnt/nas-rotom-backup` presented numeric `988:988` with share-root mode `0700`. The 2026-09-19 denial matrix verified all seven ordinary named accounts denied read/write/traverse while root retained repository access. That old export/path is now retired. **Current backup storage is `/mnt/nas-rotom-restic-backup` on `Rotom_Restic_Backup`, also presenting `988:988` mode `0700`; a fresh named-user denial matrix was not rerun after the JAR-32 cutover.**
 
@@ -354,22 +366,14 @@ For a **current read-only** check, run **on the Rotom VM as `jared`**:
 
 ```bash
 id jared
-id media
-findmnt -T /mnt/nas-media
+id libraries
+findmnt -T /mnt/nas-libraries
 findmnt -T /mnt/nas-rotom-restic-backup
-stat -c '%A %a %u:%g %n' /mnt/nas-media /mnt/nas-rotom-restic-backup
-sudo -iu media
+stat -c '%A %a %u:%g %n' /mnt/nas-libraries /mnt/nas-rotom-restic-backup
+(cd / && sudo -u libraries -- sh -c 'id && ls -ldn /mnt/nas-libraries /mnt/nas-libraries/library /mnt/nas-libraries/paperless /mnt/nas-libraries/torrents')
 ```
 
-Then run **on the Rotom VM as `media`** to inspect the effective service identity and current Media paths without changing files:
-
-```bash
-id
-ls -ldn /mnt/nas-media /mnt/nas-media/library /mnt/nas-media/torrents
-exit
-```
-
-The final `exit` returns to the original `jared` shell. These are suggested checks, not fresh results from this documentation update. Inspect an existing service's `compose.yaml` and mounts before changing it; avoid recursive ownership resets or permission broadening.
+The scoped `sudo` command inspects the effective Libraries identity and current paths without opening a service-account login shell. These are suggested checks, not fresh results from this documentation update. Inspect an existing service's `compose.yaml` and mounts before changing it; avoid recursive ownership resets or permission broadening.
 
 ### Service mounts — preserved pre-migration state
 
@@ -457,7 +461,7 @@ The current workflow is:
 - For Rotom work tied to an active **Linear** ticket, keep the ticket current during execution: record meaningful verified implementation milestones, material design or scope decisions, blockers, rollbacks, and intentional deferrals as they occur. Do not use Linear as a raw command transcript or duplicate routine diagnostics. When ChatGPT is actively assisting with the ticket and Linear access is available, make these meaningful updates during the work without requiring a separate request for each update. **The legacy documentation remains the canonical verified as-built source of truth**; update it from the final verified state at ticket closeout.
 - Generated packages and separate saved artifacts belong in the project's `Downloads/` folder. The project-managed `sources/` directory is read-only and is not a mechanism for updating Available Sources.
 - The current operational legacy documentation checkouts are recorded at `/Users/jared/Documents/ChatGPT/rotom-runbook` on Mac and verified by `retired-helper path` at `/home/jared/documentation/rotom-runbook` on Rotom. Git operations use Jared's general GitHub SSH identity and run as `jared`; do not copy that private key into service accounts. Each checkout is an operational mirror/reference for Codex and Git use, not a replacement for the Available Sources membership boundary.
-- The adopted routine Git interface is the universal `retired-helper` helper with subcommands `path`, `status`, `check`, `pull`, `diff`, `log [N]`, `commit "message"`, `push`, and `help`. The canonical source is repository support file `support/tooling/retired-helper`; the identical script is installed at `/usr/local/bin/retired-helper` on Mac and Rotom. It uses `git --no-pager`, does not provide reset/clean/force-push/automatic merge/rebase operations, and retains the guarded fast-forward/clean-tree/remote/branch/upstream checks. `commit` stages changed, deleted, and new non-ignored repository files and creates the supplied local commit; `push` publishes existing commits after safety checks.
+- The adopted routine Git interface is the universal `retired-helper` helper with subcommands `path`, `status`, `check`, `pull`, `diff`, `log [N]`, `commit "message"`, `push`, and `help`. The canonical source is repository support file `support/tooling/retired-helper`; its current version also provides `lint` and runs lint from `check`. The installed `/usr/local/bin/retired-helper` copies on Mac and Rotom retain the earlier command set until a separately authorized synchronization, so use `support/tooling/retired-helper lint` meanwhile. The helper uses `git --no-pager`, does not provide reset/clean/force-push/automatic merge/rebase operations, and retains the guarded fast-forward/clean-tree/remote/branch/upstream checks. `commit` stages changed, deleted, and new non-ignored repository files and creates the supplied local commit; `push` publishes existing commits after safety checks.
 - Repository resolution is portable rather than path-hard-coded in the helper: when invoked inside the expected legacy documentation Git repository, `retired-helper` uses that checkout; otherwise it reads a single checkout path from `${XDG_CONFIG_HOME:-$HOME/.config}/retired-helper/repository`. `retired-helper path` prints the validated resolved checkout. The fallback is recorded as `/Users/jared/Documents/ChatGPT/rotom-runbook` on Mac and verified as `/home/jared/documentation/rotom-runbook` on Rotom. The configuration directory/file were installed mode `0700`/`0600`.
 - legacy documentation execution remains environment-specific under the canonical contract in document 00, but shared workflow instructions resolve the checkout with `retired-helper path`. ChatGPT on Mac delivers changed replacement files plus the complete legacy documentation ZIP, tells Jared to copy the changed files into the Mac checkout returned by `retired-helper path` and manually replace the matching Available Sources copies, then tells Jared to run a relevant `retired-helper commit`, `retired-helper check`, and `retired-helper push`; ChatGPT performs no Git action itself. Codex on either Mac or Rotom resolves the local checkout with `retired-helper path`, edits it directly only when legacy documentation maintenance is authorized, then completes the final state with a relevant `retired-helper commit`, `retired-helper check`, `retired-helper push`, and success verification. Available Sources replacement remains manual by Jared.
 - The repository-root `AGENTS.md` is shared Git/Codex support metadata for legacy documentation work and points to document 00 rather than duplicating the canonical maintenance contract. Mac global `~/.codex/AGENTS.md` contains only the command-line editor preference. Rotom `/home/jared/.codex/AGENTS.md` remains mode `0600` under the hardened `.codex` directory, contains Rotom machine/live-state and safety guidance, resolves legacy documentation through `retired-helper path`, and delegates shared legacy documentation behavior to repository `AGENTS.md` plus document 00. If the helper is unavailable or any guard fails, Codex must stop and report the problem rather than bypassing it with destructive or ad-hoc Git operations.
@@ -465,6 +469,12 @@ The current workflow is:
 This policy supersedes the earlier browser-workflow and `00`–`08`-only documentation-scope decisions recorded in the change log. Fresh read-only Codex sessions on both Mac and Rotom verified the current layered discovery model: global machine instructions, repository `AGENTS.md`, and document 00 as the canonical legacy documentation maintenance authority. The older top-level `/home/infra/documentation/AGENTS.md` and `README.md` were not re-inspected or modified during this task; their older state is preserved as historical evidence below. Preparing legacy documentation set does not by itself deploy files to Rotom or change its services.
 
 ## 13. Codex Documentation Discovery and legacy documentation Git Integration
+
+### Current versioned validation enhancement — 2026-10-15
+
+The versioned `support/tooling/retired-helper` now provides an offline `retired-helper lint` command. It checks Git whitespace, required Markdown level-one titles, balanced fenced code blocks, local Markdown link targets, core legacy documentation filename references, and private-key material markers, and it is safe to run against uncommitted documentation changes. The versioned `retired-helper check` command invokes this lint automatically before its remote checks. Syntax validation and the versioned lint run passed during the documentation cleanup.
+
+The versioned helper currently differs from the installed `/usr/local/bin/retired-helper`, which was deliberately not changed because this task authorized documentation changes and read-only live verification only. Until a separately authorized helper synchronization is completed on Rotom and Mac, invoke the repository copy directly as `support/tooling/retired-helper lint`; do not claim the installed `retired-helper lint` command is available. The historical identical-copy checksum below remains dated evidence, not a current checksum for the edited versioned source.
 
 ### Historical state — 2026-09-28, superseded by JAR-98
 
@@ -563,8 +573,8 @@ No proposed automation becomes current through this restructure. Future monitori
 
 These items are retained for risk context; each line states whether it is still current.
 
-1. **Arcane registry history:** a pre-JAR-21 audit found stale Smart Hub/Smarthome records and incorrect Prowlarr/qBittorrent project paths. JAR-21 reconciled the active project paths; unrelated stale historical records remain technical debt. The current 2026-09-27 database reread verifies the active automation settings separately.
-2. **Arcane update scope:** the restored database now freshly confirms automatic updates at midnight with no exclusions and auto-heal every 30 seconds with no exclusions, five-restart limit, and 30-minute window. These settings are current as of the 2026-09-27 read-only audit.
+1. **Arcane registry history:** a pre-JAR-21 audit found stale Smart Hub/Smarthome records and incorrect Prowlarr/qBittorrent project paths. JAR-21 reconciled the then-active project paths; unrelated stale historical records remain technical debt. The 2026-09-27 database reread is historical and does not establish current project paths or automation settings.
+2. **Arcane update scope:** the 2026-09-27 database audit recorded automatic updates at midnight with no exclusions and auto-heal every 30 seconds with no exclusions, a five-restart limit, and a 30-minute window. The 2026-10-15 live audit supersedes that state: automatic updates and auto-heal were disabled. Recheck Arcane read-only before relying on either behavior.
 3. **Jared Wines:** intentionally undeployed; its Compose file remains `/home/web/docker/jaredwines.com/compose.yaml`. Starting it later is a separate administrative change.
 4. **Sunday updater:** the reboot-capable script is restored, but the current VM has no `/etc/cron.d/weekly-linux-update`; the old Sunday 04:00 schedule is historical and intentionally not recommissioned.
 5. **Docker logging:** the pre-migration host lacked daemon-wide limits; the current VM has daemon-wide `json-file` limits of `10m` × `3`, so the old “most logs unlimited” warning is retired for current state.

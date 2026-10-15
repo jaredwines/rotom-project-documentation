@@ -332,6 +332,11 @@ run_check() {
     fi
 
     echo
+    if ! run_lint; then
+        problems=$((problems + 1))
+    fi
+
+    echo
     echo "Checking GitHub..."
 
     if (( repo_identity_ok == 0 )); then
@@ -445,6 +450,138 @@ run_diff() {
 
     echo "Staged changes:"
     git_rpd diff --cached
+}
+
+
+# -----------------------------------------------------------------------------
+# retired-helper lint
+# -----------------------------------------------------------------------------
+
+run_lint() {
+    local problems=0
+    local fence_count
+    local file
+    local issue
+
+    local markdown_files=(
+        "00-Rotom-Change-Log.md"
+        "01-Rotom-Server-Inventory.md"
+        "02-Docker-Services.md"
+        "03-Network-and-Domains.md"
+        "04-NAS-and-Storage.md"
+        "05-Backup-and-Restore.md"
+        "06-Maintenance-and-Automation.md"
+        "07-Users-and-Permissions.md"
+        "08-Rotom-Directory-Tree.txt"
+        "AGENTS.md"
+        "README.md"
+        "support/CONTRIBUTING.md"
+    )
+
+    require_user
+    require_repo
+
+    echo "Linting legacy documentation set..."
+    echo
+
+    if git_rpd diff --check; then
+        echo "PASS  Git whitespace checks"
+    else
+        echo "FAIL  Git whitespace checks"
+        problems=$((problems + 1))
+    fi
+
+    for file in "${markdown_files[@]}"; do
+        if [[ ! -f "$RPD_DIR/$file" ]]; then
+            echo "FAIL  Missing Markdown file: $file"
+            problems=$((problems + 1))
+            continue
+        fi
+
+        if ! head -n 1 "$RPD_DIR/$file" | grep -q '^# '; then
+            echo "FAIL  Missing level-one title: $file"
+            problems=$((problems + 1))
+        fi
+
+        fence_count="$(awk '/^```/ { count++ } END { print count + 0 }' "$RPD_DIR/$file")"
+        if (( fence_count % 2 != 0 )); then
+            echo "FAIL  Unbalanced fenced code blocks: $file"
+            problems=$((problems + 1))
+        fi
+    done
+
+    if (( problems == 0 )); then
+        echo "PASS  Markdown titles and fenced code blocks"
+    fi
+
+    while IFS= read -r issue; do
+        [[ -n "$issue" ]] || continue
+        echo "FAIL  Broken local Markdown link: $issue"
+        problems=$((problems + 1))
+    done < <(
+        perl -e '
+            use strict;
+            use warnings;
+            use File::Basename qw(dirname);
+            use File::Spec;
+
+            my $root = shift @ARGV;
+            my %reported;
+
+            for my $file (@ARGV) {
+                open my $fh, "<", $file or die "Cannot read $file: $!\n";
+                local $/;
+                my $text = <$fh>;
+
+                while ($text =~ /\[[^\]]+\]\(([^)]+)\)/g) {
+                    my $target = $1;
+                    $target =~ s/\s+"[^"]*"\z//;
+                    next if $target =~ m{^(?:https?|mailto):}i;
+                    $target =~ s/#.*\z//;
+                    next if $target eq q{};
+
+                    my $path = File::Spec->catfile(dirname($file), $target);
+                    if (!-e $path && !$reported{"$file\0$target"}++) {
+                        print "$file -> $target\n";
+                    }
+                }
+
+                while ($text =~ /\b((?:00-Rotom|01-Rotom|02-Docker|03-Network|04-NAS|05-Backup|06-Maintenance|07-Users|08-Rotom)-[A-Za-z0-9-]+\.(?:md|txt))\b/g) {
+                    my $target = $1;
+                    my $start = $-[1];
+                    next if $start >= 8 && substr($text, $start - 8, 8) eq q{history/};
+                    my $path = File::Spec->catfile($root, $target);
+                    if (!-e $path && !$reported{"$file\0$target"}++) {
+                        print "$file -> $target\n";
+                    }
+                }
+            }
+        ' "$RPD_DIR" "${markdown_files[@]/#/$RPD_DIR/}"
+    )
+
+    if (( problems == 0 )); then
+        echo "PASS  Local Markdown links"
+    fi
+
+    if grep -R -n -E \
+        --include='*.md' \
+        --include='*.txt' \
+        -- '-----BEGIN ([A-Z0-9 ]+ )?PRIVATE KEY-----' \
+        "$RPD_DIR"; then
+
+        echo "FAIL  Private-key material marker found"
+        problems=$((problems + 1))
+    else
+        echo "PASS  No private-key material markers"
+    fi
+
+    echo
+    if (( problems == 0 )); then
+        echo "legacy documentation LINT: PASS"
+    else
+        echo "legacy documentation LINT: FAIL ($problems problem(s))"
+        return 1
+    fi
 }
 
 
@@ -566,7 +703,8 @@ Usage:
 Commands:
   path                   Show the resolved local legacy documentation checkout path
   status                 Show local legacy documentation repository status
-  check                  Verify repository, files, GitHub, and upstream state
+  check                  Verify documentation, repository, GitHub, and upstream state
+  lint                   Check Markdown structure, local links, and key markers
   pull                   Safely fast-forward the local legacy documentation from GitHub
   diff                   Show local uncommitted legacy documentation changes
   log [N]                Show recent commits (default: 10)
@@ -585,6 +723,7 @@ Examples:
   retired-helper path
   retired-helper status
   retired-helper check
+  retired-helper lint
   retired-helper pull
   retired-helper diff
   retired-helper log
@@ -595,7 +734,8 @@ Examples:
 Behavior:
   - Git output does not use a pager; no 'q' is required.
   - status is local-only and does not contact GitHub.
-  - check fetches GitHub but does not modify legacy documentation files.
+  - check runs documentation lint, then fetches GitHub without modifying legacy documentation files.
+  - lint is offline and may be run with uncommitted documentation changes.
   - pull refuses dirty or diverged repositories.
   - commit automatically stages all changed, deleted, and new non-ignored files.
   - commit creates a local commit only and does not push.
@@ -618,7 +758,7 @@ EOF
 command="${1:-help}"
 
 case "$command" in
-    path|status|check|pull|diff|log|commit|push)
+    path|status|check|lint|pull|diff|log|commit|push)
         ensure_rpd_dir
         ;;
 esac
@@ -640,6 +780,12 @@ case "$command" in
         shift
         require_no_args "check" "$@"
         run_check
+        ;;
+
+    lint)
+        shift
+        require_no_args "lint" "$@"
+        run_lint
         ;;
 
     pull)

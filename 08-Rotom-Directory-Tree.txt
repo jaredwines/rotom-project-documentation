@@ -8,15 +8,25 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-10-15; reconcile current guest topology and ambiguous historical text.
+# Documentation revised: 2026-10-15; improve navigation and safe-use guidance.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the legacy documentation.
+# Safe reading order:
+# 1. Use the first CURRENT TOPOLOGY section for the newest observed path summary.
+# 2. Confirm semantics in the canonical subject document before acting on a path.
+# 3. Use later CURRENT checkpoint sections only with their evidence date in mind.
+# 4. Use PRE-MIGRATION sections solely for provenance or recovery, after reconciling them
+#    with the current topology and read-only live state.
+# This file records topology; it does not override ownership, backup, mount, or service
+# semantics maintained in documents 02, 04, 05, 06, and 07.
 #
 # CURRENT TOPOLOGY — RECONCILED THROUGH 2026-10-15
 # 2026-10-15 read-only consistency overlay:
 # - Docker has 22 container objects, all running, one named volume, seventeen networks,
-#   and zero restart counts. Both Palworld containers are healthy; the reason and intended
-#   persistence of the change from the 2026-10-14 stopped state remain unverified.
+#   and zero restart counts. Both Palworld containers are healthy with `unless-stopped`.
+#   They started at 2026-10-14 12:24 PDT while Docker remained continuously active; the
+#   journal records the starts thirty seconds after an operator-run Docker system prune
+#   but no explicit start command. Causation and intended persistence remain unverified.
 # - The active stack tree has nineteen Compose files: 2 Game Servers, 2 Hosted Websites,
 #   7 Libraries, 6 Platform, and 2 Smart Home. Docker Engine is 29.9.0 and Compose v5.6.0.
 # - Arcane automatic updates, auto-heal, and scheduled pruning are disabled;
@@ -29,7 +39,8 @@
 # - retired-helper path resolves /home/jared/documentation/rotom-runbook. The former
 #   Platform checkout is absent. Two inactive rollback artifacts remain outside the checkout:
 #   /etc/systemd/system/desktop-commander.service.pre-migration-20261014-190925 and
-#   /usr/local/bin/retired-helper.pre-jar98-20261014; their retention remains NEEDS VERIFICATION.
+#   /usr/local/bin/retired-helper.pre-jar98-20261014. Both remain root-owned and differ from their
+#   active counterparts; their retention remains NEEDS VERIFICATION.
 # 2026-10-14 cleanup overlay: the verified-unused `/home/game-servers`,
 # `/home/hosted-websites`, `/home/libraries`, `/home/platform`, and
 # `/home/smart-home` trees are absent. Their locked service accounts retain
@@ -200,7 +211,7 @@
 #     support/                               repository-only material; not an legacy documentation membership boundary or an Available Sources destination
 #       CONTRIBUTING.md                      contribution guide; defers to document 00 for the canonical maintenance contract
 #       tooling/
-#         retired-helper                                canonical universal helper source; installed identically at /usr/local/bin/retired-helper on Mac and Rotom
+#         retired-helper                                canonical source; versioned copy has lint not yet installed on Mac/Rotom
 #     00-Rotom-Change-Log.md
 #     01-Rotom-Server-Inventory.md
 #     02-Docker-Services.md
@@ -211,9 +222,11 @@
 #     07-Users-and-Permissions.md
 #     08-Rotom-Directory-Tree.txt
 # - Repository support commit 152fd74 added AGENTS.md + tooling/retired-helper and was pushed; Rotom fast-forwarded to the same commit. The path is historical; the current tracked helper path is support/tooling/retired-helper.
-# - Universal retired-helper SHA-256 on verified Mac/Rotom installed + repository copies:
+# - Historical pre-lint SHA-256 on the then-identical Mac/Rotom installed + repository copies:
 #   42866ab6dbb5c47f996289d751cb26767dc79c756638cbeb9851c9e45fbdbe7b
-# - Supported commands: path, status, check, pull, diff, log [N], commit "message", push, help.
+# - Installed command set: path, status, check, pull, diff, log [N], commit "message", push, help.
+# - Current versioned source additionally provides lint and runs it from check; use
+#   support/tooling/retired-helper lint until installation synchronization is separately authorized.
 # - Resolution: expected current Git working tree first; otherwise ${XDG_CONFIG_HOME:-$HOME/.config}/retired-helper/repository; then validate expected user/repo/remote/branch/upstream/access/core files.
 # /home/jared/.config/retired-helper/                   mode 0700; Jared per-machine retired-helper configuration
 #   repository                               mode 0600; contains /home/jared/documentation/rotom-runbook; no credentials
@@ -224,7 +237,7 @@
 # - The older pre-migration top-level /home/infra/documentation/AGENTS.md + README.md state was not re-inspected in this task; preserve it below only as dated historical evidence.
 #
 # MAC legacy documentation ADMINISTRATION TOOLING — outside Rotom filesystem
-# /usr/local/bin/retired-helper                        universal helper; identical to repository support/tooling/retired-helper and Rotom installation; verified current
+# /usr/local/bin/retired-helper                        installed helper baseline; versioned lint enhancement not yet synchronized
 # ~/.config/retired-helper/                            mode 0700
 #   repository                              mode 0600; contains /Users/jared/Documents/ChatGPT/rotom-runbook; no credentials
 # ~/.codex/AGENTS.md                        Mac-global instruction reduced to command-line vim preference

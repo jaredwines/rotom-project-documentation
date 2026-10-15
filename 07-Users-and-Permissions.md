@@ -4,12 +4,20 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-10-15 — Correct current home and privilege reconstruction guidance
+**Documentation updated:** 2026-10-15 — Improve navigation and safe-use guidance
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
+
+## Navigation and Authority
+
+- Start with **1. Purpose and Scope** and **2. Current Identity and Access Model** for supported accounts, UID/GID contracts, groups, ACLs, and privilege boundaries.
+- Treat **Preserved Pre-Migration** and **Historical** sections as evidence, not as instructions to recreate retired users, groups, homes, memberships, or permissions.
+- Use **Reconstruction-Critical Information** only after reconciling it with section 2 and read-only NSS, ownership, ACL, sudo, and Docker-group evidence.
+- Review **Outstanding / Needs Verification** before granting access or changing an identity boundary.
+- This file owns identities and access policy; storage mount semantics, Docker deployment, and operational workflow remain canonical in documents 04, 02, and 06.
 
 ## 1. Purpose and Scope
 

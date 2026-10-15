@@ -4,12 +4,20 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; the current runtime baseline is the 2026-10-15 inventory in section 1A  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Reconcile current Docker and Arcane state
+**Documentation updated:** 2026-10-15 — Improve navigation and safe-use guidance
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
+
+## Navigation and Authority
+
+- Start with **1A. Current Docker Runtime and Deployment State** for the supported runtime baseline and newest dated overlays.
+- Use **Reconstruction-Critical Information** only after reconciling it with section 1A and current live Compose/container evidence.
+- Sections whose titles name `infra`, `media`, `gameserver`, `smarthome`, `web`, or other superseded domains are preserved migration history unless a newer current section explicitly reaffirms them.
+- Use **Outstanding / Needs Verification** before relying on an unverified behavior, and **Related Documentation** for storage, network, identity, backup, and automation ownership.
+- This file owns Docker/Compose deployment facts; it does not replace the canonical storage, network, backup, or permission contracts in documents 03–07.
 
 ## 1. Purpose and Scope
 
@@ -58,7 +66,7 @@ Services are grouped by the Linux account directory containing their active Comp
 
 ### Current runtime evidence boundary — 2026-10-15
 
-Read-only Compose, process, listener, NPM-route, and HTTP evidence confirms the current Platform, Libraries, Smart Home, Hosted Websites, and Paperless topology. Privileged 2026-10-15 Docker inspection found 22 container objects, all running, with one named volume, seventeen networks, and restart count zero for every object. Both Palworld containers were healthy with their expected UDP publications; this supersedes the 2026-10-14 stopped-state observation, but the reason and intended persistence remain unverified. The active stack tree contains 19 Compose files: two Game Servers, two Hosted Websites, seven Libraries modules, six Platform modules, and two Smart Home modules; Paperless and RomM each define their documented database/broker companions. Jared Wines remains intentionally undeployed.
+Read-only Compose, process, listener, NPM-route, and HTTP evidence confirms the current Platform, Libraries, Smart Home, Hosted Websites, and Paperless topology. Privileged 2026-10-15 Docker inspection found 22 container objects, all running, with one named volume, seventeen networks, and restart count zero for every object. Both Palworld containers were healthy with their expected UDP publications and use `unless-stopped`. Docker inspection dates both starts to 2026-10-14 12:24 PDT while the daemon remained continuously active from the 2026-10-13 boot. The journal records both starts thirty seconds after an operator-run Docker system prune but no explicit start command; do not infer causation or owner intent from that timing. This supersedes the 2026-10-14 stopped-state observation, while intended persistence remains unverified. The active stack tree contains 19 Compose files: two Game Servers, two Hosted Websites, seven Libraries modules, six Platform modules, and two Smart Home modules; Paperless and RomM each define their documented database/broker companions. Jared Wines remains intentionally undeployed.
 
 A later 2026-10-15 read-only follow-up again found all 22 containers running with zero restart counts. The current NAS recovery helper was inspected: after validating `/mnt/nas-libraries` plus its required `library/` and `paperless/` directories, it conditionally recovers only qBittorrentVPN, Radarr, Sonarr, Jellyfin, RomM, Paperless, and Nginx Proxy Manager when a stopped container has an eligible restart policy and a recorded NAS/mount startup-failure signature. It leaves already-running containers and intentionally stopped containers unchanged.
 
@@ -231,7 +239,9 @@ Cloudflare DDNS now uses its ordinary private `cloudflare-ddns_default` bridge, 
 
 A controlled guest reboot recovered all four modules; Homepage/Arcane health, Homepage→Glances DNS/API, local and HTTPS Homepage, Arcane HTTPS, DDNS reconciliation, NPM compatibility, qBittorrent `wg0`, and zero failed systemd units passed. JAR-48 later adds baseline dashboard coverage using these existing components only; notification delivery is intentionally not configured.
 
-## 2. Core Infrastructure — `infra`
+## 2. Infrastructure — Preserved `infra` Domain Record
+
+This section combines dated migration evidence with selectively updated service rows. It is not a current Platform reconstruction procedure; use section 1A and the current Platform overlays above for active paths and state.
 
 ### JAR-5 private Rotom documentation portal — 2026-09-29
 
@@ -249,7 +259,7 @@ Jellyfin, Radarr, Sonarr, and Prowlarr are active v2 modules under `/srv/rotom/s
 
 The table below is the original service inventory with later path/status corrections applied selectively. Use the v2 convergence sections above—not the `/home` labels in older rows—as current reconstruction authority.
 
-| Current container name | Observed image | Observed status | Published ports | Container-only ports shown | Compose file |
+| Container name | Observed image | Dated status | Published ports | Container-only ports shown | Recorded Compose file |
 | --- | --- | --- | --- | --- | --- |
 | `arcane` | `ghcr.io/getarcaneapp/manager:latest` | Up 21 hours (healthy) | `0.0.0.0:3552->3552/tcp`, `[::]:3552->3552/tcp` | None shown | `/home/infra/docker/arcane/compose.yaml` |
 | `cloudflare-ddns` | `favonia/cloudflare-ddns:1` | Up 3 days | None shown | None shown | `/home/infra/docker/cloudflare-ddns/compose.yaml` |
@@ -322,11 +332,13 @@ Games:  /game/torrents/games;   incomplete /game/torrents/incomplete/games
 
 Disposable post-UID-migration writes verified Media ownership `997:5000` and Game ownership `997:5001`. WireGuard remained active after the move. An earlier deliberate `wg0`-down test caused external egress to fail, confirming the VPN kill switch. The user intentionally cleared the old torrent/download queue during the `/data` → `/media` path migration, so preserving the historical queue is not part of the final as-built state.
 
-## 2A. Downloads — final pre-migration JAR-21 state (historical name/path)
+## 2A. Downloads — Final Pre-Migration JAR-21 State
+
+This entire subsection is historical. Current Prowlarr and qBittorrentVPN ownership, paths, and storage are defined by the Libraries overlays in section 1A.
 
 JAR-21 moved the active download stack to the dedicated `downloads` account (`901:5005`). The old Infra project trees were retained during acceptance and then removed after checksum/active-path guards and a successful Restic backup.
 
-| Current container name | Image | Current verification | Published ports | Compose file |
+| Container name | Image | Dated verification | Published ports | Historical Compose file |
 | --- | --- | --- | --- | --- |
 | `prowlarr` | `lscr.io/linuxserver/prowlarr:latest` | Active; HTTP 302; Downloads-owned | `9696:9696` | `/home/downloads/docker/prowlarr/compose.yaml` |
 | `qbittorrentvpn` | `binhex/arch-qbittorrentvpn:latest` | Active; HTTP 200; WireGuard `wg0` present; Downloads-owned | `8080:8080` | `/home/downloads/docker/qbittorrentvpn/compose.yaml` |
@@ -339,7 +351,9 @@ Radarr/Sonarr/Gamarr do not receive write access to the Downloads share. Persist
 
 Arcane remains owned by Infra. For project discovery it has `/home/downloads/docker:/home/downloads/docker:ro`, follows `/home/infra/docker/downloads -> /home/downloads/docker`, and has `followProjectSymlinks=true`. Final Arcane registry verification showed only the correct Prowlarr and qBittorrentVPN records at the symlinked Downloads paths; JAR-21 duplicate Infra/Rotom records are gone.
 
-## 3. Media — `media`
+## 3. Media — Preserved `media` Domain Record
+
+This section preserves the former Media-domain inventory and selectively appended later evidence. Current Libraries identity, Compose roots, and NAS contracts are authoritative in section 1A and documents 04 and 07.
 
 The table below preserves the original Media inventory; its Compose-file column carries later verified v2 paths where available.
 
@@ -367,7 +381,7 @@ Sonarr and Radarr mount the complete Media NAS at `/media` and bind `/mnt/nas-me
 
 Ordinary `jared` access to the media NAS is intentionally excluded. Administration uses `sudo -iu media` on Rotom after connecting as Jared. Jared's final account listing confirms he is not a member of media GID `5000`. UNAS's observed `--manage-gids` behavior means adding a client-side supplementary group alone does not grant the tested NFS access; using primary GID 5000 succeeded. See 04 and 07 for identity details and verification commands.
 
-## 4. Gameserver — `gameserver`
+## 4. Game Servers — Current Summary and Preserved `gameserver` History
 
 Palworld services use the locked `game-servers` identity at UID/GID `995:5001` and local state under `/srv/rotom/appdata/game-servers/`. Palworld stays on VM-local storage. Both current Compose modules are under `/srv/rotom/stacks/game-servers`, and their UDP mappings are unchanged. Jared and Fran were running and healthy on 2026-10-15; the reason and intended persistence of the change from the 2026-10-14 stopped state remain unverified. Gamarr is retired; original Game material is rollback-only.
 
@@ -420,7 +434,9 @@ The intended Game library roots are `/game/library/games/pc` for PC releases and
 
 Prowlarr Torznab integration uses base URL `http://192.168.1.69:9696/2`; Gamarr appends `/api` itself. Supplying a URL that already ends in `/api` produced `/api/api`, an HTML login redirect, and XML parsing failure. API keys are secrets and are intentionally omitted. The corrected base successfully returned search results and a release was sent through Prowlarr to qBittorrent. The final commissioning test was user-confirmed for download, import into the intended PC library, hardlink behavior, and continued seeding. A later live audit verified the container as `running` / `healthy`. Docker inspection shows the healthcheck comes from the image (`/etc/s6-overlay/s6-rc.d/svc-gamarr/data/check`, 30-second interval, 10-second timeout, 120-second start period, 3 retries); `/home/game/docker/gamarr/compose.yaml` has no explicit `healthcheck:` directive. Gamarr now also has verified named HTTPS access through Nginx Proxy Manager at `gamarr.rotom.casa -> 192.168.1.69:6767`; the NPM record uses certificate ID `24`, forces SSL, has no access list, and returned HTTP `302` in the route probe.
 
-## 4A. Documents — `documents`
+## 4A. Documents — Preserved Deployment History
+
+The Documents-domain paths in this section are historical. Current Paperless deployment and media ownership are defined by the Libraries overlays in section 1A and documents 04, 05, and 07.
 
 ### JAR-8 Paperless-ngx deployment — 2026-09-29
 
@@ -436,7 +452,9 @@ At this historical checkpoint, PostgreSQL, Valkey, Paperless data/configuration/
 
 The authenticated existing-original download, controlled web upload/OCR/search/thumbnail check, NAS automount/reconnect behavior, and isolated NAS snapshot restore are still required acceptance checks. Do not remove the local rollback material or the original local media tree until those checks are accepted.
 
-## 5. Smart Home — `smarthome`
+## 5. Smart Home — Preserved `smarthome` Domain Record
+
+This section preserves the earlier singular-domain paths and dated verification. Current `smart-home` Compose/state paths and permissions are defined in section 1A and document 07.
 
 ### JAR-43 Smart Home v2 convergence — 2026-09-29
 
@@ -453,7 +471,9 @@ Post-reboot verification confirmed both containers running from the v2 mounts; l
 
 The Homebridge container name was corrected on 2026-09-19 from the historical misspelling `homebrige` to `homebridge`. The Compose directory and image name were already correct. Homebridge started successfully after the change and restored its cached accessories; the whole-home scan reported no remaining `homebrige` references.
 
-## 6. Web Hosting — `web`
+## 6. Web Hosting — Preserved `web` Domain Record
+
+This section preserves the earlier `web` paths and dated verification. Current `hosted-websites` identity and Compose/state roots are defined in section 1A and document 07.
 
 ### JAR-45 Web v2 convergence — 2026-09-29
 

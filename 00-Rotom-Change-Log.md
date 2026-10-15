@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-15 — Reconcile legacy documentation consistency audit findings
+**Documentation updated:** 2026-10-15 — Improve legacy documentation navigation and maintenance guidance
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -13,6 +13,13 @@
 This file records meaningful changes to legacy documentation set and the server changes or decisions those updates describe. The numbered files `01`–`08` remain the detailed state/reference sources for the latest recorded configuration and clearly labeled plans, while other files in Available Sources may define methodology, project-specific architecture, or other maintained Rotom material. Older entries here describe history, not instructions to restore an old configuration.
 
 **Terminology:** **legacy documentation set** is the proper name for **every file intentionally kept in this project's Available Sources**. Available Sources is the membership boundary for the complete set, regardless of filename, extension, format, document type, or purpose. The numbered files **00–08** are the **Core Numbered Reference Set** within that larger documentation set. Within the Rotom project, **legacy documentation** is the accepted acronym for **legacy documentation set**. “Project docs,” “rotom project docs,” “project documentation,” “project documents,” and “project reference files” are also informal aliases unless a narrower scope is specified. Files outside Available Sources are not automatically legacy documentation set. The definition and current source map are maintained in [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md).
+
+### How to use this file safely
+
+- Use **Current Documentation Maintenance Rules** for the active legacy documentation maintenance contract.
+- Use the newest entry under **Change History** to understand the latest recorded change, then follow its named canonical subject document for supported state and procedures.
+- Treat older entries as dated evidence. They may contain retired paths, names, commands, or architecture and must not be replayed as current instructions without reconciliation.
+- Use [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md) when the correct subject document is unknown.
 
 ## Current Documentation Maintenance Rules
 
@@ -62,6 +69,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-15 — Improve legacy documentation navigation and maintenance guidance
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`, `README.md`, `support/CONTRIBUTING.md`, `support/tooling/retired-helper`.
+- **Status:** **Documentation only / Verified.** No live Rotom, PVE, Docker, NAS, network, account, permission, backup, service, storage, or data state was changed.
+- **Changes:** Added concise safe-use and navigation guidance to every core legacy documentation member, made the current-versus-historical reading path explicit, clarified mixed current/history Docker sections, stale automation chronology, and current Libraries diagnostic context, normalized out-of-order subsection suffixes, documented the gated procedure for a later history split, and added an offline `retired-helper lint` command for whitespace, document-title/fence, local-link, core-filename-reference, and private-key-marker checks across the full numbered set. Preserved all filenames, historical evidence, recovery material, and Available Sources membership; technical corrections are limited to explicitly superseding stale current-state wording with already documented newer evidence.
+- **Evidence:** Complete repository inventory and diff review; clean initial `retired-helper status`; passing `bash -n support/tooling/retired-helper` and versioned `support/tooling/retired-helper lint`; internal-link, Markdown-fence, changed-line sensitive-value, critical-topic, and changed-file-scope checks. The final versioned `support/tooling/retired-helper check` passed repository identity, core-file, lint, GitHub fetch, and upstream-equality checks and reported only the expected uncommitted documentation changes. Read-only live follow-up found both Palworld containers healthy with `unless-stopped`, started at 2026-10-14 12:24 PDT while Docker remained continuously active since 2026-10-13; the journal records their starts thirty seconds after an operator-run Docker system prune but no explicit start command, so causation and intent remain unverified. Both documented rollback files remain present and differ from their active counterparts.
+- **Outstanding:** Historical extraction is gated on Jared's manual addition of all destination files to Available Sources in one coordinated release; no split was performed. Palworld start cause/desired persistence and rollback-file retention remain Needs Verification. The enhanced versioned helper differs from `/usr/local/bin/retired-helper`; installation on Rotom and Mac requires a separately authorized live/tooling synchronization. Available Sources replacement remains manual by Jared.
 
 ## 2026-10-15 — Reconcile legacy documentation consistency audit findings
 

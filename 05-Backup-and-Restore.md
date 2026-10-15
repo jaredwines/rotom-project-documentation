@@ -4,12 +4,20 @@
 **Document role:** Canonical source for Restic backup architecture, scope, retention, verification, restore evidence, and recovery boundaries  
 **Recovery scope:** pre-migration Rotom plus current Proxmox/VM foundation  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Refresh guest recovery point and current paths
+**Documentation updated:** 2026-10-15 — Improve navigation and safe-use guidance
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
 Record substantive changes to this document in the change log as part of the same task, following its maintenance guide.
+
+## Navigation and Authority
+
+- Start with **2. Current Recovery State**, **2A. Current Rotom Restic Backup Repository and Control Files**, and **2B. Current PVE Host-Configuration Restic Repository and Control Files**.
+- Use **12. Recovery Procedure — Current Paths with Preserved Historical Evidence** for recovery planning, while verifying the selected recovery point and current target paths before action.
+- Treat **Preserved Pre-Migration**, **Historical**, and dated checkpoint sections as evidence; they do not prove that a snapshot, local artifact, mount, or credential path still exists.
+- Review **Disaster-Recovery Boundaries and Known Gaps** and **Reconstruction-Critical Information** before relying on a protection domain.
+- This file owns backup and restore claims; storage locations, automation schedules, and privilege boundaries remain canonical in documents 04, 06, and 07.
 
 ## 1. Purpose and Scope
 
@@ -612,11 +620,11 @@ JAR-19 copied both website trees from `/home/web-host/docker` to `/home/web/dock
 - At the 2026-09-19 bare-metal checkpoint, `unas-backup-status-api.service` was enabled/active on `0.0.0.0:8787`; logs showed Homepage requests from `172.24.0.3`, and UFW permitted TCP `8787` from `172.24.0.0/16`. **Current VM note:** JAR-31 verified the status API restored and active, but UFW is not installed in the Debian VM; do not carry the old UFW rule forward as current state.
 - This re-verification did not create, forget, prune, or restore a new snapshot, so it does not change the existing full-DR and full-Palworld-recovery limitations.
 
-## 14B. JAR-6 Backup-Boundary Verification — 2026-09-21
+## 14A. JAR-6 Backup-Boundary Verification — 2026-09-21
 
 JAR-6 did not change backup architecture. After the normal Rotom reboot, read-only closeout checks verified `/mnt` remains explicitly excluded, no new JAR-6 NAS path appears in `include.txt`, the existing Restic repository directory is present, `unas-backup.service` still declares `RequiresMountsFor=/mnt/nas-rotom-backup`, and `unas-backup.timer` remains enabled and active. Backup source/root metadata and Shared Drive source/root metadata were unchanged. No manual backup or retention/prune operation was run merely as a JAR-6 diagnostic.
 
-## 14A. Historical Identity-Migration Backup Verification — 2026-09-21
+## 14B. Historical Identity-Migration Backup Verification — 2026-09-21
 
 - Pre-change backup completed and created snapshot `cd230c0a` before the affected Compose projects were stopped.
 - The normal post-change `backup-to-nas` run created snapshot `b67540b0` at `2026-09-21 02:23:25 PDT`.
