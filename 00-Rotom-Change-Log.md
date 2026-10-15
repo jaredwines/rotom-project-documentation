@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-14 — Record PVE stability-monitoring interval
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`.
+- **Status:** **Documentation only / Verified.** No PVE configuration change was made.
+- **Changes:** Recorded a Jared-executed filtered review of the preceding PVE boot. It found no recurrent `e1000e` hardware-unit hang, `NETDEV WATCHDOG`, panic, MCE, OOM, or i915 failure across the October 1–8 interval. The recurring iGPU passthrough invalid option-ROM warning remains non-fatal. The historical NIC hang still explains the prior network/NFS outage, but evidence still does not prove it caused the whole-host reset.
+- **Evidence:** Jared-supplied `journalctl -b -1` output. NIC link-up was normal; the iGPU VFIO resets completed; PVE Restic Backup completed daily during the observed interval.
+- **Outstanding:** Continue normal monitoring after reboots and investigate only if the hang or reset recurs. The direct-LAN/PVE-firewall policy decision remains open. Available Sources synchronization remains manual by Jared.
+
 ## 2026-10-14 — Capture current PVE VM-backup storage configuration
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `04-NAS-and-Storage.md`.
