@@ -8,7 +8,7 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-10-14; record Remote Desktop Commander home migration.
+# Documentation revised: 2026-10-14; rename current Restic credential files.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the legacy documentation.
 #
@@ -64,6 +64,11 @@
 # - Rotom Restic Backup repo 799babb2 has 22 snapshots; latest 9494979d from 2026-10-13.
 #   `restic check` passed; Jared subsequently confirmed current full data-read and restore
 #   verification, without supplying selected-snapshot or transcript detail in this chat.
+# - 2026-10-14 current Restic credential-path alignment: both independent root-owned
+#   Restic workers use their local `/etc/restic/restic-repository-password` file, mode
+#   `0600`; contents are never documented. Rotom snapshot `333c87b3` and PVE snapshot
+#   `b5af666b` were created successfully after the path changes, and both timers are
+#   enabled and active.
 # - the five current NFS filesystems were mounted read/write during the audit.
 # - 2026-10-13 Game Servers / Smart Home NAS-drive alignment: the fstab-backed NFSv3 `Game_Servers/.data -> /mnt/nas-game-servers` and `Smart_Home/.data -> /mnt/nas-smart-home` automounts are current and live-traversal verified. Their roots are empty `988:5001` and `988:5003` setgid service boundaries; create/remove checks verified descendants as `game-servers:game-servers` and `smart-home:smart-home`. There are no current home NAS shortcuts. The former `Gameserver/.data -> /mnt/nas-gameserver` and `Smarthome/.data -> /mnt/nas-smarthome` guest contracts, mountpoints, and shortcuts are retired. No live container used either old path; Palworld worlds and Smart Home state remain VM-local, and no NAS data migration or backup-policy change was made.
 # - 2026-10-13 Media mountpoint retirement: `/mnt/nas-media` is absent. Its guest fstab/automount and active configuration dependencies had already been retired; its only remaining local `library/games` directories were empty and removed with guarded `rmdir`. The sole active Library guest contract is `/mnt/nas-libraries`. NAS-side Media export/data was not inspected or changed; older Media paths below are historical evidence only.
@@ -102,7 +107,7 @@
 #
 # PVE RESTIC BACKUP — CURRENT
 # /etc/fstab                                  canonical automount -> PVE_Restic_Backup/.data at /mnt/nas-pve-restic-backup
-# /etc/restic/nas-password                   protected credential path; contents never document
+# /etc/restic/restic-repository-password      protected credential path; contents never document
 # /usr/local/bin/backup-restic-to-nas        unchanged manual launcher name
 # /usr/local/sbin/pve-restic-backup          canonical root worker
 # /etc/systemd/system/pve-restic-backup.service
@@ -206,7 +211,7 @@
 #   docker/daemon.json             root-owned; global json-file 10m x 3
 #   restic/include.txt             restored; /mnt remains outside host Restic scope
 #   restic/exclude.txt             restored
-#   restic/nas-password            current protected credential path; root:root 0600; contents never document
+#   restic/nas-password            historical credential path in this preserved pre-migration tree; superseded by the current overlay above
 #   sudoers.d/rotom-restic-backup  current Jared exact-command rule; root:root 0440; visudo PASS
 #   sudoers.d/fran-backup-to-nas   intentionally ABSENT; Fran not recreated
 #   cron.d/weekly-linux-update     intentionally ABSENT; reboot-capable weekly schedule deferred

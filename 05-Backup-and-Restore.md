@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Restic backup architecture, scope, retention, verification, restore evidence, and recovery boundaries  
 **Recovery scope:** pre-migration Rotom plus current Proxmox/VM foundation  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Record Remote Desktop Commander home migration
+**Documentation updated:** 2026-10-14 — Rename current Restic credential files
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -15,7 +15,7 @@ Record substantive changes to this document in the change log as part of the sam
 
 ### Current PVE backup verification — 2026-10-14
 
-PVE Restic Backup remains scheduled daily at `04:00`. Its 2026-10-13 run completed successfully; the repository contained ten snapshots at audit time, with latest short ID `b3fd0c23`, and `restic check` completed without errors. Repository identity and protected credential handling are unchanged.
+PVE Restic Backup remains scheduled daily at `04:00`. Its 2026-10-13 run completed successfully; the repository contained ten snapshots at audit time, with latest short ID `b3fd0c23`, and `restic check` completed without errors. On 2026-10-14, Jared rotated the PVE repository password, then changed the root worker to use the root-only local credential file `/etc/restic/restic-repository-password`; manual post-change snapshot `b5af666b` completed successfully and the timer was re-enabled and active. Repository identity is unchanged.
 
 Rotom VM Backup uses the native `rotom-vm-daily` Proxmox VZDump job, configured for VMID 100 at `05:00`, snapshot mode, zstd compression, `repeat-missed=0`, and retention of seven daily, four weekly, and six monthly archives. Eight current VM archives were present, including the latest 2026-10-13 archive at approximately 36.3 GB compressed. A full decompression test passed and reported 64,872,503,296 bytes of uncompressed data. Jared subsequently confirmed current VMA verification or a disposable restore was completed successfully; the selected archive and transcript were not supplied in this chat. VM 100 had no Proxmox snapshots; that does not affect the independent VZDump archives.
 
@@ -25,7 +25,7 @@ The PVE backup-status API reported both schedules successfully and the two NFS b
 
 `rotom-restic-backup.timer` is enabled and active with the documented `03:00` schedule plus up to ten minutes randomized delay. Privileged inspection found 22 snapshots in repository `799babb2`; the latest is automatic snapshot `9494979d` from 2026-10-13 03:01 PDT, covering the documented guest source roots at approximately 20.086 GiB. `restic check` loaded all indexes, checked packs plus 22 snapshot trees/blobs, and found no errors. Jared subsequently confirmed the current full data-read verification and restore rehearsal completed successfully; the selected snapshot and transcript were not supplied in this chat.
 
-The VM-local `/srv/rotom/backup-staging` root is absent. Every named local artifact beneath it is historical unless a later live path check re-establishes its presence. Restic-contained copies and historical checksums remain recovery evidence, but they are not proof of a current fast local rollback copy. Authoritative Libraries/Paperless NAS payload remains outside Rotom Restic Backup; Jared confirmed its snapshot/restore path has been verified, without supplying the detailed NAS-side transcript in this chat.
+On 2026-10-14, Jared changed the Rotom root worker to use the root-only local credential file `/etc/restic/restic-repository-password`; manual post-change snapshot `333c87b3` completed successfully and the timer was re-enabled and active. The VM-local `/srv/rotom/backup-staging` root is absent. Every named local artifact beneath it is historical unless a later live path check re-establishes its presence. Restic-contained copies and historical checksums remain recovery evidence, but they are not proof of a current fast local rollback copy. Authoritative Libraries/Paperless NAS payload remains outside Rotom Restic Backup; Jared confirmed its snapshot/restore path has been verified, without supplying the detailed NAS-side transcript in this chat.
 
 ### Current Paperless Libraries recovery state — 2026-10-13
 
@@ -112,14 +112,14 @@ No authoritative NAS Media recovery was performed for JAR-50. Jared explicitly w
 
 ## 2A. Current Rotom Restic Backup Repository and Control Files
 
-Rotom Restic Backup uses unchanged technical identifiers:
+Rotom Restic Backup uses these current technical controls:
 
 - Repository: `/mnt/nas-rotom-restic-backup/rotom-restic-backup` on NAS `Rotom_Restic_Backup/.data`.
 - Manual launcher: `/usr/local/bin/backup-restic-to-nas`.
 - Worker/service/timer: `/usr/local/sbin/rotom-restic-backup`, `rotom-restic-backup.service`, `rotom-restic-backup.timer`.
 - Timer: around `03:00`, `Persistent=true`, randomized delay up to ten minutes.
 - Retention: `7 daily / 4 weekly / 12 monthly`.
-- Password path: `/etc/restic/nas-password`; credential contents are never documented.
+- Password path: `/etc/restic/restic-repository-password`; credential contents are never documented.
 
 ### JAR-47 verified v2 guest recovery point
 
@@ -179,7 +179,7 @@ Canonical current PVE host-config backup state:
 - Worker: `/usr/local/sbin/pve-restic-backup`.
 - Service/timer: `pve-restic-backup.service` / `pve-restic-backup.timer`, enabled/active, daily `04:00`, `Persistent=true`, `AccuracySec=1min`.
 - Staging: `/var/backups/pve-restic-recovery`.
-- Password path: `/etc/restic/nas-password` (unchanged path; contents never document).
+- Password path: `/etc/restic/restic-repository-password`; contents never document.
 - Retention: `restic forget --tag automatic --keep-daily 7 --keep-weekly 4 --keep-monthly 12 --prune`.
 
 JAR-68 final snapshot cleanup deliberately forgot the two pre-rename points `0cf1c62a` and `3db28d41`. Exact JSON verification confirmed both absent and canonical snapshot `35d4b0c2` present as host `pve` with path `/var/backups/pve-restic-recovery`. A subsequent `restic check` inspected the remaining snapshot and returned **no errors were found**. No immediate prune was run during that cleanup; normal later retention/prune may reclaim unreferenced pack data.
@@ -653,7 +653,7 @@ A read-only repository listing after the scheduled 03:01 run showed 17 snapshots
 - Restic include/exclude definitions: `/etc/restic/include.txt` and `/etc/restic/exclude.txt`; the script also supplies `/var/backups/system-info` explicitly.
 - Restic service/timer: `/etc/systemd/system/rotom-restic-backup.service` and `/etc/systemd/system/rotom-restic-backup.timer`; timer enabled/active, daily `03:00`, persistent, randomized delay up to 10 minutes.
 - Restic status API: `/usr/local/sbin/rotom-restic-backup-status-api` + `/etc/systemd/system/rotom-restic-backup-status-api.service`; Homepage endpoint `http://192.168.1.69:8787/backup-status`.
-- Credential location: `/etc/restic/nas-password`; contents must never be printed or copied into documentation.
+- Credential location: `/etc/restic/restic-repository-password`; contents must never be printed or copied into documentation.
 - Dated verified guest recovery point: `8efea294` at `2026-10-05 21:45 PDT`, created after repair of the active NPM SQLite staging source. The 2026-10-14 inventory instead records latest automatic snapshot `9494979d` from 2026-10-13; select and verify an incident-appropriate retained snapshot before recovery. Snapshot `3c85d5be` still contains the byte-verified JAR-84 legacy-tree archives. JAR-47 snapshot `aedd8e57` remains the latest documented application-aware restricted-restore exercise; Jared subsequently confirmed a current full data-read and restore rehearsal without supplying its selected snapshot or transcript.
 - PVE manual launcher: `/usr/local/bin/backup-rotom-vm-to-nas`; re-executes through `sudo` for non-root invocation, starts fixed `rotom-vm-vzdump-manual.service` with `--no-block`, and refuses duplicate active manual runs. Jared and Fran can follow the unit without `sudo` through `systemd-journal` membership.
 - PVE manual worker/service: `/usr/local/sbin/rotom-vm-vzdump-manual` + `/etc/systemd/system/rotom-vm-vzdump-manual.service`; VMID 100 / `nas-rotom-vm-backup` / snapshot / zstd; lock `/run/lock/rotom-vm-vzdump-manual.lock`. The old local `backup-proxmox-to-nas.pre-systemd.*` rollback helper was deliberately removed after final acceptance.

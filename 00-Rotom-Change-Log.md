@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-14 — Clarify active weekly update scheduling
+**Documentation updated:** 2026-10-14 — Rename current Restic credential files
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-14 — Rename current Restic credential files
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Renamed the root-only current Restic credential file on both hosts to `/etc/restic/restic-repository-password` and updated the Rotom and PVE root backup workers to use it. The repositories, schedules, retention, mounts, backup scope, and credential contents were unchanged.
+- **Evidence:** Jared supplied both host-side preflights showing idle services and root-only `0600` source files; each worker path change passed shell syntax validation. A manual Rotom backup created snapshot `333c87b3` at 20:25 PDT, and a manual PVE backup created snapshot `b5af666b` at 20:27 PDT. Both services returned `Result=success` / `ExecMainStatus=0`, and both timers were re-enabled and active. The PVE repository password rotation was separately verified earlier in this chat; no password content was recorded.
+- **Outstanding:** Historical references retain their original paths as evidence. Available Sources synchronization remains manual by Jared.
 
 ## 2026-10-14 — Retire Remote Desktop Commander old-home rollback contents
 
