@@ -67,7 +67,7 @@ Rotom now has two human administrators. Jared remains `1000:1000`; Fran is `1002
 
 Oh My Zsh is also configured for `desktopcmd`, `game-servers`, `hosted-websites`, `libraries`, `platform`, and `smart-home`. `desktopcmd` now uses `/usr/bin/zsh`; the change did not unlock the account or add sudo, Docker, service-group, NAS, proxy, DNS, or inbound-listener access. Existing service-account `.zshrc` files were retained as timestamped pre-Oh-My-Zsh backups when replaced. Remote Desktop Commander service health was not rechecked after this shell-only account change.
 
-PVE now has two human Linux administrators. Jared remains `1000:1000`; Fran is `1001:1001`, has a private mode-`0700` home, uses `/usr/bin/zsh` with Oh My Zsh, and belongs to `sudo`, `users`, and `systemd-journal`. Enabled identity `fran@pam` has propagated `Administrator` access at `/`, matching Jared's Proxmox authorization scope. Host-side permissions and journal access were verified; direct web-login acceptance was not supplied. PVE SSH authentication for Fran is intentionally deferred, and `/home/fran/.ssh` was verified absent.
+PVE now has two human Linux administrators. Jared remains `1000:1000`; Fran is `1001:1001`, has a private mode-`0700` home, uses `/usr/bin/zsh` with Oh My Zsh, and belongs to `sudo`, `users`, and `systemd-journal`. Enabled identity `fran@pam` has propagated `Administrator` access at `/`, matching Jared's Proxmox authorization scope. Host-side permissions and journal access were verified, and Jared confirmed direct browser-login acceptance; detailed browser evidence was not retained. PVE SSH authentication for Fran is intentionally deferred, and `/home/fran/.ssh` was verified absent.
 
 ### Current Paperless Libraries deployment — 2026-10-13
 

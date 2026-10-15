@@ -579,10 +579,10 @@ No additional Docker service is promoted to current state by this restructure. A
 
 ## 13. Outstanding / Needs Verification
 
-The VM-era backup baseline is no longer a Docker gap. The 2026-10-14 audit found 22 Rotom Restic Backup snapshots, latest automatic snapshot `9494979d` from 2026-10-13, and a successful `restic check`. Earlier points including `8efea294` and `f666d63c` remain dated evidence. Full Rotom Restic Backup data-read and restore verification remain outstanding; `/mnt` remains outside the Rotom Restic Backup source set.
+The VM-era backup baseline is no longer a Docker gap. The 2026-10-14 audit found 22 Rotom Restic Backup snapshots, latest automatic snapshot `9494979d` from 2026-10-13, and a successful `restic check`. Earlier points including `8efea294` and `f666d63c` remain dated evidence. Jared confirmed a current full Rotom Restic Backup data-read and restore rehearsal; the selected snapshot and transcript were not retained. `/mnt` remains outside the Rotom Restic Backup source set.
 
-- **Intentional:** Fran is not recreated, and her historical backup sudoers rule is not installed.
-- **Needs Verification — live Libraries-NFS loss:** startup/recreation fail-closed behavior and the Libraries guard are documented, but application behavior during sudden loss of the active Libraries NFS payload while qBittorrent is already running has not been exercised. Read-only inspection can confirm the guard definition; actual loss behavior requires a separately planned non-destructive maintenance test and must not be inferred.
+- **Intentional:** Fran is recreated with full sudo on Rotom and PVE. Her historical exact-command backup sudoers rule remains absent because full sudo already authorizes the workflow; SSH-key, legacy documentation/GitHub/Codex, and named documentation access remain deferred.
+- **Verified by Jared confirmation — live Libraries-NFS loss:** the planned non-disruptive running-qBittorrent test completed. Detailed runtime observations were not retained; do not infer behavior beyond the confirmed test outcome.
 - **Known Arcane metadata drift:** current auto-update/auto-heal settings were freshly verified on 2026-09-27 (document 06). JAR-85 verified an earlier active Arcane container mount of `/home/downloaders/docker`; the former `/home/infra/docker/downloads` discovery symlink was unreferenced by the current Arcane database and retired. The Downloader bind and its empty source were removed on 2026-10-13. Historical Arcane records that name the old symlink remain historical evidence. Its persisted qBittorrentVPN project status may be stale/`unknown`; Docker runtime and WireGuard, not Arcane metadata, are runtime authority.
 
 ## 14. Related Documentation

@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-14 — Reconcile current-state audit findings
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Documentation only.** No Rotom, PVE, Docker, NAS, router, backup, account, or credential state was changed.
+- **Changes:** Reconciled stale current-looking recovery, NFS-loss, Fran-login, alerting, Palworld-rehearsal, Arcane-automation, NAS-path, and recovery-point wording with the newest 2026-10-14 supported evidence. Preserved historical evidence and explicit limitations: exact Libraries snapshot-policy values, selected restore/archive identifiers, router-policy detail, off-site recovery coverage, PVE reset attribution, and PVE mail-delivery intent remain documented as unresolved rather than inferred.
+- **Evidence:** Complete read-only cross-document audit of the nine-file Available Sources set, using existing 2026-10-14 evidence and Jared-confirmed outcomes already recorded in this log.
+- **Outstanding:** Record exact recovery-test identifiers and NAS snapshot-policy values when supplied; establish and document any off-site recovery layer, PVE mail-delivery disposition, router-policy summary, and post-reset evidence as separately authorized work. Available Sources synchronization remains manual by Jared.
+
 ## 2026-10-14 — Clarify active weekly update scheduling
 
 - **Documentation only / Verified:** `01-Rotom-Server-Inventory.md` and `06-Maintenance-and-Automation.md` now distinguish the enabled `rotom-weekly-maintenance.timer` from the retired historical reboot-capable cron schedule. Live systemd evidence showed the Rotom timer enabled and active for Sundays at `01:15`, with persistent missed-run behavior; it performs the supported ordinary package-upgrade workflow without automatic reboot. The absent `/etc/cron.d/weekly-linux-update` schedule is intentional and is not required for weekly update coverage.
