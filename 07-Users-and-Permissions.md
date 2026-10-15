@@ -116,6 +116,8 @@ Jared's Codex directory `/home/jared/.codex` was set to mode `0700` and `/home/j
 
 On 2026-10-14, Fran received private non-credential setup only: `/home/fran/.config/retired-helper` and `/home/fran/.codex` are `fran:fran` mode `0700`, their `repository` and `AGENTS.md` files are mode `0600`, and the configured legacy documentation destination is `/home/fran/documentation/rotom-runbook`. Her AGENTS instructions match Jared's Rotom safety policy. No Fran SSH key, GitHub credential, Codex authentication, or checkout was created or copied; a no-prompt GitHub read test failed as expected. The installed helper accepts either human account but still rejects a missing/non-repository checkout.
 
+Later on 2026-10-14, Fran owner-controlled setup attempted a separate GitHub/Codex path. A local private SSH key now exists at the configured GitHub identity path as `fran:fran` mode `0600`, and the Codex CLI is installed under Fran's private local package directory. GitHub rejected that key, no Codex authentication file exists, and `/home/fran/documentation/rotom-runbook` remains absent; no key, token, passphrase, or authentication content was inspected or recorded. These incomplete local artifacts do not provide GitHub/legacy documentation access and remain deferred rather than satisfying the waived JAR-98 Fran criteria.
+
 ## 2A. Preserved Pre-Migration Identity and Access Model
 
 ### Account model

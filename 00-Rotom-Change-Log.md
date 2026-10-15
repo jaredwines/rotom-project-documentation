@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-14 — Rename current Restic credential files
+**Documentation updated:** 2026-10-14 — Final JAR-98 closeout verification
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-14 — Final JAR-98 closeout verification
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `07-Users-and-Permissions.md`.
+- **Status:** **Verified / Documentation only.**
+- **Changes:** Final live verification reconfirmed Jared's clean, synchronized independent legacy documentation checkout; the removed Platform checkout remains absent; the root-owned Rotom Docs deployment clone matches Jared's current legacy documentation commit; the `rotom-docs` service remains up with local and HTTPS checks returning `200`; and `rotom-restic-backup.timer` is enabled and active. A subsequent owner-controlled Fran setup attempt created a local SSH key and installed the Codex CLI, but it did not authorize GitHub access, complete Codex authentication, or create a checkout. The key was corrected to owner-only mode `0600`.
+- **Evidence:** Guarded `retired-helper check` passed, including GitHub fetch and `main == origin/main`; Docs Compose validation passed and the active `rotom-docs` container served `http://127.0.0.1:8082/` and `https://docs.rotom.casa/` with `200`; the deployment clone and Jared checkout both resolved to `6b4be7e`; and `rotom-restic-backup.timer` reported enabled/active. Fran's local key was not accepted by GitHub, her Codex auth file and configured checkout were absent, and no credential material was inspected or recorded.
+- **Outstanding:** Fran's GitHub authorization, Codex authentication, and independent checkout remain intentionally deferred outside JAR-98 under Jared's waiver. Available Sources synchronization remains manual by Jared.
 
 ## 2026-10-14 — Retire Platform legacy documentation checkout with owner waiver (JAR-98)
 
