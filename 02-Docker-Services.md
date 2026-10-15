@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details  
 **Scope:** Rotom workload layer; the current runtime baseline is the 2026-10-15 inventory in section 1A  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Record post-cleanup Docker and Arcane automation audit
+**Documentation updated:** 2026-10-15 — Restore Jared Wines and privatize Homepage monitoring
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -63,6 +63,14 @@ Services are grouped by the Linux account directory containing their active Comp
 **Port notation:** Entries containing `->` are published host-to-container mappings. Bare ports are listed separately as container-only ports with no host mapping shown. “None shown” means the source PORTS field was blank; it does not establish network mode or lack of connectivity.
 
 ## 1A. Current Docker Runtime and Deployment State
+
+### Current Homepage, Glances, and Jared Wines deployment — 2026-10-15
+
+`homepage` and `glances` are now the two services in `/srv/rotom/stacks/platform/homepage/compose.yaml`, sharing the existing private `homepage_default` bridge. Glances preserves its host PID namespace plus read-only Docker-socket, host-root, and configuration binds, but no longer publishes TCP `61208` on the host. Homepage's eight Glances widgets use `http://glances:61208`, including the Docker Containers metric, and all required Glances API endpoints returned `200` from Homepage. The active Glances configuration is `/srv/rotom/appdata/platform/homepage/glances/glances.conf`; `/srv/rotom/stacks/platform/glances` and `/srv/rotom/appdata/platform/glances` are retired and absent. No new Docker network was created; `glances_default` was removed when the standalone stack was retired.
+
+`jaredwines.com` is active with a read-only site-content bind and loopback-only publication `127.0.0.1:7777:80`. NPM proxy host `8` retains the `127.0.0.1:7777` HTTP upstream and forced TLS. After regenerating its stale active proxy configuration from that record, the loopback, local-SNI TLS, and public HTTPS routes all returned `200` with the expected portfolio page. Homepage's internal container-host mapping for `jaredwines.com` routes its monitor through NPM; it does not alter public DNS or make port `7777` LAN-reachable.
+
+This overlay supersedes earlier same-day standalone-Glances, loopback-`61208`, and unavailable-Jared-Wines statements.
 
 ### Complete post-cleanup runtime audit — 2026-10-15
 

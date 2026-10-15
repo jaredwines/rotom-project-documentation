@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Prepare the pilot runbook layer
+**Documentation updated:** 2026-10-15 — Restore Jared Wines and privatize Homepage monitoring
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -52,6 +52,14 @@ Within each subject document, use the newest dated **Current** section first. Us
 This audit confirms that the newest dated overlays at the start of this section are the supported current-state layer. Later undated-looking summaries and earlier JAR checkpoint tables are retained for evidence but are **Historical** wherever they name `infra`, `library`, `gameserver`, `web`, `/mnt/nas-media`, `/mnt/nas-library`, `/mnt/nas-gameserver`, Uptime Kuma, or Syncthing as current, or state a Palworld deployment status not reaffirmed by a newer overlay. Do not use those older passages as operating instructions. The final 2026-10-13 fstab and 2026-10-15 read-only verification establish five current guest NFS automount contracts: Game Servers, Smart Home, Rotom Restic Backup, Libraries, and Hosted Websites. Reconfirm their live activation read-only with `findmnt` plus `systemctl list-units --type=automount` on Rotom when troubleshooting.
 
 ## 2. Current Rotom Summary
+
+### Jared Wines recovery and private Homepage monitoring — 2026-10-15
+
+Rotom has 23 running Compose-managed containers and 18 Docker networks. `jaredwines.com` is intentionally active behind NPM proxy host `8`: its website container publishes only `127.0.0.1:7777:80`, and NPM forwards to that loopback target with forced TLS. Direct loopback, local-SNI TLS, and public HTTPS probes all returned `200` with the expected Jared Wines portfolio page. Homepage resolves that hostname internally to Rotom's LAN address solely for its site monitor; this is a Homepage container mapping, not a public-DNS change.
+
+Glances now belongs to Homepage's existing private Compose project rather than a standalone project. It has no host-published port and is reachable only to Homepage as `http://glances:61208` on `homepage_default`; Homepage's eight Glances widgets, including Docker Containers, passed their API checks. Its configuration is `/srv/rotom/appdata/platform/homepage/glances/glances.conf`; the former standalone Glances stack and appdata paths are absent. No new Docker network was created; retiring `glances_default` reduced the live network count to 18.
+
+This overlay supersedes earlier same-day Jared Wines unavailable-route and Glances loopback-publication statements.
 
 ### Post-cleanup Docker and Arcane automation audit — 2026-10-15
 

@@ -8,7 +8,7 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-10-15; improve navigation and safe-use guidance.
+# Documentation revised: 2026-10-15; restore Jared Wines and privatize Homepage monitoring.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the legacy documentation.
 # Safe reading order:
@@ -21,6 +21,21 @@
 # semantics maintained in documents 02, 04, 05, 06, and 07.
 #
 # CURRENT TOPOLOGY — RECONCILED THROUGH 2026-10-15
+# 2026-10-15 Jared Wines and Homepage/Glances overlay:
+# - `jaredwines.com` is active from
+#   `/srv/rotom/stacks/hosted-websites/jaredwines.com/compose.yaml` and publishes only
+#   `127.0.0.1:7777:80`; NPM proxy host 8 serves the public TLS route.
+# - Homepage and Glances now share
+#   `/srv/rotom/stacks/platform/homepage/compose.yaml` and the existing private
+#   `homepage_default` bridge. Glances has no published host port; Homepage reaches it
+#   as `glances:61208`.
+# - Active Glances configuration is
+#   `/srv/rotom/appdata/platform/homepage/glances/glances.conf`. The retired
+#   `/srv/rotom/stacks/platform/glances` and `/srv/rotom/appdata/platform/glances`
+#   directories are absent. No new Docker network was created; `glances_default` was
+#   removed with the standalone stack.
+# - This overlay supersedes earlier same-day Jared Wines unavailable-route and Glances
+#   loopback-publication statements.
 # 2026-10-15 Docker shared-network retirement overlay:
 # - All intended deployed container objects were recreated after the existing objects were
 #   deleted; Jared Wines remains intentionally undeployed. Docker then had 22 running

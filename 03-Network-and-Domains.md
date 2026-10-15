@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing  
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Record post-cleanup Docker and Arcane automation audit
+**Documentation updated:** 2026-10-15 — Restore Jared Wines and privatize Homepage monitoring
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -20,6 +20,14 @@ Record substantive changes to this document in the change log as part of the sam
 - This file owns network and routing facts; storage ownership, service deployment, backup, and account privileges remain canonical in documents 02 and 04–07.
 
 ## 1. Purpose and Scope
+
+### Current Jared Wines route and private Glances access — 2026-10-15
+
+`jaredwines.com` is active behind NPM proxy host `8`. Its container publishes only `127.0.0.1:7777:80`; NPM remains host-networked and forwards HTTP to `127.0.0.1:7777` with forced TLS. The host record already held that target, but its generated NPM configuration was stale and pointed at the LAN address; regenerating only host `8` corrected the active upstream. Loopback HTTP, local-SNI HTTPS, and public `https://jaredwines.com` each returned `200` with the expected portfolio page. Homepage has an internal container-host mapping for `jaredwines.com` to `192.168.1.69` so its existing HTTPS monitor reaches NPM; no public DNS, router, firewall, or certificate setting changed.
+
+Glances no longer has a host listener, including no `127.0.0.1:61208` publication. It is a private service on the existing `homepage_default` Docker bridge and Homepage reaches it as `http://glances:61208`; all eight Glances-widget API categories, including containers, returned `200` from Homepage. The retired `glances_default` bridge is absent. This private migration created no new Docker network and does not make Glances LAN-reachable.
+
+This overlay supersedes earlier same-day unavailable-Jared-Wines and loopback-`61208` observations.
 
 ### Post-cleanup Docker network and route audit — 2026-10-15
 

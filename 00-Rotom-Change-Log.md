@@ -70,6 +70,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-15 — Restore Jared Wines and privatize Homepage monitoring
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.** Jared Wines was restored through its retained NPM host, and Glances was moved into Homepage's private Compose project. No NAS data, Docker volume, certificate, secret, or unrelated workload was changed.
+- **Changes:** `jaredwines.com` now publishes only `127.0.0.1:7777:80`; NPM proxy host `8` forwards to `127.0.0.1:7777` with forced TLS. Its stale generated NPM configuration was regenerated from that verified database record. Homepage resolves `jaredwines.com` internally to Rotom's LAN address so its HTTPS site monitor reaches NPM without changing public DNS. Glances is now the `glances` service in `/srv/rotom/stacks/platform/homepage/compose.yaml`, on the existing private `homepage_default` bridge with no published host port. Homepage's eight Glances widgets use `http://glances:61208`; Glances configuration moved to `/srv/rotom/appdata/platform/homepage/glances/glances.conf`. The obsolete standalone Glances stack and appdata directories were removed after verification.
+- **Evidence:** `jaredwines.com` listened only on `127.0.0.1:7777`; its direct loopback, local-SNI TLS, and public HTTPS probes returned `200` and the expected Jared Wines portfolio title. NPM's regenerated host-8 configuration named `127.0.0.1:7777`. Homepage was healthy; its own Jared Wines monitor returned `200` (about 16 ms). Homepage and Glances shared `homepage_default`; Glances had no host TCP `61208` listener, and Homepage successfully reached Glances `status`, `cpu`, `mem`, `containers`, `diskio`, `fs`, `network`, and `sensors` API endpoints. Docker reported 23 running containers and 18 networks.
+- **Outstanding:** Available Sources replacement remains manual by Jared.
+
 ## 2026-10-15 — Verify Libraries automount recovery through a full reboot
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `runbooks/NAS-Mount-Recovery.md`.
