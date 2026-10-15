@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+RUNBOOK_DIR="$REPO_ROOT/runbooks"
+FAILURES=0
+
+pass() {
+    printf 'PASS  %s\n' "$*"
+}
+
+fail() {
+    printf 'FAIL  %s\n' "$*" >&2
+    FAILURES=$((FAILURES + 1))
+}
+
+require_text() {
+    local file="$1"
+    local text="$2"
+
+    if rg -Fq -- "$text" "$file"; then
+        pass "$(basename "$file"): $text"
+    else
+        fail "$(basename "$file"): missing $text"
+    fi
+}
+
+require_link_target() {
+    local file="$1"
+    local target="$2"
+
+    if [[ -f "$RUNBOOK_DIR/$target" ]]; then
+        pass "$(basename "$file"): related runbook exists: $target"
+    else
+        fail "$(basename "$file"): missing related runbook: $target"
+    fi
+}
+
+runbook_files=(
+    "$RUNBOOK_DIR/Docker-Website-Recovery.md"
+    "$RUNBOOK_DIR/NAS-Mount-Recovery.md"
+    "$RUNBOOK_DIR/Rotom-Restic-Backup.md"
+)
+
+required_sections=(
+    "## 1. Outcome"
+    "## 2. Use this runbook when"
+    "## 3. Impact and authorization"
+    "## 4. Canonical current-state inputs"
+    "## 5. Read-only preflight"
+    "## 6. Stop conditions"
+    "## 7. Procedure"
+    "## 8. Verification"
+    "## 9. Rollback or recovery"
+    "## 10. Troubleshooting branches"
+    "## 11. Evidence to retain"
+    "## 12. Related documentation"
+    "## 13. Maintenance notes"
+)
+
+for file in "${runbook_files[@]}"; do
+    if [[ ! -f "$file" ]]; then
+        fail "missing pilot: $(basename "$file")"
+        continue
+    fi
+
+    require_text "$file" "**Document role:**"
+    require_text "$file" "**Status:**"
+    require_text "$file" "**Applies to:**"
+    require_text "$file" "**Risk:**"
+    require_text "$file" "**Authorization:**"
+    require_text "$file" "**Last live verification:**"
+    require_text "$file" "**Canonical references:**"
+    require_text "$file" "**Maintenance contract:**"
+    require_text "$file" "**Read-only**"
+    require_text "$file" "**Changes Rotom"
+
+    for section in "${required_sections[@]}"; do
+        require_text "$file" "$section"
+    done
+done
+
+require_text "$RUNBOOK_DIR/Docker-Website-Recovery.md" "alohamillworks.com"
+require_text "$RUNBOOK_DIR/Docker-Website-Recovery.md" "Jared Wines"
+require_text "$RUNBOOK_DIR/NAS-Mount-Recovery.md" "mnt-nas\\x2dlibraries.automount"
+require_text "$RUNBOOK_DIR/NAS-Mount-Recovery.md" "rotom-nas-docker-recovery.service"
+require_text "$RUNBOOK_DIR/Rotom-Restic-Backup.md" "rotom-restic-backup.service"
+require_text "$RUNBOOK_DIR/Rotom-Restic-Backup.md" "RESTIC_PASSWORD_FILE"
+require_link_target "$RUNBOOK_DIR/NAS-Mount-Recovery.md" "Rotom-Restic-Backup.md"
+require_link_target "$RUNBOOK_DIR/Rotom-Restic-Backup.md" "NAS-Mount-Recovery.md"
+
+if (( FAILURES > 0 )); then
+    printf '\nRUNBOOK TESTS: FAIL (%d problem(s))\n' "$FAILURES" >&2
+    exit 1
+fi
+
+printf '\nRUNBOOK TESTS: PASS\n'
