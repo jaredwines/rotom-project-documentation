@@ -63,13 +63,21 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-14 — Cut over Rotom Docs to a deployment clone and prepare Fran legacy documentation controls (JAR-98)
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`, `support/tooling/retired-helper`.
+- **Status:** **Implemented / Verified (partial).**
+- **Changes:** Replaced the Rotom Docs publisher's Platform-checkout input with a root-owned deployment clone at `/srv/rotom/appdata/platform/rotom-docs/repository`, using the verified public HTTPS origin and never writing to GitHub. Publication fetches and fast-forwards only `main`, validates origin/branch/cleanliness, generates only the approved nine-file set, builds both source/site in temporary directories, then atomically swaps the site and source while retaining one prior generated revision. Created Fran's private non-credential legacy documentation/Codex configuration and changed the versioned/installed helper to allow `jared` or `fran` while retaining its remote, branch, upstream, clean-tree, fast-forward, core-file, and access checks.
+- **Evidence:** The root-owned deployment clone is at `18db80b`; the build completed, controlled output contained only the approved documentation inputs plus derived navigation/tree files, and local plus HTTPS portal checks returned `200`. A controlled temporary wrong-origin test stopped before publication and left the live site checksum unchanged. The active Restic timer is enabled and includes `/srv` and `/home`. Jared passed `retired-helper check` after installation; Fran's helper invocation reached the expected missing-checkout guard rather than the former user restriction.
+- **Outstanding:** Fran must complete her own GitHub and Codex authentication, clone the configured checkout path, and then pass authenticated `retired-helper`/Git synchronization tests. Explicit owner approval remains required before deleting the old Platform checkout. Available Sources synchronization remains manual by Jared.
+
 ## 2026-10-14 — Begin independent Jared legacy documentation checkout migration (JAR-98)
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
 - **Status:** **Implemented / Verified (partial).**
 - **Changes:** Created Jared's independently owned Rotom checkout at `/home/jared/documentation/rotom-runbook` from the shared GitHub `main` branch and changed only Jared's private `retired-helper` fallback to that path. The previous clean Platform checkout remains intact as rollback material and remains the active Rotom Docs publisher input; no publisher, service, backup, Fran credential, or Platform-account change was made.
 - **Evidence:** The new checkout is `jared:jared`, clean, tracks `origin/main`, and passed `retired-helper path`, `retired-helper status`, `retired-helper check` (including GitHub fetch), and guarded `retired-helper pull`. The live portal returned HTTPS `200`; its root-owned publisher was inspected and still uses the Platform path with the controlled nine-file atomic publication process.
-- **Outstanding:** Establish Fran's owner-controlled SSH/GitHub/Codex identity and checkout; revise/install/test the helper for both accounts without weakening guardrails; create a least-privilege non-human publisher identity and cut over/verify rollback and backups; obtain explicit owner approval before removing the old checkout. Available Sources synchronization remains manual by Jared.
+- **Outstanding:** Fran must complete her owner-controlled SSH/GitHub/Codex identity and checkout; then verify collaborative Git synchronization. Obtain explicit owner approval before removing the old checkout. Available Sources synchronization remains manual by Jared.
 
 ## 2026-10-14 — Rename current Restic credential files
 

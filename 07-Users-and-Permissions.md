@@ -106,13 +106,15 @@ The Rotom VM continues to use `rotom` / `rotom.casa`, user `jared`, and `~/.ssh/
 
 ### Current legacy documentation / GitHub / Codex access — 2026-09-28
 
-Historical `getfacl -p /home/infra` output showed the former Infra-home traversal model before the Platform rename. The current checkout and service home are under `/home/platform`; current root ACL behavior is summarized in section 1. Fran is now recreated, but no separate current Fran documentation ACL, legacy documentation checkout, GitHub identity, or Codex entry point is established.
+Historical `getfacl -p /home/infra` output showed the former Infra-home traversal model before the Platform rename. The Platform service home remains under `/home/platform`; Jared's current independent checkout is described below. Current root ACL behavior is summarized in section 1. Fran is now recreated, but has no legacy documentation checkout, GitHub identity, or Codex authentication yet.
 
 Jared's current legacy documentation Git checkout is `/home/jared/documentation/rotom-runbook`; the former `/home/infra/documentation/retired-helper` path is historical. On 2026-10-14 it was cloned cleanly from the shared GitHub `main` branch as `jared:jared` mode `0700`, and Jared's private guarded-`retired-helper` fallback was changed to it. The prior clean `/home/platform/documentation/rotom-runbook` checkout remains temporarily as rollback material and the active root-owned Rotom Docs publisher input; it is not Jared's operational checkout. Fran still has no separate legacy documentation/GitHub/Codex setup, and no credentials were copied or changed.
 
 Jared's general GitHub SSH identity is `~/.ssh/d_ed25519_github`. The private key is kept under Jared's account and must not be copied to `infra` or another service account; key contents and passphrases are never documented. Supplied output verified `ssh -T git@github.com` authenticated as GitHub account `jaredwines`, and the legacy documentation checkout uses the SSH remote `git@github.com:jaredwines/rotom-runbook.git`. The user also set `~/.ssh` mode `0700`, the GitHub private-key file mode `0600`, public-key mode `0644`, and SSH config mode `0600`.
 
 Jared's Codex directory `/home/jared/.codex` was set to mode `0700` and `/home/jared/.codex/AGENTS.md` to mode `0600`. A fresh Codex session after those changes successfully loaded the file and followed its legacy documentation path/discrepancy rules.
+
+On 2026-10-14, Fran received private non-credential setup only: `/home/fran/.config/retired-helper` and `/home/fran/.codex` are `fran:fran` mode `0700`, their `repository` and `AGENTS.md` files are mode `0600`, and the configured legacy documentation destination is `/home/fran/documentation/rotom-runbook`. Her AGENTS instructions match Jared's Rotom safety policy. No Fran SSH key, GitHub credential, Codex authentication, or checkout was created or copied; a no-prompt GitHub read test failed as expected. The installed helper accepts either human account but still rejects a missing/non-repository checkout.
 
 ## 2A. Preserved Pre-Migration Identity and Access Model
 

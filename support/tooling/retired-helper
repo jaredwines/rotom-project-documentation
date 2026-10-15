@@ -4,7 +4,7 @@ set -euo pipefail
 
 CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/retired-helper/repository"
 RPD_DIR=""
-EXPECTED_USER="jared"
+EXPECTED_USERS=("jared" "fran")
 EXPECTED_REMOTE="git@github.com:jaredwines/rotom-runbook.git"
 EXPECTED_BRANCH="main"
 EXPECTED_UPSTREAM="origin/main"
@@ -56,8 +56,17 @@ git_rpd() {
 }
 
 require_user() {
-    [[ "$(id -un)" == "$EXPECTED_USER" ]] ||
-        die "Run retired-helper as $EXPECTED_USER, without sudo."
+    local current_user
+    local expected_user
+
+    current_user="$(id -un)"
+    for expected_user in "${EXPECTED_USERS[@]}"; do
+        if [[ "$current_user" == "$expected_user" ]]; then
+            return 0
+        fi
+    done
+
+    die "Run retired-helper as one of: ${EXPECTED_USERS[*]}, without sudo."
 }
 
 require_repo() {
