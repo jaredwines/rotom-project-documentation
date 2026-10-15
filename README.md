@@ -39,7 +39,7 @@ Available Sources defines the legacy documentation membership boundary. Reposito
 - Use the current legacy documentation documents for operational reference; do not use older change-log entries as instructions to recreate prior state.
 - Use the guarded `retired-helper` helper for normal repository operations. `retired-helper path` resolves the active checkout.
 - Run the repository's offline `support/tooling/retired-helper lint` validation before synchronization checks. After the matching helper version is installed, `retired-helper lint` is equivalent.
-- Run `bash support/tooling/test-runbooks` to validate the three pilot runbooks against the final template's required safety structure.
+- From any directory, run `bash "$(retired-helper path)/support/tooling/test-runbooks"` to validate the three pilot runbooks against the final template's required safety structure.
 - Read the [contribution guide](support/CONTRIBUTING.md) before preparing a change.
 
 ## Pilot runbooks
