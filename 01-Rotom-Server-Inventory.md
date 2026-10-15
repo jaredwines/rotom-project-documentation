@@ -53,6 +53,14 @@ This audit confirms that the newest dated overlays at the start of this section 
 
 ## 2. Current Rotom Summary
 
+### Shared Docker-network retirement and recovery — 2026-10-15
+
+At Jared's direction, all existing Docker container objects were deleted and the intended deployed stacks were recreated; the intentionally undeployed Jared Wines site remains absent. All 22 expected container objects were then running. The former external bridges `rotom-proxy`, `rotom-arr`, and `rotom-monitoring` were removed from every active Compose definition and deleted from Docker after their consumers were recreated. Active workloads now use their private project bridges or documented host networking/listeners; no active shared external Docker network remains.
+
+NPM remains host-networked and continues to proxy through the documented host or loopback listeners. Prowlarr's Radarr/Sonarr integration and Radarr/Sonarr's qBittorrentVPN download-client settings use `192.168.1.69` host addresses rather than Docker service names. Glances is now loopback-only at `127.0.0.1:61208`; Homepage uses its existing `host.docker.internal` mapping to reach that API. Post-change verification found 18 Docker networks, one named volume, all 22 containers running, qBittorrentVPN `wg0` present, and expected local HTTP responses. The older shared-bridge records remain historical evidence.
+
+The root-only pre-change archives `/root/rotom-proxy-compose-pre-removal-20261015-012109.tar.gz`, `/root/rotom-arr-compose-pre-removal-20261015-013309.tar.gz`, and `/root/rotom-monitoring-pre-removal-20261015-013632.tar.gz` remain available for rollback; their retention is **Needs Verification**. `/srv/rotom/stacks/RUNTIME-POLICY.md`, referenced by earlier legacy documentation material, was absent during this work; no replacement was created.
+
 ### Read-only legacy documentation consistency reconciliation — 2026-10-15
 
 Read-only guest inspection found 22 Docker container objects, all running; both Palworld containers were healthy with their documented UDP publications. A follow-up found both use Compose restart policy `unless-stopped` and started at 2026-10-14 12:24 PDT while Docker had remained continuously active since the prior day's boot. The system journal records their container scopes starting thirty seconds after an operator-run `docker system prune -a --volumes`, but it records no explicit container-start command; temporal proximity does not establish causation or deployment intent. This supersedes the 2026-10-14 observation that they were intentionally stopped, while the reason and desired persistence remain **Needs Verification**. Docker reported one named volume, seventeen networks, Engine `29.9.0`, Compose `v5.6.0`, zero restart counts, and no failed systemd units. The active stack tree contains nineteen Compose files: two Game Servers, two Hosted Websites, seven Libraries, six Platform, and two Smart Home.

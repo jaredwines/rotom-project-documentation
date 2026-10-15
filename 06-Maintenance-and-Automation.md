@@ -21,6 +21,12 @@ Record substantive changes to this document in the change log as part of the sam
 
 ## 1. Purpose and Scope
 
+### Current Docker network recovery posture — 2026-10-15
+
+No active Rotom Compose deployment depends on an external shared Docker bridge. The former `rotom-proxy`, `rotom-arr`, and `rotom-monitoring` networks were removed after their consumers were migrated to documented host/loopback paths and verified. Consequently, a future container-recreation procedure does not need to bootstrap those networks; each deployed stack can create and use its private Compose network or its documented host-network/host-port path. Glances remains loopback-only at `127.0.0.1:61208`, and Homepage accesses it through the existing `host.docker.internal` gateway mapping.
+
+The older `/srv/rotom/stacks/RUNTIME-POLICY.md` reference was checked during this work and the file was absent. No replacement policy file or automation was created; treat the older reference as **Needs Verification** rather than an available operational procedure.
+
 ### Current PVE maintenance and risk audit — 2026-10-14
 
 PVE reported zero currently failed units. `pve-cluster`, `pvedaemon`, `pveproxy`, the CPU-temperature API, backup-status API, PVE Restic Backup timer, and weekly maintenance timer were enabled/active as applicable. The weekly maintenance job last succeeded on 2026-10-11. A later 2026-10-14 simulation proposed six upgrades—`curl`, both installed libcurl variants, `libpve-storage-perl 9.1.13`, `qemu-server 9.2.11`, and the `proxmox-kernel-7.0` metapackage—plus new signed kernel `7.0.14-23`, with no removals or held packages. Apply it only through the normal reviewed maintenance workflow and plan a reboot to activate the new kernel.

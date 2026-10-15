@@ -21,6 +21,20 @@
 # semantics maintained in documents 02, 04, 05, 06, and 07.
 #
 # CURRENT TOPOLOGY — RECONCILED THROUGH 2026-10-15
+# 2026-10-15 Docker shared-network retirement overlay:
+# - All intended deployed container objects were recreated after the existing objects were
+#   deleted; Jared Wines remains intentionally undeployed. Docker then had 22 running
+#   container objects, one named volume, and 18 networks.
+# - The former external `rotom-proxy`, `rotom-arr`, and `rotom-monitoring` bridges are
+#   absent from active Compose definitions and Docker. Workloads now use private
+#   Compose-created bridges, host networking, or documented host/loopback listeners.
+# - Glances now publishes only `127.0.0.1:61208`; Homepage reaches it using its existing
+#   `host.docker.internal` gateway mapping. No Glances listener is exposed to the LAN.
+# - Root-only pre-change archives remain at
+#   `/root/rotom-proxy-compose-pre-removal-20261015-012109.tar.gz`,
+#   `/root/rotom-arr-compose-pre-removal-20261015-013309.tar.gz`, and
+#   `/root/rotom-monitoring-pre-removal-20261015-013632.tar.gz`; retention is NEEDS
+#   VERIFICATION. The older `/srv/rotom/stacks/RUNTIME-POLICY.md` reference was absent.
 # 2026-10-15 read-only consistency overlay:
 # - Docker has 22 container objects, all running, one named volume, seventeen networks,
 #   and zero restart counts. Both Palworld containers are healthy with `unless-stopped`.

@@ -70,6 +70,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-15 — Retire Rotom shared Docker networks
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** At Jared's direction, removed the active Compose references to the external `rotom-proxy`, `rotom-arr`, and `rotom-monitoring` bridges, recreated the affected workloads, and removed each now-unused Docker network. NPM remains host-networked and continues to use documented host/loopback upstreams. Prowlarr, Radarr, Sonarr, and qBittorrentVPN retain their existing `192.168.1.69` control targets. Glances now publishes only `127.0.0.1:61208`; Homepage reaches it through its existing `host.docker.internal` gateway mapping. Root-only pre-change Compose/configuration archives were retained at `/root/rotom-{proxy,arr,monitoring}-*-20261015-*.tar.gz` for rollback.
+- **Evidence:** All 19 active Compose definitions rendered successfully. Docker reported all 22 expected container objects running; Homepage, Arcane, Paperless, RomM database, and both Palworld containers were healthy. Local checks returned the expected responses for Aloha, qBittorrent, Radarr, Sonarr, Prowlarr, RomM, Rotom Docs, Jellyfin, Paperless, Homepage, and Glances. qBittorrentVPN retained `wg0`. Homepage successfully fetched Glances through `http://host.docker.internal:61208/api/4/status`; no active Compose definition or running network referenced the three retired names.
+- **Outstanding:** `/srv/rotom/stacks/RUNTIME-POLICY.md`, referenced by older documentation, was absent during this work; no replacement was created. Retention of the three root-only rollback archives requires a separate decision. Available Sources replacement remains manual by Jared.
+
 ## 2026-10-15 — Improve legacy documentation navigation and maintenance guidance
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`, `README.md`, `support/CONTRIBUTING.md`, `support/tooling/retired-helper`.

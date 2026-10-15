@@ -21,6 +21,12 @@ Record substantive changes to this document in the change log as part of the sam
 
 ## 1. Purpose and Scope
 
+### Current Docker-network and Glances-access state — 2026-10-15
+
+The former external Docker bridges `rotom-proxy`, `rotom-arr`, and `rotom-monitoring` are retired: active Compose definitions no longer declare them, no running container attaches to them, and Docker no longer lists them. NPM remains host-networked and all retained NPM routes continue to use their documented host or loopback upstream listeners.
+
+Prowlarr's Radarr/Sonarr integrations use `http://192.168.1.69:7878` and `http://192.168.1.69:8989`; Radarr and Sonarr each use qBittorrentVPN at `192.168.1.69:8080`. Glances now publishes only `127.0.0.1:61208`; it is not LAN-published. Homepage retains `host.docker.internal:host-gateway` and its Glances widgets use `http://host.docker.internal:61208`, which passed a container-to-loopback API check. Historical bridge/subnet assignments below are not current reconstruction instructions.
+
 ### Current PVE network and exposure audit — 2026-10-14
 
 PVE uses `nic0` as the physical Intel I219-V interface and `vmbr0` at `192.168.1.68/24` with gateway `192.168.1.1`; VM 100 attaches through `tap100i0` without a configured VLAN tag or bridge VLAN filtering. The physical link negotiated 1 Gbit/s full duplex, Wake-on-LAN mode `g` is enabled, and the documented TSO/GSO-off mitigation remains effective. PVE reached Rotom (`192.168.1.69`) and the UNAS (`192.168.1.70`) without packet loss during the audit.
