@@ -66,12 +66,18 @@ This document records the current Phase B storage architecture and preserves the
 **Project:** Rotom-Home-Server  
 **Document:** `04-NAS-and-Storage.md`  
 **Baseline evidence:** 2026-09-14 22:46 PDT; read-only update 2026-09-15  
-**Documentation updated:** 2026-10-14 — Complete legacy documentation editorial and consistency audit  
+**Documentation updated:** 2026-10-15 — Record the Libraries automount recovery-posture finding
 **Status:** The former ten-automount count is historical. The 2026-10-13 local fstab/final-removal verification establishes five current guest NFS automount contracts: Game Servers, Smart Home, Rotom Restic Backup, Libraries, and Hosted Websites. Guest `Rotom_Restic_Backup` remains documented as unchanged. PVE backup exports remain `PVE_Restic_Backup` for host-config Restic and `Rotom_VM_Backup` for whole-VM VZDump at their canonical PVE paths.
 
 The original audit was read-only. It did not recursively enumerate the NAS, modify mounts or permissions, restart containers, inspect secrets, traverse Restic repository internals, or create a hardlink test file. Later user-supplied checks, completed media GID changes, and the 2026-09-18 backup-share access-protection deployment are recorded below; they are separate from that audit. Unchanged capacity, mount, and systemd observations retain their original evidence dates.
 
 ## 2. Current Storage and Recovery Policy
+
+### Current Libraries automount recovery posture — 2026-10-15
+
+Read-only validation for the pilot NAS runbook found `/mnt/nas-libraries` actively mounted read/write as NFSv3 from the exact documented `Libraries/.data` source, with all current consumers running. Its generated `mnt-nas\x2dlibraries.mount` unit is active. However, `mnt-nas\x2dlibraries.automount` remains inactive with the boot-time result `mount-start-limit-hit`; the journal shows repeated Docker-triggered attempts failed with `Network is unreachable` before the installed recovery helper directly mounted the NFS filesystem and recovered eligible containers. The Game Servers, Smart Home, Rotom Restic Backup, and Hosted Websites automount units are active.
+
+This does not make the current Libraries filesystem unavailable, but it leaves its on-demand recovery posture degraded if the active NFS mount later disappears. No unit was reset, restarted, unmounted, or otherwise changed during documentation validation. A separately authorized targeted reset/start should restore and verify the automount without unmounting the working filesystem; stop if systemd cannot do so without disrupting current consumers.
 
 The Rotom guest storage contract is five NFS systemd automounts: Game Servers, Smart Home, Rotom Restic Backup, Libraries, and Hosted Websites. The guest Shared Drive contract was retired on 2026-10-13; its NAS data, including the JAR-25 recovery image, was not changed. JAR-86 retired the final bindfs compatibility view, JAR-88 replaced the active Game mount with Gameserver, and the unused Customapps guest contract was retired on 2026-10-12. PVE has only backup-specific NAS mounts and does not host the guest application shares.
 

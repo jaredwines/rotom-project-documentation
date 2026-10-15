@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Record post-cleanup Docker and Arcane automation audit
+**Documentation updated:** 2026-10-15 — Prepare the pilot runbook layer
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -462,6 +462,20 @@ Available Sources determines the complete legacy documentation set membership. T
 ### Current membership
 
 The current Project-backed Available Sources set is exactly the nine-file Core Numbered Reference Set (`00`–`08`) listed above. There are no additional current non-numbered legacy documentation set files. Future files intentionally added to Available Sources become legacy documentation set automatically, regardless of file type or extension; files removed from Available Sources cease to be current members without erasing their historical change-log references.
+
+### Staged pilot runbook layer — pending Available Sources addition
+
+The repository now contains a task-oriented pilot layer under `runbooks/`, but these files are **not yet current legacy documentation members** because Available Sources remains the membership boundary. Jared must manually add all five files together before this section can be promoted into the current source map. Rotom Docs also remains a controlled nine-file build until its publisher input is separately updated and verified.
+
+| Task | Staged repository source |
+|---|---|
+| Runbook task index and safety model | [runbooks/README.md](runbooks/README.md) |
+| Final runbook authoring template | [runbooks/RUNBOOK-TEMPLATE.md](runbooks/RUNBOOK-TEMPLATE.md) |
+| Diagnose or recover a Docker-backed website | [runbooks/Docker-Website-Recovery.md](runbooks/Docker-Website-Recovery.md) |
+| Diagnose or recover a current Rotom NAS mount | [runbooks/NAS-Mount-Recovery.md](runbooks/NAS-Mount-Recovery.md) |
+| Run, verify, or troubleshoot Rotom Restic Backup | [runbooks/Rotom-Restic-Backup.md](runbooks/Rotom-Restic-Backup.md) |
+
+The pilots leave documents `02`–`07` authoritative for current facts. They add procedures, explicit authorization boundaries, read-only preflight, stop conditions, observable verification, rollback/recovery guidance, and evidence requirements without reorganizing the existing reference set or extracting history.
 
 The Mac checkout is recorded at `/Users/jared/Documents/ChatGPT/rotom-runbook`; the Rotom checkout is verified by `retired-helper path` at `/home/jared/documentation/rotom-runbook`. Both use origin `git@github.com:jaredwines/rotom-runbook.git`, branch `main`, and upstream `origin/main`. Historical verification at the former Mac `/Users/jared/Documents/ChatGPT/Rotom-Home-Server`, Rotom `/home/infra/documentation/retired-helper`, and retired Rotom Platform checkout remains dated evidence only. Repository support metadata includes `.gitignore`, root `AGENTS.md` and `README.md`, plus `support/CONTRIBUTING.md` and `support/tooling/retired-helper`; none is part of legacy documentation set unless intentionally added to Available Sources. Root `README.md` provides repository navigation and safety context; the contribution guide supplies concise contribution expectations while deferring legacy documentation maintenance authority to document 00. Rotom and Mac `/usr/local/bin/retired-helper` are now verified equivalent to the canonical `support/tooling/retired-helper`, including offline `lint` and automatic linting from `check`. All forms resolve the expected checkout from the active Git working tree or from `~/.config/retired-helper/repository`; `retired-helper path` exposes the result. The per-machine fallback is recorded as `/Users/jared/Documents/ChatGPT/rotom-runbook` on Mac and verified as `/home/jared/documentation/rotom-runbook` on Rotom. Mac global `~/.codex/AGENTS.md` contains only the editor preference. Rotom `/home/jared/.codex/AGENTS.md` remains the Jared-global machine entry point, contains Rotom live-state/safety guidance, and points to `retired-helper path`, the repository `AGENTS.md`, and document 00. Fresh read-only Codex sessions on both systems verified the intended discovery hierarchy. Under the adopted execution policy, Codex resolves its checkout with `retired-helper path` and uses guarded `retired-helper commit`, `retired-helper check`, and `retired-helper push` only when legacy documentation maintenance is authorized; ChatGPT on Mac remains a replacement-file/ZIP delivery path and does not publish Git changes itself. The older 2026-09-19 statement that top-level `/home/infra/documentation/AGENTS.md` and `README.md` were present remains historical; those legacy top-level files were not re-inspected during this integration task, so their present state remains unverified.
 

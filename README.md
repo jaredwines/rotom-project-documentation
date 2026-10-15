@@ -41,6 +41,17 @@ Available Sources defines the legacy documentation membership boundary. Reposito
 - Run the repository's offline `support/tooling/retired-helper lint` validation before synchronization checks. After the matching helper version is installed, `retired-helper lint` is equivalent.
 - Read the [contribution guide](support/CONTRIBUTING.md) before preparing a change.
 
+## Pilot runbooks
+
+The repository contains a staged task-oriented runbook layer under [runbooks/](runbooks/README.md):
+
+- [final runbook template](runbooks/RUNBOOK-TEMPLATE.md);
+- [Docker-backed website diagnosis and recovery](runbooks/Docker-Website-Recovery.md);
+- [NAS mount diagnosis and recovery](runbooks/NAS-Mount-Recovery.md);
+- [Rotom Restic Backup execution and verification](runbooks/Rotom-Restic-Backup.md).
+
+These files are prepared repository sources but do not become current legacy documentation set until Jared manually adds them to Available Sources. Rotom Docs requires a separate publisher/source-list update before it can publish them. Until both steps are complete, the nine-file Core Numbered Reference Set remains the complete current legacy documentation.
+
 ## Safety
 
 Never commit passwords, tokens, private keys, VPN credentials, cookies, Home Assistant secrets, Restic passwords, or other authentication material. Do not publish or share repository contents without reviewing them for sensitive operational, personal, or infrastructure information.

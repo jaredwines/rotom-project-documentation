@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-15 — Synchronize the installed legacy documentation validation helpers
+**Documentation updated:** 2026-10-15 — Prepare the runbook template and three operational pilots
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -69,6 +69,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-15 — Prepare the runbook template and three operational pilots
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `README.md`, `support/CONTRIBUTING.md`, `runbooks/README.md`, `runbooks/RUNBOOK-TEMPLATE.md`, `runbooks/Docker-Website-Recovery.md`, `runbooks/NAS-Mount-Recovery.md`, `runbooks/Rotom-Restic-Backup.md`.
+- **Status:** **Documentation only / Verified / Needs Verification.** No Docker object, Compose definition, service, timer, mount, backup, Restic repository, NAS data, proxy route, network, account, permission, application data, or other live configuration was changed. The runbook files are prepared repository sources and do not become current legacy documentation members until Jared manually adds them to Available Sources.
+- **Changes:** Established the final task-oriented runbook template, safety labels, stop-condition model, evidence standard, and task index. Added three pilot runbooks for Docker-backed website diagnosis/recovery, current Rotom NAS-mount recovery, and Rotom Restic Backup execution/verification. Preserved documents `00`–`08` as the canonical current-state reference set and linked each pilot to its fact owners. Added explicit guards for Jared Wines' unresolved deployment intent, shared NPM blast radius, exact-source NFS recovery, eligible-container-only NAS recovery, concurrent Restic work, protected credentials, repository locks, retention/prune behavior, and the distinction between snapshot creation and restore assurance.
+- **Evidence:** Began from a clean `main` checkout matching the cached upstream. Read-only live inspection confirmed 23 running containers and 19 Compose projects; Aloha's `7778:80` listener, read-only content bind, and direct/local-SNI/public `200` responses; Jared Wines running without a published port; host-networked NPM; the five current NFS automount contracts and exact sources; active NFSv3 Libraries and Rotom Restic Backup mounts; the enabled/active `rotom-nas-docker-recovery.service` and its exact Libraries directory/container gates; and the enabled/active `rotom-restic-backup.timer`, successful latest service result, current launcher/worker, repository mount, schedule, installed retention/prune commands, and latest three `rotom` automatic snapshots. Command validation corrected the generated systemd unit spelling to `mnt-nas\x2dlibraries.*`. It also found that the Libraries NFS filesystem is active and all consumers are running, but its automount unit remains inactive with historical boot result `mount-start-limit-hit`; the other four automounts are active. The recovery-changing branches were reviewed against live definitions but were not deliberately exercised by causing an outage, resetting that unit, or starting an extra backup.
+- **Outstanding:** Jared must manually add the five `runbooks/` files to Available Sources before they become current legacy documentation. Rotom Docs still builds the controlled nine-file source and requires a separately authorized publisher/allowlist update before it can publish the new layer. After membership and publishing are coordinated, update document 01's current source map and replace the staged-runbook labels. The active-but-degraded Libraries automount posture needs a separately authorized targeted reset/start and verification; do not unmount the working NFS filesystem merely to clear it. A future controlled exercise should validate the state-changing recovery branches without manufacturing risk to production data.
 
 ## 2026-10-15 — Synchronize the installed legacy documentation validation helpers
 

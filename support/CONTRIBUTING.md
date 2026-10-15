@@ -19,18 +19,9 @@ This repository records verified Rotom state. Before preparing a change, read th
 
 ### Procedural section structure
 
-Use the following order where it applies; omit a heading only when it would add no useful information:
+Use [the final runbook template](../runbooks/RUNBOOK-TEMPLATE.md) for task-oriented operational procedures. Its required design is: observable outcome; precise entry and exclusion conditions; impact and authorization; canonical current-state inputs; read-only preflight; explicit stop conditions; the smallest targeted procedure; observable verification; rollback or safe-stop recovery; troubleshooting branches; evidence requirements; related documentation; and revalidation triggers.
 
-1. Purpose
-2. Scope
-3. Prerequisites
-4. Current architecture or ownership
-5. Procedure
-6. Verification
-7. Rollback or recovery
-8. Troubleshooting
-9. Related documentation
-10. Last verified date or maintenance notes
+Command blocks must identify whether they are read-only, change Rotom, require Jared on PVE, are destructive and require explicit approval, or access credential-sensitive paths. A procedure must not make the reader infer desired state, authority, success criteria, or what to do when live state differs.
 
 Keep current-state facts in their canonical subject document. Link to those facts from procedures instead of copying commands, paths, identities, schedules, or configuration details into multiple files. Separate proposed work and historical evidence from supported current procedure.
 
