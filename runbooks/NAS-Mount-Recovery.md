@@ -1,11 +1,11 @@
 # Runbook: Diagnose and Recover a Rotom NAS Mount
 
 **Document role:** Operational pilot runbook  
-**Status:** Verified for diagnosis, controlled automount repair, and current recovery-helper behavior
+**Status:** Verified for diagnosis, controlled automount repair, and full reboot recovery-helper behavior
 **Applies to:** The five current NFS systemd-automount contracts on the Rotom VM  
 **Risk:** Read-only diagnosis; moderate targeted mount and eligible-container recovery  
 **Authorization:** Diagnosis is read-only. Starting an existing configured mount and running the installed targeted recovery helper change live Rotom state. Editing `fstab`, changing NAS exports/permissions, unmounting live storage, or modifying data requires separate scope.  
-**Last live verification:** 2026-10-15 — current fstab contracts, active NFSv3 mounts, systemd unit, and installed helper inspected  
+**Last live verification:** 2026-10-15 — full VM reboot; retrying helper restored Libraries automount and covered services
 **Canonical references:** [04-NAS-and-Storage.md](../04-NAS-and-Storage.md), [02-Docker-Services.md](../02-Docker-Services.md), [06-Maintenance-and-Automation.md](../06-Maintenance-and-Automation.md), [07-Users-and-Permissions.md](../07-Users-and-Permissions.md)  
 **Maintenance contract:** [00-Rotom-Change-Log.md](../00-Rotom-Change-Log.md)
 
@@ -47,7 +47,7 @@ The installed `rotom-nas-docker-recovery.service` validates only `/mnt/nas-libra
 
 All five are NFS systemd automount contracts from NAS `192.168.1.70`. Exact export paths and ownership remain canonical in document 04 and live `findmnt --fstab` output.
 
-At the initial 2026-10-15 validation point, the Libraries NFS filesystem was active and healthy but `mnt-nas\x2dlibraries.automount` was inactive with boot result `mount-start-limit-hit`. A controlled repair then restored both unit layers, confirmed the exact source, restarted the seven dependent containers, and verified their services. Treat an active mount with a failed automount as working storage with degraded future recovery posture, not as full success.
+At the initial 2026-10-15 validation point, the Libraries NFS filesystem was active and healthy but `mnt-nas\x2dlibraries.automount` was inactive with boot result `mount-start-limit-hit`. A controlled repair restored both unit layers, confirmed the exact source, restarted the seven dependent containers, and verified their services. A same-day full reboot then proved the hardened recovery path: early Docker and first-helper attempts briefly failed before NAS reachability, while the helper's configured retry about 30 seconds later re-armed the automount, mounted the exact source, recovered eligible services, and completed successfully. Both generated Libraries units remained active and no systemd units were failed. An active mount with an inactive or failed automount is still degraded and requires targeted recovery.
 
 ## 5. Read-only preflight
 

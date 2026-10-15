@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Restore Libraries automount and harden NAS recovery
+**Documentation updated:** 2026-10-15 — Verify Libraries automount recovery through a full reboot
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -79,7 +79,7 @@ During boot, repeated Docker-triggered Libraries mount attempts failed with `Net
 
 On 2026-10-15, a controlled maintenance window stopped only the seven current Libraries bind consumers, cleanly stopped the active mount, reset the generated units, re-armed the automount, and triggered the configured NFS mount by read-only directory checks. `mnt-nas\x2dlibraries.automount` and `mnt-nas\x2dlibraries.mount` both now report `active`; `findmnt` confirms the exact documented `Libraries/.data` source mounted read/write. The seven containers returned running with zero restart counts, and all relevant application, VPN, and NPM checks passed. No export, NAS permission, NAS data, Compose definition, or backup state changed.
 
-The recovery helper now resets failed generated mount/automount units, arms the automount before starting an inactive mount, confirms the exact NFS filesystem, and fails closed if the automount is not active after recovery. Its eligible-container filter remains unchanged. A root-only pre-change helper is retained at `/root/rotom-nas-docker-recovery.pre-automount-20261015-113500`; a future controlled reboot remains required to prove the hardened boot sequence end to end.
+The recovery helper now resets failed generated mount/automount units, arms the automount before starting an inactive mount, confirms the exact NFS filesystem, and fails closed if the automount is not active after recovery. Its eligible-container filter remains unchanged. A full VM reboot on 2026-10-15 proved the hardened path: Docker's early attempts still encountered `Network is unreachable` before NAS reachability, and the helper's first run consequently retried once; its approximately 30-second retry re-armed the automount, mounted the exact Libraries export, recovered eligible services, and completed successfully. Both generated Libraries units remained active afterward, with zero failed systemd units. A root-only pre-change helper remains at `/root/rotom-nas-docker-recovery.pre-automount-20261015-113500` pending an explicit retention decision.
 
 The Rotom guest storage contract is five NFS systemd automounts: Game Servers, Smart Home, Rotom Restic Backup, Libraries, and Hosted Websites. The guest Shared Drive contract was retired on 2026-10-13; its NAS data, including the JAR-25 recovery image, was not changed. JAR-86 retired the final bindfs compatibility view, JAR-88 replaced the active Game mount with Gameserver, and the unused Customapps guest contract was retired on 2026-10-12. PVE has only backup-specific NAS mounts and does not host the guest application shares.
 

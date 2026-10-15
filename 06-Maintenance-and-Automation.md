@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload evidence through 2026-09-25; Phase B host/VM foundation plus live automation refresh verified 2026-09-27  
-**Documentation updated:** 2026-10-15 — Record post-cleanup Docker and Arcane automation audit
+**Documentation updated:** 2026-10-15 — Verify Libraries automount recovery through a full reboot
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -25,7 +25,7 @@ Record substantive changes to this document in the change log as part of the sam
 
 The current `rotom-nas-docker-recovery` helper now protects the Libraries automount as well as the NFS mount. If `/mnt/nas-libraries` is inactive, it resets failed `mnt-nas\x2dlibraries.mount` and `.automount` units, starts the automount, starts the configured mount, verifies that the target is active NFS, and fails closed if the automount does not remain active. It then retains its existing narrow recovery behavior: only stopped covered containers with `unless-stopped`/`always` policy and a recorded NAS/mount startup failure are considered; running, intentionally stopped, absent, and unrelated containers remain untouched.
 
-This replaced the earlier helper behavior that started only the mount unit, which could leave a working NFS filesystem without an armed automount after boot-time start-limit failure. A controlled repair restored both unit layers and verified the active Libraries NFS source, all covered containers, qBittorrentVPN `wg0`, NPM/Aloha, Paperless health, and zero failed systemd units. The root-only pre-change script is `/root/rotom-nas-docker-recovery.pre-automount-20261015-113500`; retain it until a controlled reboot proves the hardened boot sequence.
+This replaced the earlier helper behavior that started only the mount unit, which could leave a working NFS filesystem without an armed automount after boot-time start-limit failure. A controlled repair restored both unit layers and verified the active Libraries NFS source, all covered containers, qBittorrentVPN `wg0`, NPM/Aloha, Paperless health, and zero failed systemd units. Full reboot acceptance on 2026-10-15 then proved the retry path: Docker's first mount attempts and the helper's first pass occurred before NAS reachability, but the helper's configured retry ran about 30 seconds later, re-armed the automount, mounted the exact NFS source, recovered the eligible services, and ended successfully. Both Libraries units were active afterward and `systemctl --failed` was empty. The root-only pre-change script is `/root/rotom-nas-docker-recovery.pre-automount-20261015-113500`; retain or remove it only by an explicit retention decision.
 
 ### Current Arcane automation drift — 2026-10-15
 

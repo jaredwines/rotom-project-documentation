@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-15 — Prepare the runbook template and three operational pilots
+**Documentation updated:** 2026-10-15 — Verify Libraries automount recovery through a full reboot
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -70,13 +70,21 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-15 — Verify Libraries automount recovery through a full reboot
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `runbooks/NAS-Mount-Recovery.md`.
+- **Status:** **Verified.** Documentation records the final reboot acceptance of the previously implemented Libraries automount recovery; no further live configuration changed during this verification.
+- **Changes:** Replaced the provisional reboot-validation requirement with the observed boot behavior. At boot, Docker initially triggered the Libraries mount before the NAS was reachable, producing brief `Network is unreachable` failures and `mount-start-limit-hit`. The enabled recovery service made its configured retry about 30 seconds later, reset and armed the generated automount, mounted the documented Libraries export, and recovered the covered services.
+- **Evidence:** The VM booted at `2026-10-15 11:39:51 PDT`. `mnt-nas\\x2dlibraries.automount` became active at `11:40:00`; after the retry, `mnt-nas\\x2dlibraries.mount` became active at `11:40:33`; and `rotom-nas-docker-recovery.service` completed successfully at `11:40:48`. Final checks confirmed the exact read/write Libraries NFSv3 source, all 23 containers running, healthy Paperless/RomM/Arcane/Homepage/Palworld checks where defined, qBittorrentVPN `wg0` at `10.2.0.2/32`, expected service HTTP responses, zero covered-container restarts, and zero failed systemd units.
+- **Outstanding:** The root-only pre-change helper remains an available rollback artifact at `/root/rotom-nas-docker-recovery.pre-automount-20261015-113500`; retain or remove it only under a separately authorized rollback-retention decision. Available Sources replacement remains manual by Jared.
+
 ## 2026-10-15 — Restore Libraries automount and harden NAS recovery
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `runbooks/NAS-Mount-Recovery.md`.
 - **Status:** **Implemented / Verified.** The repair changed only the Libraries NFS mount lifecycle, its seven dependent container runtime states, and the root-owned recovery helper. No Compose definition, NAS export, NAS ownership/ACL, application data, backup, repository, network, or credential was changed.
 - **Changes:** During a short controlled maintenance window, stopped only `qbittorrentvpn`, `radarr`, `sonarr`, `jellyfin`, `romm`, `paperless`, and `nginx-proxy-manager`; cleanly stopped the active direct Libraries NFS mount; reset the generated mount/automount failure state; re-armed `mnt-nas\\x2dlibraries.automount`; triggered the configured mount through the required `library/` and `paperless/` paths; and restarted the seven containers. Hardened `/usr/local/sbin/rotom-nas-docker-recovery` so, when its target NFS mount is inactive, it resets both generated units, arms the automount before starting the mount, verifies the exact NFS filesystem, and fails closed if the automount is not active. The helper's existing eligible-container-only recovery behavior is unchanged. A root-only mode-`0750` pre-change helper is retained at `/root/rotom-nas-docker-recovery.pre-automount-20261015-113500` for rollback.
 - **Evidence:** Before repair, the Libraries mount was active from the documented `Libraries/.data` NFSv3 export while its automount was inactive with historical `mount-start-limit-hit`; journal evidence showed repeated Docker-triggered boot attempts before NAS reachability. The seven listed containers were the exact current consumers of Libraries binds and stopped cleanly with exit `0`. The re-armed mount and automount both reported `active`; `findmnt` confirmed the exact documented source read/write; the helper syntax check and installed-versus-reviewed comparison passed; a live helper restart completed successfully and left every covered container running. Final verification found qBittorrentVPN `wg0` at `10.2.0.2/32`, expected local responses from qBittorrent, Radarr, Sonarr, Jellyfin, RomM, Paperless, and NPM/Aloha, Paperless health `healthy`, zero container restarts, and zero failed systemd units.
-- **Outstanding:** A future controlled reboot is needed to prove the new boot-time recovery behavior end to end. Retain the root-only rollback copy until that verification and an explicit retention decision. Available Sources replacement remains manual by Jared.
+- **Outstanding:** Superseded by the successful same-day full-reboot verification recorded above. Retain the root-only rollback copy until an explicit retention decision. Available Sources replacement remains manual by Jared.
 
 ## 2026-10-15 — Prepare the runbook template and three operational pilots
 
