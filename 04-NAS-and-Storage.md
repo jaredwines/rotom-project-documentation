@@ -4,7 +4,7 @@
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts  
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Improve navigation and safe-use guidance
+**Documentation updated:** 2026-10-15 — Restore Libraries automount and harden NAS recovery
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -75,9 +75,11 @@ The original audit was read-only. It did not recursively enumerate the NAS, modi
 
 ### Current Libraries automount recovery posture — 2026-10-15
 
-Read-only validation for the pilot NAS runbook found `/mnt/nas-libraries` actively mounted read/write as NFSv3 from the exact documented `Libraries/.data` source, with all current consumers running. Its generated `mnt-nas\x2dlibraries.mount` unit is active. However, `mnt-nas\x2dlibraries.automount` remains inactive with the boot-time result `mount-start-limit-hit`; the journal shows repeated Docker-triggered attempts failed with `Network is unreachable` before the installed recovery helper directly mounted the NFS filesystem and recovered eligible containers. The Game Servers, Smart Home, Rotom Restic Backup, and Hosted Websites automount units are active.
+During boot, repeated Docker-triggered Libraries mount attempts failed with `Network is unreachable` before NAS reachability and left `mnt-nas\x2dlibraries.automount` inactive with `mount-start-limit-hit`. The installed helper subsequently mounted the exact Libraries NFSv3 export directly and recovered eligible stopped containers, leaving the filesystem usable but its automount layer degraded.
 
-This does not make the current Libraries filesystem unavailable, but it leaves its on-demand recovery posture degraded if the active NFS mount later disappears. No unit was reset, restarted, unmounted, or otherwise changed during documentation validation. A separately authorized targeted reset/start should restore and verify the automount without unmounting the working filesystem; stop if systemd cannot do so without disrupting current consumers.
+On 2026-10-15, a controlled maintenance window stopped only the seven current Libraries bind consumers, cleanly stopped the active mount, reset the generated units, re-armed the automount, and triggered the configured NFS mount by read-only directory checks. `mnt-nas\x2dlibraries.automount` and `mnt-nas\x2dlibraries.mount` both now report `active`; `findmnt` confirms the exact documented `Libraries/.data` source mounted read/write. The seven containers returned running with zero restart counts, and all relevant application, VPN, and NPM checks passed. No export, NAS permission, NAS data, Compose definition, or backup state changed.
+
+The recovery helper now resets failed generated mount/automount units, arms the automount before starting an inactive mount, confirms the exact NFS filesystem, and fails closed if the automount is not active after recovery. Its eligible-container filter remains unchanged. A root-only pre-change helper is retained at `/root/rotom-nas-docker-recovery.pre-automount-20261015-113500`; a future controlled reboot remains required to prove the hardened boot sequence end to end.
 
 The Rotom guest storage contract is five NFS systemd automounts: Game Servers, Smart Home, Rotom Restic Backup, Libraries, and Hosted Websites. The guest Shared Drive contract was retired on 2026-10-13; its NAS data, including the JAR-25 recovery image, was not changed. JAR-86 retired the final bindfs compatibility view, JAR-88 replaced the active Game mount with Gameserver, and the unused Customapps guest contract was retired on 2026-10-12. PVE has only backup-specific NAS mounts and does not host the guest application shares.
 

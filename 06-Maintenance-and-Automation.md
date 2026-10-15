@@ -21,6 +21,12 @@ Record substantive changes to this document in the change log as part of the sam
 
 ## 1. Purpose and Scope
 
+### Current Libraries automount recovery hardening — 2026-10-15
+
+The current `rotom-nas-docker-recovery` helper now protects the Libraries automount as well as the NFS mount. If `/mnt/nas-libraries` is inactive, it resets failed `mnt-nas\x2dlibraries.mount` and `.automount` units, starts the automount, starts the configured mount, verifies that the target is active NFS, and fails closed if the automount does not remain active. It then retains its existing narrow recovery behavior: only stopped covered containers with `unless-stopped`/`always` policy and a recorded NAS/mount startup failure are considered; running, intentionally stopped, absent, and unrelated containers remain untouched.
+
+This replaced the earlier helper behavior that started only the mount unit, which could leave a working NFS filesystem without an armed automount after boot-time start-limit failure. A controlled repair restored both unit layers and verified the active Libraries NFS source, all covered containers, qBittorrentVPN `wg0`, NPM/Aloha, Paperless health, and zero failed systemd units. The root-only pre-change script is `/root/rotom-nas-docker-recovery.pre-automount-20261015-113500`; retain it until a controlled reboot proves the hardened boot sequence.
+
 ### Current Arcane automation drift — 2026-10-15
 
 Read-only inspection of the live Arcane database classifies automatic updates and auto-heal as enabled, scheduled pruning as disabled, and `followProjectSymlinks` as enabled. Arcane activity records show Auto Heal jobs every five minutes and a successful non-dry-run automatic update beginning at 10:40:27 PDT. Docker events align with that activity: Arcane replaced `nginx:alpine`, then stopped, destroyed, recreated, and started `jaredwines.com`. The audit itself issued no mutating Docker or Compose command. This supersedes the earlier same-day statement that automatic updates and auto-heal were disabled.

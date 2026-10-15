@@ -1,7 +1,7 @@
 # Runbook: Diagnose and Recover a Rotom NAS Mount
 
 **Document role:** Operational pilot runbook  
-**Status:** Verified for diagnosis and current recovery-helper behavior; live automount reset/start remains unexercised  
+**Status:** Verified for diagnosis, controlled automount repair, and current recovery-helper behavior
 **Applies to:** The five current NFS systemd-automount contracts on the Rotom VM  
 **Risk:** Read-only diagnosis; moderate targeted mount and eligible-container recovery  
 **Authorization:** Diagnosis is read-only. Starting an existing configured mount and running the installed targeted recovery helper change live Rotom state. Editing `fstab`, changing NAS exports/permissions, unmounting live storage, or modifying data requires separate scope.  
@@ -47,7 +47,7 @@ The installed `rotom-nas-docker-recovery.service` validates only `/mnt/nas-libra
 
 All five are NFS systemd automount contracts from NAS `192.168.1.70`. Exact export paths and ownership remain canonical in document 04 and live `findmnt --fstab` output.
 
-At the 2026-10-15 validation point, the Libraries NFS filesystem was active and healthy but `mnt-nas\x2dlibraries.automount` was inactive with boot result `mount-start-limit-hit`. The other four automount units were active. Treat an active mount with a failed automount as working storage with degraded future recovery posture, not as full success.
+At the initial 2026-10-15 validation point, the Libraries NFS filesystem was active and healthy but `mnt-nas\x2dlibraries.automount` was inactive with boot result `mount-start-limit-hit`. A controlled repair then restored both unit layers, confirmed the exact source, restarted the seven dependent containers, and verified their services. Treat an active mount with a failed automount as working storage with degraded future recovery posture, not as full success.
 
 ## 5. Read-only preflight
 
