@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Record additional Jared-confirmed operational verification
+**Documentation updated:** 2026-10-14 — Clarify active weekly update scheduling
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -370,7 +370,7 @@ A read-only audit after the 02:20 PDT reboot refreshed the then-current Phase B 
 
 JAR-31 compatibility/application restoration and the JAR-33 virtualization baseline are complete. The remaining items are either intentional commissioning decisions or facts that still need current evidence:
 
-- **Intentional / separate from the portable baseline:** Fran is now recreated as a full Rotom/PVE administrator, but SSH-key authentication remains deferred and her historical exact-command guest backup sudoers rule remains absent because full sudo already authorizes the workflow. The reboot-capable weekly updater script is present but its cron schedule is absent; broader JAR-47/off-site failure-domain recovery work remains unfinished even though Rotom Restic Backup, PVE Restic Backup, and Rotom VM Backup schedules are now active. JAR-49 commissioned an optional host-specific Intel iGPU attachment; removal of `hostpci0` returns the independently portable VM baseline.
+- **Intentional / separate from the portable baseline:** Fran is now recreated as a full Rotom/PVE administrator, but SSH-key authentication remains deferred and her historical exact-command guest backup sudoers rule remains absent because full sudo already authorizes the workflow. The reboot-capable weekly updater script is present but its cron schedule is intentionally absent: the active `rotom-weekly-maintenance.timer` already provides Sunday `01:15` ordinary package upgrades without automatic reboot. Broader JAR-47/off-site failure-domain recovery work remains unfinished even though Rotom Restic Backup, PVE Restic Backup, and Rotom VM Backup schedules are now active. JAR-49 commissioned an optional host-specific Intel iGPU attachment; removal of `hostpci0` returns the independently portable VM baseline.
 - **Verified by Jared confirmation — NAS metadata persistence:** service-share root UID/GID/mode persistence was observed after a NAS/UniFi Drive event; detailed `stat`/`findmnt` and NAS export output was not supplied in this chat.
 - **Verified — recurring Rotom Restic Backup and PVE Restic Backup execution:** by 2026-10-14 the guest repository contained 22 snapshots with latest `9494979d`, and the PVE repository contained ten snapshots with latest `b3fd0c23`; both repository checks passed. Jared subsequently confirmed current guest `--read-data` verification and restore rehearsal.
 - **Verified — native PVE VZDump scheduler execution:** the 2026-10-05 archive list contains six `05:00` archives from 2026-09-30 through 2026-10-05, confirming the final-name `rotom-vm-daily` job is producing retained archives. Jared subsequently confirmed current VMA verification or disposable-restore acceptance.

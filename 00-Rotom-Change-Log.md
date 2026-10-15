@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-14 — Standardize backup system display names
+**Documentation updated:** 2026-10-14 — Clarify active weekly update scheduling
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -62,6 +62,10 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-14 — Clarify active weekly update scheduling
+
+- **Documentation only / Verified:** `01-Rotom-Server-Inventory.md` and `06-Maintenance-and-Automation.md` now distinguish the enabled `rotom-weekly-maintenance.timer` from the retired historical reboot-capable cron schedule. Live systemd evidence showed the Rotom timer enabled and active for Sundays at `01:15`, with persistent missed-run behavior; it performs the supported ordinary package-upgrade workflow without automatic reboot. The absent `/etc/cron.d/weekly-linux-update` schedule is intentional and is not required for weekly update coverage.
 
 ## 2026-10-14 — Accept current trusted-LAN exposure policy
 
