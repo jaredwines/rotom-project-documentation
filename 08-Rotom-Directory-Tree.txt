@@ -8,11 +8,20 @@
 # Record substantive tree changes in the change log in the same task,
 # following its maintenance guide. Keep proposed paths separate from observed paths.
 #
-# Documentation revised: 2026-10-14; rename current Restic credential files.
+# Documentation revised: 2026-10-14; retire unused service-home trees and `/opt/containerd`.
 # Baseline: existing project tree plus JAR-31 restoration/reboot, JAR-32 Restic cutover, JAR-66 Proxmox VZDump storage, JAR-33 baseline verification, JAR-67 native Proxmox scheduling, the later 2026-09-27 backup-control/recovery-point refresh, and the verified Proxmox host-config Restic deployment.
 # State rule: CURRENT sections are reconstruction/operations authority; HISTORICAL/PRE-MIGRATION sections preserve dated evidence and may contain retired names/paths; RETIRED means intentionally inactive; PROPOSED is not implemented; NEEDS VERIFICATION is not settled by the legacy documentation.
 #
 # CURRENT TOPOLOGY — RECONCILED THROUGH 2026-10-14
+# 2026-10-14 cleanup overlay: the verified-unused `/home/game-servers`,
+# `/home/hosted-websites`, `/home/libraries`, `/home/platform`, and
+# `/home/smart-home` trees are absent. Their locked service accounts retain
+# configured NSS home fields, while active Compose, state, and protected-input roots
+# remain under `/srv/rotom`. Pre-removal checks found no nested mounts, open users,
+# or Docker bind mounts; system and listed-container health remained good afterward.
+# The unused 12 KiB `/opt/containerd` directory (empty `bin/` and `lib/`
+# subdirectories) is absent. Active containerd uses `/usr/bin/containerd` and
+# `/run/containerd/containerd.sock`; Docker uses `/var/lib/docker`.
 # The explicit 2026-10-13 overlays immediately below are the current supported topology.
 # The large tree beginning later in this file is a preserved pre-migration/restoration
 # capture unless a path is explicitly reaffirmed by an overlay. It must not be used to

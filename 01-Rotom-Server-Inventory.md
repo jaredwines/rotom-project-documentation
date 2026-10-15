@@ -4,7 +4,7 @@
 **Document role:** Architecture/index starting point and high-level Rotom summary  
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-14 — Rename current Restic credential files
+**Documentation updated:** 2026-10-14 — Retire unused service-home trees and `/opt/containerd`
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -42,6 +42,12 @@ Within each subject document, use the newest dated **Current** section first. Us
 This audit confirms that the 2026-10-13 overlays at the start of this section are the supported current-state layer. Later undated-looking summaries and earlier JAR checkpoint tables are retained for evidence but are **Historical** wherever they name `infra`, `library`, `gameserver`, `web`, `/mnt/nas-media`, `/mnt/nas-library`, `/mnt/nas-gameserver`, Uptime Kuma, Paperless, Syncthing, or running Palworld containers as current. Do not use those older passages as operating instructions. The final 2026-10-13 fstab and removal verification establishes five current guest NFS automount contracts: Game Servers, Smart Home, Rotom Restic Backup, Libraries, and Hosted Websites. Reconfirm their live activation read-only with `findmnt` plus `systemctl list-units --type=automount` on Rotom when troubleshooting.
 
 ## 2. Current Rotom Summary
+
+### Current service-home and containerd cleanup — 2026-10-14
+
+At Jared's explicit authorization, Rotom removed the verified-unused `/home/game-servers`, `/home/hosted-websites`, `/home/libraries`, `/home/platform`, and `/home/smart-home` trees. The five locked service accounts remain, and their NSS home fields still name those now-absent paths; no account-home migration was performed. Their active Compose, mutable-state, and protected-input roots remain under `/srv/rotom`. Pre-removal checks found no nested mounts, open users, or Docker bind mounts. The system remained running afterward, with all listed containers up and `desktop-commander.service` active.
+
+The unused 12 KiB `/opt/containerd` directory, containing only empty `bin/` and `lib/` subdirectories, was removed separately. The active runtime uses `/usr/bin/containerd` and `/run/containerd/containerd.sock`; Docker remains on `/var/lib/docker`, and both verified healthy after the removal.
 
 ### Read-only PVE host and VM baseline — 2026-10-14
 

@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** historical workload identity evidence through 2026-09-25; Phase B guest admin/backup-access state verified through 2026-09-27  
-**Documentation updated:** 2026-10-14 — Rename current Restic credential files
+**Documentation updated:** 2026-10-14 — Retire unused service-home trees and `/opt/containerd`
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -14,6 +14,8 @@ Record substantive changes to this document in the change log as part of the sam
 ## 1. Purpose and Scope
 
 ### Current identity and Smart Home ownership audit — 2026-10-14
+
+Jared explicitly authorized removal of the verified-unused `/home/game-servers`, `/home/hosted-websites`, `/home/libraries`, `/home/platform`, and `/home/smart-home` trees. The five accounts remain password-locked with their existing UID:GID contracts and configured NSS home fields; those fields now point to absent directories. No account-home migration was performed. Active service Compose, state, and protected-input roots remain under `/srv/rotom`; pre-removal checks found no nested mounts, open users, or Docker bind mounts, and the system plus listed containers remained healthy afterward.
 
 Live NSS data now confirms `platform 997:5002`, `libraries 127:5000`, `hosted-websites 902:5004`, `game-servers 995:5001`, `smart-home 126:5003`, `jared 1000:1000`, `desktopcmd 1001:1001`, and human administrator `fran 1002:1002`. Rotom Fran belongs to `sudo`, `users`, and Docker GID `989`; she is the Docker group's sole listed member. Service identities retain only their primary service groups. Privileged read-only `passwd -S` verification on 2026-10-14 found `platform`, `libraries`, `hosted-websites`, `game-servers`, `smart-home`, and `desktopcmd` each password-locked (`L`); no unlock or password-setting command was run.
 
@@ -25,7 +27,7 @@ The existing `desktopcmd` identity was then migrated live from `/home/desktopcmd
 
 The Smart Home stack directories are root-owned, but both live Compose files are owned by `smart-home:smart-home`. On 2026-10-14 Jared confirmed the cross-domain Game Servers grants were unintended, so only the named `game-servers:rw-` Home Assistant and `game-servers:rwx` Homebridge ACL entries were removed. Home Assistant remains `smart-home:smart-home` mode `0660`; Homebridge remains `smart-home:smart-home` mode `0670`; Jared retains read-only/read-traverse named access. Negative access tests confirmed `game-servers` cannot write either file, positive tests confirmed `smart-home` can read/write both, and Compose validation passed.
 
-`/srv/rotom/backup-staging` is absent, so the earlier ACL observations for that root and its descendants are historical. The current `/srv/rotom`, `/home`, and `/home/platform` roots retain the documented named Jared read/traverse/default ACL pattern.
+`/srv/rotom/backup-staging` is absent, so the earlier ACL observations for that root and its descendants are historical. The current `/srv/rotom` and `/home` roots retain the documented named Jared read/traverse/default ACL pattern; the former `/home/platform` service-home tree was retired on 2026-10-14.
 
 ### Current Paperless Libraries identity — 2026-10-13
 

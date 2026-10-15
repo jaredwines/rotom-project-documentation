@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-14 — Retire unused service-home trees and `/opt/containerd`
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** At Jared's explicit authorization, removed the verified-unused `/home/game-servers`, `/home/hosted-websites`, `/home/libraries`, `/home/platform`, and `/home/smart-home` trees. The five locked service accounts and their configured NSS home fields remain; active service Compose, state, and protected-input roots remain under `/srv/rotom`. Also removed the unused 12 KiB `/opt/containerd` directory; the active runtime continues to use `/usr/bin/containerd`, `/run/containerd/containerd.sock`, and `/var/lib/docker`.
+- **Evidence:** Immediately before deletion, all five paths were directories on the root ext4 filesystem and checks found no nested mounts, open users, or Docker bind mounts. Afterward, every listed path was absent and the accounts remained present. The system reported `running`; listed containers remained up; `desktop-commander.service` remained active; `containerd.service` remained active; and Docker reported `DockerRootDir=/var/lib/docker`.
+- **Outstanding:** The NSS home fields intentionally still name the removed paths; no account-home migration was performed. Available Sources synchronization remains manual by Jared.
+
 ## 2026-10-14 — Final JAR-98 closeout verification
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `07-Users-and-Permissions.md`.
