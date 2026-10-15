@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-14 — Begin independent Jared legacy documentation checkout migration (JAR-98)
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Implemented / Verified (partial).**
+- **Changes:** Created Jared's independently owned Rotom checkout at `/home/jared/documentation/rotom-runbook` from the shared GitHub `main` branch and changed only Jared's private `retired-helper` fallback to that path. The previous clean Platform checkout remains intact as rollback material and remains the active Rotom Docs publisher input; no publisher, service, backup, Fran credential, or Platform-account change was made.
+- **Evidence:** The new checkout is `jared:jared`, clean, tracks `origin/main`, and passed `retired-helper path`, `retired-helper status`, `retired-helper check` (including GitHub fetch), and guarded `retired-helper pull`. The live portal returned HTTPS `200`; its root-owned publisher was inspected and still uses the Platform path with the controlled nine-file atomic publication process.
+- **Outstanding:** Establish Fran's owner-controlled SSH/GitHub/Codex identity and checkout; revise/install/test the helper for both accounts without weakening guardrails; create a least-privilege non-human publisher identity and cut over/verify rollback and backups; obtain explicit owner approval before removing the old checkout. Available Sources synchronization remains manual by Jared.
+
 ## 2026-10-14 — Rename current Restic credential files
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`.

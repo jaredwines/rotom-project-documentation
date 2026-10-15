@@ -71,6 +71,10 @@ At this historical checkpoint, the active NAS recovery helper validated only Med
 
 Superseded for current identity and path ownership by JAR-94 above; retained as dated operational evidence.
 
+### JAR-98 partial legacy documentation-checkout migration — 2026-10-14
+
+Jared now uses the independently owned checkout `/home/jared/documentation/rotom-runbook`; its private `~/.config/retired-helper/repository` fallback was changed to that location only. It is clean on `main`, tracks `origin/main`, and passed guarded `retired-helper path`, `status`, `check` (including a GitHub fetch), and `pull`. The clean `/home/platform/documentation/rotom-runbook` checkout is retained temporarily as rollback material and remains the input to the root-owned Rotom Docs publisher. The portal was reachable by HTTPS during preflight. Fran has no established legacy documentation/GitHub/Codex setup, and the installed/versioned helper currently permits only `jared`; do not treat either Fran workflow or the separate publisher deployment source as implemented. No service, backup, or publisher configuration was changed.
+
 The root-owned Rotom Docs publisher reads the legacy documentation checkout at `/home/platform/documentation/rotom-runbook` and publishes its controlled derived source to `/srv/rotom/appdata/platform/rotom-docs/source`. Its Compose/build files reside in `/srv/rotom/stacks/platform/rotom-docs`. The checkout is owned by Jared under the Platform documentation path; no `infra` service identity remains.
 
 The root-owned alert worker now reads its protected Platform inputs from `/srv/rotom/secrets/platform`. The enabled `filesync-syncthing.service` retains its name but now has `/srv/rotom/stacks/platform/syncthing` as its working directory. It was inactive after a historical NAS dependency failure; the healthy Syncthing container is the current verified runtime, and the unit is no longer failed.
