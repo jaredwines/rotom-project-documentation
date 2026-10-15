@@ -17,7 +17,7 @@ Record substantive changes to this document in the change log as part of the sam
 
 PVE uses `nic0` as the physical Intel I219-V interface and `vmbr0` at `192.168.1.68/24` with gateway `192.168.1.1`; VM 100 attaches through `tap100i0` without a configured VLAN tag or bridge VLAN filtering. The physical link negotiated 1 Gbit/s full duplex, Wake-on-LAN mode `g` is enabled, and the documented TSO/GSO-off mitigation remains effective. PVE reached Rotom (`192.168.1.69`) and the UNAS (`192.168.1.70`) without packet loss during the audit.
 
-The Proxmox firewall reported `Status: disabled/running`; cluster and node rule listings were empty. The PVE web UI on `8006` and read-only monitoring APIs on LAN-bound `8788` and `8789` therefore depend on LAN reachability and their application/access controls rather than an active PVE firewall policy. The NPM route `pve.rotom.casa -> https://192.168.1.68:8006` with access-list ID `1` remains active, but it is not a substitute for host firewall policy. Whether the disabled firewall and direct LAN listeners are intentional **Needs Owner Confirmation**.
+The Proxmox firewall reported `Status: disabled/running`; cluster and node rule listings were empty. The PVE web UI on `8006` and read-only monitoring APIs on LAN-bound `8788` and `8789` therefore depend on LAN reachability and their application/access controls rather than an active PVE firewall policy. The NPM route `pve.rotom.casa -> https://192.168.1.68:8006` with access-list ID `1` remains active, but it is not a substitute for host firewall policy. Jared explicitly accepted this trusted-LAN design on 2026-10-14; no hardening or firewall-project work is planned from that decision.
 
 ### Current route, DNS, listener, and certificate audit — 2026-10-14
 
@@ -29,7 +29,7 @@ Certificate ID `24` covers `*.rotom.casa` and `rotom.casa` and expires 2026-12-1
 
 The LAN resolver currently overrides only `rotom.casa` to `192.168.1.69`. The tested `*.rotom.casa` service names resolve through the LAN resolver to public `68.8.40.225`, so ordinary LAN access to those names depends on public-IP hairpin/NAT behavior rather than a wildcard local override. Public resolver queries were unavailable from this execution context; the public-IP value above is the answer returned by the LAN resolver.
 
-Current listener inspection shows that NPM is not the only LAN-reachable path. TCP `80`, `81`, and `443` are LAN-wide, as are Homepage `3001`, Arcane `3552`, Aloha `7778`, Jellyfin `8096`, Radarr `7878`, Sonarr `8989`, Prowlarr `9696`, Home Assistant `8123`, Homebridge `8581`, and the backup-status API `8787`. qBittorrent `8080`, RomM `8081`, Paperless `8000`, and Rotom Docs `8082` are loopback-only. The guest has no UFW installation per the current VM baseline; whether the direct LAN exposure is intentional **Needs Owner Confirmation**.
+Current listener inspection shows that NPM is not the only LAN-reachable path. TCP `80`, `81`, and `443` are LAN-wide, as are Homepage `3001`, Arcane `3552`, Aloha `7778`, Jellyfin `8096`, Radarr `7878`, Sonarr `8989`, Prowlarr `9696`, Home Assistant `8123`, Homebridge `8581`, and the backup-status API `8787`. qBittorrent `8080`, RomM `8081`, Paperless `8000`, and Rotom Docs `8082` are loopback-only. The guest has no UFW installation per the current VM baseline. Jared explicitly accepted these direct listeners as the intended trusted-LAN design on 2026-10-14; no firewall change is planned.
 
 ### Current Paperless route — 2026-10-13
 
@@ -918,11 +918,9 @@ Host-side WOL is current and persistent: Proxmox `nic0` supports magic-packet wa
 
 Historical NPM evidence retained legacy Smart Hub/Portainer/OliveTin/PalTools database rows that were `enabled=1` but absent from generated `proxy_host/*.conf` files. Jared confirmed the current-record review and ownership decision completed. The decision and any resulting record changes were not supplied in this chat, so none are inferred.
 
-### Current exposure policy — Needs Verification
+### Current exposure policy — Intentional trusted-LAN design
 
-The Debian VM currently has **no UFW installation** per JAR-31; the broad UFW rules documented in section 14 belong to the retired bare-metal host. Current externally reachable services therefore cannot be inferred from those old rules.
-
-The 2026-09-27 read-only audit refreshed Rotom listeners and Docker-published ports, so the host-side portion is verified current. UniFi WAN forwarding/firewall/NAT policy remains unverified and must still be inspected separately before drawing conclusions about Internet exposure.
+The Debian VM currently has **no UFW installation** per JAR-31; the broad UFW rules documented in section 14 belong to the retired bare-metal host. Jared accepted the current PVE-disabled-firewall and direct-Rotom-listener posture as intentional trusted-LAN exposure. No firewall hardening, listener restriction, router, VLAN, or port-forwarding change is planned from this decision. The 2026-09-27 and 2026-10-14 listener inventories remain the operational reference.
 
 ### qBittorrent live Libraries-NFS-loss behavior — Verified by Jared confirmation
 

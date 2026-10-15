@@ -63,6 +63,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-14 — Accept current trusted-LAN exposure policy
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`.
+- **Status:** **Documentation only / Owner decision.** No firewall, listener, proxy, router, VLAN, or port-forwarding configuration was changed.
+- **Changes:** Jared accepted the current trusted-LAN design: PVE's firewall remains disabled, and the documented direct Rotom LAN listeners remain intentional. No hardening or firewall-project work is planned from this decision; preserve the current operating model unless Jared separately requests a change.
+- **Evidence:** Jared's explicit owner decision in this chat.
+- **Outstanding:** None for the exposure-policy decision. Available Sources synchronization remains manual by Jared.
+
 ## 2026-10-14 — Record PVE stability-monitoring interval
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`.
