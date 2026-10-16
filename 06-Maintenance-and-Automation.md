@@ -124,7 +124,7 @@ NPM certificate renewal remains active. Diagnose renewal by inspecting the curre
 
 ## 6. Documentation and Synchronization Workflow
 
-Resolve the active checkout with `rr path` after the installed helper cutover. During migration preparation, use the tracked `support/tooling/rr`; keep the installed `retired-helper` implementation working until `/usr/local/bin/rr` passes verification in this environment. Repository `AGENTS.md` and document 00 govern RR changes.
+Resolve the active checkout with `rr path`. `/usr/local/bin/rr` is the canonical installed implementation. `/usr/local/bin/retired-helper` is a minimal wrapper delegating to `rr`; retain it only for compatibility while the inaccessible Mac environment remains independently unverified. Repository `AGENTS.md` and document 00 govern RR changes.
 
 Supported helper commands are `path`, `status`, `check`, `lint`, `pull`, `diff`, `log`, `commit`, `push`, and `help`. Do not bypass a helper safety failure with reset, clean, merge, rebase, force-push, or ad-hoc publication.
 
