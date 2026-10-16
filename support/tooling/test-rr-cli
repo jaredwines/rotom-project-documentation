@@ -48,10 +48,13 @@ expect_failure() {
 }
 
 run_rr() {
-    env \
-        XDG_CONFIG_HOME="$CONFIG_ROOT" \
-        GIT_SSH_COMMAND="$FAKE_SSH" \
-        "$RR" "$@"
+    (
+        cd "$FIXTURE_ROOT"
+        env \
+            XDG_CONFIG_HOME="$CONFIG_ROOT" \
+            GIT_SSH_COMMAND="$FAKE_SSH" \
+            "$RR" "$@"
+    )
 }
 
 git init --bare "$REMOTE" >/dev/null
