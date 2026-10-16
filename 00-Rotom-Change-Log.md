@@ -84,6 +84,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-15 — Rename the Mac RR checkout directory
+
+- **Files changed:** `00-Rotom-Change-Log.md` and `01-Rotom-Server-Inventory.md`.
+- **Status:** **Implemented / Verified.** The Mac checkout path and its private RR discovery configuration were changed; repository contents, Git history, the GitHub remote, installed tooling, Available Sources, and Rotom live state were not changed by the directory move.
+- **Changes:** Renamed the clean Mac checkout from `/Users/jared/Documents/ChatGPT/rotom-runbook` to `/Users/jared/Documents/ChatGPT/rotom-runbook` and updated `~/.config/rr/repository` to the new path. This supersedes the migration entry below only for the current Mac checkout-path fact; its dated cutover evidence remains historical.
+- **Evidence:** A pre-move `rr check` passed with clean `main` matching `origin/main`. The destination was required to be absent before the move. From the new path, `rr path` returned `/Users/jared/Documents/ChatGPT/rotom-runbook`; `rr check` passed again with a clean tree, `main`, `origin/main`, and `git@github.com:jaredwines/rotom-runbook.git` for fetch and push.
+- **Outstanding:** Available Sources replacement remains manual by Jared.
+
 ## 2026-10-15 — Migrate legacy documentation set to Rotom Runbook
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`, `AGENTS.md`, `README.md`, `support/tooling/rr`, `support/tooling/test-rr-runbooks`, and `support/tooling/test-rr-cli`; removed `support/tooling/test-retired-helper-runbooks` in favor of its RR replacement and removed the transitional `support/tooling/retired-helper` wrapper after final environment verification.
