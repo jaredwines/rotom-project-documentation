@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RR maintenance contract
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-15 — Prepare Rotom Runbook identity and migration gates
+**Documentation updated:** 2026-10-15 — Migrate the private documentation portal to Rotom Support
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -83,6 +83,15 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-15 — Migrate private documentation portal to Rotom Support
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`, `support/tooling/test-rr-runbooks`, and the explicit supplementary inputs under `support/website/`.
+- **Status:** **Implemented / Verified / Published.**
+- **Changes:** Created the private **Rotom Support** MkDocs Material portal with primary Home, Runbook, Architecture, and Guides sections. The Runbook remains the controlled rendering of the authoritative numbered `00`–`08` set at `/runbook/`; Architecture and Guides are explicitly selected supplementary inputs and do not change Available Sources. Prepared `/srv/rotom/{stacks,appdata}/platform/mkdocs-rr`, preserved the existing `rotom-docs` stack and data as inactive rollback material, then moved the loopback `127.0.0.1:8082` listener to the read-only `mkdocs-rr` container. The guarded publisher retains origin/branch/clean-tree/fast-forward validation, fixed source selection, isolated build, atomic output swap, and one previous generated source/site revision. NPM host `27` routes `support.rotom.casa` to the loopback endpoint with existing certificate `24` and trusted-LAN access list `1`; legacy host `22` now permanently redirects historical paths and query strings to `/runbook/` under the same access list. The Platform Homepage card is now Rotom Support with the requested description, URL, compatible icon, Docker status binding, and site monitor.
+- **Evidence:** The replacement Compose configuration and publisher shell syntax passed; an inactive publisher validation completed an isolated MkDocs build with the explicit source allowlist and no link warnings. The preloaded target output contained Home, `/runbook/`, `/architecture/`, and `/guides/` before the controlled listener handoff. After a transient first-start connection reset, the guarded rollback restored `rotom-docs`; a retried handoff passed all four local routes and left `mkdocs-rr` running read-only on `127.0.0.1:8082`. HTTPS checks returned `200` for every new section through `support.rotom.casa`; the existing wildcard certificate covered the hostname. A representative historical deep link with a query string returned `301` to the matching `/runbook/` page. An ephemeral Docker-bridge request received `403`, while authorized local and LAN-path checks succeeded. Homepage reported healthy and its API returned the updated card. No system units failed and no unrelated container was recreated.
+- **Recovery:** The previous `rotom-docs` stack, application data, stopped container, and generated `site.previous` content remain. A consistent pre-change NPM database backup and previous host-22 configuration are retained beside NPM state. Available Sources replacement remains manual by Jared.
+- **Outstanding:** URL fragments are client-side and cannot be observed by the redirecting host; the equivalent anchors remain published in the routed Runbook pages. Retention or removal of inactive `rotom-docs` rollback material requires a future explicit decision.
 
 ## 2026-10-15 — Rename the Mac RR checkout directory
 

@@ -109,13 +109,18 @@ require_text 07-Users-and-Permissions.md "## Diagnose an Identity, Ownership, or
 require_text 07-Users-and-Permissions.md 'Never use `chmod 777`'
 
 require_text 01-Rotom-Server-Inventory.md "23 running Compose-managed containers, 18 Docker networks, two named volumes, and 18 Compose definitions"
+require_text 01-Rotom-Server-Inventory.md "Rotom Support"
 require_text 02-Docker-Services.md '| Jared Wines | Supported active site |'
 require_text 02-Docker-Services.md "The final live topology contains 23 running containers, 18 Docker networks, two named volumes, and 18 Compose definitions"
+require_text 02-Docker-Services.md '| Rotom Support | Supported active service |'
 require_text 03-Network-and-Domains.md '`jaredwines.com` is active behind NPM proxy host `8`'
 require_text 03-Network-and-Domains.md 'Glances no longer has a host listener'
+require_text 03-Network-and-Domains.md '`support.rotom.casa`'
 require_text 06-Maintenance-and-Automation.md '`autoUpdate=true`, `autoHealEnabled=true`, `scheduledPruneEnabled=false`, and `followProjectSymlinks=true`'
+require_text 06-Maintenance-and-Automation.md '/srv/rotom/appdata/platform/mkdocs-rr/repository'
 require_text 07-Users-and-Permissions.md 'Aloha and Jared Wines active'
 require_text 08-Rotom-Directory-Tree.txt 'Final 2026-10-15 state is 23 running container objects, 18 networks, two named volumes, and 18 Compose definitions.'
+require_text 08-Rotom-Directory-Tree.txt 'mkdocs-rr/compose.yaml'
 
 reject_text '| Jared Wines | **Needs Verification** |' "$REPO_ROOT"/0[1-8]-*
 reject_text '**Jared Wines `502`:** expected under the unresolved current design.' "$REPO_ROOT"/0[1-8]-*

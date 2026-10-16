@@ -4,7 +4,7 @@
 **Document role:** Task-first starting page, symptom router, architecture overview, and source map
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Prepare Rotom Runbook identity and migration gates
+**Documentation updated:** 2026-10-15 — Migrate the private documentation portal to Rotom Support
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -76,7 +76,7 @@ The verified application topology is **23 running Compose-managed containers, 18
 
 | Domain | Identity | Active roots | Current services |
 |---|---:|---|---|
-| Platform | `997:5002` | `/srv/rotom/{stacks,appdata,secrets}/platform` | Nginx Proxy Manager, Homepage with Glances, Arcane, Cloudflare DDNS, Rotom Docs |
+| Platform | `997:5002` | `/srv/rotom/{stacks,appdata,secrets}/platform` | Nginx Proxy Manager, Homepage with Glances, Arcane, Cloudflare DDNS, Rotom Support |
 | Libraries | `127:5000` | `/srv/rotom/{stacks,appdata,secrets}/libraries` | Jellyfin, Radarr, Sonarr, Prowlarr, qBittorrentVPN, RomM, Paperless |
 | Hosted Websites | `902:5004` | `/srv/rotom/{stacks,appdata}/hosted-websites` | Aloha Millworks, Jared Wines |
 | Game Servers | `995:5001` | `/srv/rotom/{stacks,appdata,secrets}/game-servers` | Palworld Jared, Palworld Fran |
@@ -134,6 +134,8 @@ The alerting worker, units, timers, scripts, Homepage integration, and delivery 
 Rotom Runbook is every file intentionally kept in the project's Available Sources. The numbered files `00`–`08` are the complete current nine-file set. Repository support files such as `AGENTS.md`, `README.md`, and `support/tooling/*` are not RR members unless intentionally added to Available Sources.
 
 The independently verified RR checkout is `/home/jared/documentation/rotom-runbook` on Rotom and `/Users/jared/Documents/ChatGPT/rotom-runbook` on the Mac. Rotom intentionally retains its working legacy directory; the Mac checkout was renamed after the cross-environment migration passed. In each environment, `rr path` resolves the checkout through `~/.config/rr/repository`. Available Sources replacement remains manual by Jared.
+
+The private **Rotom Support** portal presents the authoritative numbered set below at `/runbook/`, plus the explicitly selected supplementary `support/website/architecture/index.md` and `support/website/guides/index.md` inputs. Those supplementary sources do not change Runbook membership or Available Sources; they explain and route to the numbered sources rather than establish operational truth.
 
 ## 8. Current Source Map
 

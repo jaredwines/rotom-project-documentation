@@ -17,7 +17,8 @@
 #       cloudflare-ddns/compose.yaml
 #       homepage/compose.yaml              Homepage + Glances
 #       nginx-proxy-manager/compose.yaml
-#       rotom-docs/compose.yaml
+#       mkdocs-rr/compose.yaml              Rotom Support active stack
+#       rotom-docs/compose.yaml             retained inactive rollback stack
 #     libraries/
 #       jellyfin/compose.yaml
 #       paperless/compose.yaml
@@ -39,7 +40,8 @@
 #     platform/
 #       homepage/glances/glances.conf
 #       nginx-proxy-manager/{data,letsencrypt}/
-#       rotom-docs/repository/             root-owned deployment clone
+#       mkdocs-rr/{repository,source,site,site.previous}/  active guarded publisher state
+#       rotom-docs/                         retained inactive rollback state
 #     libraries/
 #       paperless/
 #       prowlarr/
@@ -173,7 +175,8 @@
 #
 # RR / CODEX / GITHUB
 # /home/jared/documentation/rotom-runbook/   canonical RR checkout; legacy path retained intentionally
-# /srv/rotom/appdata/platform/rotom-docs/repository/       root-owned publisher clone
+# /srv/rotom/appdata/platform/mkdocs-rr/repository/        root-owned Rotom Support publisher clone
+# /srv/rotom/{stacks,appdata}/platform/rotom-docs/         retained inactive rollback paths
 # /usr/local/bin/rr                                      canonical installed helper
 # /usr/local/bin/retired-helper.pre-rr-20261015                    root-only retired pre-cutover helper; recovery only
 # /home/jared/.config/rr/repository                      private path configuration

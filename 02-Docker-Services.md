@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details
 **Scope:** Rotom workload layer; the current runtime baseline is the 2026-10-15 inventory in section 1
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Prepare Rotom Runbook identity and migration gates
+**Documentation updated:** 2026-10-15 — Migrate the private documentation portal to Rotom Support
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -218,7 +218,7 @@ The final live topology contains 23 running containers, 18 Docker networks, two 
 
 | Domain | Compose definitions | Supported services |
 |---|---:|---|
-| Platform | 5 | Nginx Proxy Manager, Homepage with Glances, Arcane, Cloudflare DDNS, Rotom Docs |
+| Platform | 5 | Nginx Proxy Manager, Homepage with Glances, Arcane, Cloudflare DDNS, Rotom Support |
 | Libraries | 7 | Jellyfin, Radarr, Sonarr, Prowlarr, qBittorrentVPN, RomM, Paperless |
 | Hosted Websites | 2 | Aloha Millworks, Jared Wines |
 | Game Servers | 2 | Palworld Jared, Palworld Fran |
@@ -233,7 +233,7 @@ The runtime uses local Docker root `/var/lib/docker`. Supported mutable state is
 | Homepage and Glances | Supported active pair | One Compose file at `/srv/rotom/stacks/platform/homepage/compose.yaml`; Glances has no host listener |
 | Nginx Proxy Manager | Supported active service | Host networking; authoritative state under Platform appdata; no Docker socket |
 | Arcane | Supported active service | Platform stacks are mounted for management; automation policy is recorded in document 06 |
-| Rotom Docs | Supported active service | Read-only generated site; loopback listener `127.0.0.1:8082` |
+| Rotom Support | Supported active service | Read-only generated site from `/srv/rotom/{stacks,appdata}/platform/mkdocs-rr`; `mkdocs-rr` retains the loopback listener `127.0.0.1:8082` |
 | Aloha Millworks | Supported active site | Host publication `7778:80` |
 | Jared Wines | Supported active site | Loopback-only `127.0.0.1:7777:80`; NPM proxy host `8` |
 | Libraries applications | Supported active services | Authoritative NAS payload under `/mnt/nas-libraries`; non-creating binds where loss would be unsafe |

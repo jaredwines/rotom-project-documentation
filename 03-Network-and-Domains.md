@@ -4,7 +4,7 @@
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Prepare Rotom Runbook identity and migration gates
+**Documentation updated:** 2026-10-15 — Migrate the private documentation portal to Rotom Support
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -90,7 +90,8 @@ Nginx Proxy Manager is host-networked and owns the guest's HTTP/HTTPS reverse-pr
 | Name | Upstream | Notes |
 |---|---|---|
 | `rotom.casa` | Homepage on `192.168.1.69:3001` | Homepage requires `Host: rotom.casa`; a bare loopback request returning `400` is expected |
-| `docs.rotom.casa` | `127.0.0.1:8082` | Private Rotom documentation portal |
+| `support.rotom.casa` | `127.0.0.1:8082` | Private Rotom Support portal; NPM host `27`, wildcard certificate `24`, and trusted-LAN access list `1` |
+| `docs.rotom.casa` | `127.0.0.1:8082` | Legacy private hostname; NPM host `22` permanently redirects paths and query strings to `https://support.rotom.casa/runbook/` |
 | `pve.rotom.casa` | HTTPS `192.168.1.68:8006` | Forced TLS, WebSockets, and the configured access list |
 | `jaredwines.com` | `127.0.0.1:7777` | Active behind NPM proxy host `8`; public and local-SNI checks returned `200` |
 | `alohamillworks.com` | `192.168.1.69:7778` | Active website |
@@ -101,7 +102,7 @@ Application routes for Paperless, Prowlarr, RomM, Home Assistant, Homebridge, Je
 
 ## 3. Current Listener and Docker-Network Model
 
-Supported host or loopback publications include Homepage `3001`, Arcane `3552`, Rotom Docs `127.0.0.1:8082`, qBittorrent `127.0.0.1:8080`, Jared Wines `127.0.0.1:7777`, Aloha `7778`, Jellyfin `8096`, Home Assistant `8123`, Radarr `7878`, Sonarr `8989`, Prowlarr `9696`, NPM `80/81/443`, and the read-only Rotom backup-status API `8787`.
+Supported host or loopback publications include Homepage `3001`, Arcane `3552`, Rotom Support `127.0.0.1:8082`, qBittorrent `127.0.0.1:8080`, Jared Wines `127.0.0.1:7777`, Aloha `7778`, Jellyfin `8096`, Home Assistant `8123`, Radarr `7878`, Sonarr `8989`, Prowlarr `9696`, NPM `80/81/443`, and the read-only Rotom backup-status API `8787`.
 
 Container ports and current process listeners are time-sensitive; verify them read-only before diagnosis or change.
 
@@ -151,7 +152,7 @@ The pre-virtualization bare-metal interface, routing, UFW, Docker bridge-address
 
 - Preserve Rotom reservation `192.168.1.69`, PVE `192.168.1.68`, NAS `192.168.1.70`, and the currently documented MAC/VM identity contracts.
 - Preserve NPM state, certificates, access lists, and host-networking role.
-- Preserve loopback-only exposure for Jared Wines, Rotom Docs, and qBittorrent.
+- Preserve loopback-only exposure for Jared Wines, Rotom Support, and qBittorrent. Preserve the trusted-LAN restriction on both the support hostname and its legacy redirect.
 - Preserve the five exact guest NFS sources from document 04.
 - Keep secret values out of diagnostic output and documentation.
 - Reconcile public DNS, LAN DNS, TLS, proxy configuration, listeners, and application state before changing any layer.

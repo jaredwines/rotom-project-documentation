@@ -4,7 +4,7 @@
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** Current state reconciled through 2026-10-15; see outstanding items for remaining verification
-**Documentation updated:** 2026-10-15 — Prepare Rotom Runbook identity and migration gates
+**Documentation updated:** 2026-10-15 — Migrate the private documentation portal to Rotom Support
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -128,7 +128,7 @@ Resolve the active checkout with `rr path`. `/usr/local/bin/rr` is the sole cano
 
 Supported helper commands are `path`, `status`, `check`, `lint`, `pull`, `diff`, `log`, `commit`, `push`, and `help`. Do not bypass a helper safety failure with reset, clean, merge, rebase, force-push, or ad-hoc publication.
 
-The Rotom RR checkout intentionally retains the working legacy directory `/home/jared/documentation/rotom-runbook`; `/home/jared/.config/rr/repository` points to it. Rotom Docs publishes from a separate root-owned deployment clone under `/srv/rotom/appdata/platform/rotom-docs/repository`; it does not publish from a human home checkout.
+The Rotom RR checkout intentionally retains the working legacy directory `/home/jared/documentation/rotom-runbook`; `/home/jared/.config/rr/repository` points to it. Rotom Support publishes from a separate root-owned deployment clone under `/srv/rotom/appdata/platform/mkdocs-rr/repository`; it does not publish from a human home checkout. Its publisher permits only the numbered `00`–`08` sources plus explicit `support/website/{home.md,architecture/index.md,guides/index.md}` inputs, validates a clean fast-forward deployment clone, builds in isolated stages, and atomically retains one generated-site/source rollback revision.
 
 Repository support files are not RR members merely because they are tracked. Available Sources remains the membership boundary and replacement remains manual by Jared.
 
