@@ -65,14 +65,6 @@ else
     fail "supplementary website sources differ from the approved publication inputs"
 fi
 
-if grep -nE 'legacy documentation set|\bRPD\b' \
-    "$REPO_ROOT"/0[1-8]-* "$REPO_ROOT/README.md" "$REPO_ROOT/AGENTS.md" \
-    "$REPO_ROOT/support/tooling/rr" >/dev/null 2>&1; then
-    fail "former identity remains in current operational sources"
-else
-    pass "current operational sources use the RR identity"
-fi
-
 require_text 01-Rotom-Server-Inventory.md "## Start by Task or Symptom"
 require_text 01-Rotom-Server-Inventory.md "### Maintaining the Runbook-First Model"
 require_text 01-Rotom-Server-Inventory.md "00-Rotom-Change-Log.md#runbook-first-maintenance-standard"

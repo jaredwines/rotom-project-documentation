@@ -133,7 +133,7 @@ The alerting worker, units, timers, scripts, Homepage integration, and delivery 
 
 Rotom Runbook is every file intentionally kept in the project's Available Sources. The numbered files `00`–`08` are the complete current nine-file set. Repository support files such as `AGENTS.md`, `README.md`, and `support/tooling/*` are not RR members unless intentionally added to Available Sources.
 
-The independently verified RR checkout is `/home/jared/documentation/rotom-runbook` on Rotom and `/Users/jared/Documents/ChatGPT/rotom-runbook` on the Mac. Rotom intentionally retains its working legacy directory; the Mac checkout was renamed after the cross-environment migration passed. In each environment, `rr path` resolves the checkout through `~/.config/rr/repository`. Available Sources replacement remains manual by Jared.
+The independently verified RR checkout is `/home/jared/documentation/rotom-runbook` on Rotom and `/Users/jared/Documents/ChatGPT/rotom-runbook` on the Mac. In each environment, `rr path` resolves the checkout through `~/.config/rr/repository`. Available Sources replacement remains manual by Jared.
 
 The private **Rotom Support** portal presents the authoritative numbered set below at `/runbook/`, plus the explicitly selected supplementary `support/website/architecture/index.md` and `support/website/guides/index.md` inputs. Those supplementary sources do not change Runbook membership or Available Sources; they explain and route to the numbered sources rather than establish operational truth.
 

@@ -59,7 +59,7 @@ For each `Update the RR` task:
 4. Cross-check the complete current RR for contradictions introduced or exposed by the update. Reconcile contradictions where the available evidence supports a resolution; otherwise preserve the uncertainty explicitly rather than guessing.
 5. Add one dated entry at the top of **Change History**, below this maintenance guide, for the documentation task. Use `YYYY-MM-DD` in Rotom's project timezone, `America/Los_Angeles`. State the actual change or evidence date separately if it differs from the documentation date. Combine related work from the same task into one entry.
 6. In that entry, list the changed filenames and briefly explain what changed and why. Label relevant items **Implemented**, **Documentation only**, **Proposed**, or **Verified**. Use **Verified** only for results supported by supplied output or an actual check, identify the evidence, and record unresolved checks or limitations. Keep passwords, tokens, keys, and other secrets out of the log.
-7. Preserve earlier dated entries as historical evidence. Do not silently rewrite history to match current terminology or policy. If an older entry is wrong, add a dated correction identifying what it supersedes. Historical references to the former `Update the legacy documentation` command remain historical rather than current instructions.
+7. Preserve earlier dated entries as historical evidence. Do not silently rewrite history to match current terminology or policy unless Jared explicitly authorizes an archival terminology rewrite. If an older entry is wrong, add a dated correction identifying what it supersedes. Historical command names are never current instructions.
 8. Complete RR delivery according to the execution environment:
    - **ChatGPT on Mac (non-Codex):** deliver replacement copies of the **materially changed RR files individually** and package the **complete current RR set**, including unchanged members, into one ZIP named **`Rotom-Runbook-YYYY-MM-DD.zip`** using the documentation-update date in `America/Los_Angeles`. Tell Jared to run `rr path` on the Mac to resolve the active local checkout, copy the materially changed files into that checkout, manually replace the corresponding Available Sources copies, then run `rr commit "<relevant concise commit message>"`, `rr check`, and `rr push` on the Mac and verify success. ChatGPT prepares the files and instructions only; it does not execute the RR Git commit or push itself.
    - **Codex on Mac:** resolve the active local RR checkout with `rr path` and work directly in that checkout. After the final RR files are complete, run `rr commit "<relevant concise commit message>"`, then `rr check`, then `rr push`, and verify the commit and push succeeded. A separate replacement-file/ZIP package is not required unless Jared explicitly requests one.
@@ -84,6 +84,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-16 — Retire legacy documentation identity remnants
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`, and `support/tooling/test-rr-runbooks`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Moved Rotom's independently managed RR checkout to `/home/jared/documentation/rotom-runbook`, updated its private `rr` discovery path, and removed the retired helper and publisher rollback artifacts that retained the former documentation identity. At Jared's explicit direction, replaced the former identity throughout current and historical RR records.
+- **Evidence:** `rr status` was clean before the move; afterward `rr path` resolves the new checkout and reports the expected `origin/main`. Jared removed the three exact root-owned artifacts on Rotom; follow-up checks found no active service, timer, cron, or configuration dependency on the former identity.
+- **Outstanding:** Git object history and local interactive transcripts are archival records outside the tracked RR and active Rotom configuration; they were not rewritten or erased.
+
 ## 2026-10-15 — Migrate private documentation portal to Rotom Support
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`, `support/tooling/test-rr-runbooks`, and the explicit supplementary inputs under `support/website/`.
@@ -97,11 +105,11 @@ Keep future entries brief: the change log should point to the detailed documents
 
 - **Files changed:** `00-Rotom-Change-Log.md` and `01-Rotom-Server-Inventory.md`.
 - **Status:** **Implemented / Verified.** The Mac checkout path and its private RR discovery configuration were changed; repository contents, Git history, the GitHub remote, installed tooling, Available Sources, and Rotom live state were not changed by the directory move.
-- **Changes:** Renamed the clean Mac checkout from `/Users/jared/Documents/ChatGPT/rotom-runbook` to `/Users/jared/Documents/ChatGPT/rotom-runbook` and updated `~/.config/rr/repository` to the new path. This supersedes the migration entry below only for the current Mac checkout-path fact; its dated cutover evidence remains historical.
+- **Changes:** Renamed the clean Mac checkout to `/Users/jared/Documents/ChatGPT/rotom-runbook` and updated `~/.config/rr/repository` to the canonical path. This supersedes the migration entry below only for the current Mac checkout-path fact; its dated cutover evidence remains historical.
 - **Evidence:** A pre-move `rr check` passed with clean `main` matching `origin/main`. The destination was required to be absent before the move. From the new path, `rr path` returned `/Users/jared/Documents/ChatGPT/rotom-runbook`; `rr check` passed again with a clean tree, `main`, `origin/main`, and `git@github.com:jaredwines/rotom-runbook.git` for fetch and push.
 - **Outstanding:** Available Sources replacement remains manual by Jared.
 
-## 2026-10-15 — Migrate legacy documentation set to Rotom Runbook
+## 2026-10-15 — Complete the Rotom Runbook identity migration
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`, `AGENTS.md`, `README.md`, `support/tooling/rr`, `support/tooling/test-rr-runbooks`, and `support/tooling/test-rr-cli`; removed `support/tooling/test-retired-helper-runbooks` in favor of its RR replacement and removed the transitional `support/tooling/retired-helper` wrapper after final environment verification.
 - **Status:** **Implemented / Verified / Published.** Documentation, GitHub identity, Rotom CLI integration, local origin, publisher configuration, website identity, and access controls were migrated and verified.
@@ -1533,7 +1541,7 @@ Keep future entries brief: the change log should point to the detailed documents
 - **Evidence:** Explicit user decision in this chat after the 2026-09-21 legacy documentation package was renamed to `Rotom-Runbook-2026-09-21.zip`.
 - **Outstanding:** None.
 
-## 2026-09-21 — Adopt legacy documentation acronym and isolated-Bash large-command safety rule
+## 2026-09-21 — Adopt legacy documentation terminology and isolated-Bash large-command safety rule
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`.
 - **Status:** **Documentation only / Adopted.** No live Rotom service, Docker container, NAS export, mount, account, permission, backup job, firewall rule, or application data was changed by this documentation update.
@@ -1684,7 +1692,7 @@ Keep future entries brief: the change log should point to the detailed documents
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`.
 - **Status:** Documentation correction only; no live Rotom service, Docker container, NAS export, mount, network, backup, account, or proxy configuration was changed by this task.
 - **Changes:** Added the previously omitted Radarr `172.18.0.0/16` bridge network to the current network summaries in the server inventory and Docker inventory. Refreshed the Docker, networking, and maintenance document update summaries to include the verified Homebridge `homebrige` → `homebridge` correction. Clarified the distinction between `/home/rotom/documentation` as the authoritative on-server Codex/control-document location and Available Sources as the membership boundary for legacy documentation set. Corrected the historical Shared Drive wording so its capacity figures are explicitly described as observations from the 2026-09-15 audit rather than current overview values. Also updated the documentation-definition paragraph in the server inventory to include the current Manual Maintenance standard in the non-numbered Project Documentation set.
-- **Evidence:** Cross-document consistency review of the current twelve-file legacy documentation set set, using the already recorded 2026-09-19 network and Homebridge verification evidence. No new live verification was required.
+- **Evidence:** Cross-document consistency review of the then-current twelve-file legacy documentation set, using the already recorded 2026-09-19 network and Homebridge verification evidence. No new live verification was required.
 - **Outstanding:** None created by this cleanup. Existing unrelated operational verification gaps remain unchanged.
 
 ## 2026-09-19 — Correct Homebridge container-name typo
@@ -1910,7 +1918,7 @@ Keep future entries brief: the change log should point to the detailed documents
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `Rotom-Architecture-and-Deployment-Standard.md`.
 - **Status:** Documentation only; structure and indexing cleanup.
-- **Changes:** Moved the two earlier Available Sources policy entries into the `Change history` section without changing their historical wording. Kept the numbered `00`–`08` files as the core legacy documentation set set, added the Architecture and Deployment Standard to the server inventory as a maintained companion standard, and changed the standard's header so it no longer implies membership in the numbered set.
+- **Changes:** Moved the two earlier Available Sources policy entries into the `Change history` section without changing their historical wording. Kept the numbered `00`–`08` files as the core legacy documentation set, added the Architecture and Deployment Standard to the server inventory as a maintained companion standard, and changed the standard's header so it no longer implies membership in the numbered set.
 - **Evidence:** Documentation consistency review and user approval recorded on 2026-09-18.
 - **Outstanding:** Jared must manually replace these three files in `/Users/jared/Documents/ChatGPT/Rotom-Home-Server` and in Available Sources. No live Rotom change is authorized or required.
 
@@ -2006,7 +2014,7 @@ Keep future entries brief: the change log should point to the detailed documents
 - **Evidence:** User-supplied `stat`, `getfacl`, and `sudo -u ... test` output from 2026-09-16. The output confirms the two control files, their ownership and modes, ACL entries, and successful read-only access tests for `jared` and `fran`. It also confirms `/home/jared/.codex/AGENTS.md` exists as `jared:jared` mode `0600`. No document contents or authentication material were used as evidence.
 - **Outstanding:** Copy the numbered files `00` through `08` into `/home/rotom/documentation` only through a separate reviewed synchronization task, then verify their metadata and update this documentation from observed results. Configure and verify a per-user Codex entry point for `fran` only if Fran will run Codex.
 
-## 2026-09-16 — Consolidate the complete legacy documentation set set
+## 2026-09-16 — Consolidate the complete legacy documentation set
 
 - **Files changed:** All nine maintained files, `00-Rotom-Change-Log.md` through `08-Rotom-Directory-Tree.txt`.
 - **Status:** Documentation only.

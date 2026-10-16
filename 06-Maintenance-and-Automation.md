@@ -124,11 +124,11 @@ NPM certificate renewal remains active. Diagnose renewal by inspecting the curre
 
 ## 6. Documentation and Synchronization Workflow
 
-Resolve the active checkout with `rr path`. `/usr/local/bin/rr` is the sole canonical installed implementation on Rotom and the Mac. The transitional `retired-helper` wrappers were retired after both environments passed independent RR verification and dependency audits. Repository `AGENTS.md` and document 00 govern RR changes.
+Resolve the active checkout with `rr path`. `/usr/local/bin/rr` is the sole canonical installed implementation on Rotom and the Mac. Earlier transition helpers were removed after both environments passed independent RR verification and dependency audits. Repository `AGENTS.md` and document 00 govern RR changes.
 
 Supported helper commands are `path`, `status`, `check`, `lint`, `pull`, `diff`, `log`, `commit`, `push`, and `help`. Do not bypass a helper safety failure with reset, clean, merge, rebase, force-push, or ad-hoc publication.
 
-The Rotom RR checkout intentionally retains the working legacy directory `/home/jared/documentation/rotom-runbook`; `/home/jared/.config/rr/repository` points to it. Rotom Support publishes from a separate root-owned deployment clone under `/srv/rotom/appdata/platform/mkdocs-rr/repository`; it does not publish from a human home checkout. Its publisher permits only the numbered `00`–`08` sources plus explicit `support/website/{home.md,architecture/index.md,guides/index.md}` inputs, validates a clean fast-forward deployment clone, builds in isolated stages, and atomically retains one generated-site/source rollback revision.
+The Rotom RR checkout is `/home/jared/documentation/rotom-runbook`; `/home/jared/.config/rr/repository` points to it. Rotom Support publishes from a separate root-owned deployment clone under `/srv/rotom/appdata/platform/mkdocs-rr/repository`; it does not publish from a human home checkout. Its publisher permits only the numbered `00`–`08` sources plus explicit `support/website/{home.md,architecture/index.md,guides/index.md}` inputs, validates a clean fast-forward deployment clone, builds in isolated stages, and atomically retains one generated-site/source rollback revision.
 
 Repository support files are not RR members merely because they are tracked. Available Sources remains the membership boundary and replacement remains manual by Jared.
 
