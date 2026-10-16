@@ -2,7 +2,7 @@
 
 **Documentation set:** Rotom Runbook
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details
-**Scope:** Rotom workload layer; the current runtime baseline is the 2026-10-15 inventory in section 1  
+**Scope:** Rotom workload layer; the current runtime baseline is the 2026-10-15 inventory in section 1
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
 **Documentation updated:** 2026-10-15 — Prepare Rotom Runbook identity and migration gates
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
