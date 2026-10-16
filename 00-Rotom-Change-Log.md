@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole legacy documentation maintenance contract  
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-15 — Reconcile final acceptance findings and retire unused contribution guide
+**Documentation updated:** 2026-10-15 — Remove obsolete ticket labels and consolidate operational references
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -83,6 +83,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-15 — Remove obsolete ticket labels and consolidate operational references
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`, and `support/tooling/test-retired-helper-runbooks`.
+- **Status:** **Documentation only / Implemented / Verified.** No service, container, image, network, mount, timer, account, permission, backup, repository, NAS data, certificate, credential, or other live configuration was changed.
+- **Changes:** Removed obsolete ticket-label narrative from the operational reference documents while preserving the protected history in this file and literal recovery artifact paths. Consolidated superseded same-day and pre-migration layers into concise current-state, retirement, recovery, ownership, and Needs Verification sections. Preserved the six runbooks, task router, maintenance triggers, current service/storage/backup contracts, recovery evidence, and security boundaries. Corrected the documented alerting-state and retired rollback-path discrepancies found during read-only inspection, and added regression coverage for the concise topology and ticket-label boundary.
+- **Evidence:** Began from clean `main` at `576a03650c66841ddd1d0177db8ef6220fad6bcd`. Read-only inspection confirmed the current five stack domains, eighteen Compose definitions, five read/write NFSv3 mounts, the current service identities, absence of retired stack/path definitions and retired ports, and the empty root-only `/var/lib/rotom-alerting` directory. The tracked repository-wide case-insensitive scan fell from 1,273 matches to protected change-log history plus nine literal audit/image paths outside this file. Structural runbook tests, offline lint, link/fragment checks, secret-pattern checks, and `git diff --check` passed in the prepared tree.
+- **Outstanding:** Privileged Docker object/image/network enumeration and unreadable root-only rollback artifacts were not verified. Arcane exclusions, exact current NAS snapshot settings, and incident-specific recovery-point selection remain **Needs Verification**. `retired-helper check` was not authorized and remains pending; Available Sources replacement remains manual by Jared.
 
 ## 2026-10-15 — Retire unused repository contribution guide
 

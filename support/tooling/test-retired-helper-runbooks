@@ -68,6 +68,8 @@ done
 require_text 08-Rotom-Directory-Tree.txt "# MAINTENANCE AND REVALIDATION TRIGGERS"
 require_text 08-Rotom-Directory-Tree.txt "# CURRENT TOPOLOGY"
 require_text 08-Rotom-Directory-Tree.txt "# PRE-MIGRATION RESTORATION TARGET"
+require_text 08-Rotom-Directory-Tree.txt "# RETIRED PATH WARNINGS"
+require_text 08-Rotom-Directory-Tree.txt "# RECOVERY RULES"
 
 require_text 02-Docker-Services.md "## Diagnose and Recover a Container or Docker-Backed Website"
 require_text 04-NAS-and-Storage.md "## Diagnose and Recover a Configured NAS Mount"
@@ -93,6 +95,12 @@ reject_text '| Jared Wines | **Needs Verification** |' "$REPO_ROOT"/0[1-8]-*
 reject_text '**Jared Wines `502`:** expected under the unresolved current design.' "$REPO_ROOT"/0[1-8]-*
 reject_text "Arcane's live 2026-10-15 settings have automatic updates, auto-heal, and scheduled pruning disabled" "$REPO_ROOT"/0[1-8]-*
 reject_text '**Current live verification — 2026-10-15:** Arcane automatic updates are disabled' "$REPO_ROOT"/0[1-8]-*
+
+if grep -nE 'JAR-[0-9]+' "$REPO_ROOT"/0[1-8]-* >/dev/null 2>&1; then
+    fail "operational references contain non-literal uppercase ticket labels"
+else
+    pass "operational references contain no non-literal uppercase ticket labels"
+fi
 
 invalid_labels=$(grep -hE '^\*\*(Read-only|Changes Rotom|Credential-sensitive|PVE|Destructive)' \
     "$REPO_ROOT"/0[2-7]-*.md | grep -vFx -e '**Read-only**' \
