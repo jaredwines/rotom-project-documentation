@@ -84,6 +84,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-16 — Simplify Rotom Support Homepage status
+
+- **Files changed:** `00-Rotom-Change-Log.md`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Removed the Rotom Support card's `siteMonitor` configuration from Homepage, retaining its `my-docker` / `mkdocs-rr` Docker-status binding as the sole indicator. This corrects the 2026-10-15 migration entry's historical statement that the card also had a site monitor.
+- **Evidence:** Homepage's service API now reports the Rotom Support card without `siteMonitor`; its Docker-status API reports `mkdocs-rr` as `running`. The removed URL-monitor request had reported `500` after approximately five seconds even though the Support proxy and loopback upstream each returned `200`.
+- **Outstanding:** None.
+
 ## 2026-10-16 — Retire legacy documentation identity remnants
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`, and `support/tooling/test-rr-runbooks`.
