@@ -172,7 +172,8 @@ while IFS= read -r record; do
     fragment=${link#*#}
 
     if [[ -n "$target" ]]; then
-        destination=$(realpath -m "$(dirname "$source")/$target")
+        target=${target//%20/ }
+        destination="$REPO_ROOT/$target"
     else
         destination=$source
     fi
