@@ -4,9 +4,9 @@ Rotom Support is the private reference portal for the Rotom environment. It brin
 
 ## Choose a section
 
-- [Runbook](runbook/) is the authoritative source for current configuration, operations, maintenance, security, troubleshooting, and recovery.
-- [Architecture](architecture/) explains the verified relationships between Rotom's infrastructure, services, network, storage, and recovery layers.
-- [Guides](guides/) offers task-oriented starting points that point back to the Runbook for the controlling procedure.
+- [Runbook](runbook/index.md) is the authoritative source for current configuration, operations, maintenance, security, troubleshooting, and recovery.
+- [Architecture](architecture/index.md) explains the verified relationships between Rotom's infrastructure, services, network, storage, and recovery layers.
+- [Guides](guides/index.md) offers task-oriented starting points that point back to the Runbook for the controlling procedure.
 
 ## Authority and scope
 
