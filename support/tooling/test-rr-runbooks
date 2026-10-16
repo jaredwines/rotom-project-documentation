@@ -51,6 +51,19 @@ require_text README.md "# Rotom Runbook"
 require_text AGENTS.md "## RR Git workflow"
 require_file support/tooling/rr
 require_file support/tooling/test-rr-cli
+require_file support/website/home.md
+require_file support/website/architecture/index.md
+require_file support/website/guides/index.md
+
+expected_website_sources='architecture/index.md
+guides/index.md
+home.md'
+actual_website_sources=$(find "$REPO_ROOT/support/website" -type f -printf '%P\n' | LC_ALL=C sort)
+if [[ "$actual_website_sources" == "$expected_website_sources" ]]; then
+    pass "supplementary website sources are explicitly bounded"
+else
+    fail "supplementary website sources differ from the approved publication inputs"
+fi
 
 if grep -nE 'legacy documentation set|\bRPD\b' \
     "$REPO_ROOT"/0[1-8]-* "$REPO_ROOT/README.md" "$REPO_ROOT/AGENTS.md" \
