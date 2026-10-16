@@ -4,7 +4,6 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 RR="$REPO_ROOT/support/tooling/rr"
-RPD_WRAPPER="$REPO_ROOT/support/tooling/retired-helper"
 EXPECTED_REMOTE="git@github.com:jaredwines/rotom-runbook.git"
 FIXTURE_ROOT="$(mktemp -d)"
 REMOTE="$FIXTURE_ROOT/remote.git"
@@ -144,8 +143,6 @@ git -C "$SEED" add README.md
 git -C "$SEED" commit -m "Advance fixture beyond checkout" >/dev/null
 git -C "$SEED" push origin main >/dev/null
 expect_failure "rr push rejects behind checkout" "is behind GitHub" run_rr push
-
-PATH="$REPO_ROOT/support/tooling:$PATH" expect_success "retired-helper compatibility wrapper delegates to rr" "$RPD_WRAPPER" help
 
 if (( FAILURES > 0 )); then
     printf '\nRR CLI TESTS: FAIL (%d problem(s))\n' "$FAILURES" >&2

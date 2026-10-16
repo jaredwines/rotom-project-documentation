@@ -50,9 +50,7 @@ require_text 00-Rotom-Change-Log.md 'The sole canonical documentation-update com
 require_text README.md "# Rotom Runbook"
 require_text AGENTS.md "## RR Git workflow"
 require_file support/tooling/rr
-require_file support/tooling/retired-helper
 require_file support/tooling/test-rr-cli
-require_text support/tooling/retired-helper 'exec rr "$@"'
 
 if grep -nE 'legacy documentation set|\bRPD\b' \
     "$REPO_ROOT"/0[1-8]-* "$REPO_ROOT/README.md" "$REPO_ROOT/AGENTS.md" \

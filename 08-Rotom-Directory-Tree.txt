@@ -175,8 +175,7 @@
 # /home/jared/documentation/rotom-runbook/   canonical RR checkout; legacy path retained intentionally
 # /srv/rotom/appdata/platform/rotom-docs/repository/       root-owned publisher clone
 # /usr/local/bin/rr                                      canonical installed helper
-# /usr/local/bin/retired-helper                                     minimal compatibility wrapper delegating to rr
-# /usr/local/bin/retired-helper.pre-rr-20261015                    root-only pre-cutover recovery copy
+# /usr/local/bin/retired-helper.pre-rr-20261015                    root-only retired pre-cutover helper; recovery only
 # /home/jared/.config/rr/repository                      private path configuration
 # Available Sources remains the RR membership boundary and replacement is manual.
 #

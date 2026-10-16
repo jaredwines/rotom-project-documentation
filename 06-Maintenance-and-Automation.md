@@ -124,7 +124,7 @@ NPM certificate renewal remains active. Diagnose renewal by inspecting the curre
 
 ## 6. Documentation and Synchronization Workflow
 
-Resolve the active checkout with `rr path`. `/usr/local/bin/rr` is the canonical installed implementation. `/usr/local/bin/retired-helper` is a minimal wrapper delegating to `rr`; retain it only for compatibility while the inaccessible Mac environment remains independently unverified. Repository `AGENTS.md` and document 00 govern RR changes.
+Resolve the active checkout with `rr path`. `/usr/local/bin/rr` is the sole canonical installed implementation on Rotom and the Mac. The transitional `retired-helper` wrappers were retired after both environments passed independent RR verification and dependency audits. Repository `AGENTS.md` and document 00 govern RR changes.
 
 Supported helper commands are `path`, `status`, `check`, `lint`, `pull`, `diff`, `log`, `commit`, `push`, and `help`. Do not bypass a helper safety failure with reset, clean, merge, rebase, force-push, or ad-hoc publication.
 
