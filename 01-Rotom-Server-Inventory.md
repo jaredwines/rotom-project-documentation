@@ -1,10 +1,10 @@
 # 01 - Rotom Server Inventory
 
-**Documentation set:** legacy documentation set  
+**Documentation set:** Rotom Runbook
 **Document role:** Task-first starting page, symptom router, architecture overview, and source map
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Canonical cleanup and current-state consolidation
+**Documentation updated:** 2026-10-15 — Prepare Rotom Runbook identity and migration gates
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -14,7 +14,7 @@ This document is the front-page architecture/index for Rotom. It summarizes the 
 
 Purpose: front-page index and quick-reference architecture summary.
 
-**legacy documentation state labels:** **Current** means the latest supported recorded state; **Historical** preserves dated evidence that may no longer apply; **Retired** means intentionally no longer active; **Proposed** is not implemented; **Needs Verification** means the legacy documentation lacks enough current evidence and should not be treated as settled.
+**RR state labels:** **Current** means the latest supported recorded state; **Historical** preserves dated evidence that may no longer apply; **Retired** means intentionally no longer active; **Proposed** is not implemented; **Needs Verification** means the RR lacks enough current evidence and should not be treated as settled.
 
 ## Start by Task or Symptom
 
@@ -29,7 +29,7 @@ Procedures answer **what to do**. Current-state reference answers **what exists*
 | Timer, scheduled automation, update, or maintenance problem | [06 — Automation and Maintenance Tasks](06-Maintenance-and-Automation.md#start-by-task-or-symptom) |
 | Permission, ownership, user, group, identity, or access problem | [07 — Identity and Access Tasks](07-Users-and-Permissions.md#start-by-task-or-symptom) |
 | Filesystem-path lookup | [08 — Current Topology](08-Rotom-Directory-Tree.txt) |
-| legacy documentation maintenance or publication | [00 — Current Documentation Maintenance Rules](00-Rotom-Change-Log.md#current-documentation-maintenance-rules) |
+| RR maintenance or publication | [00 — Current Documentation Maintenance Rules](00-Rotom-Change-Log.md#current-documentation-maintenance-rules) |
 
 ### Maintaining the Runbook-First Model
 
@@ -38,7 +38,7 @@ Follow the canonical [Runbook-First Maintenance Standard](00-Rotom-Change-Log.md
 ### Recommended reading path
 
 1. Read **Current Rotom Summary** for the newest system-wide orientation.
-2. Use **How to use the legacy documentation** or **Current Source Map** to select the canonical subject document.
+2. Use **How to use the RR** or **Current Source Map** to select the canonical subject document.
 3. In that document, read its navigation/authority block and current-state sections before any procedure.
 4. Use **Outstanding Decisions and Needs Verification** to identify uncertainty that must not be guessed through.
 5. Consult preserved history only for provenance, rollback context, or reconstruction, and reconcile it with current sections plus read-only live evidence first.
@@ -49,7 +49,7 @@ The inventory summarizes cross-system facts but does not replace the detailed su
 
 Jared confirmed completion and verification of the current Rotom Restic full-data-read plus restore rehearsal, current Rotom VM Backup VMA verification or disposable restore, Libraries/Paperless NAS snapshot retention plus isolated restore, NAS metadata persistence after a NAS/UniFi Drive event, controlled live Libraries-NFS-loss behavior, end-to-end Wake-on-LAN, VPN credential rotation, UniFi/router-policy review, full isolated Palworld disaster-recovery rehearsal, authenticated Paperless acceptance, Fran PVE browser login, legacy NPM-record review, certificate renewal, and dormant Docker-artifact review. Detailed transcripts, identifiers, and retain/remove decisions were not supplied in this chat; retain historical test evidence below as history, but do not present these items as current gaps.
 
-### How to use the legacy documentation
+### How to use the RR
 
 Start here, then follow the canonical subject document instead of relying on duplicated detail:
 
@@ -129,11 +129,11 @@ The alerting worker, units, timers, scripts, Homepage integration, and delivery 
 - Continue normal monitoring of the historical PVE NIC/reset and non-fatal iGPU option-ROM warning. Do not infer a single cause without new evidence.
 - Select and verify an incident-appropriate recovery point at recovery time; retention changes available snapshot and archive sets.
 
-## 7. legacy documentation set Model
+## 7. Rotom Runbook Model
 
-legacy documentation set is every file intentionally kept in the project's Available Sources. The numbered files `00`–`08` are the complete current nine-file set. Repository support files such as `AGENTS.md`, `README.md`, and `support/tooling/*` are not legacy documentation members unless intentionally added to Available Sources.
+Rotom Runbook is every file intentionally kept in the project's Available Sources. The numbered files `00`–`08` are the complete current nine-file set. Repository support files such as `AGENTS.md`, `README.md`, and `support/tooling/*` are not RR members unless intentionally added to Available Sources.
 
-The current canonical checkout on Rotom is `/home/jared/documentation/rotom-runbook`, resolved through `retired-helper path`. The Mac checkout is recorded at `/Users/jared/Documents/ChatGPT/rotom-runbook`. Available Sources replacement remains manual by Jared.
+The canonical RR checkout on Rotom intentionally retains the working legacy directory `/home/jared/documentation/rotom-runbook`; `rr path` resolves it through `/home/jared/.config/rr/repository`. This avoids a cosmetic path move during the repository and CLI cutover. The Mac checkout remains recorded at `/Users/jared/Documents/ChatGPT/rotom-runbook` until that independently verified environment is migrated. Available Sources replacement remains manual by Jared.
 
 ## 8. Current Source Map
 
@@ -145,7 +145,7 @@ The current canonical checkout on Rotom is `/home/jared/documentation/rotom-runb
 | `03-Network-and-Domains.md` | Addressing, listeners, DNS, TLS, proxying, and access |
 | `04-NAS-and-Storage.md` | NAS exports, mounts, storage identity, and mount recovery |
 | `05-Backup-and-Restore.md` | Backup systems, recovery evidence, and restore procedures |
-| `06-Maintenance-and-Automation.md` | Timers, maintenance, monitoring, and legacy documentation tooling |
+| `06-Maintenance-and-Automation.md` | Timers, maintenance, monitoring, and RR tooling |
 | `07-Users-and-Permissions.md` | Accounts, ownership, privilege, ACLs, and access |
 | `08-Rotom-Directory-Tree.txt` | Concise current topology and recovery-critical paths |
 

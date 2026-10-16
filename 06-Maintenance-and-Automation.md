@@ -1,10 +1,10 @@
 # 06 - Maintenance and Automation
 
-**Documentation set:** legacy documentation set  
-**Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow  
+**Documentation set:** Rotom Runbook
+**Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** Current state reconciled through 2026-10-15; see outstanding items for remaining verification
-**Documentation updated:** 2026-10-15 — Canonical cleanup and current-state consolidation
+**Documentation updated:** 2026-10-15 — Prepare Rotom Runbook identity and migration gates
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -61,7 +61,7 @@ Retain the unit name, trigger time, exit result, sanitized journal error, depend
 ## Navigation and Authority
 
 - Start with **1. Current Maintenance and Automation** for active timers, helpers, and routine operating behavior.
-- Use **5. Command-Line Safety and Administration**, **6. Documentation and Synchronization Workflow**, and **7. legacy documentation Validation** for administration and legacy documentation workflow.
+- Use **5. Command-Line Safety and Administration**, **6. Documentation and Synchronization Workflow**, and **7. RR Validation** for administration and RR workflow.
 - Treat retired automation and preserved historical evidence as context, not as active scheduling or execution instructions.
 - Review **Outstanding / Needs Verification** before depending on an automation, notification, certificate, or recovery behavior.
 - This file owns operational workflow and automation; backup semantics, service deployment, and privileges remain canonical in documents 05, 02, and 07.
@@ -124,25 +124,26 @@ NPM certificate renewal remains active. Diagnose renewal by inspecting the curre
 
 ## 6. Documentation and Synchronization Workflow
 
-Resolve the active checkout with `retired-helper path`. Repository `AGENTS.md` and document 00 govern legacy documentation changes.
+Resolve the active checkout with `rr path` after the installed helper cutover. During migration preparation, use the tracked `support/tooling/rr`; keep the installed `retired-helper` implementation working until `/usr/local/bin/rr` passes verification in this environment. Repository `AGENTS.md` and document 00 govern RR changes.
 
 Supported helper commands are `path`, `status`, `check`, `lint`, `pull`, `diff`, `log`, `commit`, `push`, and `help`. Do not bypass a helper safety failure with reset, clean, merge, rebase, force-push, or ad-hoc publication.
 
-The current Rotom checkout is `/home/jared/documentation/rotom-runbook`. Rotom Docs publishes from a separate root-owned deployment clone under `/srv/rotom/appdata/platform/rotom-docs/repository`; it does not publish from a human home checkout.
+The Rotom RR checkout intentionally retains the working legacy directory `/home/jared/documentation/rotom-runbook`; `/home/jared/.config/rr/repository` points to it. Rotom Docs publishes from a separate root-owned deployment clone under `/srv/rotom/appdata/platform/rotom-docs/repository`; it does not publish from a human home checkout.
 
-Repository support files are not legacy documentation members merely because they are tracked. Available Sources remains the membership boundary and replacement remains manual by Jared.
+Repository support files are not RR members merely because they are tracked. Available Sources remains the membership boundary and replacement remains manual by Jared.
 
-## 7. legacy documentation Validation
+## 7. RR Validation
 
-The tracked `support/tooling/retired-helper` owns offline lint. Before publication, the maintenance contract requires:
+The tracked `support/tooling/rr` owns offline lint. Before publication, the maintenance contract requires:
 
-- `support/tooling/test-retired-helper-runbooks`
-- `support/tooling/retired-helper lint`
+- `support/tooling/test-rr-runbooks`
+- `support/tooling/test-rr-cli`
+- `support/tooling/rr lint`
 - `git diff --check`
 - semantic ownership/duplication review
-- `retired-helper check` at a clean checkpoint
+- `rr check` at a clean checkpoint
 
-`retired-helper check` performs a network comparison and requires explicit authorization when the task withholds it.
+`rr check` performs a network comparison and requires explicit authorization when the task withholds it.
 
 ## 8. Outstanding / Needs Verification
 
@@ -161,4 +162,4 @@ The tracked `support/tooling/retired-helper` owns offline lint. Before publicati
 
 ## Maintenance and Revalidation Triggers
 
-Follow the canonical [Runbook-First Maintenance Standard](00-Rotom-Change-Log.md#runbook-first-maintenance-standard). Revalidate after a service, timer, schedule, worker, update policy, monitoring endpoint, maintenance procedure, legacy documentation tool, checkout path, or automation dependency changes.
+Follow the canonical [Runbook-First Maintenance Standard](00-Rotom-Change-Log.md#runbook-first-maintenance-standard). Revalidate after a service, timer, schedule, worker, update policy, monitoring endpoint, maintenance procedure, RR tool, checkout path, or automation dependency changes.

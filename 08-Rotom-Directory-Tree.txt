@@ -1,5 +1,5 @@
 # 08 - Rotom Directory Tree
-# Documentation set: legacy documentation set
+# Documentation set: Rotom Runbook
 # Document role: Concise current filesystem topology and recovery-critical paths.
 # Configuration semantics remain canonical in documents 02 through 07.
 # Index: 01-Rotom-Server-Inventory.md
@@ -92,8 +92,8 @@
 #   desktop-commander/                    active locked service home/application root
 #
 # /home/
-#   jared/                                human administrator; canonical legacy documentation checkout below
-#     documentation/rotom-runbook/
+#   jared/                                human administrator; canonical RR checkout below
+#     documentation/rotom-runbook/   intentional legacy checkout path for RR
 #   fran/                                 human administrator
 #
 # CURRENT SERVICE IDENTITIES
@@ -169,14 +169,15 @@
 # - Do not overwrite production merely to test recoverability.
 # - Do not manually alter Restic repository internals.
 # - Do not infer NAS-side deletion from a retired guest mount.
-# - Keep PVE actions Jared-executed where the legacy documentation labels them that way.
+# - Keep PVE actions Jared-executed where the RR labels them that way.
 #
-# legacy documentation / CODEX / GITHUB
-# /home/jared/documentation/rotom-runbook/   canonical Rotom checkout
+# RR / CODEX / GITHUB
+# /home/jared/documentation/rotom-runbook/   canonical RR checkout; legacy path retained intentionally
 # /srv/rotom/appdata/platform/rotom-docs/repository/       root-owned publisher clone
-# /usr/local/bin/retired-helper                                      installed helper
-# /home/jared/.config/retired-helper/repository                      private path configuration
-# Available Sources remains the legacy documentation membership boundary and replacement is manual.
+# /usr/local/bin/retired-helper                                     pre-cutover installed helper; retain until rr verification
+# /usr/local/bin/rr                                      canonical installed helper after the owner-executed cutover
+# /home/jared/.config/rr/repository                      private path configuration
+# Available Sources remains the RR membership boundary and replacement is manual.
 #
 # NEEDS VERIFICATION
 # - Arcane exclusions and intended long-term automatic-update/auto-heal policy.

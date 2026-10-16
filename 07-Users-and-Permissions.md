@@ -1,10 +1,10 @@
 # 07 - Users and Permissions
 
-**Documentation set:** legacy documentation set  
-**Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy  
+**Documentation set:** Rotom Runbook
+**Document role:** Canonical source for Linux accounts, UID/GID identities, groups, privileges, ACLs, and access policy
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** Current state reconciled through 2026-10-15; see outstanding items for remaining verification
-**Documentation updated:** 2026-10-15 — Canonical cleanup and current-state consolidation
+**Documentation updated:** 2026-10-15 — Prepare Rotom Runbook identity and migration gates
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -75,7 +75,7 @@ Retain the exact path, numeric and named identity, parent traversal result, prio
 
 | Host | Account | Current access |
 |---|---|---|
-| Rotom | `jared` | Primary administrator; sudo and GitHub/legacy documentation owner workflow |
+| Rotom | `jared` | Primary administrator; sudo and GitHub/RR owner workflow |
 | Rotom | `fran` (`1002:1002`) | Full sudo; groups include `users` and Docker GID `989` |
 | PVE | `jared` | Primary administrator |
 | PVE | `fran` (`1001:1001`) | Sudo, `users`, `systemd-journal`, and propagated PVE Administrator role |
@@ -122,7 +122,7 @@ Use the owning service identity for ordinary service-specific administration. Ro
 
 ## 5. Administrative and Credential Boundaries
 
-- legacy documentation GitHub operations run as `jared`; do not copy Jared's private key into a service account.
+- RR GitHub operations run as `jared`; do not copy Jared's private key into a service account.
 - Protected Restic credentials remain root-only and are never documented by value.
 - Service secrets remain under `/srv/rotom/secrets` with restrictive ownership and modes.
 - Remote Desktop Commander remains locked, has no sudo or Docker membership, and uses its existing outbound service registration without exposing its device state.
@@ -141,7 +141,7 @@ Do not recreate a legacy account or home from historical documentation. First id
 - Preserve root-only secret and backup credential boundaries.
 - Preserve setgid and ACL behavior on service storage.
 - Preserve Docker-group membership as an explicit root-equivalent grant.
-- Preserve Jared's legacy documentation/GitHub identity separation from service accounts.
+- Preserve Jared's RR/GitHub identity separation from service accounts.
 - Verify selected recovery material before changing an account, ownership, or home path.
 
 ## 8. Outstanding / Needs Verification

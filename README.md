@@ -1,8 +1,8 @@
-# legacy documentation set
+# Rotom Runbook
 
-This repository is the Git working copy for the **legacy documentation set** (**legacy documentation**): a nine-file, runbook-first operating manual and evidence-based reference for Rotom.
+This repository is the Git working copy for the **Rotom Runbook** (**RR**): a nine-file, runbook-first operating manual and evidence-based reference for Rotom.
 
-The legacy documentation describes supported state. It distinguishes **Current**, **Historical**, **Retired**, **Proposed**, and **Needs Verification** information so that plans and old evidence are not mistaken for live configuration.
+The RR describes supported state. It distinguishes **Current**, **Historical**, **Retired**, **Proposed**, and **Needs Verification** information so that plans and old evidence are not mistaken for live configuration.
 
 ## Start here
 
@@ -17,7 +17,7 @@ Use this reading order for administration or recovery:
 
 ## Documentation map
 
-The current legacy documentation consists of the Core Numbered Reference Set:
+The current RR consists of the Core Numbered Reference Set:
 
 | Document | Purpose |
 | --- | --- |
@@ -31,21 +31,21 @@ The current legacy documentation consists of the Core Numbered Reference Set:
 | [07 - Users and Permissions](07-Users-and-Permissions.md) | Identity, ownership, permission, privilege, and access operations |
 | [08 - Rotom Directory Tree](08-Rotom-Directory-Tree.txt) | Current filesystem reference with historical paths clearly separated |
 
-Available Sources defines the legacy documentation membership boundary. Repository-support files, including this README, are not legacy documentation members unless intentionally added to Available Sources. The current source map and membership details live in [01 - Rotom Server Inventory](01-Rotom-Server-Inventory.md).
+Available Sources defines the RR membership boundary. Repository-support files, including this README, are not RR members unless intentionally added to Available Sources. The current source map and membership details live in [01 - Rotom Server Inventory](01-Rotom-Server-Inventory.md).
 
 ## Using this repository
 
 - Treat dated evidence and explicit state labels as more authoritative than unstated assumptions.
-- Use the current legacy documentation documents for operational reference; do not use older change-log entries as instructions to recreate prior state.
-- Read the canonical maintenance contract in [00 - Rotom Change Log](00-Rotom-Change-Log.md) before preparing an legacy documentation change.
-- Use the guarded `retired-helper` helper for normal repository operations. `retired-helper path` resolves the active checkout.
-- Run the repository's offline `support/tooling/retired-helper lint` validation before synchronization checks. After the matching helper version is installed, `retired-helper lint` is equivalent.
-- From any directory, run `bash "$(retired-helper path)/support/tooling/test-retired-helper-runbooks"` to validate the numbered runbook-first legacy documentation's permanent structure, links, safety labels, and nine-file membership.
+- Use the current RR documents for operational reference; do not use older change-log entries as instructions to recreate prior state.
+- Read the canonical maintenance contract in [00 - Rotom Change Log](00-Rotom-Change-Log.md) before preparing an RR change.
+- Use the guarded `rr` helper for normal repository operations. `rr path` resolves the active checkout.
+- Run the repository's offline `support/tooling/rr lint` validation before synchronization checks. After the matching helper version is installed, `rr lint` is equivalent.
+- From any directory, run `bash "$(rr path)/support/tooling/test-rr-runbooks"` to validate the numbered runbook-first RR's permanent structure, links, safety labels, and nine-file membership.
 
 ## Safety
 
 Never commit passwords, tokens, private keys, VPN credentials, cookies, Home Assistant secrets, Restic passwords, or other authentication material. Do not publish or share repository contents without reviewing them for sensitive operational, personal, or infrastructure information.
 
-## Keeping the legacy documentation current
+## Keeping the RR current
 
-The canonical legacy documentation maintenance contract is [00 - Rotom Change Log](00-Rotom-Change-Log.md). It defines the required evidence standard, consistency review, state labels, dated change-history entries, and the supported publication workflow. This README is repository navigation and does not replace that contract.
+The canonical RR maintenance contract is [00 - Rotom Change Log](00-Rotom-Change-Log.md). It defines the required evidence standard, consistency review, state labels, dated change-history entries, and the supported publication workflow. This README is repository navigation and does not replace that contract.

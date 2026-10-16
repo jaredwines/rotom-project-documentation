@@ -1,10 +1,10 @@
 # 05 - Backup and Restore
 
-**Documentation set:** legacy documentation set  
-**Document role:** Canonical source for Restic backup architecture, scope, retention, verification, restore evidence, and recovery boundaries  
+**Documentation set:** Rotom Runbook
+**Document role:** Canonical source for Restic backup architecture, scope, retention, verification, restore evidence, and recovery boundaries
 **Recovery scope:** pre-migration Rotom plus current Proxmox/VM foundation  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Canonical cleanup and current-state consolidation
+**Documentation updated:** 2026-10-15 — Prepare Rotom Runbook identity and migration gates
 **Related canonical sources:** `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
@@ -253,7 +253,7 @@ The VM-local `/srv/rotom/backup-staging` path is absent. Historical references t
 
 The 2026-10-14 audit found ten snapshots and a successful `restic check`. Manual post-credential-path snapshot `b5af666b` completed successfully, and the timer was enabled and active.
 
-PVE work remains Jared-executed where the legacy documentation labels it **PVE — Jared executes**.
+PVE work remains Jared-executed where the RR labels it **PVE — Jared executes**.
 
 ## 4. Rotom VM Backup
 

@@ -33,7 +33,7 @@ for n in 00 01 02 03 04 05 06 07 08; do
 done
 
 numbered_count=$(find "$REPO_ROOT" -maxdepth 1 -type f \( -name '0[0-7]-*.md' -o -name '08-*.txt' \) | wc -l)
-[[ "$numbered_count" -eq 9 ]] && pass "nine numbered legacy documentation sources" || fail "expected nine numbered legacy documentation sources; found $numbered_count"
+[[ "$numbered_count" -eq 9 ]] && pass "nine numbered RR sources" || fail "expected nine numbered RR sources; found $numbered_count"
 
 for file in \
     00-Rotom-Change-Log.md 01-Rotom-Server-Inventory.md 02-Docker-Services.md \
@@ -44,8 +44,23 @@ do
 done
 
 require_text 00-Rotom-Change-Log.md "### Runbook-First Maintenance Standard"
-require_text 00-Rotom-Change-Log.md "An legacy documentation update is incomplete if it changes how Rotom is operated, diagnosed, maintained, or recovered"
-require_text 00-Rotom-Change-Log.md "support/tooling/test-retired-helper-runbooks"
+require_text 00-Rotom-Change-Log.md "An RR update is incomplete if it changes how Rotom is operated, diagnosed, maintained, or recovered"
+require_text 00-Rotom-Change-Log.md "support/tooling/test-rr-runbooks"
+require_text 00-Rotom-Change-Log.md 'The sole canonical documentation-update command is **`Update the RR`**'
+require_text README.md "# Rotom Runbook"
+require_text AGENTS.md "## RR Git workflow"
+require_file support/tooling/rr
+require_file support/tooling/retired-helper
+require_file support/tooling/test-rr-cli
+require_text support/tooling/retired-helper 'exec rr "$@"'
+
+if grep -nE 'legacy documentation set|\bRPD\b' \
+    "$REPO_ROOT"/0[1-8]-* "$REPO_ROOT/README.md" "$REPO_ROOT/AGENTS.md" \
+    "$REPO_ROOT/support/tooling/rr" >/dev/null 2>&1; then
+    fail "former identity remains in current operational sources"
+else
+    pass "current operational sources use the RR identity"
+fi
 
 require_text 01-Rotom-Server-Inventory.md "## Start by Task or Symptom"
 require_text 01-Rotom-Server-Inventory.md "### Maintaining the Runbook-First Model"
@@ -193,8 +208,8 @@ else
 fi
 
 if (( FAILURES > 0 )); then
-    printf '\nNUMBERED legacy documentation RUNBOOK TESTS: FAIL (%d problem(s))\n' "$FAILURES" >&2
+    printf '\nNUMBERED RR RUNBOOK TESTS: FAIL (%d problem(s))\n' "$FAILURES" >&2
     exit 1
 fi
 
-printf '\nNUMBERED legacy documentation RUNBOOK TESTS: PASS\n'
+printf '\nNUMBERED RR RUNBOOK TESTS: PASS\n'
