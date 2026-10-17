@@ -86,10 +86,10 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## 2026-10-16 — Correct validation portability on the Mac
 
-- **Files changed:** `00-Rotom-Change-Log.md` and repository support file `support/tooling/test-rr-runbooks`.
+- **Files changed:** `00-Rotom-Change-Log.md` and repository support files `support/tooling/test-rr-runbooks` and `support/tooling/test-guides`.
 - **Status:** **Implemented / Verified** on Rotom; Mac rerun pending.
-- **Changes:** Replaced the GNU-only `find -printf` use in the website input allowlist check with portable `find` and `sed`, preserving the same exact membership comparison.
-- **Evidence:** The Mac checkout fast-forwarded cleanly to `6aa7cbe` using `rr pull`; its isolated RS CLI tests passed. The structural test then stopped because macOS `find` does not support `-printf`. The corrected structural test and RS lint passed on Rotom.
+- **Changes:** Replaced the GNU-only `find -printf` use in the website input allowlist check with portable `find` and `sed`, preserving the same exact membership comparison. Replaced guide enumeration requiring Bash 4 and GNU sort with portable NUL-delimited enumeration.
+- **Evidence:** The Mac checkout fast-forwarded cleanly to `6aa7cbe` using `rr pull`; its isolated RS CLI tests passed. The structural test then stopped because macOS `find` does not support `-printf`. The corrected structural test passed on both Rotom and the Mac; guide validation then exposed Bash 3 incompatibility, which was corrected and requires a Mac rerun.
 - **Outstanding:** Rerun validation on the Mac and install and verify its RS helper. The Mac already has an unrelated `/usr/bin/rs`; preserve it and audit command resolution and dependencies. Available Sources replacement remains manual.
 
 ## 2026-10-16 — Verify RS repository and publication checkpoints

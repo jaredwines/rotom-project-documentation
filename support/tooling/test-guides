@@ -31,12 +31,19 @@ if [[ ! -d "$GUIDE_DIR" ]]; then
     exit 1
 fi
 
-mapfile -d '' guide_files < <(find "$GUIDE_DIR" -type f -name '*.md' -print0 | sort -z)
+guide_files=()
+guide_count=0
+while IFS= read -r -d '' file; do
+    guide_files+=("$file")
+    guide_count=$((guide_count + 1))
+done < <(find "$GUIDE_DIR" -type f -name '*.md' -print0)
 
-if (( ${#guide_files[@]} == 0 )); then
+if (( guide_count == 0 )); then
     fail "guide directory contains no Markdown guides"
+    printf '\nGUIDE TESTS: FAIL (%d problem(s))\n' "$FAILURES" >&2
+    exit 1
 else
-    pass "guide directory contains ${#guide_files[@]} Markdown guide(s)"
+    pass "guide directory contains $guide_count Markdown guide(s)"
 fi
 
 for file in "${guide_files[@]}"; do
