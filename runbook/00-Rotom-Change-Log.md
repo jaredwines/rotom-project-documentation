@@ -84,6 +84,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-16 — Verify Mac compatibility cutover
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`; Mac `/usr/local/bin/rr` and its recovery copy.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Jared replaced the Mac's independent `rr` with the minimal `rs` compatibility wrapper after `rs` passed its checks. The wrapper remains for unverified legacy consumers; the existing Mac checkout path and resolver remain unchanged. Apple's unrelated `/usr/bin/rs` remains available at its absolute path; the login PATH selects `/usr/local/bin/rs` first.
+- **Evidence:** Jared's Terminal output showed `rs check` and the installed `rr check` passing against GitHub. Independent Mac inspection confirmed root:wheel mode `0755` and wrapper SHA-256 `dde6073b21a08f928b8cd17c0c1e1458171e3a00a3bbcd110da51a2c0f8af73e`, matching the tracked wrapper. The prior implementation is retained at `/usr/local/bin/rr.pre-rs-20261016`, root:wheel mode `0700`; restore that file to `/usr/local/bin/rr` if rollback is required.
+- **Outstanding:** Jared manually replaces Available Sources. Audit additional environments independently if they become accessible; do not infer coverage beyond Rotom and this Mac. The legacy `docs.rotom.casa` route continues to redirect to the existing private portal.
+
 ## 2026-10-16 — Verify the Mac RS installation
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`; Mac `/usr/local/bin/rs`.
