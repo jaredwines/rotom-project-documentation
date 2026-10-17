@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RR maintenance contract
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-16 — Repair Rotom Support publisher synchronization
+**Documentation updated:** 2026-10-16 — Record repository Architecture directory
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -83,6 +83,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-16 — Record repository Architecture directory
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `08-Rotom-Directory-Tree.txt`.
+- **Status:** **Documentation only / Verified.**
+- **Changes:** Recorded the new `Architecture/` directory in the repository source map and directory reference. It currently contains only a Git placeholder and no RR source; the existing supplementary website architecture input remains separate. This does not decide the membership or publication status of future files.
+- **Evidence:** Local repository inspection and commit `481fa37`; the existing numbered RR set remains `00`–`08` in `runbook/`.
+- **Outstanding:** Available Sources replacement remains manual by Jared; the Mac checkout and helper synchronization remain unverified.
 
 ## 2026-10-16 — Repair Rotom Support publisher synchronization
 
