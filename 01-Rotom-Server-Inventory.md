@@ -4,8 +4,8 @@
 **Document role:** Task-first starting page, symptom router, architecture overview, and source map
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-16 — Add total-loss recovery orchestration
-**Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`, `09-PVE-and-Rotom-Total-Loss-Recovery.md`
+**Documentation updated:** 2026-10-16 — Separate the total-loss guide from RR membership
+**Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
 ## 1. Purpose and Scope
@@ -29,7 +29,6 @@ Procedures answer **what to do**. Current-state reference answers **what exists*
 | Timer, scheduled automation, update, or maintenance problem | [06 — Automation and Maintenance Tasks](06-Maintenance-and-Automation.md#start-by-task-or-symptom) |
 | Permission, ownership, user, group, identity, or access problem | [07 — Identity and Access Tasks](07-Users-and-Permissions.md#start-by-task-or-symptom) |
 | Filesystem-path lookup | [08 — Current Topology](08-Rotom-Directory-Tree.txt) |
-| Complete loss of the original PVE computer and Rotom VM | [09 — Emergency Recovery Path](09-PVE-and-Rotom-Total-Loss-Recovery.md#emergency-recovery-path) |
 | RR maintenance or publication | [00 — Current Documentation Maintenance Rules](00-Rotom-Change-Log.md#current-documentation-maintenance-rules) |
 
 ### Maintaining the Runbook-First Model
@@ -64,7 +63,6 @@ Start here, then follow the canonical subject document instead of relying on dup
 | Timers, maintenance, monitoring, and administration workflow | [06-Maintenance-and-Automation.md](06-Maintenance-and-Automation.md) |
 | Accounts, UID/GID contracts, ACLs, sudo, and access policy | [07-Users-and-Permissions.md](07-Users-and-Permissions.md) |
 | Filesystem topology and important paths | [08-Rotom-Directory-Tree.txt](08-Rotom-Directory-Tree.txt) |
-| Blank-hardware PVE and Rotom total-loss recovery | [09-PVE-and-Rotom-Total-Loss-Recovery.md](09-PVE-and-Rotom-Total-Loss-Recovery.md) |
 
 Within each subject document, use the current-state sections first. Use historical or pre-migration evidence only for provenance, reconstruction, or recovery; do not replay it as current instruction without reconciling it against live read-only state.
 
@@ -133,11 +131,11 @@ The alerting worker, units, timers, scripts, Homepage integration, and delivery 
 
 ## 7. Rotom Runbook Model
 
-Rotom Runbook is every file intentionally kept in the project's Available Sources. The numbered files `00`–`09` are the complete current ten-file Core Numbered Reference Set. Repository support files such as `AGENTS.md`, `README.md`, and `support/tooling/*` are not RR members unless intentionally added to Available Sources. Available Sources replacement remains manual by Jared.
+Rotom Runbook is every file intentionally kept in the project's Available Sources. The numbered files `00`–`08` are the complete current nine-file Core Numbered Reference Set. Repository support files and supplementary guides, including `guide/PVE-and-Rotom-Total-Loss-Recovery.md`, are not current RR members and must not be added to Available Sources without an explicit future membership decision. Available Sources replacement remains manual by Jared.
 
 The independently verified RR checkout is `/home/jared/documentation/rotom-runbook` on Rotom and `/Users/jared/Documents/ChatGPT/rotom-runbook` on the Mac. In each environment, `rr path` resolves the checkout through `~/.config/rr/repository`. Available Sources replacement remains manual by Jared.
 
-The private **Rotom Support** portal currently publishes the prior `00`–`08` allowlist at `/runbook/`, plus the explicitly selected supplementary `support/website/architecture/index.md` and `support/website/guides/index.md` inputs. Publishing document `09` requires a separately authorized live publisher/allowlist update. Those supplementary sources do not change Runbook membership or Available Sources; they explain and route to numbered sources rather than establish operational truth.
+The private **Rotom Support** portal publishes the complete numbered `00`–`08` RR allowlist at `/runbook/`, plus the explicitly selected supplementary `support/website/architecture/index.md` and `support/website/guides/index.md` inputs. Repository files under `guide/` are not included. Those supplementary sources do not change Runbook membership or Available Sources; they explain and route to numbered sources rather than establish operational truth.
 
 ## 8. Current Source Map
 
@@ -152,10 +150,9 @@ The private **Rotom Support** portal currently publishes the prior `00`–`08` a
 | `06-Maintenance-and-Automation.md` | Timers, maintenance, monitoring, and RR tooling |
 | `07-Users-and-Permissions.md` | Accounts, ownership, privilege, ACLs, and access |
 | `08-Rotom-Directory-Tree.txt` | Concise current topology and recovery-critical paths |
-| `09-PVE-and-Rotom-Total-Loss-Recovery.md` | Blank-hardware total-loss recovery orchestration |
 
 ## 9. Canonical Fact Ownership
 
-Document 01 routes tasks and summarizes current state; it does not replace the detailed owning documents. Application facts belong to document 02, transport to 03, storage to 04, routine backup/restore to 05, automation to 06, identities to 07, topology to 08, total-loss orchestration to 09, and governance/history to 00.
+Document 01 routes tasks and summarizes current state; it does not replace the detailed owning documents. Application facts belong to document 02, transport to 03, storage and NAS contracts to 04, backup/recovery facts and ordinary restores to 05, automation to 06, identities to 07, topology to 08, and governance/history to 00. The repository's supplementary total-loss guide orchestrates these subjects without becoming an RR fact owner.
 
 When a current fact changes, update its owner, affected runbook procedure, task-router destination if needed, revalidation triggers, structural tests, and the protected change log in the same authorized task.

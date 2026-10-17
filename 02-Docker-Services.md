@@ -5,7 +5,7 @@
 **Scope:** Rotom workload layer; the current runtime baseline is the 2026-10-16 inventory in section 1
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
 **Documentation updated:** 2026-10-16 — Reconcile recovery-critical topology
-**Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `09-PVE-and-Rotom-Total-Loss-Recovery.md`
+**Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -293,7 +293,6 @@ The local `/srv/rotom/backup-staging` root is absent. Historical statements abou
 - [05 — Backup and Restore](05-Backup-and-Restore.md)
 - [06 — Maintenance and Automation](06-Maintenance-and-Automation.md)
 - [07 — Users and Permissions](07-Users-and-Permissions.md)
-- [09 — PVE and Rotom Total-Loss Recovery](09-PVE-and-Rotom-Total-Loss-Recovery.md)
 
 ## Maintenance and Revalidation Triggers
 

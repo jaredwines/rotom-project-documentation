@@ -166,7 +166,7 @@
 # guest Shared Drive mount retired; separately authorized NAS access required
 #
 # RECOVERY RULES
-# Total-loss orchestration is canonical in 09-PVE-and-Rotom-Total-Loss-Recovery.md.
+# Supplementary total-loss guide: guide/PVE-and-Rotom-Total-Loss-Recovery.md (not an RR member).
 # - Verify an exact recovery point before use.
 # - Restore into an isolated target when practical.
 # - Preserve numeric identity, modes, ACLs, secret boundaries, and non-creating binds.

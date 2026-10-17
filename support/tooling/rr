@@ -233,7 +233,6 @@ run_check() {
         "06-Maintenance-and-Automation.md"
         "07-Users-and-Permissions.md"
         "08-Rotom-Directory-Tree.txt"
-        "09-PVE-and-Rotom-Total-Loss-Recovery.md"
     )
 
     require_user
@@ -313,7 +312,7 @@ run_check() {
     done
 
     if (( missing == 0 && untracked == 0 )); then
-        echo "PASS  Core RR set: all 00-09 files exist and are tracked"
+        echo "PASS  Core RR set: all 00-08 files exist and are tracked"
     else
         problems=$((problems + 1))
     fi
@@ -474,7 +473,7 @@ run_lint() {
         "06-Maintenance-and-Automation.md"
         "07-Users-and-Permissions.md"
         "08-Rotom-Directory-Tree.txt"
-        "09-PVE-and-Rotom-Total-Loss-Recovery.md"
+        "guide/PVE-and-Rotom-Total-Loss-Recovery.md"
         "AGENTS.md"
         "README.md"
     )
@@ -547,7 +546,7 @@ run_lint() {
                     }
                 }
 
-                while ($text =~ /\b((?:00-Rotom|01-Rotom|02-Docker|03-Network|04-NAS|05-Backup|06-Maintenance|07-Users|08-Rotom|09-PVE)-[A-Za-z0-9-]+\.(?:md|txt))\b/g) {
+                while ($text =~ /\b((?:00-Rotom|01-Rotom|02-Docker|03-Network|04-NAS|05-Backup|06-Maintenance|07-Users|08-Rotom)-[A-Za-z0-9-]+\.(?:md|txt))\b/g) {
                     my $target = $1;
                     my $start = $-[1];
                     next if $start >= 8 && substr($text, $start - 8, 8) eq q{history/};
