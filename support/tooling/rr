@@ -5,7 +5,7 @@ set -euo pipefail
 CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/rr/repository"
 RR_DIR=""
 EXPECTED_USERS=("jared" "fran")
-EXPECTED_REMOTE="git@github.com:jaredwines/rotom-runbook.git"
+EXPECTED_REMOTE="git@github.com:jaredwines/rotom-support.git"
 EXPECTED_BRANCH="main"
 EXPECTED_UPSTREAM="origin/main"
 

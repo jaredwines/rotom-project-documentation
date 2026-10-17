@@ -4,7 +4,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 RR="$REPO_ROOT/support/tooling/rr"
-EXPECTED_REMOTE="git@github.com:jaredwines/rotom-runbook.git"
+EXPECTED_REMOTE="git@github.com:jaredwines/rotom-support.git"
 FIXTURE_ROOT="$(mktemp -d)"
 REMOTE="$FIXTURE_ROOT/remote.git"
 SEED="$FIXTURE_ROOT/seed"
