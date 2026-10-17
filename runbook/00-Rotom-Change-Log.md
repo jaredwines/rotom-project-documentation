@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RR maintenance contract
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-16 — Record the Rotom Support repository rename
+**Documentation updated:** 2026-10-16 — Record Mac verification after repository rename
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -83,6 +83,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-16 — Verify the Mac after the repository rename
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `06-Maintenance-and-Automation.md`.
+- **Status:** **Documentation only / Verified.**
+- **Changes:** Recorded the Mac checkout and helper cutover to `jaredwines/rotom-support`. This supersedes the outstanding Mac synchronization and verification items in the preceding repository-rename, Architecture-directory, publisher-repair, and runbook-directory entries; their dated evidence remains historical.
+- **Evidence:** Jared supplied Mac terminal output showing the checkout fast-forwarded to `0b63c03`, the helper and origin were updated, and `rr check` passed with a clean `main`, the new SSH origin, all nine numbered files, successful lint, and a GitHub match. Jared also confirmed replacement of the prior Available Sources copies.
+- **Outstanding:** Jared must manually replace these newly updated Available Sources files; the Mac checkout will need a routine pull for this documentation update.
 
 ## 2026-10-16 — Rename the GitHub repository to Rotom Support
 
