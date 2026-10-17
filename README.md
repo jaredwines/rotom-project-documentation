@@ -35,7 +35,7 @@ Available Sources defines the RR membership boundary. Repository-support files, 
 
 ## Supplementary guides
 
-Files under `guide/` are repository guides, not RR members or Available Sources. Use [PVE and Rotom Total-Loss Recovery](guide/PVE-and-Rotom-Total-Loss-Recovery.md) for blank-hardware disaster-recovery orchestration and acceptance.
+Every file under `guide/` is a repository guide that remains separate from the RR, Core Numbered Reference Set, Available Sources, RR-only validation, and RR publication. Use [PVE and Rotom Total-Loss Recovery](guide/PVE-and-Rotom-Total-Loss-Recovery.md) for blank-hardware disaster-recovery orchestration and acceptance.
 
 ## Using this repository
 
@@ -44,7 +44,8 @@ Files under `guide/` are repository guides, not RR members or Available Sources.
 - Read the canonical maintenance contract in [00 - Rotom Change Log](00-Rotom-Change-Log.md) before preparing an RR change.
 - Use the guarded `rr` helper for normal repository operations. `rr path` resolves the active checkout.
 - Run the repository's offline `support/tooling/rr lint` validation before synchronization checks. After the matching helper version is installed, `rr lint` is equivalent.
-- From any directory, run `bash "$(rr path)/support/tooling/test-rr-runbooks"` to validate the numbered runbook-first RR's permanent structure and nine-file membership, plus the supplementary guide's links, safety labels, phase structure, and diagrams.
+- From any directory, run `bash "$(rr path)/support/tooling/test-rr-runbooks"` to validate only the numbered runbook-first RR's permanent structure and nine-file membership.
+- Run `bash "$(rr path)/support/tooling/test-guides"` separately to validate files under `guide/` without changing RR membership.
 
 ## Safety
 

@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RR maintenance contract
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-16 — Separate total-loss guide from RR membership
+**Documentation updated:** 2026-10-16 — Establish `guide/` as a hard boundary outside RR
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -83,6 +83,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-16 — Establish `guide/` as a hard boundary outside RR
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`; repository instruction/support files `AGENTS.md`, `README.md`, `support/tooling/rr`, `support/tooling/test-rr-cli`, `support/tooling/test-rr-runbooks`, and new `support/tooling/test-guides`.
+- **Status:** **Documentation only / Implemented / Verified.** No PVE, Rotom, VM, NAS, repository data, snapshot, archive, network, credential, DNS, external service, or live publisher state changed.
+- **Changes:** Established the directory-wide rule that every file under `guide/` is separate from RR, the Core Numbered Reference Set, Available Sources, RR-only validation, and RR publication. Removed the guide dependency from `rr lint`, its CLI fixture, and the RR structural suite; created an independent guide validator that retains link, fence, label, secret-pattern, phase, and diagram checks without changing RR membership.
+- **Evidence:** RR and guide validation suites, isolated RR CLI tests, shell syntax, whitespace, local link/fragment checks, secret-pattern checks, and four-diagram Mermaid grammar validation passed independently.
+- **Outstanding:** Available Sources remains the numbered `00`–`08` RR set. Files under `guide/` require separate distribution or publication decisions if desired.
 
 ## 2026-10-16 — Separate the total-loss guide from Rotom Runbook
 

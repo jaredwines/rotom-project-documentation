@@ -1,0 +1,149 @@
+#!/usr/bin/env bash
+set -u -o pipefail
+
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)"
+REPO_ROOT="$(CDPATH= cd -- "$SCRIPT_DIR/../.." && pwd -P)"
+GUIDE_DIR="$REPO_ROOT/guide"
+FAILURES=0
+
+pass() {
+    printf 'PASS  %s\n' "$1"
+}
+
+fail() {
+    printf 'FAIL  %s\n' "$1" >&2
+    FAILURES=$((FAILURES + 1))
+}
+
+require_text() {
+    local file="$1"
+    local text="$2"
+    if grep -Fq -- "$text" "$REPO_ROOT/$file"; then
+        pass "$file: $text"
+    else
+        fail "$file: missing required text: $text"
+    fi
+}
+
+if [[ ! -d "$GUIDE_DIR" ]]; then
+    fail "guide directory is missing"
+    printf '\nGUIDE TESTS: FAIL (%d problem(s))\n' "$FAILURES" >&2
+    exit 1
+fi
+
+mapfile -d '' guide_files < <(find "$GUIDE_DIR" -type f -name '*.md' -print0 | sort -z)
+
+if (( ${#guide_files[@]} == 0 )); then
+    fail "guide directory contains no Markdown guides"
+else
+    pass "guide directory contains ${#guide_files[@]} Markdown guide(s)"
+fi
+
+for file in "${guide_files[@]}"; do
+    relative=${file#"$REPO_ROOT/"}
+    head -n 1 "$file" | grep -q '^# ' && pass "$relative: level-one title" || fail "$relative: missing level-one title"
+    grep -Fq '**Artifact class:** Supplementary repository guide; not a Rotom Runbook or Available Sources member' "$file" &&
+        pass "$relative: separate-from-RR classification" ||
+        fail "$relative: missing separate-from-RR classification"
+    fences=$(grep -c '^```' "$file" || true)
+    (( fences % 2 == 0 )) && pass "$relative: balanced fences" || fail "$relative: unbalanced fences"
+done
+
+while IFS= read -r issue; do
+    [[ -n "$issue" ]] || continue
+    fail "broken guide Markdown link: $issue"
+done < <(
+    perl -e '
+        use strict;
+        use warnings;
+        use File::Basename qw(dirname);
+        use File::Spec;
+        my %reported;
+        for my $file (@ARGV) {
+            open my $fh, "<", $file or die "Cannot read $file: $!\n";
+            local $/;
+            my $text = <$fh>;
+            while ($text =~ /\[[^\]]+\]\(([^)]+)\)/g) {
+                my $target = $1;
+                $target =~ s/\s+"[^"]*"\z//;
+                next if $target =~ m{^(?:https?|mailto):}i;
+                $target =~ s/#.*\z//;
+                next if $target eq q{};
+                my $path = File::Spec->catfile(dirname($file), $target);
+                print "$file -> $target\n" if !-e $path && !$reported{"$file\0$target"}++;
+            }
+        }
+    ' "${guide_files[@]}"
+)
+pass "guide local link target scan completed"
+
+while IFS= read -r record; do
+    source=${record%%:*}
+    link=${record#*:}
+    link=${link#](}
+    target=${link%%#*}
+    fragment=${link#*#}
+    if [[ -n "$target" ]]; then
+        target=${target//%20/ }
+        destination="$(dirname "$source")/$target"
+    else
+        destination=$source
+    fi
+    matched=0
+    while IFS= read -r heading; do
+        slug=$(printf '%s\n' "$heading" |
+            tr '[:upper:]' '[:lower:]' |
+            sed -E 's/`//g; s/<[^>]*>//g; s/[^[:alnum:] _-]//g; s/[[:space:]]+/-/g; s/^-+//; s/-+$//')
+        if [[ "$slug" == "$fragment" ]]; then
+            matched=1
+            break
+        fi
+    done < <(sed -nE 's/^#{1,6}[[:space:]]+//p' "$destination")
+    (( matched == 1 )) || fail "broken guide fragment: ${source#$REPO_ROOT/} -> $link"
+done < <(grep -H -oE '\]\([^)]*#[^)]+' "${guide_files[@]}" | sort -u)
+pass "guide local fragment scan completed"
+
+invalid_labels=$(grep -hE '^\*\*(Read-only|Changes Rotom|Credential-sensitive|PVE|Destructive)' "${guide_files[@]}" | grep -vFx \
+    -e '**Read-only**' \
+    -e '**Read-only; may activate an existing automount**' \
+    -e '**Changes Rotom**' \
+    -e '**Changes Rotom and protected storage/repository state**' \
+    -e '**Credential-sensitive**' \
+    -e '**PVE — Jared executes**' \
+    -e '**Destructive — explicit approval required**' || true)
+[[ -z "$invalid_labels" ]] && pass "guide command labels use approved forms" || fail "unapproved guide command label: $invalid_labels"
+
+if grep -R -n -E -- '-----BEGIN (OPENSSH|RSA|EC|DSA) PRIVATE KEY-----|(^|[[:space:]])(token|password|secret)[[:space:]]*=[[:space:]]*[^<[:space:]]' "$GUIDE_DIR" >/dev/null 2>&1; then
+    fail "possible secret or private-key material found in guide directory"
+else
+    pass "no secret/private-key material pattern found in guide directory"
+fi
+
+RECOVERY_GUIDE="guide/PVE-and-Rotom-Total-Loss-Recovery.md"
+if [[ -f "$REPO_ROOT/$RECOVERY_GUIDE" ]]; then
+    require_text "$RECOVERY_GUIDE" "## Emergency Recovery Path"
+    require_text "$RECOVERY_GUIDE" "## Operator Navigation and Incident Control"
+    require_text "$RECOVERY_GUIDE" "### Recovery Control Sheet"
+    require_text "$RECOVERY_GUIDE" "### Recovery architecture"
+    require_text "$RECOVERY_GUIDE" "### End-to-end flow with verification and safe-stop branches"
+    require_text "$RECOVERY_GUIDE" "### Recovery-source decision tree"
+    require_text "$RECOVERY_GUIDE" "### Service dependency graph"
+    require_text "$RECOVERY_GUIDE" "### Gap-Closure Register"
+
+    phase_count=$(grep -Ec '^## Phase ([0-9]|1[0-9]|20) - ' "$REPO_ROOT/$RECOVERY_GUIDE" || true)
+    [[ "$phase_count" -eq 21 ]] && pass "recovery guide: all 21 phases" || fail "recovery guide: expected 21 phases; found $phase_count"
+    for phase in {0..20}; do
+        count=$(grep -Ec "^## Phase ${phase} - " "$REPO_ROOT/$RECOVERY_GUIDE" || true)
+        [[ "$count" -eq 1 ]] || fail "recovery guide: expected one Phase $phase heading; found $count"
+    done
+
+    mermaid_count=$(grep -c '^```mermaid$' "$REPO_ROOT/$RECOVERY_GUIDE" || true)
+    [[ "$mermaid_count" -eq 4 ]] && pass "recovery guide: four Mermaid diagrams" || fail "recovery guide: expected four Mermaid diagrams; found $mermaid_count"
+fi
+
+if (( FAILURES > 0 )); then
+    printf '\nGUIDE TESTS: FAIL (%d problem(s))\n' "$FAILURES" >&2
+    exit 1
+fi
+
+printf '\nGUIDE TESTS: PASS\n'

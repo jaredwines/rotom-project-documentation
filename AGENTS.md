@@ -11,6 +11,10 @@ This repository is the Git working copy for the Rotom Runbook (RR).
 
 Repository support files such as root `AGENTS.md`, `.gitignore`, `README.md`, and files under `support/` are not RR members merely because they are stored in this Git repository. Available Sources remains the RR membership boundary.
 
+## Supplementary guides
+
+Every file under `guide/` is separate from Rotom Runbook. Files in that directory are not RR members, are not part of the Core Numbered Reference Set, must not be added to Available Sources, and must not be required by RR-only validation or publication. Validate guide content with `support/tooling/test-guides`, not by expanding RR membership. A guide may link to RR fact owners; if a guide change also changes an RR-owned fact or procedure, update that RR owner separately under the maintenance contract.
+
 ## RR Git workflow
 
 Use the `rr` helper for normal RR Git operations.

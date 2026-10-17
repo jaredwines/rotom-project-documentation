@@ -473,7 +473,6 @@ run_lint() {
         "06-Maintenance-and-Automation.md"
         "07-Users-and-Permissions.md"
         "08-Rotom-Directory-Tree.txt"
-        "guide/PVE-and-Rotom-Total-Loss-Recovery.md"
         "AGENTS.md"
         "README.md"
     )

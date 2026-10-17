@@ -131,7 +131,7 @@ The alerting worker, units, timers, scripts, Homepage integration, and delivery 
 
 ## 7. Rotom Runbook Model
 
-Rotom Runbook is every file intentionally kept in the project's Available Sources. The numbered files `00`–`08` are the complete current nine-file Core Numbered Reference Set. Repository support files and supplementary guides, including `guide/PVE-and-Rotom-Total-Loss-Recovery.md`, are not current RR members and must not be added to Available Sources without an explicit future membership decision. Available Sources replacement remains manual by Jared.
+Rotom Runbook is every file intentionally kept in the project's Available Sources. The numbered files `00`–`08` are the complete current nine-file Core Numbered Reference Set. Every file under `guide/` is a separate repository guide, not an RR member, and must remain outside Available Sources, RR-only validation, and RR publication. Repository support files such as `AGENTS.md`, `README.md`, and `support/tooling/*` are likewise not RR members merely because they are tracked. Available Sources replacement remains manual by Jared.
 
 The independently verified RR checkout is `/home/jared/documentation/rotom-runbook` on Rotom and `/Users/jared/Documents/ChatGPT/rotom-runbook` on the Mac. In each environment, `rr path` resolves the checkout through `~/.config/rr/repository`. Available Sources replacement remains manual by Jared.
 

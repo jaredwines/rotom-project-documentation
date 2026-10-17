@@ -48,8 +48,6 @@ for file in \
 do
     require_file "$file"
 done
-require_file guide/PVE-and-Rotom-Total-Loss-Recovery.md
-require_text guide/PVE-and-Rotom-Total-Loss-Recovery.md "not a Rotom Runbook or Available Sources member"
 
 require_text 00-Rotom-Change-Log.md "### Runbook-First Maintenance Standard"
 require_text 00-Rotom-Change-Log.md "An RR update is incomplete if it changes how Rotom is operated, diagnosed, maintained, or recovered"
@@ -57,8 +55,11 @@ require_text 00-Rotom-Change-Log.md "support/tooling/test-rr-runbooks"
 require_text 00-Rotom-Change-Log.md 'The sole canonical documentation-update command is **`Update the RR`**'
 require_text README.md "# Rotom Runbook"
 require_text AGENTS.md "## RR Git workflow"
+require_text AGENTS.md 'Every file under `guide/` is separate from Rotom Runbook'
+require_text README.md 'Every file under `guide/` is a repository guide that remains separate from the RR'
 require_file support/tooling/rr
 require_file support/tooling/test-rr-cli
+require_file support/tooling/test-guides
 require_file support/website/home.md
 require_file support/website/architecture/index.md
 require_file support/website/guides/index.md
@@ -96,28 +97,6 @@ require_text 08-Rotom-Directory-Tree.txt "# CURRENT TOPOLOGY"
 require_text 08-Rotom-Directory-Tree.txt "# PRE-MIGRATION RESTORATION TARGET"
 require_text 08-Rotom-Directory-Tree.txt "# RETIRED PATH WARNINGS"
 require_text 08-Rotom-Directory-Tree.txt "# RECOVERY RULES"
-require_text guide/PVE-and-Rotom-Total-Loss-Recovery.md "## Emergency Recovery Path"
-require_text guide/PVE-and-Rotom-Total-Loss-Recovery.md "## Operator Navigation and Incident Control"
-require_text guide/PVE-and-Rotom-Total-Loss-Recovery.md "### Recovery Control Sheet"
-require_text guide/PVE-and-Rotom-Total-Loss-Recovery.md "### Recovery architecture"
-require_text guide/PVE-and-Rotom-Total-Loss-Recovery.md "### End-to-end flow with verification and safe-stop branches"
-require_text guide/PVE-and-Rotom-Total-Loss-Recovery.md "## Phase 0 - Declare the Incident and Preserve Recovery Sources"
-require_text guide/PVE-and-Rotom-Total-Loss-Recovery.md "## Phase 20 - Create and Verify Fresh Backups"
-require_text guide/PVE-and-Rotom-Total-Loss-Recovery.md "### Recovery-source decision tree"
-require_text guide/PVE-and-Rotom-Total-Loss-Recovery.md "### Service dependency graph"
-require_text guide/PVE-and-Rotom-Total-Loss-Recovery.md "### Gap-Closure Register"
-require_text guide/PVE-and-Rotom-Total-Loss-Recovery.md "## Maintenance and Revalidation Triggers"
-
-phase_count=$(grep -Ec '^## Phase ([0-9]|1[0-9]|20) - ' "$REPO_ROOT/guide/PVE-and-Rotom-Total-Loss-Recovery.md" || true)
-[[ "$phase_count" -eq 21 ]] && pass "supplementary guide: all 21 recovery phases" || fail "supplementary guide: expected 21 recovery phases; found $phase_count"
-
-for phase in {0..20}; do
-    count=$(grep -Ec "^## Phase ${phase} - " "$REPO_ROOT/guide/PVE-and-Rotom-Total-Loss-Recovery.md" || true)
-    [[ "$count" -eq 1 ]] || fail "supplementary guide: expected one Phase $phase heading; found $count"
-done
-
-mermaid_count=$(grep -c '^```mermaid$' "$REPO_ROOT/guide/PVE-and-Rotom-Total-Loss-Recovery.md" || true)
-[[ "$mermaid_count" -eq 4 ]] && pass "supplementary guide: four Mermaid diagrams" || fail "supplementary guide: expected four Mermaid diagrams; found $mermaid_count"
 
 require_text 02-Docker-Services.md "## Diagnose and Recover a Container or Docker-Backed Website"
 require_text 04-NAS-and-Storage.md "## Diagnose and Recover a Configured NAS Mount"
@@ -156,7 +135,7 @@ else
 fi
 
 invalid_labels=$(grep -hE '^\*\*(Read-only|Changes Rotom|Credential-sensitive|PVE|Destructive)' \
-    "$REPO_ROOT"/0[2-7]-*.md "$REPO_ROOT/guide/PVE-and-Rotom-Total-Loss-Recovery.md" | grep -vFx -e '**Read-only**' \
+    "$REPO_ROOT"/0[2-7]-*.md | grep -vFx -e '**Read-only**' \
     -e '**Read-only; may activate an existing automount**' \
     -e '**Changes Rotom**' \
     -e '**Changes Rotom and protected storage/repository state**' \
@@ -231,16 +210,16 @@ while IFS= read -r record; do
         fail "broken local fragment: ${source#$REPO_ROOT/} -> $link"
     fi
 done < <(grep -H -oE '\]\([^)]*#[^)]+' \
-    "$REPO_ROOT"/0[0-7]-*.md "$REPO_ROOT/guide/PVE-and-Rotom-Total-Loss-Recovery.md" "$REPO_ROOT/README.md" | sort -u)
+    "$REPO_ROOT"/0[0-7]-*.md "$REPO_ROOT/README.md" | sort -u)
 pass "local fragment target scan completed"
 
-for file in "$REPO_ROOT"/*.md "$REPO_ROOT"/guide/*.md; do
+for file in "$REPO_ROOT"/*.md; do
     fences=$(grep -c '^```' "$file" || true)
     (( fences % 2 == 0 )) && pass "balanced fences: ${file#$REPO_ROOT/}" || fail "unbalanced fences: ${file#$REPO_ROOT/}"
 done
 
 if grep -R -n -E -- '-----BEGIN (OPENSSH|RSA|EC|DSA) PRIVATE KEY-----|(^|[[:space:]])(token|password|secret)[[:space:]]*=[[:space:]]*[^<[:space:]]' \
-    "$REPO_ROOT"/0[0-8]-* "$REPO_ROOT/README.md" "$REPO_ROOT/guide" "$REPO_ROOT/support" >/dev/null 2>&1; then
+    "$REPO_ROOT"/0[0-8]-* "$REPO_ROOT/README.md" "$REPO_ROOT/support" >/dev/null 2>&1; then
     fail "possible secret or private-key material found"
 else
     pass "no secret/private-key material pattern found"
