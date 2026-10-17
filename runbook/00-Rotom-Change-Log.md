@@ -84,6 +84,13 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-16 — Verify RS repository and publication checkpoints
+
+- **Files changed:** `00-Rotom-Change-Log.md`.
+- **Status:** **Documentation only / Verified**, with Mac and Available Sources work outstanding.
+- **Evidence:** GitHub reports repository ID `1390601496`, owner `jaredwines`, default branch `main`, public visibility, and administrator access for Jared. The public branch API reports `main` unprotected with no active branch rules, matching the earlier recorded baseline. At revision `2c5435d6462d3df163ba46455eb377b3e84a4ded`, the clean Rotom checkout passed `rs check` and the clean publisher checkout matched it. The final RS publication served the expected title and denied an untrusted bridge client with HTTP 403; the prior entry records the recovery copies.
+- **Outstanding:** Only Rotom is connected to Desktop Commander; the Mac is not mounted and has no configured SSH host. Its `rs` installation, dependencies, and independent checks remain unverified. Jared must manually replace Available Sources. Repository permissions beyond the observed administrator access and the full settings inventory were not independently compared.
+
 ## 2026-10-16 — Migrate documentation identity to Rotom Support
 
 - **Files changed:** Numbered documents `00`–`08`, `AGENTS.md`, `README.md`, the separate total-loss guide, website guide input, and documentation tooling. Rotom's installed helper and Codex entry point are also updated.
