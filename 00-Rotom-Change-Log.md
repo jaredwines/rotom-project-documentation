@@ -63,7 +63,7 @@ For each `Update the RR` task:
 8. Complete RR delivery according to the execution environment:
    - **ChatGPT on Mac (non-Codex):** deliver replacement copies of the **materially changed RR files individually** and package the **complete current RR set**, including unchanged members, into one ZIP named **`Rotom-Runbook-YYYY-MM-DD.zip`** using the documentation-update date in `America/Los_Angeles`. Tell Jared to run `rr path` on the Mac to resolve the active local checkout, copy the materially changed files into that checkout, manually replace the corresponding Available Sources copies, then run `rr commit "<relevant concise commit message>"`, `rr check`, and `rr push` on the Mac and verify success. ChatGPT prepares the files and instructions only; it does not execute the RR Git commit or push itself.
    - **Codex on Mac:** resolve the active local RR checkout with `rr path` and work directly in that checkout. After the final RR files are complete, run `rr commit "<relevant concise commit message>"`, then `rr check`, then `rr push`, and verify the commit and push succeeded. A separate replacement-file/ZIP package is not required unless Jared explicitly requests one.
-   - **Codex on Rotom:** resolve the active local RR checkout with `rr path` and work directly in that checkout. After the final RR files are complete, run `rr commit "<relevant concise commit message>"`, then `rr check`, then `rr push`, and verify the commit and push succeeded. A separate replacement-file/ZIP package is not required unless Jared explicitly requests one.
+   - **Codex on Rotom:** resolve the active local RR checkout with `rr path` and work directly in that checkout. When the active sandbox restricts the checkout's `.git` directory or GitHub network access, request the necessary execution access before running `rr check` or other affected `rr` Git operations; retain all helper safety checks. After the final RR files are complete, run `rr commit "<relevant concise commit message>"`, then `rr check`, then `rr push`, and verify the commit and push succeeded. A separate replacement-file/ZIP package is not required unless Jared explicitly requests one.
    - **All environments:** Available Sources replacement remains manual by Jared. Do not open or control a browser for synchronization, claim a manual destination is updated before Jared confirms it, commit unrelated changes or temporary files, or commit secrets. If an `rr` check, commit, or push fails, stop and report the problem rather than bypassing the guardrails. Preserve existing RR filenames whenever possible and do not add checksum manifests, packaging metadata, generated README files, or other non-RR extras unless explicitly requested. Generated packages and separate artifacts belong under `Downloads/`; the local `sources/` mirror remains read-only.
 9. For Rotom work tied to an active Linear ticket, keep that ticket current as meaningful work is verified: record material design or scope decisions, verified implementation milestones, blockers, rollbacks, and intentional deferrals as they occur. Do not use Linear as a raw command transcript or duplicate routine diagnostic output. When ChatGPT is actively assisting with the ticket and Linear access is available, these meaningful updates should be made during the work without requiring Jared to separately request each one. The RR remains the canonical verified as-built source of truth; update it from the final verified state at ticket closeout.
 
@@ -83,6 +83,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-16 — Clarify sandbox access for RR Git checks
+
+- **Files changed:** `00-Rotom-Change-Log.md`.
+- **Status:** **Documentation only / Verified.**
+- **Changes:** Clarified that Codex on Rotom should request the execution access needed for RR Git operations before running them when the sandbox restricts Git metadata or GitHub. Existing helper guardrails and stop-on-failure rules remain in force.
+- **Evidence:** A sandboxed `rr check` could not write `.git/FETCH_HEAD`; the same check passed with the necessary execution access, and the preceding RR update was committed and pushed through `rr`.
+- **Outstanding:** Available Sources replacement remains manual by Jared.
 
 ## 2026-10-16 — Restore Smart Home DNS and ConBee passthrough
 
