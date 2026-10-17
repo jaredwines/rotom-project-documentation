@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RR maintenance contract
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-16 — Place the numbered RR in `runbook/`
+**Documentation updated:** 2026-10-16 — Repair Rotom Support publisher synchronization
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -83,6 +83,15 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-16 — Repair Rotom Support publisher synchronization
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`; live Rotom Support publisher script and deployment checkout.
+- **Status:** **Implemented / Verified.**
+- **Changes:** With Jared's approval, preserved the clean divergent deployment checkout and replaced it with a fresh clone of the verified GitHub `main`. Updated the guarded publisher to read the numbered sources from `runbook/` while retaining its origin, branch, clean-tree, fast-forward, allowlist, staged-build, and rollback safeguards. In the generated site only, the two references to the separate recovery guide are rendered as plain text because the guide is outside the publication allowlist.
+- **Evidence:** The old checkout at `e87d6f3` and rewritten GitHub history had no common ancestor; corresponding historical commits had matching subjects and timestamps but different tree contents. SSH and HTTPS both identified the same GitHub branch. A separate checkout and the installed publisher each passed isolated MkDocs validation without warnings. The guarded publisher built and published successfully; local Home, Runbook, inventory, backup, architecture, and guides routes returned HTTP 200, the guide references appeared as text, and the documentation container was running.
+- **Recovery:** Retained the previous checkout at `/srv/rotom/appdata/platform/mkdocs-rr/repository.pre-runbook-directory-20261016` and publisher script at `/srv/rotom/stacks/platform/mkdocs-rr/scripts/publish-source.pre-runbook-directory-20261016`. Preserved the earlier `site.previous` and `source.previous` copies with the `.pre-runbook-directory-20261016` suffix and the immediate pre-cutover site and source with the `.pre-runbook-publication-20261016` suffix.
+- **Outstanding:** Mac helper and checkout synchronization and manual Available Sources replacement remain Jared's tasks.
 
 ## 2026-10-16 — Place the numbered RR in `runbook/`
 

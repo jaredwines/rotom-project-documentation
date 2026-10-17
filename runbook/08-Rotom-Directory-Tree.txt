@@ -179,6 +179,7 @@
 # /home/jared/documentation/rotom-runbook/                   canonical RR checkout
 # /home/jared/documentation/rotom-runbook/runbook/           numbered RR documents 00–08
 # /srv/rotom/appdata/platform/mkdocs-rr/repository/        root-owned Rotom Support publisher clone
+# /srv/rotom/appdata/platform/mkdocs-rr/repository.pre-runbook-directory-20261016/  preserved former publisher clone
 # /srv/rotom/{stacks,appdata}/platform/rotom-docs/         retained inactive rollback paths
 # /usr/local/bin/rr                                      canonical installed helper
 # /home/jared/.config/rr/repository                      private path configuration
