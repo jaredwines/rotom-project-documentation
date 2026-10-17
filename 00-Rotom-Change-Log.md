@@ -84,6 +84,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-16 — Harden total-loss recovery for emergency execution
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `09-PVE-and-Rotom-Total-Loss-Recovery.md`; repository support file `support/tooling/test-rr-runbooks`.
+- **Status:** **Documentation only / Verified.** No PVE, Rotom, VM, NAS, repository, snapshot, archive, network, credential, DNS, external service, or live publisher state changed.
+- **Changes:** Added a fast-navigation map, explicit recovery-state model, printable control sheet, command/version provenance, evidence fields in phase and acceptance gates, and an actionable gap-closure register. Replaced the VM-only flow diagram with the required full end-to-end verification/safe-stop flow, added a second archive-path guard before `qmrestore`, and removed TLS verification bypass from the local-SNI acceptance probe. Structural tests now preserve the new emergency-control sections.
+- **Evidence:** Complete semantic/tabletop review against the recovery requirements and current RR; local link, fence, label, secret-pattern, shell, whitespace, Mermaid grammar, and RR validation repeated after the changes.
+- **Outstanding:** Operational readiness still requires Jared to close the explicitly blocked external-credential, installer, NAS-snapshot, application-database, off-site-protection, Available Sources, live publisher, and installed-helper deployment gaps. The guide now provides a proof requirement and blocking effect for each recovery-critical gap.
+
 ## 2026-10-16 — Add PVE and Rotom total-loss recovery orchestration
 
 - **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`, `09-PVE-and-Rotom-Total-Loss-Recovery.md`; repository support files `README.md`, `support/tooling/rr`, `support/tooling/test-rr-cli`, `support/tooling/test-rr-runbooks`, and `support/website/guides/index.md`.

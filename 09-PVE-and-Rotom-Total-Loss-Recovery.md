@@ -4,7 +4,7 @@
 **Document role:** Canonical orchestration guide for rebuilding PVE and Rotom after complete loss of the original computer
 **Scenario:** Replacement hardware; original PVE installation, local disks, and running Rotom VM are unavailable
 **Evidence baseline:** PVE and Rotom read-only inspection on 2026-10-16
-**Documentation updated:** 2026-10-16
+**Documentation updated:** 2026-10-16 — Harden emergency execution and evidence controls
 **Routine backup authority:** [05 - Backup and Restore](05-Backup-and-Restore.md)
 **Index:** [01 - Rotom Server Inventory](01-Rotom-Server-Inventory.md)
 **Maintenance contract:** [00 - Rotom Change Log](00-Rotom-Change-Log.md#current-documentation-maintenance-rules)
@@ -82,6 +82,55 @@ Credentials and private material are deliberately excluded from this guide. The 
 
 Detailed phases: [0](#phase-0---declare-the-incident-and-preserve-recovery-sources), [1](#phase-1---inventory-snapshots-archives-nas-data-and-timestamps), [2](#phase-2---install-proxmox-ve), [3](#phase-3---establish-minimal-conflict-free-networking), [4](#phase-4---validate-pve-restic), [5](#phase-5---selectively-reconstruct-pve), [6](#phase-6---configure-rotom-vm-backup-storage), [7](#phase-7---verify-the-chosen-vzdump-archive), [8](#phase-8---restore-vmid-100-in-isolation), [9](#phase-9---inspect-rotom-before-activation), [10](#phase-10---verify-exact-nas-exports), [11](#phase-11---compare-vzdump-state-with-rotom-restic), [12](#phase-12---selectively-restore-guest-local-state), [13](#phase-13---recover-nas-resident-data), [14](#phase-14---validate-identities-and-permissions), [15](#phase-15---adapt-hardware-specific-configuration), [16](#phase-16---return-services-in-dependency-order), [17](#phase-17---validate-databases-applications-proxying-dns-and-tls), [18](#phase-18---restore-backup-and-maintenance-automation), [19](#phase-19---final-reboot-and-acceptance), and [20](#phase-20---create-and-verify-fresh-backups).
 
+## Operator Navigation and Incident Control
+
+Use the phases in order. A link is navigation, not permission to skip a gate. Keep the recovery record on a separate trusted device or on paper so it survives a failed replacement host.
+
+| Need | Go directly to |
+|---|---|
+| First 15 minutes | [Emergency Recovery Path](#emergency-recovery-path), then [Phase 0](#phase-0---declare-the-incident-and-preserve-recovery-sources) |
+| Choose a consistent recovery point | [Recovery-Point Selection and Consistency](#7-recovery-point-selection-and-consistency) |
+| Record the current decision and loss window | [Recovery Control Sheet](#recovery-control-sheet) |
+| Check whether the next phase is allowed | [Phase Gate Summary](#phase-gate-summary) |
+| Handle a missing or failed source | [Troubleshooting and Fallback Paths](#30-troubleshooting-and-fallback-paths) |
+| Stop or undo the last targeted change | [Rollback and Safe-Stop Matrix](#31-rollback-and-safe-stop-matrix) |
+| Record proof | [Evidence Log](#32-evidence-log) |
+| Close readiness gaps before a disaster | [Gap-Closure Register](#gap-closure-register) |
+| Perform final acceptance | [Phase 19](#phase-19---final-reboot-and-acceptance) and [Printable Final Checklist](#34-printable-final-checklist) |
+
+### Recovery state model
+
+| State | Meaning | Permitted progression |
+|---|---|---|
+| `PRESERVED` | Sources inventoried and protected; no target recovery begun | Select a recovery set |
+| `RECONSTRUCTING` | Clean PVE is being rebuilt; no restored production identity is active | Restore the VM stopped and disconnected |
+| `ISOLATED` | Rotom may boot only through console; production MAC/IP and writers remain inactive | Inspect, stage, and reconcile |
+| `RECOVERY-NETWORK` | Temporary conflict-free identity permits only required administrative/NAS access | Verify exact sources and dependencies |
+| `PRODUCTION-CANDIDATE` | Production identity is enabled, but acceptance is incomplete | Run ordered service and reboot acceptance |
+| `ACCEPTED` | Every Phase 19 row passes and residual risks are approved | Create the fresh backup baseline |
+| `SAFE-STOP` | A gate failed or evidence is ambiguous | Preserve evidence; follow the owning fallback before proceeding |
+
+### Recovery Control Sheet
+
+| Control | Recorded value |
+|---|---|
+| Incident ID, date/time, and operator |  |
+| Original host fencing proof |  |
+| Replacement hardware identifier |  |
+| Current recovery state | `PRESERVED` / `RECONSTRUCTING` / `ISOLATED` / `RECOVERY-NETWORK` / `PRODUCTION-CANDIDATE` / `ACCEPTED` / `SAFE-STOP` |
+| PVE Restic snapshot ID/time |  |
+| VZDump path/time/size/integrity evidence |  |
+| Rotom Restic snapshot ID/time |  |
+| NAS data or snapshot ID/time |  |
+| Application DB/export time |  |
+| Chosen consistency point and timezone |  |
+| Expected loss window |  |
+| Temporary PVE/Rotom identity |  |
+| Approved production MAC/IP reuse |  |
+| Current phase and gate evidence |  |
+| Accepted degraded capabilities |  |
+| Next action, owner, and approval |  |
+
 ## 1. Purpose, Audience, Scope, and Exclusions
 
 This guide is for an administrator rebuilding Rotom without the original computer. It covers blank replacement hardware through accepted production service and new backups.
@@ -101,6 +150,8 @@ The official references supporting the procedure are the [Proxmox VE Administrat
 
 The original PVE host, local disks, firmware state, and running VM are gone. The UniFi NAS survives with the four current recovery domains plus NAS snapshots. Replacement disks, NIC names, MACs, CPU flags, firmware, GPU, IOMMU groups, USB topology, and boot layout may differ.
 
+### Recovery architecture
+
 ```mermaid
 flowchart LR
     HW[Replacement hardware] --> PVE[Clean PVE]
@@ -115,6 +166,33 @@ flowchart LR
     GATE -->|pass| PROD[Production]
     GATE -->|fail| STOP[Safe stop]
     PROD --> NEW[Fresh verified backups]
+```
+
+### End-to-end flow with verification and safe-stop branches
+
+```mermaid
+flowchart TD
+    A[Preserve sources] --> B{Recovery set consistent?}
+    B -->|no| STOP[Safe stop and preserve evidence]
+    B -->|yes| C[Install clean PVE]
+    C --> D{PVE and NAS access verified?}
+    D -->|no| STOP
+    D -->|yes| E[Reconstruct PVE selectively]
+    E --> F{VZDump passes zstd and VMA checks?}
+    F -->|no| ALT[Choose a recorded fallback]
+    ALT --> B
+    F -->|yes| G[Restore VM stopped and disconnected]
+    G --> H{Offline guest inspection passes?}
+    H -->|no| STOP
+    H -->|yes| I[Reconcile Restic and NAS data]
+    I --> J{Data and identities consistent?}
+    J -->|no| STOP
+    J -->|yes| K[Adapt hardware and start services in order]
+    K --> L{Application and reboot acceptance passes?}
+    L -->|no| STOP
+    L -->|yes| M[Accepted production system]
+    M --> N[Create and verify fresh backups]
+    N --> O[Recovery evidence complete]
 ```
 
 ## 3. Prepare-Now Readiness Checklist
@@ -138,19 +216,19 @@ Complete this while the current systems still exist. A missing required item is 
 
 ## 4. Offline Recovery Kit
 
-| Item | Approved external location to record | Gap rule |
-|---|---|---|
-| Verified PVE installer and compatible version | Offline encrypted media plus printed checksum record | **CRITICAL PRE-DISASTER GAP** if absent |
-| PVE Restic password | Password manager/emergency escrow location only | Never record value here |
-| Rotom Restic password | Password manager/emergency escrow location only | Never record value here |
-| NAS and router/UniFi administration | Recovery account location and second-factor recovery | **CRITICAL PRE-DISASTER GAP** if host-dependent |
-| SSH access | Secure private-key location plus public-key authorization record | Never copy a private key into RR |
-| RR and this guide | Offline digital and printable copies | Include all numbered sources |
-| NAS export discovery | Sanitized export/path record and appliance procedure | Revalidate UUID-backed paths |
-| IP/MAC decisions | Printed reservation table | Prove old identities cannot return |
-| DNS/domain access | Registrar/DNS provider recovery location | Include MFA recovery |
-| Application keys | Approved recovery location per application | Include encryption and recovery keys |
-| USB/passthrough inventory | Device IDs, purpose, physical port, photographs | Bus numbers are not portable |
+| Item | Recorded locator — never the secret | Last verified | Gap rule |
+|---|---|---|---|
+| Verified PVE installer and compatible version |  |  | **CRITICAL PRE-DISASTER GAP** if absent |
+| PVE Restic password |  |  | Password manager/emergency escrow location only |
+| Rotom Restic password |  |  | Password manager/emergency escrow location only |
+| NAS and router/UniFi administration |  |  | **CRITICAL PRE-DISASTER GAP** if host-dependent |
+| SSH access |  |  | Secure private-key location plus public-key authorization record |
+| RR and this guide |  |  | Include all numbered sources and an offline printable copy |
+| NAS export discovery |  |  | Sanitized export/path record and appliance procedure |
+| IP/MAC decisions |  |  | Prove old identities cannot return |
+| DNS/domain access |  |  | Registrar/DNS provider recovery location plus MFA recovery |
+| Application keys |  |  | Include encryption and recovery-key locators per application |
+| USB/passthrough inventory |  |  | Device IDs, purpose, physical port, and photographs; bus numbers are not portable |
 
 ## 5. Recovery Architecture and Source Hierarchy
 
@@ -180,6 +258,18 @@ Complete this while the current systems still exist. A missing required item is 
 | USB | ConBee `1cf1:0030`; Bluetooth `8087:0aaa` | Prefer stable vendor/product mapping only after proving the exact device and exclusivity |
 | VM firmware | OVMF, q35, 4 MiB EFI disk | Preserve when supported; do not convert firmware casually |
 
+### Command and version provenance
+
+| Interface | Evidence used for this guide | Incident-time rule |
+|---|---|---|
+| PVE and QEMU | PVE `9.2.0`, manager `9.2.21`, `qemu-server` `9.2.10`; local `qmrestore help` and current VM configuration captured 2026-10-16 | Re-read local help on the replacement version before using a changed option |
+| VMA | Installed `vma help` confirmed stdin verification syntax on 2026-10-16 | Do not restore an archive unless both the zstd stream and VMA verify successfully |
+| PVE storage | Current `pvesm status`, storage definition, and archive listing supplied 2026-10-16 | Reconfirm the exact export and storage ID on the replacement host |
+| Restic | Official snapshot, check, and staging-restore documentation plus current repository layout | Stop if the replacement Restic CLI changes syntax or repository compatibility |
+| Debian guest | Debian 13 current-state evidence and official stable installation guidance | Reconcile package/service behavior against the restored guest version |
+
+These are compatibility evidence, not permission to replay old hardware configuration. Record replacement versions in the Evidence Log before the first state-changing command.
+
 ## 7. Recovery-Point Selection and Consistency
 
 Do not combine the newest object from every layer automatically. Record a single decision before restore.
@@ -200,6 +290,8 @@ Decision rules:
 - **NAS files newer than their guest database:** stop. Do not attach newer mutable files to an older catalog/database without an application-specific reconciliation plan.
 - **Database and files from incompatible points:** recover both from one consistent point or use an application-native import/rebuild procedure.
 - **No mutually consistent set:** preserve all sources, choose the least-loss isolated base, document expected loss, and escalate before production activation.
+
+### Recovery-source decision tree
 
 ```mermaid
 flowchart TD
@@ -408,6 +500,7 @@ case "$ARCHIVE" in
   *) printf '%s\n' 'STOP: unexpected archive path' >&2; return 1 2>/dev/null || exit 1 ;;
 esac
 sudo test -f "$ARCHIVE"
+sudo stat -c '%n %s bytes %y' "$ARCHIVE"
 sudo zstd --test "$ARCHIVE"
 set -o pipefail
 sudo zstd --decompress --stdout --no-progress "$ARCHIVE" |
@@ -430,30 +523,17 @@ A successful verification proves only this archive stream. It does not prove gue
 
 ## Phase 8 - Restore VMID `100` in Isolation
 
-```mermaid
-flowchart TD
-    A[Verified archive] --> B{VMID 100 free and capacity sufficient?}
-    B -->|no| S[Safe stop]
-    B -->|yes| C[Restore with start disabled]
-    C --> D[Set onboot 0]
-    D --> E[Disconnect NIC]
-    E --> F{Hardware config reviewed?}
-    F -->|no| S
-    F -->|yes| G[Boot isolated]
-    G --> H{Guest checks pass?}
-    H -->|no| S
-    H -->|yes| I[Temporary recovery networking]
-    I --> J{Recovery set consistent?}
-    J -->|no| S
-    J -->|yes| K[Production activation gate]
-```
-
 **PVE — Jared executes**
 
 ```bash
 sudo /usr/bin/pvesh get /cluster/resources --type vm --output-format yaml
 sudo /usr/sbin/pvesm status
 read -r -p 'Exact verified VMID 100 archive path: ' ARCHIVE
+case "$ARCHIVE" in
+  /mnt/pve/nas-rotom-vm-backup/dump/vzdump-qemu-100-*.vma.zst) ;;
+  *) printf '%s\n' 'STOP: unexpected archive path' >&2; return 1 2>/dev/null || exit 1 ;;
+esac
+sudo test -f "$ARCHIVE"
 sudo /usr/sbin/qmrestore "$ARCHIVE" 100 --storage local-lvm --start 0
 sudo /usr/sbin/qm set 100 --onboot 0
 sudo /usr/sbin/qm set 100 \
@@ -707,6 +787,8 @@ sudo stat -c '%n %u:%g %a' /srv/rotom /srv/rotom/stacks /srv/rotom/appdata /srv/
 
 ## Phase 16 - Return Services in Dependency Order
 
+### Service dependency graph
+
 ```mermaid
 flowchart TD
     NET[LAN, DNS, clock] --> NAS[Exact NAS mounts]
@@ -758,7 +840,7 @@ curl -sS -o /dev/null -w 'homepage %{http_code}\n' -H 'Host: rotom.casa' http://
 curl -sS -o /dev/null -w 'aloha %{http_code}\n' http://127.0.0.1:7778/
 curl -sS -o /dev/null -w 'jaredwines %{http_code}\n' http://127.0.0.1:7777/
 getent ahostsv4 rotom.casa
-curl -k -sS -o /dev/null -w 'local-sni %{http_code}\n' \
+curl -sS -o /dev/null -w 'local-sni %{http_code}\n' \
   --resolve rotom.casa:443:127.0.0.1 https://rotom.casa/
 systemctl --failed --no-pager
 ```
@@ -806,20 +888,20 @@ Recreate, do not blindly copy, the current automation contracts: PVE Restic `04:
 
 ## Phase 19 - Final Reboot and Acceptance
 
-| Acceptance item | Required result | Evidence |
-|---|---|---|
-| PVE boot/storage/network | Correct boot, bridge, address, storage, zero unexplained failures |  |
-| VM safety | VMID `100`, intended `onboot`, MAC/IP uniqueness, old host fenced |  |
-| Rotom boot/filesystem | Clean boot, expected disk, no filesystem error |  |
-| NAS | Exact five contracts; active mounts only where needed; no shadow data |  |
-| Identity | Numeric UID/GID, locks, modes, ACLs, Docker membership correct |  |
-| Docker | Expected projects/containers only; health/restarts reviewed |  |
-| Databases/apps | Phase 17 checks pass |  |
-| Proxy/DNS/TLS | Intended direct, SNI, LAN/public, certificate and access-list results |  |
-| Hardware | Accepted NIC/WOL, GPU, USB, Bluetooth, ConBee results or documented degraded mode |  |
-| Automation | Correct timers/jobs and next runs; no unexpected writer |  |
-| Observability | Homepage/status APIs and logs reflect accepted state |  |
-| Recovery evidence | Recovery-point decision, commands, outputs, and residual risks retained |  |
+| Acceptance item | Required result | Evidence reference | Operator/time |
+|---|---|---|---|
+| PVE boot/storage/network | Correct boot, bridge, address, storage, zero unexplained failures |  |  |
+| VM safety | VMID `100`, intended `onboot`, MAC/IP uniqueness, old host fenced |  |  |
+| Rotom boot/filesystem | Clean boot, expected disk, no filesystem error |  |  |
+| NAS | Exact five contracts; active mounts only where needed; no shadow data |  |  |
+| Identity | Numeric UID/GID, locks, modes, ACLs, Docker membership correct |  |  |
+| Docker | Expected projects/containers only; health/restarts reviewed |  |  |
+| Databases/apps | Phase 17 checks pass |  |  |
+| Proxy/DNS/TLS | Intended direct, SNI, LAN/public, certificate and access-list results |  |  |
+| Hardware | Accepted NIC/WOL, GPU, USB, Bluetooth, ConBee results or documented degraded mode |  |  |
+| Automation | Correct timers/jobs and next runs; no unexpected writer |  |  |
+| Observability | Homepage/status APIs and logs reflect accepted state |  |  |
+| Recovery evidence | Recovery-point decision, commands, outputs, and residual risks retained |  |  |
 
 | Control | Requirement |
 |---|---|
@@ -872,29 +954,29 @@ systemctl status pve-restic-backup.service rotom-vm-vzdump-manual.service --no-p
 
 ## Phase Gate Summary
 
-| Phase | Do not continue until |
-|---:|---|
-| 0 | Original sources are protected and the old host is fenced |
-| 1 | One explicit recovery-point decision and loss window are recorded |
-| 2 | Clean PVE is stable on the verified replacement target |
-| 3 | Conflict-free management and exact NAS reachability are proven |
-| 4 | The PVE Restic repository and selected snapshot are readable |
-| 5 | PVE was reconstructed selectively and survives verification |
-| 6 | `nas-rotom-vm-backup` resolves to the exact surviving export |
-| 7 | The chosen archive passes both zstd and VMA verification |
-| 8 | VMID `100` is stopped, `onboot=0`, NIC disconnected, and config recorded |
-| 9 | Rotom passes offline inspection and application writers are stopped |
-| 10 | Exact NFS sources, required paths, and no-shadow conditions pass |
-| 11 | Every Restic path decision is application-consistent and approved |
-| 12 | Each promoted guest-local set passes metadata and native data checks |
-| 13 | NAS authority, snapshot, and database/file consistency are resolved |
-| 14 | Numeric identities, modes, ACLs, locks, and privileges pass |
-| 15 | Each hardware dependency passes or an accepted degraded mode is recorded |
-| 16 | Each service layer passes before consumers start |
-| 17 | Native database, app, proxy, DNS, TLS, and authenticated checks pass |
-| 18 | Automation definitions and next runs match accepted policy without an unintended run |
-| 19 | The final reboot acceptance table is complete |
-| 20 | Fresh backup IDs, integrity level, and restore-test evidence are retained |
+| Phase | Do not continue until | Status (`PASS` / `SAFE-STOP`) | Evidence reference |
+|---:|---|---|---|
+| 0 | Original sources are protected and the old host is fenced |  |  |
+| 1 | One explicit recovery-point decision and loss window are recorded |  |  |
+| 2 | Clean PVE is stable on the verified replacement target |  |  |
+| 3 | Conflict-free management and exact NAS reachability are proven |  |  |
+| 4 | The PVE Restic repository and selected snapshot are readable |  |  |
+| 5 | PVE was reconstructed selectively and survives verification |  |  |
+| 6 | `nas-rotom-vm-backup` resolves to the exact surviving export |  |  |
+| 7 | The chosen archive passes both zstd and VMA verification |  |  |
+| 8 | VMID `100` is stopped, `onboot=0`, NIC disconnected, and config recorded |  |  |
+| 9 | Rotom passes offline inspection and application writers are stopped |  |  |
+| 10 | Exact NFS sources, required paths, and no-shadow conditions pass |  |  |
+| 11 | Every Restic path decision is application-consistent and approved |  |  |
+| 12 | Each promoted guest-local set passes metadata and native data checks |  |  |
+| 13 | NAS authority, snapshot, and database/file consistency are resolved |  |  |
+| 14 | Numeric identities, modes, ACLs, locks, and privileges pass |  |  |
+| 15 | Each hardware dependency passes or an accepted degraded mode is recorded |  |  |
+| 16 | Each service layer passes before consumers start |  |  |
+| 17 | Native database, app, proxy, DNS, TLS, and authenticated checks pass |  |  |
+| 18 | Automation definitions and next runs match accepted policy without an unintended run |  |  |
+| 19 | The final reboot acceptance table is complete |  |  |
+| 20 | Fresh backup IDs, integrity level, and restore-test evidence are retained |  |  |
 
 ## 30. Troubleshooting and Fallback Paths
 
@@ -964,6 +1046,23 @@ Never retain credential values, private keys, cookies, protected environment con
 - The raw image is crash-consistent and has not been rehearsed as a bare-metal restore.
 - The live 2026-10-16 Rotom audit found 19 Docker networks because the retained inactive `rotom-docs_default` network still exists; this is not cleanup authorization.
 - Available Sources replacement remains manual by Jared. The live Rotom Support publisher must be separately updated to admit document `09` before the portal can publish it.
+
+### Gap-Closure Register
+
+An unresolved row does not make the guide unsafe; it deliberately blocks the dependent recovery branch instead of encouraging guesswork. Close each row only with sanitized evidence and update this guide in the same RR task.
+
+| Gap | Owner/action before disaster | Closure evidence | Blocking effect if open | Status/date |
+|---|---|---|---|---|
+| PVE installer/version | Store verified installer externally; record version, checksum, boot mode, and media test | Checksum verification plus successful test boot | Blocks Phase 2 |  |
+| Restic credentials | Record approved external locators and test retrieval without recording values | Retrieval rehearsal and root-only destination metadata | Blocks Phases 4, 11, and 12 |  |
+| NAS/router access | Test recovery account and MFA recovery independently of Rotom/PVE | Successful separate-device login record | Blocks export verification and NAS recovery |  |
+| DNS/domain access | Test registrar/provider recovery and MFA escrow | Successful recovery-path rehearsal | Blocks external route repair if current state is lost |  |
+| SSH/application keys | Inventory required public authorization and secret locators | Sanitized inventory and application recovery test | May block administration or encrypted application state |  |
+| NAS snapshot procedure | Record current schedule/retention and rehearse an isolated appliance-native restore | Snapshot ID, isolated target, comparison, and cleanup record | Blocks snapshot promotion; current NAS remains read-only authority |  |
+| Application databases | Record version-specific offline checks and export/import rehearsal per application | Native check output and isolated import result | Blocks promotion of affected mutable state |  |
+| Hardware inventory | Update device IDs, purpose, physical ports, photos, and accepted degraded modes | Host/guest/app test record | Blocks only the affected passthrough dependency |  |
+| Off-site protection | Decide and implement an independently administered off-site layer | Successful backup, integrity check, and isolated restore | Site/NAS loss remains unrecoverable |  |
+| RR distribution | Store current `00`–`09` set offline and print the emergency/control/checklist pages | File comparison and physical-copy location | Slows or blocks guided recovery without GitHub |  |
 
 ## 34. Printable Final Checklist
 

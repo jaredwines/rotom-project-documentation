@@ -90,9 +90,24 @@ require_text 08-Rotom-Directory-Tree.txt "# PRE-MIGRATION RESTORATION TARGET"
 require_text 08-Rotom-Directory-Tree.txt "# RETIRED PATH WARNINGS"
 require_text 08-Rotom-Directory-Tree.txt "# RECOVERY RULES"
 require_text 09-PVE-and-Rotom-Total-Loss-Recovery.md "## Emergency Recovery Path"
+require_text 09-PVE-and-Rotom-Total-Loss-Recovery.md "## Operator Navigation and Incident Control"
+require_text 09-PVE-and-Rotom-Total-Loss-Recovery.md "### Recovery Control Sheet"
+require_text 09-PVE-and-Rotom-Total-Loss-Recovery.md "### Recovery architecture"
+require_text 09-PVE-and-Rotom-Total-Loss-Recovery.md "### End-to-end flow with verification and safe-stop branches"
 require_text 09-PVE-and-Rotom-Total-Loss-Recovery.md "## Phase 0 - Declare the Incident and Preserve Recovery Sources"
 require_text 09-PVE-and-Rotom-Total-Loss-Recovery.md "## Phase 20 - Create and Verify Fresh Backups"
+require_text 09-PVE-and-Rotom-Total-Loss-Recovery.md "### Recovery-source decision tree"
+require_text 09-PVE-and-Rotom-Total-Loss-Recovery.md "### Service dependency graph"
+require_text 09-PVE-and-Rotom-Total-Loss-Recovery.md "### Gap-Closure Register"
 require_text 09-PVE-and-Rotom-Total-Loss-Recovery.md "## Maintenance and Revalidation Triggers"
+
+phase_count=$(grep -Ec '^## Phase ([0-9]|1[0-9]|20) - ' "$REPO_ROOT/09-PVE-and-Rotom-Total-Loss-Recovery.md" || true)
+[[ "$phase_count" -eq 21 ]] && pass "document 09: all 21 recovery phases" || fail "document 09: expected 21 recovery phases; found $phase_count"
+
+for phase in {0..20}; do
+    count=$(grep -Ec "^## Phase ${phase} - " "$REPO_ROOT/09-PVE-and-Rotom-Total-Loss-Recovery.md" || true)
+    [[ "$count" -eq 1 ]] || fail "document 09: expected one Phase $phase heading; found $count"
+done
 
 mermaid_count=$(grep -c '^```mermaid$' "$REPO_ROOT/09-PVE-and-Rotom-Total-Loss-Recovery.md" || true)
 [[ "$mermaid_count" -eq 4 ]] && pass "document 09: four Mermaid diagrams" || fail "document 09: expected four Mermaid diagrams; found $mermaid_count"
