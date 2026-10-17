@@ -87,10 +87,10 @@ Keep future entries brief: the change log should point to the detailed documents
 ## 2026-10-16 — Place the numbered RR in `runbook/`
 
 - **Files changed:** All nine numbered RR documents were moved into `runbook/`; repository instructions, README, guide links, and RR tooling were updated for the new paths.
-- **Status:** **Documentation and repository tooling change.**
+- **Status:** **Implemented / Verified**, with publisher synchronization blocked.
 - **Changes:** The checkout root still identifies the repository via `rr path`; append `runbook/` for the numbered documents. The separate `guide/` boundary and the existing filenames remain unchanged.
-- **Evidence:** Repository path, link, structural, and isolated helper tests pass against the new layout. Rotom's global Codex instructions now identify the new directory.
-- **Outstanding:** The installed Rotom helper, Mac helper and checkout, and Rotom Support publisher require synchronization with the new paths. The live publisher continues serving its previously generated site until its guarded publisher is updated and successfully run. Available Sources replacement remains manual by Jared.
+- **Evidence:** Repository path, link, structural, and isolated helper tests pass against the new layout. Rotom's global Codex instructions identify the new directory. The installed `/usr/local/bin/rr` matches the tracked helper and `rr check` passed; its previous version is retained at `/usr/local/bin/rr.pre-runbook-directory-20261016`.
+- **Outstanding:** An isolated publisher validation stopped at the deployment checkout's guard: its `main` at `e87d6f3` is ahead by 177 commits and behind by 187 commits relative to fetched `origin/main` at `70903e2`, and the histories have no common ancestor. No reset, merge, replacement, build, or publication was attempted. Investigate that discrepancy before updating the publisher's source paths or publishing. The existing site continues serving its previously generated content. The Mac helper and checkout still require synchronization. Available Sources replacement remains manual by Jared.
 
 ## 2026-10-16 — Establish `guide/` as a hard boundary outside RR
 
