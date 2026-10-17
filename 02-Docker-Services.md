@@ -240,9 +240,13 @@ The runtime uses local Docker root `/var/lib/docker`. Supported mutable state is
 | Paperless | Supported active service | VM-local database/configuration plus `/mnt/nas-libraries/paperless` media |
 | qBittorrentVPN | Supported active service | Libraries torrent/sentinel contract, WireGuard, loopback UI `127.0.0.1:8080` |
 | Palworld Jared and Fran | Supported active services | VM-local state; UDP publications unchanged; both healthy at the evidence date |
-| Home Assistant and Homebridge | Supported active services | VM-local state under Smart Home appdata; host networking retained for discovery |
+| Home Assistant and Homebridge | Supported active services | VM-local state under Smart Home appdata; host networking retained for discovery; each Compose file explicitly uses DNS `192.168.1.1` |
 
 Container state is time-sensitive. Diagnose current runtime state with the runbook above instead of relying on the evidence-date count alone.
+
+Home Assistant's ZHA integration is configured for a ConBee II at `/dev/ttyACM0`. PVE VM 100 has USB passthrough for vendor/product `1cf1:0030`, configured by Jared. After the 2026-10-16 PVE reboot, the device was visible on Rotom and in the Home Assistant container. The numbered device path can change, and individual Zigbee device operation was not verified. Historical ConBee disconnection during PVE stability testing did not establish the cause of earlier resets; monitor PVE stability after reconnection.
+
+For a ZHA missing-device error, check the device on Rotom and inside Home Assistant before changing configuration. If absent on Rotom, Jared must inspect the physical adapter and PVE passthrough. If present on Rotom but absent in the container, assess container startup timing and the existing Compose configuration before any targeted recovery. Preserve Zigbee state and avoid replacing the coordinator or resetting its network as a diagnostic step.
 
 ## 3. Docker Networking
 

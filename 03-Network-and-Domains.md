@@ -128,6 +128,8 @@ Cloudflare DDNS remains an outbound-only Platform service. Its protected token v
 
 Local and public DNS can legitimately differ. Diagnose the local resolver result, public authoritative result, NPM route, certificate, access list, and upstream independently. A wildcard DNS answer does not prove that an application or proxy route exists.
 
+Home Assistant and Homebridge explicitly use router DNS `192.168.1.1` in their Compose definitions. On 2026-10-16 their previous container resolver files had no nameserver even though the host resolver worked. For outbound DNS failures, compare the host and affected container resolver files and resolution results before changing shared DNS. After the PVE reboot, both containers retained the configured DNS and Home Assistant resolved the Sensibo hostname; the integration's full operation was not independently verified.
+
 NPM certificate-renewal behavior remains current. Jared confirmed a successful renewal event; inspect the currently served certificate and NPM renewal state during certificate incidents rather than relying on the historical certificate dates.
 
 ## 6. Administrative and Monitoring Access

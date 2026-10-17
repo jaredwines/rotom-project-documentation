@@ -84,6 +84,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-16 — Restore Smart Home DNS and ConBee passthrough
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `02-Docker-Services.md`, `03-Network-and-Domains.md`.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Configured Home Assistant and Homebridge Compose DNS to use `192.168.1.1` after their container resolver files lacked a nameserver. Jared reconnected the ConBee II and configured PVE VM 100 USB passthrough for `1cf1:0030`; Home Assistant's existing ZHA configuration uses `/dev/ttyACM0`. This supersedes the earlier historical disconnected-state evidence, not its unresolved stability investigation.
+- **Evidence:** Following Jared's PVE reboot, Rotom detected the ConBee II and Home Assistant's container saw `/dev/ttyACM0`; both Smart Home services were running, retained the configured DNS, and returned HTTP `200`. Home Assistant resolved the Sensibo hostname; no matching recent ZHA or Sensibo setup errors were observed.
+- **Outstanding:** Individual Zigbee device response and complete Sensibo integration operation were not independently verified. Monitor PVE stability with the adapter reconnected. Available Sources replacement remains manual by Jared.
+
 ## 2026-10-16 — Simplify Rotom Support Homepage status
 
 - **Files changed:** `00-Rotom-Change-Log.md`.
