@@ -79,7 +79,7 @@ require_file support/website/guides/index.md
 expected_website_sources='architecture/index.md
 guides/index.md
 home.md'
-actual_website_sources=$(find "$REPO_ROOT/support/website" -type f -printf '%P\n' | LC_ALL=C sort)
+actual_website_sources=$(cd "$REPO_ROOT/support/website" && find . -type f | sed 's|^\./||' | LC_ALL=C sort)
 if [[ "$actual_website_sources" == "$expected_website_sources" ]]; then
     pass "supplementary website sources are explicitly bounded"
 else
