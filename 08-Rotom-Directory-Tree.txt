@@ -4,11 +4,12 @@
 # Configuration semantics remain canonical in documents 02 through 07.
 # Index: 01-Rotom-Server-Inventory.md
 # Maintenance contract and protected history: 00-Rotom-Change-Log.md
-# Evidence date: 2026-10-15
+# Evidence date: 2026-10-16
 #
 # CURRENT TOPOLOGY
 #
-# Final 2026-10-15 state is 23 running container objects, 18 networks, two named volumes, and 18 Compose definitions.
+# Final 2026-10-16 state is 23 running container objects, 19 networks, two named volumes, and 18 active Compose definitions.
+# The unattached rotom-docs_default network belongs to the retained inactive rollback stack; its presence is not cleanup authorization.
 #
 # /srv/rotom/
 #   stacks/
@@ -165,6 +166,7 @@
 # guest Shared Drive mount retired; separately authorized NAS access required
 #
 # RECOVERY RULES
+# Total-loss orchestration is canonical in 09-PVE-and-Rotom-Total-Loss-Recovery.md.
 # - Verify an exact recovery point before use.
 # - Restore into an isolated target when practical.
 # - Preserve numeric identity, modes, ACLs, secret boundaries, and non-creating binds.
@@ -192,6 +194,6 @@
 # Follow the canonical Runbook-First Maintenance Standard in
 # 00-Rotom-Change-Log.md#runbook-first-maintenance-standard.
 # Revalidate when an operationally important path, mount, identity, service root,
-# backup destination, recovery artifact, or ownership boundary changes. Update the
+# backup destination, recovery artifact, total-loss phase, or ownership boundary changes. Update the
 # owning subject document as well; this file records topology and must not become a
 # competing procedure owner.

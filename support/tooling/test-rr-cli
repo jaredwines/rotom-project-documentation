@@ -69,6 +69,7 @@ do
     printf '# %s\n' "$file" >"$SEED/$file"
 done
 printf '# Directory Tree\n' >"$SEED/08-Rotom-Directory-Tree.txt"
+printf '# Total Loss Recovery\n' >"$SEED/09-PVE-and-Rotom-Total-Loss-Recovery.md"
 printf '# Fixture instructions\n' >"$SEED/AGENTS.md"
 printf '# Fixture readme\n' >"$SEED/README.md"
 

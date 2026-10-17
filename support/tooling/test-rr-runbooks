@@ -27,18 +27,19 @@ reject_text() {
     fi
 }
 
-for n in 00 01 02 03 04 05 06 07 08; do
+for n in 00 01 02 03 04 05 06 07 08 09; do
     count=$(find "$REPO_ROOT" -maxdepth 1 -type f -name "$n-*" | wc -l)
     [[ "$count" -eq 1 ]] && pass "one numbered source for $n" || fail "expected one numbered source for $n; found $count"
 done
 
-numbered_count=$(find "$REPO_ROOT" -maxdepth 1 -type f \( -name '0[0-7]-*.md' -o -name '08-*.txt' \) | wc -l)
-[[ "$numbered_count" -eq 9 ]] && pass "nine numbered RR sources" || fail "expected nine numbered RR sources; found $numbered_count"
+numbered_count=$(find "$REPO_ROOT" -maxdepth 1 -type f \( -name '0[0-7]-*.md' -o -name '08-*.txt' -o -name '09-*.md' \) | wc -l)
+[[ "$numbered_count" -eq 10 ]] && pass "ten numbered RR sources" || fail "expected ten numbered RR sources; found $numbered_count"
 
 for file in \
     00-Rotom-Change-Log.md 01-Rotom-Server-Inventory.md 02-Docker-Services.md \
     03-Network-and-Domains.md 04-NAS-and-Storage.md 05-Backup-and-Restore.md \
-    06-Maintenance-and-Automation.md 07-Users-and-Permissions.md 08-Rotom-Directory-Tree.txt
+    06-Maintenance-and-Automation.md 07-Users-and-Permissions.md 08-Rotom-Directory-Tree.txt \
+    09-PVE-and-Rotom-Total-Loss-Recovery.md
 do
     require_file "$file"
 done
@@ -88,6 +89,13 @@ require_text 08-Rotom-Directory-Tree.txt "# CURRENT TOPOLOGY"
 require_text 08-Rotom-Directory-Tree.txt "# PRE-MIGRATION RESTORATION TARGET"
 require_text 08-Rotom-Directory-Tree.txt "# RETIRED PATH WARNINGS"
 require_text 08-Rotom-Directory-Tree.txt "# RECOVERY RULES"
+require_text 09-PVE-and-Rotom-Total-Loss-Recovery.md "## Emergency Recovery Path"
+require_text 09-PVE-and-Rotom-Total-Loss-Recovery.md "## Phase 0 - Declare the Incident and Preserve Recovery Sources"
+require_text 09-PVE-and-Rotom-Total-Loss-Recovery.md "## Phase 20 - Create and Verify Fresh Backups"
+require_text 09-PVE-and-Rotom-Total-Loss-Recovery.md "## Maintenance and Revalidation Triggers"
+
+mermaid_count=$(grep -c '^```mermaid$' "$REPO_ROOT/09-PVE-and-Rotom-Total-Loss-Recovery.md" || true)
+[[ "$mermaid_count" -eq 4 ]] && pass "document 09: four Mermaid diagrams" || fail "document 09: expected four Mermaid diagrams; found $mermaid_count"
 
 require_text 02-Docker-Services.md "## Diagnose and Recover a Container or Docker-Backed Website"
 require_text 04-NAS-and-Storage.md "## Diagnose and Recover a Configured NAS Mount"
@@ -100,10 +108,10 @@ require_text 06-Maintenance-and-Automation.md "## Investigate a Failed Timer or 
 require_text 07-Users-and-Permissions.md "## Diagnose an Identity, Ownership, or Access Failure"
 require_text 07-Users-and-Permissions.md 'Never use `chmod 777`'
 
-require_text 01-Rotom-Server-Inventory.md "23 running Compose-managed containers, 18 Docker networks, two named volumes, and 18 Compose definitions"
+require_text 01-Rotom-Server-Inventory.md "23 running Compose-managed containers, 19 Docker networks, two named volumes, and 18 active Compose definitions"
 require_text 01-Rotom-Server-Inventory.md "Rotom Support"
 require_text 02-Docker-Services.md '| Jared Wines | Supported active site |'
-require_text 02-Docker-Services.md "The final live topology contains 23 running containers, 18 Docker networks, two named volumes, and 18 Compose definitions"
+require_text 02-Docker-Services.md "The final live topology contains 23 running containers, 19 Docker networks, two named volumes, and 18 active Compose definitions"
 require_text 02-Docker-Services.md '| Rotom Support | Supported active service |'
 require_text 03-Network-and-Domains.md '`jaredwines.com` is active behind NPM proxy host `8`'
 require_text 03-Network-and-Domains.md 'Glances no longer has a host listener'
@@ -111,22 +119,22 @@ require_text 03-Network-and-Domains.md '`support.rotom.casa`'
 require_text 06-Maintenance-and-Automation.md '`autoUpdate=true`, `autoHealEnabled=true`, `scheduledPruneEnabled=false`, and `followProjectSymlinks=true`'
 require_text 06-Maintenance-and-Automation.md '/srv/rotom/appdata/platform/mkdocs-rr/repository'
 require_text 07-Users-and-Permissions.md 'Aloha and Jared Wines active'
-require_text 08-Rotom-Directory-Tree.txt 'Final 2026-10-15 state is 23 running container objects, 18 networks, two named volumes, and 18 Compose definitions.'
+require_text 08-Rotom-Directory-Tree.txt 'Final 2026-10-16 state is 23 running container objects, 19 networks, two named volumes, and 18 active Compose definitions.'
 require_text 08-Rotom-Directory-Tree.txt 'mkdocs-rr/compose.yaml'
 
-reject_text '| Jared Wines | **Needs Verification** |' "$REPO_ROOT"/0[1-8]-*
-reject_text '**Jared Wines `502`:** expected under the unresolved current design.' "$REPO_ROOT"/0[1-8]-*
-reject_text "Arcane's live 2026-10-15 settings have automatic updates, auto-heal, and scheduled pruning disabled" "$REPO_ROOT"/0[1-8]-*
-reject_text '**Current live verification — 2026-10-15:** Arcane automatic updates are disabled' "$REPO_ROOT"/0[1-8]-*
+reject_text '| Jared Wines | **Needs Verification** |' "$REPO_ROOT"/0[1-9]-*
+reject_text '**Jared Wines `502`:** expected under the unresolved current design.' "$REPO_ROOT"/0[1-9]-*
+reject_text "Arcane's live 2026-10-15 settings have automatic updates, auto-heal, and scheduled pruning disabled" "$REPO_ROOT"/0[1-9]-*
+reject_text '**Current live verification — 2026-10-15:** Arcane automatic updates are disabled' "$REPO_ROOT"/0[1-9]-*
 
-if grep -nE 'JAR-[0-9]+' "$REPO_ROOT"/0[1-8]-* >/dev/null 2>&1; then
+if grep -nE 'JAR-[0-9]+' "$REPO_ROOT"/0[1-9]-* >/dev/null 2>&1; then
     fail "operational references contain non-literal uppercase ticket labels"
 else
     pass "operational references contain no non-literal uppercase ticket labels"
 fi
 
 invalid_labels=$(grep -hE '^\*\*(Read-only|Changes Rotom|Credential-sensitive|PVE|Destructive)' \
-    "$REPO_ROOT"/0[2-7]-*.md | grep -vFx -e '**Read-only**' \
+    "$REPO_ROOT"/0[2-7]-*.md "$REPO_ROOT"/09-*.md | grep -vFx -e '**Read-only**' \
     -e '**Read-only; may activate an existing automount**' \
     -e '**Changes Rotom**' \
     -e '**Changes Rotom and protected storage/repository state**' \
@@ -145,7 +153,8 @@ for pair in \
     '04-NAS-and-Storage.md:Diagnose and Recover a Configured NAS Mount' \
     '05-Backup-and-Restore.md:Start by Task or Symptom' \
     '06-Maintenance-and-Automation.md:Start by Task or Symptom' \
-    '07-Users-and-Permissions.md:Start by Task or Symptom'
+    '07-Users-and-Permissions.md:Start by Task or Symptom' \
+    '09-PVE-and-Rotom-Total-Loss-Recovery.md:Emergency Recovery Path'
 do
     file=${pair%%:*}; heading=${pair#*:}
     grep -Fq -- "## $heading" "$REPO_ROOT/$file" && pass "router destination: $file#$heading" || fail "missing router destination: $file#$heading"
@@ -158,7 +167,7 @@ else
 fi
 
 if grep -n -E 'runbooks/|test-runbooks|staged pilot|pilot runbook|pending Available Sources addition|parallel runbook layer' \
-    "$REPO_ROOT"/0[1-8]-* "$REPO_ROOT/README.md" >/dev/null 2>&1; then
+    "$REPO_ROOT"/0[1-9]-* "$REPO_ROOT/README.md" >/dev/null 2>&1; then
     fail "obsolete pilot-layer wording remains"
 else
     pass "obsolete pilot-layer wording absent"
@@ -169,7 +178,7 @@ while IFS= read -r link; do
     case "$target" in ''|http:*|https:*|mailto:*|'<'*) continue ;; esac
     target=${target//%20/ }
     [[ -e "$REPO_ROOT/$target" ]] || fail "broken root-relative local link: $target"
-done < <(grep -hoE '\]\([^)]+' "$REPO_ROOT"/0[0-7]-*.md "$REPO_ROOT/README.md" | sort -u)
+done < <(grep -hoE '\]\([^)]+' "$REPO_ROOT"/0[0-7]-*.md "$REPO_ROOT"/09-*.md "$REPO_ROOT/README.md" | sort -u)
 pass "local link target scan completed"
 
 while IFS= read -r record; do
@@ -201,7 +210,7 @@ while IFS= read -r record; do
         fail "broken local fragment: ${source#$REPO_ROOT/} -> $link"
     fi
 done < <(grep -H -oE '\]\([^)]*#[^)]+' \
-    "$REPO_ROOT"/0[0-7]-*.md "$REPO_ROOT/README.md" | sort -u)
+    "$REPO_ROOT"/0[0-7]-*.md "$REPO_ROOT"/09-*.md "$REPO_ROOT/README.md" | sort -u)
 pass "local fragment target scan completed"
 
 for file in "$REPO_ROOT"/*.md; do
@@ -210,7 +219,7 @@ for file in "$REPO_ROOT"/*.md; do
 done
 
 if grep -R -n -E -- '-----BEGIN (OPENSSH|RSA|EC|DSA) PRIVATE KEY-----|(^|[[:space:]])(token|password|secret)[[:space:]]*=[[:space:]]*[^<[:space:]]' \
-    "$REPO_ROOT"/0[0-8]-* "$REPO_ROOT/README.md" "$REPO_ROOT/support" >/dev/null 2>&1; then
+    "$REPO_ROOT"/0[0-9]-* "$REPO_ROOT/README.md" "$REPO_ROOT/support" >/dev/null 2>&1; then
     fail "possible secret or private-key material found"
 else
     pass "no secret/private-key material pattern found"

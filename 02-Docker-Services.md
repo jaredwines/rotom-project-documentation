@@ -2,10 +2,10 @@
 
 **Documentation set:** Rotom Runbook
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details
-**Scope:** Rotom workload layer; the current runtime baseline is the 2026-10-15 inventory in section 1
+**Scope:** Rotom workload layer; the current runtime baseline is the 2026-10-16 inventory in section 1
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Migrate the private documentation portal to Rotom Support
-**Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
+**Documentation updated:** 2026-10-16 — Reconcile recovery-critical topology
+**Related canonical sources:** `01-Rotom-Server-Inventory.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `09-PVE-and-Rotom-Total-Loss-Recovery.md`
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -212,9 +212,9 @@ Revalidate this runbook when a website's desired deployment state, Compose path,
 
 ## 1. Current Docker Runtime and Deployment State
 
-**Evidence date:** 2026-10-15.
+**Evidence date:** 2026-10-16.
 
-The final live topology contains 23 running containers, 18 Docker networks, two named volumes, and 18 Compose definitions. Every supported application is Compose-managed under `/srv/rotom/stacks`.
+The final live topology contains 23 running containers, 19 Docker networks, two named volumes, and 18 active Compose definitions. The extra network is the unattached `rotom-docs_default` network retained with the inactive rollback stack; its existence is not cleanup authorization. Every supported application is Compose-managed under `/srv/rotom/stacks`.
 
 | Domain | Compose definitions | Supported services |
 |---|---:|---|
@@ -293,6 +293,7 @@ The local `/srv/rotom/backup-staging` root is absent. Historical statements abou
 - [05 — Backup and Restore](05-Backup-and-Restore.md)
 - [06 — Maintenance and Automation](06-Maintenance-and-Automation.md)
 - [07 — Users and Permissions](07-Users-and-Permissions.md)
+- [09 — PVE and Rotom Total-Loss Recovery](09-PVE-and-Rotom-Total-Loss-Recovery.md)
 
 ## Maintenance and Revalidation Triggers
 

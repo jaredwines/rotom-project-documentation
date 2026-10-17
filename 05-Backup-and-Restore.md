@@ -4,8 +4,8 @@
 **Document role:** Canonical source for Restic backup architecture, scope, retention, verification, restore evidence, and recovery boundaries
 **Recovery scope:** pre-migration Rotom plus current Proxmox/VM foundation  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-15 — Prepare Rotom Runbook identity and migration gates
-**Related canonical sources:** `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`  
+**Documentation updated:** 2026-10-16 — Route total-loss recovery to document 09
+**Related canonical sources:** `01-Rotom-Server-Inventory.md`, `04-NAS-and-Storage.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `09-PVE-and-Rotom-Total-Loss-Recovery.md`
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)  
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -17,6 +17,7 @@ Record substantive changes to this document in the change log as part of the sam
 - Use **7. Restore Procedure** for recovery planning, while verifying the selected recovery point and current target paths before action.
 - Treat **6. Recovery-Critical Historical Evidence** as evidence; it does not prove that a snapshot, local artifact, mount, or credential path still exists.
 - Review **8. Recovery Limitations and Outstanding Work** before relying on a protection domain.
+- For complete loss of the PVE computer, use [document 09](09-PVE-and-Rotom-Total-Loss-Recovery.md#emergency-recovery-path); this document retains ownership of routine backup architecture and ordinary restores.
 - This file owns backup and restore claims; storage locations, automation schedules, and privilege boundaries remain canonical in documents 04, 06, and 07.
 
 ## Start by Task or Symptom
@@ -28,6 +29,7 @@ Record substantive changes to this document in the change log as part of the sam
 | Verify repository structure or full pack readability | Use the assurance-level guidance in this document; do not confuse snapshot creation with `restic check` or `restic check --read-data` |
 | Restore data | Select a known recovery point and restore to an isolated restricted staging location before planning live replacement |
 | PVE Restic or Rotom VM VZDump work | Use the PVE sections in this document; all PVE actions are **PVE — Jared executes** |
+| Rebuild from blank replacement hardware | Use [09 — PVE and Rotom Total-Loss Recovery](09-PVE-and-Rotom-Total-Loss-Recovery.md#emergency-recovery-path) |
 
 ## Run and Verify Rotom Restic Backup
 
@@ -334,7 +336,8 @@ Stop if the repository is locked by active work, credentials are unavailable, th
 - [04 — NAS and Storage](04-NAS-and-Storage.md)
 - [06 — Maintenance and Automation](06-Maintenance-and-Automation.md)
 - [07 — Users and Permissions](07-Users-and-Permissions.md)
+- [09 — PVE and Rotom Total-Loss Recovery](09-PVE-and-Rotom-Total-Loss-Recovery.md)
 
 ## Maintenance and Revalidation Triggers
 
-Follow the canonical [Runbook-First Maintenance Standard](00-Rotom-Change-Log.md#runbook-first-maintenance-standard). Revalidate after a source path, exclusion, repository, credential path, timer, schedule, retention rule, archive destination, NAS snapshot policy, restore result, application persistence path, or recovery procedure changes.
+Follow the canonical [Runbook-First Maintenance Standard](00-Rotom-Change-Log.md#runbook-first-maintenance-standard). Revalidate this document and document 09 after a source path, exclusion, repository, credential path, timer, schedule, retention rule, archive destination, NAS snapshot policy, restore result, application persistence path, or recovery procedure changes.

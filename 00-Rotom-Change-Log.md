@@ -4,15 +4,15 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RR maintenance contract
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-15 — Migrate the private documentation portal to Rotom Support
-**Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
+**Documentation updated:** 2026-10-16 — Add total-loss recovery orchestration
+**Related canonical sources:** `01-Rotom-Server-Inventory.md` through `09-PVE-and-Rotom-Total-Loss-Recovery.md`
 
 
 **Index:** [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md)
 
-This file records meaningful changes to Rotom Runbook and the server changes or decisions those updates describe. The numbered files `01`–`08` remain the detailed state/reference sources for the latest recorded configuration and clearly labeled plans, while other files in Available Sources may define methodology, project-specific architecture, or other maintained Rotom material. Older entries here describe history, not instructions to restore an old configuration.
+This file records meaningful changes to Rotom Runbook and the server changes or decisions those updates describe. The numbered files `01`–`09` remain the detailed state/reference sources for the latest recorded configuration and clearly labeled plans, while other files in Available Sources may define methodology, project-specific architecture, or other maintained Rotom material. Older entries here describe history, not instructions to restore an old configuration.
 
-**Terminology:** **Rotom Runbook** is the proper name for **every file intentionally kept in this project's Available Sources**. Available Sources is the membership boundary for the complete set, regardless of filename, extension, format, document type, or purpose. The numbered files **00–08** are the **Core Numbered Reference Set** within that larger documentation set. Within the Rotom project, **RR** is the accepted acronym for **Rotom Runbook**. “Project docs,” “rotom project docs,” “project documentation,” “project documents,” and “project reference files” are also informal aliases unless a narrower scope is specified. Files outside Available Sources are not automatically Rotom Runbook. The definition and current source map are maintained in [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md).
+**Terminology:** **Rotom Runbook** is the proper name for **every file intentionally kept in this project's Available Sources**. Available Sources is the membership boundary for the complete set, regardless of filename, extension, format, document type, or purpose. The numbered files **00–09** are the **Core Numbered Reference Set** within that larger documentation set. Within the Rotom project, **RR** is the accepted acronym for **Rotom Runbook**. “Project docs,” “rotom project docs,” “project documentation,” “project documents,” and “project reference files” are also informal aliases unless a narrower scope is specified. Files outside Available Sources are not automatically Rotom Runbook. The definition and current source map are maintained in [01-Rotom-Server-Inventory.md](01-Rotom-Server-Inventory.md).
 
 ### How to use this file safely
 
@@ -83,6 +83,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-16 — Add PVE and Rotom total-loss recovery orchestration
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `02-Docker-Services.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`, `09-PVE-and-Rotom-Total-Loss-Recovery.md`; repository support files `README.md`, `support/tooling/rr`, `support/tooling/test-rr-cli`, `support/tooling/test-rr-runbooks`, and `support/website/guides/index.md`.
+- **Status:** **Documentation only / Verified / Needs Verification.** No PVE, Rotom, VM, NAS, repository, snapshot, archive, network, credential, DNS, external service, or live publisher state changed.
+- **Changes:** Added document `09` as the canonical blank-hardware total-loss recovery orchestrator and expanded the Core Numbered Reference Set to `00`–`09`. Added the emergency path, source hierarchy, offline kit, recovery-point consistency rules, 21 gated phases, four Mermaid diagrams, fallback and safe-stop matrices, evidence record, and final checklist. Routed total loss from document 01 while preserving document 05 as the owner of routine backup architecture and ordinary restores. Updated RR structural tooling for ten-file membership and document 09's required structure. Corrected the current Docker-network count from 18 to 19 after identifying the unattached `rotom-docs_default` network retained with the inactive rollback stack; this is not cleanup authorization.
+- **Evidence:** Read-only Rotom inspection on 2026-10-16 confirmed Debian 13, VM address/MAC, five NFS contracts, 23 running containers, 19 networks, two volumes, 18 active Compose definitions, current identities, backup timers, Restic scope, and ConBee/Bluetooth/iGPU visibility. Jared's read-only PVE output confirmed PVE `9.2.0`, manager `9.2.21`, VMID `100` configuration, exact NFS storage, eight retained VZDump archives, the native `05:00` job, PVE Restic snapshot/staging evidence, IOMMU groups, and current restore/VMA command help. Procedure syntax was cross-checked against official Proxmox, Debian, and Restic documentation.
+- **Outstanding:** Jared must manually add/replace document `09` and the other changed RR sources in Available Sources. The live Rotom Support publisher still permits only `00`–`08`; admitting and publishing `09` requires separate live-change authorization. External credential locations, exact NAS snapshot settings/procedure, and upgrade-sensitive application-native database recovery commands remain explicitly marked pre-disaster gaps.
 
 ## 2026-10-16 — Record Bluetooth setup and reinforce RR access preflight
 

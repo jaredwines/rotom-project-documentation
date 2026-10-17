@@ -22,6 +22,8 @@ Use [NAS and Storage](../runbook/04-NAS-and-Storage.md) to identify the exact au
 
 Follow [Backup and Restore](../runbook/05-Backup-and-Restore.md). It distinguishes the Rotom Restic repository, PVE configuration backup, VM backup, and NAS snapshot layers, including their verification and restoration limits. Treat credential handling and protected repository changes as separately controlled work.
 
+For complete loss of the original PVE computer, start with the one-page [Emergency Recovery Path](../runbook/09-PVE-and-Rotom-Total-Loss-Recovery.md#emergency-recovery-path). It orchestrates clean PVE installation, isolated VMID `100` restoration, selective Restic recovery, NAS reconciliation, production acceptance, and fresh backup creation.
+
 ## Troubleshoot scheduled work
 
 [Maintenance and Automation](../runbook/06-Maintenance-and-Automation.md) is the source for timers, maintenance behavior, publisher workflow, and monitoring. Start with read-only evidence and preserve the existing safeguards around backups and publication.
