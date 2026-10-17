@@ -28,4 +28,4 @@ Follow [Backup and Restore](../runbook/05-Backup-and-Restore.md). It distinguish
 
 ## Use Codex with Rotom
 
-Resolve the Runbook with `rr path`, read the repository instructions and the relevant authoritative source, inspect live state, compare it with the documented state, make the smallest targeted change, and verify it. Update the Runbook from the final verified state under its maintenance contract. Codex does not replace the required authorization boundaries for protected data, credentials, or PVE actions.
+Resolve the Runbook with `rs path`, read the repository instructions and the relevant authoritative source, inspect live state, compare it with the documented state, make the smallest targeted change, and verify it. Update the Runbook from the final verified state under its maintenance contract. Codex does not replace the required authorization boundaries for protected data, credentials, or PVE actions.

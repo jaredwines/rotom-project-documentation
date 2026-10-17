@@ -1,6 +1,6 @@
 # 02 - Rotom Docker Services Inventory
 
-**Documentation set:** Rotom Runbook
+**Documentation set:** Rotom Support
 **Document role:** Canonical source for Docker/Compose service inventory and deployment details
 **Scope:** Rotom workload layer; the current runtime baseline is the 2026-10-16 inventory in section 1
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
@@ -276,7 +276,7 @@ The local `/srv/rotom/backup-staging` root is absent. Historical statements abou
 - Preserve the exact current NFS sources and mountpoints from document 04.
 - Preserve non-creating NAS binds, qBittorrent sentinel checks, and current container restart policy.
 - Preserve NPM database/certificate state, Home Assistant/Homebridge state, both Palworld worlds, Paperless VM-local state, and authoritative NAS payload.
-- Do not place secret values in Compose files or the RR.
+- Do not place secret values in Compose files or the RS.
 - Use a selected, verified backup or snapshot rather than reconstructing a retired service from historical prose.
 
 ## 7. Outstanding / Needs Verification

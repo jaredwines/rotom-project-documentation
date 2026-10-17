@@ -1,0 +1,843 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/rs/repository"
+LEGACY_CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/rr/repository"
+RS_DIR=""
+EXPECTED_USERS=("jared" "fran")
+EXPECTED_REMOTE="git@github.com:jaredwines/rotom-support.git"
+EXPECTED_BRANCH="main"
+EXPECTED_UPSTREAM="origin/main"
+
+
+# -----------------------------------------------------------------------------
+# Helpers
+# -----------------------------------------------------------------------------
+
+die() {
+    echo "ERROR: $*" >&2
+    exit 1
+}
+
+resolve_rs_dir() {
+    local top=""
+    local remote=""
+    local configured=""
+
+    if top="$(git -C "$PWD" rev-parse --show-toplevel 2>/dev/null)"; then
+        remote="$(git -C "$top" remote get-url origin 2>/dev/null || true)"
+
+        if [[ "$remote" == "$EXPECTED_REMOTE" ]]; then
+            RS_DIR="$top"
+            return 0
+        fi
+    fi
+
+    local selected_config="$CONFIG_FILE"
+    if [[ ! -e "$selected_config" ]]; then
+        selected_config="$LEGACY_CONFIG_FILE"
+    fi
+    [[ -r "$selected_config" ]] || return 1
+
+    IFS= read -r configured < "$selected_config" || true
+    configured="${configured%$'\r'}"
+
+    [[ -n "$configured" ]] || return 1
+
+    RS_DIR="$configured"
+    return 0
+}
+
+ensure_rs_dir() {
+    [[ -n "$RS_DIR" ]] && return 0
+
+    resolve_rs_dir ||
+        die "Unable to resolve the RS checkout. Run from the RS repository or configure $CONFIG_FILE."
+}
+
+git_rs() {
+    git --no-pager -C "$RS_DIR" "$@"
+}
+
+require_user() {
+    local current_user
+    local expected_user
+
+    current_user="$(id -un)"
+    for expected_user in "${EXPECTED_USERS[@]}"; do
+        if [[ "$current_user" == "$expected_user" ]]; then
+            return 0
+        fi
+    done
+
+    die "Run rs as one of: ${EXPECTED_USERS[*]}, without sudo."
+}
+
+require_repo() {
+    [[ -d "$RS_DIR/.git" ]] ||
+        die "RS Git repository not found at $RS_DIR."
+
+    git_rs rev-parse --is-inside-work-tree >/dev/null 2>&1 ||
+        die "$RS_DIR is not a valid Git working tree."
+}
+
+current_remote() {
+    git_rs remote get-url origin 2>/dev/null || true
+}
+
+current_branch() {
+    git_rs branch --show-current
+}
+
+current_upstream() {
+    git_rs rev-parse \
+        --abbrev-ref \
+        --symbolic-full-name \
+        '@{u}' 2>/dev/null || true
+}
+
+require_expected_repo() {
+    local remote
+    local branch
+    local upstream
+
+    require_user
+    require_repo
+
+    remote="$(current_remote)"
+    branch="$(current_branch)"
+    upstream="$(current_upstream)"
+
+    [[ "$remote" == "$EXPECTED_REMOTE" ]] ||
+        die "Unexpected origin remote: ${remote:-<none>}"
+
+    [[ "$branch" == "$EXPECTED_BRANCH" ]] ||
+        die "Expected branch '$EXPECTED_BRANCH', found '${branch:-<detached>}'"
+
+    [[ "$upstream" == "$EXPECTED_UPSTREAM" ]] ||
+        die "Expected upstream '$EXPECTED_UPSTREAM', found '${upstream:-<none>}'"
+}
+
+require_clean() {
+    if [[ -n "$(git_rs status --porcelain)" ]]; then
+        echo "RS checkout has local changes:" >&2
+        git_rs status --short >&2
+        die "Resolve or commit the local changes before continuing."
+    fi
+}
+
+ahead_behind() {
+    git_rs rev-list \
+        --left-right \
+        --count \
+        "$EXPECTED_UPSTREAM...HEAD"
+}
+
+require_no_args() {
+    local command="$1"
+    shift
+
+    if (( $# != 0 )); then
+        die "'rs $command' does not accept arguments."
+    fi
+}
+
+
+# -----------------------------------------------------------------------------
+# rs path
+# -----------------------------------------------------------------------------
+
+run_path() {
+    require_expected_repo
+    printf '%s\n' "$RS_DIR"
+}
+
+
+# -----------------------------------------------------------------------------
+# rs status
+# -----------------------------------------------------------------------------
+
+run_status() {
+    local remote
+    local branch
+    local upstream
+    local latest
+    local behind
+    local ahead
+
+    require_user
+    require_repo
+
+    remote="$(current_remote)"
+    branch="$(current_branch)"
+    upstream="$(current_upstream)"
+    latest="$(git_rs log -1 --oneline)"
+
+    echo "RS repository"
+    echo "  Path:     $RS_DIR"
+    echo "  Remote:   ${remote:-<none>}"
+    echo "  Branch:   ${branch:-<detached>}"
+    echo "  Upstream: ${upstream:-<none>}"
+    echo "  Latest:   $latest"
+    echo
+
+    if [[ -n "$(git_rs status --porcelain)" ]]; then
+        echo "Working tree: DIRTY"
+        git_rs status --short
+    else
+        echo "Working tree: clean"
+    fi
+
+    echo
+
+    if git_rs show-ref \
+        --verify \
+        --quiet "refs/remotes/$EXPECTED_UPSTREAM"; then
+
+        read -r behind ahead <<< "$(ahead_behind)"
+
+        echo "Cached upstream:"
+        echo "  Ahead:  $ahead"
+        echo "  Behind: $behind"
+    else
+        echo "Cached upstream: unavailable"
+    fi
+
+    echo
+    echo "Network was not checked."
+    echo "Use 'rs check' for a fresh GitHub check."
+}
+
+
+# -----------------------------------------------------------------------------
+# rs check
+# -----------------------------------------------------------------------------
+
+run_check() {
+    local problems=0
+    local remote
+    local branch
+    local upstream
+    local tracked_ds
+    local behind
+    local ahead
+    local fetch_ok=0
+    local repo_identity_ok=1
+    local missing=0
+    local untracked=0
+    local file
+
+    local required_files=(
+        "runbook/00-Rotom-Change-Log.md"
+        "runbook/01-Rotom-Server-Inventory.md"
+        "runbook/02-Docker-Services.md"
+        "runbook/03-Network-and-Domains.md"
+        "runbook/04-NAS-and-Storage.md"
+        "runbook/05-Backup-and-Restore.md"
+        "runbook/06-Maintenance-and-Automation.md"
+        "runbook/07-Users-and-Permissions.md"
+        "runbook/08-Rotom-Directory-Tree.txt"
+    )
+
+    require_user
+
+    echo "Checking Rotom Support..."
+    echo
+
+    if [[ -d "$RS_DIR/.git" ]] &&
+       git_rs rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        echo "PASS  Git repository: $RS_DIR"
+    else
+        echo "FAIL  Git repository is missing or invalid"
+        return 1
+    fi
+
+    remote="$(current_remote)"
+
+    if [[ "$remote" == "$EXPECTED_REMOTE" ]]; then
+        echo "PASS  Origin remote: $remote"
+    else
+        echo "FAIL  Origin remote: ${remote:-<none>}"
+        problems=$((problems + 1))
+        repo_identity_ok=0
+    fi
+
+    branch="$(current_branch)"
+
+    if [[ "$branch" == "$EXPECTED_BRANCH" ]]; then
+        echo "PASS  Branch: $branch"
+    else
+        echo "FAIL  Branch: ${branch:-<detached>}"
+        problems=$((problems + 1))
+        repo_identity_ok=0
+    fi
+
+    upstream="$(current_upstream)"
+
+    if [[ "$upstream" == "$EXPECTED_UPSTREAM" ]]; then
+        echo "PASS  Upstream: $upstream"
+    else
+        echo "FAIL  Upstream: ${upstream:-<none>}"
+        problems=$((problems + 1))
+        repo_identity_ok=0
+    fi
+
+    if [[ -z "$(git_rs status --porcelain)" ]]; then
+        echo "PASS  Working tree: clean"
+    else
+        echo "FAIL  Working tree has local changes"
+        git_rs status --short
+        problems=$((problems + 1))
+    fi
+
+    if test -x "$RS_DIR" &&
+       test -r "$RS_DIR" &&
+       test -w "$RS_DIR"; then
+        echo "PASS  RS checkout is readable, writable, and traversable"
+    else
+        echo "FAIL  RS filesystem access"
+        problems=$((problems + 1))
+    fi
+
+    for file in "${required_files[@]}"; do
+        if [[ ! -f "$RS_DIR/$file" ]]; then
+            echo "FAIL  Missing RS file: $file"
+            missing=1
+            continue
+        fi
+
+        if ! git_rs ls-files \
+            --error-unmatch \
+            -- "$file" >/dev/null 2>&1; then
+
+            echo "FAIL  RS file exists but is not tracked: $file"
+            untracked=1
+        fi
+    done
+
+    if (( missing == 0 && untracked == 0 )); then
+        echo "PASS  Core RS set: all 00-08 files exist and are tracked"
+    else
+        problems=$((problems + 1))
+    fi
+
+    tracked_ds="$(
+        git_rs ls-files |
+            grep -E '(^|/)\.DS_Store$' ||
+            true
+    )"
+
+    if [[ -z "$tracked_ds" ]]; then
+        echo "PASS  No tracked .DS_Store files"
+    else
+        echo "FAIL  Tracked .DS_Store files found:"
+        echo "$tracked_ds"
+        problems=$((problems + 1))
+    fi
+
+    echo
+    if ! run_lint; then
+        problems=$((problems + 1))
+    fi
+
+    echo
+    echo "Checking GitHub..."
+
+    if (( repo_identity_ok == 0 )); then
+        echo "SKIP  GitHub fetch because repository identity checks failed"
+    else
+        if git_rs fetch --prune origin; then
+            echo "PASS  GitHub fetch"
+            fetch_ok=1
+        else
+            echo "FAIL  GitHub fetch"
+            problems=$((problems + 1))
+        fi
+    fi
+
+    if (( fetch_ok == 1 )); then
+        if git_rs show-ref \
+            --verify \
+            --quiet "refs/remotes/$EXPECTED_UPSTREAM"; then
+
+            read -r behind ahead <<< "$(ahead_behind)"
+
+            if (( behind > 0 && ahead > 0 )); then
+                echo "FAIL  Branch has diverged: ahead $ahead, behind $behind"
+                problems=$((problems + 1))
+            elif (( behind > 0 )); then
+                echo "INFO  Update available: behind $behind commit(s)"
+            elif (( ahead > 0 )); then
+                echo "INFO  Local branch is ahead by $ahead commit(s)"
+            else
+                echo "PASS  Local branch matches $EXPECTED_UPSTREAM"
+            fi
+        else
+            echo "FAIL  Remote-tracking branch $EXPECTED_UPSTREAM not found"
+            problems=$((problems + 1))
+        fi
+    fi
+
+    echo
+
+    if (( problems == 0 )); then
+        echo "RS CHECK: PASS"
+    else
+        echo "RS CHECK: FAIL ($problems problem(s))"
+        return 1
+    fi
+}
+
+
+# -----------------------------------------------------------------------------
+# rs pull
+# -----------------------------------------------------------------------------
+
+run_pull() {
+    local behind
+    local ahead
+
+    require_expected_repo
+    require_clean
+
+    echo "Fetching latest RS from GitHub..."
+    git_rs fetch --prune origin
+
+    read -r behind ahead <<< "$(ahead_behind)"
+
+    if (( behind > 0 && ahead > 0 )); then
+        die "Local and remote branches have diverged. No changes were made."
+    fi
+
+    if (( ahead > 0 )); then
+        echo "Local RS is ahead of GitHub by $ahead commit(s)."
+        echo "Nothing was pulled."
+        echo "Use 'rs push' to publish the local commit(s)."
+        exit 0
+    fi
+
+    if (( behind == 0 )); then
+        echo "RS is already up to date."
+        git_rs log -1 --oneline
+        exit 0
+    fi
+
+    echo "Fast-forwarding $EXPECTED_BRANCH by $behind commit(s)..."
+    git_rs merge --ff-only "$EXPECTED_UPSTREAM"
+
+    echo
+    echo "RS updated successfully:"
+    git_rs log -1 --oneline
+}
+
+
+# -----------------------------------------------------------------------------
+# rs diff
+# -----------------------------------------------------------------------------
+
+run_diff() {
+    require_user
+    require_repo
+
+    if [[ -z "$(git_rs status --porcelain)" ]]; then
+        echo "RS working tree is clean. No local diff."
+        exit 0
+    fi
+
+    echo "RS status:"
+    git_rs status --short
+    echo
+
+    echo "Unstaged changes:"
+    git_rs diff
+    echo
+
+    echo "Staged changes:"
+    git_rs diff --cached
+}
+
+
+# -----------------------------------------------------------------------------
+# rs lint
+# -----------------------------------------------------------------------------
+
+run_lint() {
+    local problems=0
+    local fence_count
+    local file
+    local issue
+
+    local markdown_files=(
+        "runbook/00-Rotom-Change-Log.md"
+        "runbook/01-Rotom-Server-Inventory.md"
+        "runbook/02-Docker-Services.md"
+        "runbook/03-Network-and-Domains.md"
+        "runbook/04-NAS-and-Storage.md"
+        "runbook/05-Backup-and-Restore.md"
+        "runbook/06-Maintenance-and-Automation.md"
+        "runbook/07-Users-and-Permissions.md"
+        "runbook/08-Rotom-Directory-Tree.txt"
+        "AGENTS.md"
+        "README.md"
+    )
+
+    require_user
+    require_repo
+
+    echo "Linting Rotom Support..."
+    echo
+
+    if git_rs diff --check; then
+        echo "PASS  Git whitespace checks"
+    else
+        echo "FAIL  Git whitespace checks"
+        problems=$((problems + 1))
+    fi
+
+    for file in "${markdown_files[@]}"; do
+        if [[ ! -f "$RS_DIR/$file" ]]; then
+            echo "FAIL  Missing Markdown file: $file"
+            problems=$((problems + 1))
+            continue
+        fi
+
+        if ! head -n 1 "$RS_DIR/$file" | grep -q '^# '; then
+            echo "FAIL  Missing level-one title: $file"
+            problems=$((problems + 1))
+        fi
+
+        fence_count="$(awk '/^```/ { count++ } END { print count + 0 }' "$RS_DIR/$file")"
+        if (( fence_count % 2 != 0 )); then
+            echo "FAIL  Unbalanced fenced code blocks: $file"
+            problems=$((problems + 1))
+        fi
+    done
+
+    if (( problems == 0 )); then
+        echo "PASS  Markdown titles and fenced code blocks"
+    fi
+
+    while IFS= read -r issue; do
+        [[ -n "$issue" ]] || continue
+        echo "FAIL  Broken local Markdown link: $issue"
+        problems=$((problems + 1))
+    done < <(
+        perl -e '
+            use strict;
+            use warnings;
+            use File::Basename qw(dirname);
+            use File::Spec;
+
+            my $root = shift @ARGV;
+            my %reported;
+
+            for my $file (@ARGV) {
+                open my $fh, "<", $file or die "Cannot read $file: $!\n";
+                local $/;
+                my $text = <$fh>;
+
+                while ($text =~ /\[[^\]]+\]\(([^)]+)\)/g) {
+                    my $target = $1;
+                    $target =~ s/\s+"[^"]*"\z//;
+                    next if $target =~ m{^(?:https?|mailto):}i;
+                    $target =~ s/#.*\z//;
+                    next if $target eq q{};
+
+                    my $path = File::Spec->catfile(dirname($file), $target);
+                    if (!-e $path && !$reported{"$file\0$target"}++) {
+                        print "$file -> $target\n";
+                    }
+                }
+
+                while ($text =~ /\b((?:00-Rotom|01-Rotom|02-Docker|03-Network|04-NAS|05-Backup|06-Maintenance|07-Users|08-Rotom)-[A-Za-z0-9-]+\.(?:md|txt))\b/g) {
+                    my $target = $1;
+                    my $start = $-[1];
+                    next if $start >= 8 && substr($text, $start - 8, 8) eq q{history/};
+                    my $path = File::Spec->catfile($root, q{runbook}, $target);
+                    if (!-e $path && !$reported{"$file\0$target"}++) {
+                        print "$file -> $target\n";
+                    }
+                }
+            }
+        ' "$RS_DIR" "${markdown_files[@]/#/$RS_DIR/}"
+    )
+
+    if (( problems == 0 )); then
+        echo "PASS  Local Markdown links"
+    fi
+
+    if grep -R -n -E \
+        --include='*.md' \
+        --include='*.txt' \
+        -- '-----BEGIN ([A-Z0-9 ]+ )?PRIVATE KEY-----' \
+        "$RS_DIR"; then
+
+        echo "FAIL  Private-key material marker found"
+        problems=$((problems + 1))
+    else
+        echo "PASS  No private-key material markers"
+    fi
+
+    echo
+    if (( problems == 0 )); then
+        echo "RS LINT: PASS"
+    else
+        echo "RS LINT: FAIL ($problems problem(s))"
+        return 1
+    fi
+}
+
+
+# -----------------------------------------------------------------------------
+# rs log
+# -----------------------------------------------------------------------------
+
+run_log() {
+    local count="${1:-10}"
+
+    [[ "$count" =~ ^[1-9][0-9]*$ ]] ||
+        die "Log count must be a positive integer."
+
+    require_user
+    require_repo
+
+    git_rs log \
+        -n "$count" \
+        --date=short \
+        --pretty=format:'%h  %ad  %d  %s'
+
+    echo
+}
+
+
+# -----------------------------------------------------------------------------
+# rs commit
+# -----------------------------------------------------------------------------
+
+run_commit() {
+    local message
+
+    require_expected_repo
+
+    if (( $# != 1 )); then
+        echo 'Usage: rs commit "commit message"' >&2
+        exit 2
+    fi
+
+    message="$1"
+
+    if [[ -z "${message//[[:space:]]/}" ]]; then
+        die "Commit message cannot be empty."
+    fi
+
+    if [[ -z "$(git_rs status --porcelain)" ]]; then
+        echo "Nothing to commit. RS working tree is clean."
+        exit 0
+    fi
+
+    echo "Staging all RS changes..."
+    git_rs add -A
+
+    if git_rs diff --cached --quiet; then
+        echo "Nothing was staged. No commit created."
+        exit 0
+    fi
+
+    git_rs commit -m "$message"
+
+    echo
+    echo "RS commit created:"
+    git_rs log -1 --oneline
+    echo
+    echo "The commit has not been pushed."
+    echo "Run 'rs push' to publish it."
+}
+
+
+# -----------------------------------------------------------------------------
+# rs push
+# -----------------------------------------------------------------------------
+
+run_push() {
+    local behind
+    local ahead
+
+    require_expected_repo
+    require_clean
+
+    echo "Fetching GitHub before push..."
+    git_rs fetch --prune origin
+
+    read -r behind ahead <<< "$(ahead_behind)"
+
+    if (( behind > 0 && ahead > 0 )); then
+        die "Local and remote branches have diverged. Push refused."
+    fi
+
+    if (( behind > 0 )); then
+        die "Local RS is behind GitHub by $behind commit(s). Run 'rs pull' first."
+    fi
+
+    if (( ahead == 0 )); then
+        echo "Nothing to push. RS already matches GitHub."
+        exit 0
+    fi
+
+    echo "Pushing $ahead commit(s) to GitHub..."
+    git_rs push origin HEAD:main
+
+    echo
+    echo "RS push completed:"
+    git_rs log -1 --oneline
+}
+
+
+# -----------------------------------------------------------------------------
+# Help
+# -----------------------------------------------------------------------------
+
+show_help() {
+    cat <<'EOF'
+Rotom Support helper
+
+Usage:
+  rs <command>
+
+Commands:
+  path                   Show the resolved local RS checkout path
+  status                 Show local RS repository status
+  check                  Verify documentation, repository, GitHub, and upstream state
+  lint                   Check Markdown structure, local links, and key markers
+  pull                   Safely fast-forward the local RS from GitHub
+  diff                   Show local uncommitted RS changes
+  log [N]                Show recent commits (default: 10)
+  commit "message"       Stage all RS changes and create a local commit
+  push                   Push existing local commits to GitHub
+  help                   Show this help
+
+Repository resolution:
+  1. If the current directory is inside the expected RS Git repository,
+     use that checkout.
+  2. Otherwise read the checkout path from:
+     ~/.config/rs/repository
+     or $XDG_CONFIG_HOME/rs/repository when XDG_CONFIG_HOME is set.
+     If absent, the legacy rr/repository configuration is used.
+
+Examples:
+  rs path
+  rs status
+  rs check
+  rs lint
+  rs pull
+  rs diff
+  rs log
+  rs log 5
+  rs commit "Update Rotom Support"
+  rs push
+
+Behavior:
+  - Git output does not use a pager; no 'q' is required.
+  - status is local-only and does not contact GitHub.
+  - check runs documentation lint, then fetches GitHub without modifying RS files.
+  - lint is offline and may be run with uncommitted documentation changes.
+  - pull refuses dirty or diverged repositories.
+  - commit automatically stages all changed, deleted, and new non-ignored files.
+  - commit creates a local commit only and does not push.
+  - push refuses dirty, behind, or diverged repositories.
+  - push publishes existing local commits immediately.
+  - no confirmation prompts are used.
+
+Safety:
+  - Run as jared, without sudo.
+  - The expected repository, remote, branch, and upstream are verified.
+  - reset, clean, force-push, automatic merge commits, and rebases are not provided.
+EOF
+}
+
+
+# -----------------------------------------------------------------------------
+# Command dispatcher
+# -----------------------------------------------------------------------------
+
+command="${1:-help}"
+
+case "$command" in
+    path|status|check|lint|pull|diff|log|commit|push)
+        ensure_rs_dir
+        ;;
+esac
+
+case "$command" in
+    path)
+        shift
+        require_no_args "path" "$@"
+        run_path
+        ;;
+
+    status)
+        shift
+        require_no_args "status" "$@"
+        run_status
+        ;;
+
+    check)
+        shift
+        require_no_args "check" "$@"
+        run_check
+        ;;
+
+    lint)
+        shift
+        require_no_args "lint" "$@"
+        run_lint
+        ;;
+
+    pull)
+        shift
+        require_no_args "pull" "$@"
+        run_pull
+        ;;
+
+    diff)
+        shift
+        require_no_args "diff" "$@"
+        run_diff
+        ;;
+
+    log)
+        shift
+
+        if (( $# > 1 )); then
+            die "Usage: rs log [N]"
+        fi
+
+        run_log "${1:-10}"
+        ;;
+
+    commit)
+        shift
+        run_commit "$@"
+        ;;
+
+    push)
+        shift
+        require_no_args "push" "$@"
+        run_push
+        ;;
+
+    help|-h|--help)
+        if (( $# > 0 )); then
+            shift
+        fi
+        require_no_args "help" "$@"
+        show_help
+        ;;
+
+    *)
+        echo "Unknown command: $1" >&2
+        echo >&2
+        show_help >&2
+        exit 2
+        ;;
+esac

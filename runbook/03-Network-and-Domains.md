@@ -1,6 +1,6 @@
 # 03 - Rotom Network and Domains
 
-**Documentation set:** Rotom Runbook
+**Documentation set:** Rotom Support
 **Document role:** Canonical source for Rotom LAN, DNS, Docker networking, ports, Cloudflare, NPM, and domain routing
 **Hosts:** PVE hypervisor `pve` plus Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  

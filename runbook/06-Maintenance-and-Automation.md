@@ -1,6 +1,6 @@
 # 06 - Maintenance and Automation
 
-**Documentation set:** Rotom Runbook
+**Documentation set:** Rotom Support
 **Document role:** Canonical source for scheduled/routine maintenance, automation, monitoring behavior, and operational administration workflow
 **Hosts:** PVE hypervisor `pve` and Debian VM `rotom`  
 **Baseline verified:** Current state reconciled through 2026-10-16; see outstanding items for remaining verification
@@ -61,7 +61,7 @@ Retain the unit name, trigger time, exit result, sanitized journal error, depend
 ## Navigation and Authority
 
 - Start with **1. Current Maintenance and Automation** for active timers, helpers, and routine operating behavior.
-- Use **5. Command-Line Safety and Administration**, **6. Documentation and Synchronization Workflow**, and **7. RR Validation** for administration and RR workflow.
+- Use **5. Command-Line Safety and Administration**, **6. Documentation and Synchronization Workflow**, and **7. RS Validation** for administration and RS workflow.
 - Treat retired automation and preserved historical evidence as context, not as active scheduling or execution instructions.
 - Review **Outstanding / Needs Verification** before depending on an automation, notification, certificate, or recovery behavior.
 - This file owns operational workflow and automation; backup semantics, service deployment, and privileges remain canonical in documents 05, 02, and 07.
@@ -128,26 +128,26 @@ NPM certificate renewal remains active. Diagnose renewal by inspecting the curre
 
 ## 6. Documentation and Synchronization Workflow
 
-Resolve the active checkout with `rr path`. `/usr/local/bin/rr` is the sole canonical installed implementation on Rotom and the Mac. Earlier transition helpers were removed after both environments passed independent RR verification and dependency audits. Repository `AGENTS.md` and document 00 govern RR changes.
+Resolve the active checkout with `rs path`. On Rotom, `/usr/local/bin/rs` is the canonical implementation; `/usr/local/bin/rr` delegates to it for compatibility while Mac and other dependencies remain unverified. The prior installed helper is retained as a recovery copy. Repository `AGENTS.md` and document 00 govern RS changes.
 
 Supported helper commands are `path`, `status`, `check`, `lint`, `pull`, `diff`, `log`, `commit`, `push`, and `help`. Do not bypass a helper safety failure with reset, clean, merge, rebase, force-push, or ad-hoc publication.
 
-The Rotom RR checkout is `/home/jared/rotom-support`; `/home/jared/.config/rr/repository` points to it. Its GitHub origin and the installed Rotom helper expect `git@github.com:jaredwines/rotom-support.git`. The numbered documents reside in its `runbook/` directory. On 2026-10-16, the Mac checkout and updated helper passed `rr check` against the renamed SSH origin at commit `0b63c03`; later documentation updates require a routine pull. Rotom Support publishes from a separate root-owned deployment clone under `/srv/rotom/appdata/platform/mkdocs-rr/repository`, using `https://github.com/jaredwines/rotom-support.git`; it does not publish from a human home checkout. Its guarded publisher reads the numbered `00`–`08` sources from `runbook/` plus explicit `support/website/{home.md,architecture/index.md,guides/index.md}` inputs. Repository files under `guide/` are outside that allowlist; the two recovery-guide references in the published backup document are rendered as plain text. The publisher validates a clean fast-forward deployment clone, builds in isolated stages, and atomically retains one generated-site/source rollback revision. The former divergent deployment checkout and previous publisher script are retained as recovery copies; see the 2026-10-16 repair entry in document 00.
+The Rotom RS checkout is `/home/jared/rotom-support`; `/home/jared/.config/rr/repository` points to it. Its GitHub origin and the installed Rotom helper expect `git@github.com:jaredwines/rotom-support.git`. The numbered documents reside in its `runbook/` directory. On 2026-10-16, the Mac checkout and then-current `rr` helper passed `rr check` against the renamed SSH origin at commit `0b63c03`; Mac installation of `rs` and later updates require independent verification. Rotom Support publishes from a separate root-owned deployment clone under `/srv/rotom/appdata/platform/mkdocs-rr/repository`, using `https://github.com/jaredwines/rotom-support.git`; it does not publish from a human home checkout. Its guarded publisher reads the numbered `00`–`08` sources from `runbook/` plus explicit `support/website/{home.md,architecture/index.md,guides/index.md}` inputs. Repository files under `guide/` are outside that allowlist; the two recovery-guide references in the published backup document are rendered as plain text. The publisher validates a clean fast-forward deployment clone, builds in isolated stages, and atomically retains one generated-site/source rollback revision. The former divergent deployment checkout and previous publisher script are retained as recovery copies; see the 2026-10-16 repair entry in document 00.
 
-Repository support files are not RR members merely because they are tracked. Available Sources remains the membership boundary and replacement remains manual by Jared.
+Repository support files are not RS members merely because they are tracked. Available Sources remains the membership boundary and replacement remains manual by Jared.
 
-## 7. RR Validation
+## 7. RS Validation
 
-The tracked `support/tooling/rr` owns offline lint. Before publication, the maintenance contract requires:
+The tracked `support/tooling/rs` owns offline lint. The legacy test filename `test-rr-runbooks` remains in use; `test-rr-cli` delegates to `test-rs-cli`. Before publication, the maintenance contract requires:
 
 - `support/tooling/test-rr-runbooks`
-- `support/tooling/test-rr-cli`
-- `support/tooling/rr lint`
+- `support/tooling/test-rs-cli`
+- `support/tooling/rs lint`
 - `git diff --check`
 - semantic ownership/duplication review
-- `rr check` at a clean checkpoint
+- `rs check` at a clean checkpoint
 
-`rr check` performs a network comparison and requires explicit authorization when the task withholds it.
+`rs check` performs a network comparison and requires explicit authorization when the task withholds it.
 
 ## 8. Outstanding / Needs Verification
 
@@ -167,4 +167,4 @@ The tracked `support/tooling/rr` owns offline lint. Before publication, the main
 
 ## Maintenance and Revalidation Triggers
 
-Follow the canonical [Runbook-First Maintenance Standard](00-Rotom-Change-Log.md#runbook-first-maintenance-standard). Revalidate after a service, timer, schedule, worker, update policy, monitoring endpoint, maintenance procedure, RR tool, checkout path, RR membership/publisher allowlist, automation dependency, Bluetooth adapter, firmware, or PVE passthrough changes. Revalidate the supplementary total-loss guide when a recovery dependency changes.
+Follow the canonical [Runbook-First Maintenance Standard](00-Rotom-Change-Log.md#runbook-first-maintenance-standard). Revalidate after a service, timer, schedule, worker, update policy, monitoring endpoint, maintenance procedure, RS tool, checkout path, RS membership/publisher allowlist, automation dependency, Bluetooth adapter, firmware, or PVE passthrough changes. Revalidate the supplementary total-loss guide when a recovery dependency changes.

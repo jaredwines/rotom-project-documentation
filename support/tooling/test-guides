@@ -42,7 +42,7 @@ fi
 for file in "${guide_files[@]}"; do
     relative=${file#"$REPO_ROOT/"}
     head -n 1 "$file" | grep -q '^# ' && pass "$relative: level-one title" || fail "$relative: missing level-one title"
-    grep -Fq '**Artifact class:** Supplementary repository guide; not a Rotom Runbook or Available Sources member' "$file" &&
+    grep -Fq '**Artifact class:** Supplementary repository guide; not a Rotom Support or Available Sources member' "$file" &&
         pass "$relative: separate-from-RR classification" ||
         fail "$relative: missing separate-from-RR classification"
     fences=$(grep -c '^```' "$file" || true)

@@ -1,15 +1,15 @@
 # PVE and Rotom Total-Loss Recovery
 
-**Artifact class:** Supplementary repository guide; not a Rotom Runbook or Available Sources member
+**Artifact class:** Supplementary repository guide; not a Rotom Support or Available Sources member
 **Document role:** Orchestration guide for rebuilding PVE and Rotom after complete loss of the original computer
 **Scenario:** Replacement hardware; original PVE installation, local disks, and running Rotom VM are unavailable
 **Evidence baseline:** PVE and Rotom read-only inspection on 2026-10-16
 **Documentation updated:** 2026-10-16 — Harden emergency execution and evidence controls
 **Routine backup authority:** [05 - Backup and Restore](../runbook/05-Backup-and-Restore.md)
-**RR index:** [01 - Rotom Server Inventory](../runbook/01-Rotom-Server-Inventory.md)
-**RR dependency governance:** [00 - Rotom Change Log](../runbook/00-Rotom-Change-Log.md#current-documentation-maintenance-rules)
+**RS index:** [01 - Rotom Server Inventory](../runbook/01-Rotom-Server-Inventory.md)
+**RS dependency governance:** [00 - Rotom Change Log](../runbook/00-Rotom-Change-Log.md#current-documentation-maintenance-rules)
 
-This supplementary guide provides **total-loss recovery orchestration** without becoming part of the RR. RR document 05 retains ownership of backup architecture, schedules, retention, assurance levels, routine checks, and ordinary restores; the other numbered RR documents retain their existing subject ownership. Commands in this guide are examples only where their syntax and current Rotom context were verified. Every selected snapshot, archive, device, interface, storage target, and recovery point must still be recorded and checked at incident time.
+This supplementary guide provides **total-loss recovery orchestration** without becoming part of the RS. RS document 05 retains ownership of backup architecture, schedules, retention, assurance levels, routine checks, and ordinary restores; the other numbered RS documents retain their existing subject ownership. Commands in this guide are examples only where their syntax and current Rotom context were verified. Every selected snapshot, archive, device, interface, storage target, and recovery point must still be recorded and checked at incident time.
 
 ## Emergency Recovery Path
 
@@ -199,7 +199,7 @@ flowchart TD
 
 Complete this while the current systems still exist. A missing required item is **CRITICAL PRE-DISASTER GAP**.
 
-- [ ] Keep an offline, printable copy of the complete RR and this guide.
+- [ ] Keep an offline, printable copy of the complete RS and this guide.
 - [ ] Keep a verified PVE installer compatible with the protected system; current evidence is PVE `9.2.0`, manager `9.2.21`, kernel `7.0.14-19-pve`.
 - [ ] Record installer checksum verification and boot mode.
 - [ ] Store approved retrieval locations for both Restic passwords outside PVE and Rotom.
@@ -223,7 +223,7 @@ Complete this while the current systems still exist. A missing required item is 
 | Rotom Restic password |  |  | Password manager/emergency escrow location only |
 | NAS and router/UniFi administration |  |  | **CRITICAL PRE-DISASTER GAP** if host-dependent |
 | SSH access |  |  | Secure private-key location plus public-key authorization record |
-| RR and this guide |  |  | Include all numbered sources and an offline printable copy |
+| RS and this guide |  |  | Include all numbered sources and an offline printable copy |
 | NAS export discovery |  |  | Sanitized export/path record and appliance procedure |
 | IP/MAC decisions |  |  | Prove old identities cannot return |
 | DNS/domain access |  |  | Registrar/DNS provider recovery location plus MFA recovery |
@@ -240,7 +240,7 @@ Complete this while the current systems still exist. A missing required item is 
 | Rotom VM disks and base guest state | Selected VZDump archive | Historical raw image only if VZDump unavailable | VZDump is the normal base |
 | Newer/healthier guest-local state | Selected Rotom Restic snapshot | VZDump state | Restore selected paths through staging |
 | Libraries and Paperless media | Current NAS data or selected NAS snapshot | Historical artifacts where verified | Rotom Restic excludes `/mnt` |
-| Guest identities and modes | Restored VM plus RR numeric contracts | Rotom Restic metadata | Never normalize recursively |
+| Guest identities and modes | Restored VM plus RS numeric contracts | Rotom Restic metadata | Never normalize recursively |
 | Hardware passthrough | Replacement hardware evidence | Old config as intent only | Reassess; identifiers are not portable |
 
 ## 6. Hardware and PVE-Version Compatibility
@@ -321,7 +321,7 @@ The Emergency Recovery Path stop conditions apply to every phase. In addition, s
 | Outcome | Incident scope, authority, and surviving sources are recorded; originals remain unchanged |
 | Entry | Total loss is confirmed; NAS is available or can be kept safely offline |
 | Exclusions/impact | No recovery source, snapshot, repository, archive, credential, DNS, or external service changes |
-| Source | NAS appliance inventory, offline RR, credential escrow |
+| Source | NAS appliance inventory, offline RS, credential escrow |
 | Read-only preflight | Record incident time, failed-host identity, NAS health, snapshot inventory, and who has write access |
 | Stop | Old host may return; NAS degradation is active; source ownership is unclear |
 | Smallest action | Freeze retention/deletion by approved appliance policy only if already rehearsed; otherwise preserve and escalate |
@@ -913,7 +913,7 @@ Recreate, do not blindly copy, the current automation contracts: PVE Restic `04:
 | Smallest action | Reboot PVE once; observe host, VM, NAS race handling, containers, devices, and routes |
 | Expected/verification | Every acceptance row passes after reboot without manual broad recovery |
 | Rollback/safe stop | If host unstable, keep VM stopped or remove last passthrough; if guest fails, keep production gate closed |
-| Troubleshooting | Use owning RR document and retained before/after evidence |
+| Troubleshooting | Use owning RS document and retained before/after evidence |
 | Evidence/gate | Completed table; do not create the new recovery baseline until accepted |
 
 ## Phase 20 - Create and Verify Fresh Backups
@@ -982,7 +982,7 @@ systemctl status pve-restic-backup.service rotom-vm-vzdump-manual.service --no-p
 
 | Failure | Capability retained | Expected loss/constraint | Escalation point |
 |---|---|---|---|
-| PVE Restic unavailable | Clean PVE plus VZDump restore | Manual recreation; less host evidence/automation | Rebuild from RR and official PVE interfaces; do not guess private state |
+| PVE Restic unavailable | Clean PVE plus VZDump restore | Manual recreation; less host evidence/automation | Rebuild from RS and official PVE interfaces; do not guess private state |
 | VZDump unavailable | Rotom Restic plus raw image | No normal whole-VM base; OS/boot/VM config reconstruction required | Build isolated Debian guest compatible with selected Restic point; expert review |
 | Rotom Restic unavailable | VZDump plus NAS | Guest state limited to VZDump timestamp | Accept VZDump loss window after application checks |
 | Preferred VZDump fails | Older retained archives | Larger loss window and different NAS/DB consistency | Update recovery decision and verify next candidate fully |
@@ -1045,11 +1045,11 @@ Never retain credential values, private keys, cookies, protected environment con
 - A VZDump verification, Restic check, successful boot, or NAS snapshot listing proves only its own assurance level.
 - The raw image is crash-consistent and has not been rehearsed as a bare-metal restore.
 - The live 2026-10-16 Rotom audit found 19 Docker networks because the retained inactive `rotom-docs_default` network still exists; this is not cleanup authorization.
-- This guide is intentionally outside Available Sources and the numbered RR publication set. Publishing it anywhere requires a separate explicit decision; do not add it to the RR allowlist merely because it is tracked in this repository.
+- This guide is intentionally outside Available Sources and the numbered RS publication set. Publishing it anywhere requires a separate explicit decision; do not add it to the RS allowlist merely because it is tracked in this repository.
 
 ### Gap-Closure Register
 
-An unresolved row does not make the guide unsafe; it deliberately blocks the dependent recovery branch instead of encouraging guesswork. Close each row only with sanitized evidence and update this guide in the same repository documentation task. Update an RR file only when its owned fact or procedure changes.
+An unresolved row does not make the guide unsafe; it deliberately blocks the dependent recovery branch instead of encouraging guesswork. Close each row only with sanitized evidence and update this guide in the same repository documentation task. Update an RS file only when its owned fact or procedure changes.
 
 | Gap | Owner/action before disaster | Closure evidence | Blocking effect if open | Status/date |
 |---|---|---|---|---|
@@ -1062,14 +1062,14 @@ An unresolved row does not make the guide unsafe; it deliberately blocks the dep
 | Application databases | Record version-specific offline checks and export/import rehearsal per application | Native check output and isolated import result | Blocks promotion of affected mutable state |  |
 | Hardware inventory | Update device IDs, purpose, physical ports, photos, and accepted degraded modes | Host/guest/app test record | Blocks only the affected passthrough dependency |  |
 | Off-site protection | Decide and implement an independently administered off-site layer | Successful backup, integrity check, and isolated restore | Site/NAS loss remains unrecoverable |  |
-| RR and guide distribution | Store the current `00`–`08` RR set plus this separate guide offline; print the emergency/control/checklist pages | File comparison and physical-copy location | Slows or blocks guided recovery without GitHub |  |
+| RS and guide distribution | Store the current `00`–`08` RS set plus this separate guide offline; print the emergency/control/checklist pages | File comparison and physical-copy location | Slows or blocks guided recovery without GitHub |  |
 
 ## 34. Printable Final Checklist
 
 ### Prepare now
 
 - [ ] Offline PVE installer and checksum verified.
-- [ ] Complete offline/printed `00`–`08` RR and this separate guide are both available.
+- [ ] Complete offline/printed `00`–`08` RS and this separate guide are both available.
 - [ ] Both Restic password retrieval locations verified.
 - [ ] NAS/router, SSH, DNS/domain, and application-key recovery verified.
 - [ ] PVE, Rotom, NAS, reservation, MAC, and export records current.
@@ -1103,4 +1103,4 @@ An unresolved row does not make the guide unsafe; it deliberately blocks the dep
 
 ## Maintenance and Revalidation Triggers
 
-This file is a supplementary guide, not an RR member. Revalidate it after any PVE/Rotom version, VM hardware, VMID, address/MAC, storage/export, repository, staging path, backup scope, schedule/retention, credential location, NAS snapshot procedure, application persistence/database, UID/GID/ACL, Compose path, proxy/DNS/TLS, hardware passthrough, acceptance test, or official restore-command change. If a guide update changes an RR-owned fact or procedure, update the owning RR document under the [Runbook-First Maintenance Standard](../runbook/00-Rotom-Change-Log.md#runbook-first-maintenance-standard). Re-run the complete guide structure, link, secret-pattern, and Mermaid checks whenever headings, anchors, labels, or diagrams change.
+This file is a supplementary guide, not an RS member. Revalidate it after any PVE/Rotom version, VM hardware, VMID, address/MAC, storage/export, repository, staging path, backup scope, schedule/retention, credential location, NAS snapshot procedure, application persistence/database, UID/GID/ACL, Compose path, proxy/DNS/TLS, hardware passthrough, acceptance test, or official restore-command change. If a guide update changes an RS-owned fact or procedure, update the owning RS document under the [Runbook-First Maintenance Standard](../runbook/00-Rotom-Change-Log.md#runbook-first-maintenance-standard). Re-run the complete guide structure, link, secret-pattern, and Mermaid checks whenever headings, anchors, labels, or diagrams change.

@@ -1,6 +1,6 @@
 # 05 - Backup and Restore
 
-**Documentation set:** Rotom Runbook
+**Documentation set:** Rotom Support
 **Document role:** Canonical source for Restic backup architecture, scope, retention, verification, restore evidence, and recovery boundaries
 **Recovery scope:** pre-migration Rotom plus current Proxmox/VM foundation  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
@@ -17,7 +17,7 @@ Record substantive changes to this document in the change log as part of the sam
 - Use **7. Restore Procedure** for recovery planning, while verifying the selected recovery point and current target paths before action.
 - Treat **6. Recovery-Critical Historical Evidence** as evidence; it does not prove that a snapshot, local artifact, mount, or credential path still exists.
 - Review **8. Recovery Limitations and Outstanding Work** before relying on a protection domain.
-- For complete loss of the PVE computer, use the supplementary repository [PVE and Rotom Total-Loss Recovery guide](../guide/PVE-and-Rotom-Total-Loss-Recovery.md#emergency-recovery-path). The guide is not an RR member; this document retains ownership of backup architecture and ordinary restores.
+- For complete loss of the PVE computer, use the supplementary repository [PVE and Rotom Total-Loss Recovery guide](../guide/PVE-and-Rotom-Total-Loss-Recovery.md#emergency-recovery-path). The guide is not an RS member; this document retains ownership of backup architecture and ordinary restores.
 - This file owns backup and restore claims; storage locations, automation schedules, and privilege boundaries remain canonical in documents 04, 06, and 07.
 
 ## Start by Task or Symptom
@@ -255,7 +255,7 @@ The VM-local `/srv/rotom/backup-staging` path is absent. Historical references t
 
 The 2026-10-14 audit found ten snapshots and a successful `restic check`. Manual post-credential-path snapshot `b5af666b` completed successfully, and the timer was enabled and active.
 
-PVE work remains Jared-executed where the RR labels it **PVE — Jared executes**.
+PVE work remains Jared-executed where the RS labels it **PVE — Jared executes**.
 
 ## 4. Rotom VM Backup
 
@@ -339,4 +339,4 @@ Stop if the repository is locked by active work, credentials are unavailable, th
 
 ## Maintenance and Revalidation Triggers
 
-Follow the canonical [Runbook-First Maintenance Standard](00-Rotom-Change-Log.md#runbook-first-maintenance-standard). Revalidate this document after a source path, exclusion, repository, credential path, timer, schedule, retention rule, archive destination, NAS snapshot policy, restore result, application persistence path, or recovery procedure changes. Revalidate the supplementary total-loss guide when one of its RR-owned dependencies changes.
+Follow the canonical [Runbook-First Maintenance Standard](00-Rotom-Change-Log.md#runbook-first-maintenance-standard). Revalidate this document after a source path, exclusion, repository, credential path, timer, schedule, retention rule, archive destination, NAS snapshot policy, restore result, application persistence path, or recovery procedure changes. Revalidate the supplementary total-loss guide when one of its RS-owned dependencies changes.

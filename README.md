@@ -1,8 +1,8 @@
-# Rotom Runbook
+# Rotom Support
 
-This repository is the Git working copy for the **Rotom Runbook** (**RR**): a nine-file, runbook-first operating manual and evidence-based reference for Rotom.
+This repository is the Git working copy for the **Rotom Support** (**RS**): a nine-file, runbook-first operating manual and evidence-based reference for Rotom.
 
-The RR describes supported state. It distinguishes **Current**, **Historical**, **Retired**, **Proposed**, and **Needs Verification** information so that plans and old evidence are not mistaken for live configuration.
+The RS describes supported state. It distinguishes **Current**, **Historical**, **Retired**, **Proposed**, and **Needs Verification** information so that plans and old evidence are not mistaken for live configuration.
 
 ## Start here
 
@@ -17,7 +17,7 @@ Use this reading order for administration or recovery:
 
 ## Documentation map
 
-The current RR consists of the Core Numbered Reference Set in `runbook/`:
+The current RS consists of the Core Numbered Reference Set in `runbook/`:
 
 | Document | Purpose |
 | --- | --- |
@@ -31,26 +31,26 @@ The current RR consists of the Core Numbered Reference Set in `runbook/`:
 | [07 - Users and Permissions](runbook/07-Users-and-Permissions.md) | Identity, ownership, permission, privilege, and access operations |
 | [08 - Rotom Directory Tree](runbook/08-Rotom-Directory-Tree.txt) | Current filesystem reference with historical paths clearly separated |
 
-Available Sources defines the RR membership boundary. Repository-support files, including this README, are not RR members unless intentionally added to Available Sources. The current source map and membership details live in [01 - Rotom Server Inventory](runbook/01-Rotom-Server-Inventory.md).
+Available Sources defines the RS membership boundary. Repository-support files, including this README, are not RS members unless intentionally added to Available Sources. The current source map and membership details live in [01 - Rotom Server Inventory](runbook/01-Rotom-Server-Inventory.md).
 
 ## Supplementary guides
 
-Every file under `guide/` is a repository guide that remains separate from the RR, Core Numbered Reference Set, Available Sources, RR-only validation, and RR publication. Use [PVE and Rotom Total-Loss Recovery](guide/PVE-and-Rotom-Total-Loss-Recovery.md) for blank-hardware disaster-recovery orchestration and acceptance.
+Every file under `guide/` is a repository guide that remains separate from the RS, Core Numbered Reference Set, Available Sources, RS-only validation, and RS publication. Use [PVE and Rotom Total-Loss Recovery](guide/PVE-and-Rotom-Total-Loss-Recovery.md) for blank-hardware disaster-recovery orchestration and acceptance.
 
 ## Using this repository
 
 - Treat dated evidence and explicit state labels as more authoritative than unstated assumptions.
-- Use the current RR documents for operational reference; do not use older change-log entries as instructions to recreate prior state.
-- Read the canonical maintenance contract in [00 - Rotom Change Log](runbook/00-Rotom-Change-Log.md) before preparing an RR change.
-- Use the guarded `rr` helper for normal repository operations. `rr path` resolves the active checkout.
-- Run the repository's offline `support/tooling/rr lint` validation before synchronization checks. After the matching helper version is installed, `rr lint` is equivalent.
-- From any directory, run `bash "$(rr path)/support/tooling/test-rr-runbooks"` to validate only the numbered runbook-first RR's permanent structure and nine-file membership.
-- Run `bash "$(rr path)/support/tooling/test-guides"` separately to validate files under `guide/` without changing RR membership.
+- Use the current RS documents for operational reference; do not use older change-log entries as instructions to recreate prior state.
+- Read the canonical maintenance contract in [00 - Rotom Change Log](runbook/00-Rotom-Change-Log.md) before preparing an RS change.
+- Use the guarded `rs` helper for normal repository operations. `rs path` resolves the active checkout.
+- Run the repository's offline `support/tooling/rs lint` validation before synchronization checks. After the matching helper version is installed, `rs lint` is equivalent.
+- From any directory, run `bash "$(rs path)/support/tooling/test-rr-runbooks"` to validate only the numbered runbook-first RS's permanent structure and nine-file membership.
+- Run `bash "$(rs path)/support/tooling/test-guides"` separately to validate files under `guide/` without changing RS membership.
 
 ## Safety
 
 Never commit passwords, tokens, private keys, VPN credentials, cookies, Home Assistant secrets, Restic passwords, or other authentication material. Do not publish or share repository contents without reviewing them for sensitive operational, personal, or infrastructure information.
 
-## Keeping the RR current
+## Keeping the RS current
 
-The canonical RR maintenance contract is [00 - Rotom Change Log](runbook/00-Rotom-Change-Log.md). It defines the required evidence standard, consistency review, state labels, dated change-history entries, and the supported publication workflow. This README is repository navigation and does not replace that contract.
+The canonical RS maintenance contract is [00 - Rotom Change Log](runbook/00-Rotom-Change-Log.md). It defines the required evidence standard, consistency review, state labels, dated change-history entries, and the supported publication workflow. This README is repository navigation and does not replace that contract.

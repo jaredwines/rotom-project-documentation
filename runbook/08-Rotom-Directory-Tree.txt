@@ -1,5 +1,5 @@
 # 08 - Rotom Directory Tree
-# Documentation set: Rotom Runbook
+# Documentation set: Rotom Support
 # Document role: Concise current filesystem topology and recovery-critical paths.
 # Configuration semantics remain canonical in documents 02 through 07.
 # Index: 01-Rotom-Server-Inventory.md
@@ -95,8 +95,8 @@
 #   desktop-commander/                    active locked service home/application root
 #
 # /home/
-#   jared/                                human administrator; canonical RR checkout below
-#     rotom-support/                       canonical RR checkout
+#   jared/                                human administrator; canonical RS checkout below
+#     rotom-support/                       canonical RS checkout
 #   fran/                                 human administrator
 #
 # CURRENT SERVICE IDENTITIES
@@ -166,25 +166,26 @@
 # guest Shared Drive mount retired; separately authorized NAS access required
 #
 # RECOVERY RULES
-# Supplementary total-loss guide: guide/PVE-and-Rotom-Total-Loss-Recovery.md (not an RR member).
+# Supplementary total-loss guide: guide/PVE-and-Rotom-Total-Loss-Recovery.md (not an RS member).
 # - Verify an exact recovery point before use.
 # - Restore into an isolated target when practical.
 # - Preserve numeric identity, modes, ACLs, secret boundaries, and non-creating binds.
 # - Do not overwrite production merely to test recoverability.
 # - Do not manually alter Restic repository internals.
 # - Do not infer NAS-side deletion from a retired guest mount.
-# - Keep PVE actions Jared-executed where the RR labels them that way.
+# - Keep PVE actions Jared-executed where the RS labels them that way.
 #
-# RR / CODEX / GITHUB
-# /home/jared/rotom-support/                              canonical RR checkout
-# /home/jared/rotom-support/runbook/                      numbered RR documents 00–08
+# RS / CODEX / GITHUB
+# /home/jared/rotom-support/                              canonical RS checkout
+# /home/jared/rotom-support/runbook/                      numbered RS documents 00–08
 # /home/jared/rotom-support/Architecture/                 empty repository directory, Git placeholder only
 # /srv/rotom/appdata/platform/mkdocs-rr/repository/        root-owned Rotom Support publisher clone
 # /srv/rotom/appdata/platform/mkdocs-rr/repository.pre-runbook-directory-20261016/  preserved former publisher clone
 # /srv/rotom/{stacks,appdata}/platform/rotom-docs/         retained inactive rollback paths
-# /usr/local/bin/rr                                      canonical installed helper
+# /usr/local/bin/rs                                      canonical installed helper
+# /usr/local/bin/rr                                      compatibility wrapper
 # /home/jared/.config/rr/repository                      private path configuration
-# Available Sources remains the RR membership boundary and replacement is manual.
+# Available Sources remains the RS membership boundary and replacement is manual.
 #
 # NEEDS VERIFICATION
 # - Arcane exclusions and intended long-term automatic-update/auto-heal policy.

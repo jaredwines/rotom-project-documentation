@@ -60,14 +60,16 @@ do
 done
 
 require_text 00-Rotom-Change-Log.md "### Runbook-First Maintenance Standard"
-require_text 00-Rotom-Change-Log.md "An RR update is incomplete if it changes how Rotom is operated, diagnosed, maintained, or recovered"
+require_text 00-Rotom-Change-Log.md "An RS update is incomplete if it changes how Rotom is operated, diagnosed, maintained, or recovered"
 require_text 00-Rotom-Change-Log.md "support/tooling/test-rr-runbooks"
-require_text 00-Rotom-Change-Log.md 'The sole canonical documentation-update command is **`Update the RR`**'
-require_text README.md "# Rotom Runbook"
-require_text AGENTS.md "## RR Git workflow"
-require_text AGENTS.md 'Every file under `guide/` is separate from Rotom Runbook'
-require_text README.md 'Every file under `guide/` is a repository guide that remains separate from the RR'
+require_text 00-Rotom-Change-Log.md 'The sole canonical documentation-update command is **`Update the RS`**'
+require_text README.md "# Rotom Support"
+require_text AGENTS.md "## RS Git workflow"
+require_text AGENTS.md 'Every file under `guide/` is separate from Rotom Support'
+require_text README.md 'Every file under `guide/` is a repository guide that remains separate from the RS'
+require_file support/tooling/rs
 require_file support/tooling/rr
+require_file support/tooling/test-rs-cli
 require_file support/tooling/test-rr-cli
 require_file support/tooling/test-guides
 require_file support/website/home.md

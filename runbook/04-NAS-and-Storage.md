@@ -1,6 +1,6 @@
 # 04 - Rotom NAS and Storage Architecture
 
-**Documentation set:** Rotom Runbook
+**Documentation set:** Rotom Support
 **Document role:** Canonical source for NAS exports, NFS mounts, storage layout, automount behavior, and storage contracts
 **Hosts:** PVE hypervisor `pve`, Debian VM `rotom`, and UniFi UNAS 2  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
