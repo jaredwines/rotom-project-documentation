@@ -15,6 +15,8 @@ Repository support files such as root `AGENTS.md`, `.gitignore`, `README.md`, an
 
 Use the `rr` helper for normal RR Git operations.
 
+On Rotom, when the sandbox restricts `.git` or GitHub access, request the needed execution access **before** running `rr check`, `rr commit`, `rr push`, or other affected Git operations. Do not first run them in the restricted sandbox. Follow the stop-on-failure rules in `00-Rotom-Change-Log.md`.
+
 - Use `rr path` to resolve the active local checkout.
 - Use `rr status`, `rr check`, `rr pull`, `rr diff`, `rr log`, `rr commit`, and `rr push` rather than bypassing the helper's guardrails.
 - Do not hard-code Mac or Rotom checkout paths in shared workflow instructions.

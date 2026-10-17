@@ -93,6 +93,10 @@ The older reboot-capable `weekly-linux-update` script exists, but its cron sched
 
 PVE actions remain Jared-executed where labelled.
 
+### Bluetooth adapter
+
+PVE VM 100 passes the Intel Bluetooth adapter (`8087:0aaa`) to Rotom as `usb1`; the existing ConBee II uses `usb0`. Rotom has the Debian `bluez` and `firmware-iwlwifi` packages, and `bluetooth.service` is enabled. After Jared rebooted PVE on 2026-10-16, Rotom detected the adapter, the service was active, and the powered controller was discovering nearby devices. The current boot's kernel firmware log was not accessible during that check; pairing and data exchange with a specific device remain unverified. PVE passthrough is host-specific and must be revalidated when the host or adapter changes.
+
 ## 2. Libraries Recovery Automation
 
 The NAS recovery helper handles the boot-time race in which Docker requests Libraries before the NAS is reachable. It resets failed generated units, arms `mnt-nas\x2dlibraries.automount`, starts or triggers the exact mount, verifies the documented NFS source and required directories, and fails closed if the automount does not remain active.
@@ -152,6 +156,7 @@ The tracked `support/tooling/rr` owns offline lint. Before publication, the main
 - PVE iGPU option-ROM warning and historical reset/NIC stability only if symptoms recur.
 - Exact NAS snapshot settings and incident-specific recovery points.
 - Fran's deferred SSH-key setup.
+- Bluetooth pairing and data exchange with a specific device; post-reboot kernel firmware log verification.
 
 ## 9. Related Documentation
 
@@ -162,4 +167,4 @@ The tracked `support/tooling/rr` owns offline lint. Before publication, the main
 
 ## Maintenance and Revalidation Triggers
 
-Follow the canonical [Runbook-First Maintenance Standard](00-Rotom-Change-Log.md#runbook-first-maintenance-standard). Revalidate after a service, timer, schedule, worker, update policy, monitoring endpoint, maintenance procedure, RR tool, checkout path, or automation dependency changes.
+Follow the canonical [Runbook-First Maintenance Standard](00-Rotom-Change-Log.md#runbook-first-maintenance-standard). Revalidate after a service, timer, schedule, worker, update policy, monitoring endpoint, maintenance procedure, RR tool, checkout path, automation dependency, Bluetooth adapter, firmware, or PVE passthrough changes.

@@ -84,6 +84,14 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-16 — Record Bluetooth setup and reinforce RR access preflight
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `06-Maintenance-and-Automation.md`; repository support file `AGENTS.md`.
+- **Status:** **Implemented / Verified / Documentation only.**
+- **Changes:** Recorded PVE USB passthrough and Rotom Bluetooth packages, service, and reboot evidence. Added a prominent reminder to the repository instructions to obtain the execution access required for RR Git operations before running them in a restricted sandbox.
+- **Evidence:** Jared supplied the PVE configuration and applied `usb1` passthrough for Intel `8087:0aaa`. Rotom detected the adapter, loaded Intel firmware before reboot, and after the PVE reboot showed an active enabled service, powered controller, and device discovery. A sandboxed `rr check` failed to write Git metadata; the check subsequently passed with the required execution access.
+- **Outstanding:** Specific-device pairing and data exchange and the post-reboot firmware log were not verified. Available Sources replacement remains manual by Jared.
+
 ## 2026-10-16 — Clarify sandbox access for RR Git checks
 
 - **Files changed:** `00-Rotom-Change-Log.md`.
