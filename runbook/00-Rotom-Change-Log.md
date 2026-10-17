@@ -84,6 +84,13 @@ Keep future entries brief: the change log should point to the detailed documents
 
 ## Change History
 
+## 2026-10-16 — Verify the Mac RS installation
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`; Mac `/usr/local/bin/rs`.
+- **Status:** **Implemented / Verified**, with compatibility cutover outstanding.
+- **Evidence:** Jared installed `/usr/local/bin/rs` as `root:wheel` mode `0755`. Its SHA-256 `f263f681b55ce8f2dab3f7be7cf46e1d30ae3b8407a5d41e92501a39f427037c` matches the tracked implementation; `rs check` passed against clean GitHub `main`. Mac CLI, structural, and guide tests passed after the portability fixes. The existing Apple `/usr/bin/rs` was preserved; the login PATH resolves `/usr/local/bin/rs` first.
+- **Recovery / outstanding:** The old Mac `/usr/local/bin/rr` remains an independent implementation pending a root-owned backup and replacement with the tested compatibility wrapper. Desktop Commander blocks privileged commands, so Jared must perform that installation. Available Sources replacement remains manual. Existing Mac checkout and publisher paths are intentionally retained.
+
 ## 2026-10-16 — Correct validation portability on the Mac
 
 - **Files changed:** `00-Rotom-Change-Log.md` and repository support files `support/tooling/test-rr-runbooks` and `support/tooling/test-guides`.
