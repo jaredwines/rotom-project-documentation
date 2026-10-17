@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RR maintenance contract
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-16 — Record Mac verification after repository rename
+**Documentation updated:** 2026-10-16 — Move the Rotom checkout to rotom-support
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -83,6 +83,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-16 — Move the Rotom checkout to rotom-support
+
+- **Files changed:** `00-Rotom-Change-Log.md`, `01-Rotom-Server-Inventory.md`, `06-Maintenance-and-Automation.md`, `08-Rotom-Directory-Tree.txt`; Rotom checkout location and private `rr` resolver configuration.
+- **Status:** **Implemented / Verified.**
+- **Changes:** Moved Jared's Rotom checkout from `/home/jared/documentation/rotom-runbook` to `/home/jared/rotom-support` and updated its private resolver. The GitHub origin, Mac checkout, and separate Support publisher checkout were not moved. Earlier path records remain historical evidence.
+- **Evidence:** Before the move, `rr check` passed on a clean checkout matching GitHub, the destination was absent, and both paths were on the same filesystem. After the move, `rr path` and `rr check` confirmed the new checkout and GitHub synchronization.
+- **Outstanding:** Available Sources replacement remains manual by Jared; the Mac checkout needs a routine pull for these documentation changes.
 
 ## 2026-10-16 — Verify the Mac after the repository rename
 

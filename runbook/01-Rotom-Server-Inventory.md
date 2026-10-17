@@ -4,7 +4,7 @@
 **Document role:** Task-first starting page, symptom router, architecture overview, and source map
 **Hosts:** PVE hypervisor `pve` and portable Debian VM `rotom`  
 **Baseline verified:** Mixed evidence dates; see section-level evidence notes  
-**Documentation updated:** 2026-10-16 — Record repository Architecture directory
+**Documentation updated:** 2026-10-16 — Record the Rotom checkout move
 **Related canonical sources:** `02-Docker-Services.md`, `03-Network-and-Domains.md`, `04-NAS-and-Storage.md`, `05-Backup-and-Restore.md`, `06-Maintenance-and-Automation.md`, `07-Users-and-Permissions.md`, `08-Rotom-Directory-Tree.txt`
 **Change history and update rules:** [00-Rotom-Change-Log.md](00-Rotom-Change-Log.md)
 
@@ -133,7 +133,7 @@ The alerting worker, units, timers, scripts, Homepage integration, and delivery 
 
 Rotom Runbook is every file intentionally kept in the project's Available Sources. The numbered files `00`–`08` in the checkout's `runbook/` directory are the complete current nine-file Core Numbered Reference Set. Every file under `guide/` is a separate repository guide, not an RR member, and must remain outside Available Sources, RR-only validation, and RR publication. Repository support files such as `AGENTS.md`, `README.md`, and `support/tooling/*` are likewise not RR members merely because they are tracked. Available Sources replacement remains manual by Jared.
 
-The RR checkout is `/home/jared/documentation/rotom-runbook` on Rotom and `/Users/jared/Documents/ChatGPT/rotom-runbook` on the Mac. In each environment, `rr path` resolves the checkout through `~/.config/rr/repository`; append `runbook/` to locate the numbered files. Available Sources replacement remains manual by Jared.
+The RR checkout is `/home/jared/rotom-support` on Rotom and `/Users/jared/Documents/ChatGPT/rotom-runbook` on the Mac. In each environment, `rr path` resolves the checkout through `~/.config/rr/repository`; append `runbook/` to locate the numbered files. Available Sources replacement remains manual by Jared.
 
 The checkout also has an `Architecture/` directory, currently containing only a Git placeholder; it has no current RR source. It is distinct from the existing supplementary website input `support/website/architecture/index.md`.
 
