@@ -224,15 +224,15 @@ run_check() {
     local file
 
     local required_files=(
-        "00-Rotom-Change-Log.md"
-        "01-Rotom-Server-Inventory.md"
-        "02-Docker-Services.md"
-        "03-Network-and-Domains.md"
-        "04-NAS-and-Storage.md"
-        "05-Backup-and-Restore.md"
-        "06-Maintenance-and-Automation.md"
-        "07-Users-and-Permissions.md"
-        "08-Rotom-Directory-Tree.txt"
+        "runbook/00-Rotom-Change-Log.md"
+        "runbook/01-Rotom-Server-Inventory.md"
+        "runbook/02-Docker-Services.md"
+        "runbook/03-Network-and-Domains.md"
+        "runbook/04-NAS-and-Storage.md"
+        "runbook/05-Backup-and-Restore.md"
+        "runbook/06-Maintenance-and-Automation.md"
+        "runbook/07-Users-and-Permissions.md"
+        "runbook/08-Rotom-Directory-Tree.txt"
     )
 
     require_user
@@ -464,15 +464,15 @@ run_lint() {
     local issue
 
     local markdown_files=(
-        "00-Rotom-Change-Log.md"
-        "01-Rotom-Server-Inventory.md"
-        "02-Docker-Services.md"
-        "03-Network-and-Domains.md"
-        "04-NAS-and-Storage.md"
-        "05-Backup-and-Restore.md"
-        "06-Maintenance-and-Automation.md"
-        "07-Users-and-Permissions.md"
-        "08-Rotom-Directory-Tree.txt"
+        "runbook/00-Rotom-Change-Log.md"
+        "runbook/01-Rotom-Server-Inventory.md"
+        "runbook/02-Docker-Services.md"
+        "runbook/03-Network-and-Domains.md"
+        "runbook/04-NAS-and-Storage.md"
+        "runbook/05-Backup-and-Restore.md"
+        "runbook/06-Maintenance-and-Automation.md"
+        "runbook/07-Users-and-Permissions.md"
+        "runbook/08-Rotom-Directory-Tree.txt"
         "AGENTS.md"
         "README.md"
     )
@@ -549,7 +549,7 @@ run_lint() {
                     my $target = $1;
                     my $start = $-[1];
                     next if $start >= 8 && substr($text, $start - 8, 8) eq q{history/};
-                    my $path = File::Spec->catfile($root, $target);
+                    my $path = File::Spec->catfile($root, q{runbook}, $target);
                     if (!-e $path && !$reported{"$file\0$target"}++) {
                         print "$file -> $target\n";
                     }

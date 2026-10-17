@@ -17,7 +17,7 @@ Record substantive changes to this document in the change log as part of the sam
 - Use **7. Restore Procedure** for recovery planning, while verifying the selected recovery point and current target paths before action.
 - Treat **6. Recovery-Critical Historical Evidence** as evidence; it does not prove that a snapshot, local artifact, mount, or credential path still exists.
 - Review **8. Recovery Limitations and Outstanding Work** before relying on a protection domain.
-- For complete loss of the PVE computer, use the supplementary repository [PVE and Rotom Total-Loss Recovery guide](guide/PVE-and-Rotom-Total-Loss-Recovery.md#emergency-recovery-path). The guide is not an RR member; this document retains ownership of backup architecture and ordinary restores.
+- For complete loss of the PVE computer, use the supplementary repository [PVE and Rotom Total-Loss Recovery guide](../guide/PVE-and-Rotom-Total-Loss-Recovery.md#emergency-recovery-path). The guide is not an RR member; this document retains ownership of backup architecture and ordinary restores.
 - This file owns backup and restore claims; storage locations, automation schedules, and privilege boundaries remain canonical in documents 04, 06, and 07.
 
 ## Start by Task or Symptom
@@ -29,7 +29,7 @@ Record substantive changes to this document in the change log as part of the sam
 | Verify repository structure or full pack readability | Use the assurance-level guidance in this document; do not confuse snapshot creation with `restic check` or `restic check --read-data` |
 | Restore data | Select a known recovery point and restore to an isolated restricted staging location before planning live replacement |
 | PVE Restic or Rotom VM VZDump work | Use the PVE sections in this document; all PVE actions are **PVE — Jared executes** |
-| Rebuild from blank replacement hardware | Use the supplementary [PVE and Rotom Total-Loss Recovery guide](guide/PVE-and-Rotom-Total-Loss-Recovery.md#emergency-recovery-path) |
+| Rebuild from blank replacement hardware | Use the supplementary [PVE and Rotom Total-Loss Recovery guide](../guide/PVE-and-Rotom-Total-Loss-Recovery.md#emergency-recovery-path) |
 
 ## Run and Verify Rotom Restic Backup
 

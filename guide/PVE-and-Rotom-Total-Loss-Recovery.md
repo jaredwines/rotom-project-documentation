@@ -5,9 +5,9 @@
 **Scenario:** Replacement hardware; original PVE installation, local disks, and running Rotom VM are unavailable
 **Evidence baseline:** PVE and Rotom read-only inspection on 2026-10-16
 **Documentation updated:** 2026-10-16 — Harden emergency execution and evidence controls
-**Routine backup authority:** [05 - Backup and Restore](../05-Backup-and-Restore.md)
-**RR index:** [01 - Rotom Server Inventory](../01-Rotom-Server-Inventory.md)
-**RR dependency governance:** [00 - Rotom Change Log](../00-Rotom-Change-Log.md#current-documentation-maintenance-rules)
+**Routine backup authority:** [05 - Backup and Restore](../runbook/05-Backup-and-Restore.md)
+**RR index:** [01 - Rotom Server Inventory](../runbook/01-Rotom-Server-Inventory.md)
+**RR dependency governance:** [00 - Rotom Change Log](../runbook/00-Rotom-Change-Log.md#current-documentation-maintenance-rules)
 
 This supplementary guide provides **total-loss recovery orchestration** without becoming part of the RR. RR document 05 retains ownership of backup architecture, schedules, retention, assurance levels, routine checks, and ordinary restores; the other numbered RR documents retain their existing subject ownership. Commands in this guide are examples only where their syntax and current Rotom context were verified. Every selected snapshot, archive, device, interface, storage target, and recovery point must still be recorded and checked at incident time.
 
@@ -1103,4 +1103,4 @@ An unresolved row does not make the guide unsafe; it deliberately blocks the dep
 
 ## Maintenance and Revalidation Triggers
 
-This file is a supplementary guide, not an RR member. Revalidate it after any PVE/Rotom version, VM hardware, VMID, address/MAC, storage/export, repository, staging path, backup scope, schedule/retention, credential location, NAS snapshot procedure, application persistence/database, UID/GID/ACL, Compose path, proxy/DNS/TLS, hardware passthrough, acceptance test, or official restore-command change. If a guide update changes an RR-owned fact or procedure, update the owning RR document under the [Runbook-First Maintenance Standard](../00-Rotom-Change-Log.md#runbook-first-maintenance-standard). Re-run the complete guide structure, link, secret-pattern, and Mermaid checks whenever headings, anchors, labels, or diagrams change.
+This file is a supplementary guide, not an RR member. Revalidate it after any PVE/Rotom version, VM hardware, VMID, address/MAC, storage/export, repository, staging path, backup scope, schedule/retention, credential location, NAS snapshot procedure, application persistence/database, UID/GID/ACL, Compose path, proxy/DNS/TLS, hardware passthrough, acceptance test, or official restore-command change. If a guide update changes an RR-owned fact or procedure, update the owning RR document under the [Runbook-First Maintenance Standard](../runbook/00-Rotom-Change-Log.md#runbook-first-maintenance-standard). Re-run the complete guide structure, link, secret-pattern, and Mermaid checks whenever headings, anchors, labels, or diagrams change.

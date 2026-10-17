@@ -60,15 +60,16 @@ git init --bare "$REMOTE" >/dev/null
 git init -b main "$SEED" >/dev/null
 git -C "$SEED" config user.name "RR Fixture"
 git -C "$SEED" config user.email "rr-fixture@example.invalid"
+mkdir -p "$SEED/runbook"
 
 for file in \
     00-Rotom-Change-Log.md 01-Rotom-Server-Inventory.md 02-Docker-Services.md \
     03-Network-and-Domains.md 04-NAS-and-Storage.md 05-Backup-and-Restore.md \
     06-Maintenance-and-Automation.md 07-Users-and-Permissions.md
 do
-    printf '# %s\n' "$file" >"$SEED/$file"
+    printf '# %s\n' "$file" >"$SEED/runbook/$file"
 done
-printf '# Directory Tree\n' >"$SEED/08-Rotom-Directory-Tree.txt"
+printf '# Directory Tree\n' >"$SEED/runbook/08-Rotom-Directory-Tree.txt"
 printf '# Fixture instructions\n' >"$SEED/AGENTS.md"
 printf '# Fixture readme\n' >"$SEED/README.md"
 

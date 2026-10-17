@@ -4,7 +4,7 @@
 **Document role:** Canonical history of documentation/server changes, adopted decisions, corrections, status, outstanding checks, and the sole RR maintenance contract
 **Scope:** Rotom system history across bare metal, Proxmox host, and portable VM  
 **Baseline verified:** Historical record; evidence dates are entry-specific  
-**Documentation updated:** 2026-10-16 — Establish `guide/` as a hard boundary outside RR
+**Documentation updated:** 2026-10-16 — Place the numbered RR in `runbook/`
 **Related canonical sources:** `01-Rotom-Server-Inventory.md` through `08-Rotom-Directory-Tree.txt`
 
 
@@ -83,6 +83,14 @@ Keep future entries brief: the change log should point to the detailed documents
 ```
 
 ## Change History
+
+## 2026-10-16 — Place the numbered RR in `runbook/`
+
+- **Files changed:** All nine numbered RR documents were moved into `runbook/`; repository instructions, README, guide links, and RR tooling were updated for the new paths.
+- **Status:** **Documentation and repository tooling change.**
+- **Changes:** The checkout root still identifies the repository via `rr path`; append `runbook/` for the numbered documents. The separate `guide/` boundary and the existing filenames remain unchanged.
+- **Evidence:** Repository path, link, structural, and isolated helper tests pass against the new layout. Rotom's global Codex instructions now identify the new directory.
+- **Outstanding:** The installed Rotom helper, Mac helper and checkout, and Rotom Support publisher require synchronization with the new paths. The live publisher continues serving its previously generated site until its guarded publisher is updated and successfully run. Available Sources replacement remains manual by Jared.
 
 ## 2026-10-16 — Establish `guide/` as a hard boundary outside RR
 
